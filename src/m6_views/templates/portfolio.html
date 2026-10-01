@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% import "icons.html" as icon %}
+{% block title %}Your portfolio{% endblock %}
+
+{#
+  Your portfolio (DECISIONS V1-82). A visitor picks funds and enters what they
+  put in; `portfolio.js` works out the rest in their browser from the NAVs and
+  holdings this site publishes. Nothing entered is sent anywhere: it is kept in
+  this browser's storage and, if asked, in a file the visitor saves.
+#}
+{% block content %}
+<section class="plain pf" data-portfolio data-root="{{ root }}">
+  <p class="eyebrow">Your portfolio</p>
+  <h1>What your funds are worth, and what they own</h1>
+  <p class="lede">
+    Pick the funds you hold and enter what you put in, as lump sums or SIPs. The
+    figures are worked out in this browser from the prices and holdings this site
+    publishes; nothing you enter is sent anywhere.
+  </p>
+  <noscript><p class="pf__note">This page works out your figures in the browser,
+    so it needs JavaScript. Nothing you enter would be sent anywhere.</p></noscript>
+
+  <div class="pf__toolbar">
+    <button type="button" class="button" data-action="save">Save to file</button>
+    <button type="button" class="button" data-action="load">Load from file</button>
+    <button type="button" class="button button--quiet" data-action="clear">Clear</button>
+    <input type="file" id="pf-file" accept="application/json,.json" hidden>
+  </div>
+  <p class="pf__status" id="pf-status" role="status"></p>
+
+  <div class="card pf__entry">
+    <label class="pf__label" for="pf-pick" id="pf-pick-label">Add a fund</label>
+    <input id="pf-pick" class="pf__pick" list="pf-funds" autocomplete="off"
+           placeholder="Type part of a fund's name" disabled>
+    <datalist id="pf-funds"></datalist>
+    <p class="pf__hint">Direct plans are listed. A Regular plan can be entered as its
+      Direct version; its value here then reads higher than your statement, by the
+      difference in cost.</p>
+    <div data-out="holdings"></div>
+  </div>
+
+  <section class="home-section" aria-labelledby="pf-summary-h">
+    <div class="section-head"><h2 id="pf-summary-h">Summary</h2></div>
+    <div data-out="summary"></div>
+  </section>
+  <section class="home-section" aria-labelledby="pf-funds-h">
+    <div class="section-head"><h2 id="pf-funds-h">Your funds</h2></div>
+    <div data-out="funds"></div>
+  </section>
+  <section class="home-section" aria-labelledby="pf-look-h">
+    <div class="section-head"><h2 id="pf-look-h">What you own, through all your funds</h2>
+      <p>From each fund's latest disclosure, weighted by what your holding in it is worth.</p></div>
+    <div data-out="look"></div>
+  </section>
+  <section class="home-section" aria-labelledby="pf-alts-h">
+    <div class="section-head"><h2 id="pf-alts-h">The same money in other funds</h2>
+      <p>Each fund beside others of its category: what the same amounts on the same
+        dates would be worth today.</p></div>
+    <div data-out="alts"></div>
+  </section>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ root }}/static/portfolio-math.js" defer></script>
+<script src="{{ root }}/static/portfolio.js" defer></script>
+{% endblock %}

@@ -313,8 +313,11 @@ python -m http.server -d site 8000                      # then open http://127.0
 
 Its front page maps how funds are organised and shows each large equity category's
 highest three-year returns; `/funds/` lists every published fund in one table you can
-sort by size, cost, return or category rank, and narrow by category. It carries AMFI's
-figures and fund houses' own disclosures, and nothing else:
+sort by size, cost, return or category rank, and narrow by category; `/portfolio/`
+builds your own portfolio from the funds you pick and what you put in, works out its
+value, return and look-through in your browser, and sets each fund beside others of
+its category, with nothing you enter leaving the browser. It carries AMFI's figures
+and fund houses' own disclosures, and nothing else:
 
 - **Benchmarks by proxy.** NSE's index levels are licensed for personal use, so the
   public copy leaves them out. Where an index fund declares the same benchmark as a
@@ -449,6 +452,7 @@ recomputes the reference portfolio without importing any of the code it checks.
 ```bash
 pip install -e ".[dev,cas]" -c requirements.lock   # inside .venv; start.py installs [cas] only
 python -m pytest -q                                # 1,626 tests, hermetic, no network
+node --test "tests/js/*.test.mjs"                  # the portfolio page's arithmetic, against the ledger's
 python -m ruff check .
 python -m mypy                                     # strict
 python -m scripts.verify_v0_ledger --check         # the independent ledger verifier

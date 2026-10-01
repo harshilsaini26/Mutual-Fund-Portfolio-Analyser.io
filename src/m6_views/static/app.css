@@ -1229,3 +1229,26 @@ body { font-size: 15.5px; overflow-x: clip; }  /* a full-bleed hero is 100vw, sc
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* Your portfolio (V1-82) */
+.pf__toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+.pf__status { min-height: 1.4em; color: var(--ink-soft); font-size: 13px; }
+.pf__note, .pf__hint, .pf__estimate { color: var(--ink-soft); font-size: 13px; max-width: 72ch; }
+.pf__entry { display: grid; gap: 10px; margin-bottom: 28px; }
+.pf__label { font-weight: 650; }
+.pf__pick { width: min(100%, 560px); }
+.pf__holding { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 8px; }
+.pf__holding-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+.pf__holding-head h3 { margin: 0; font-size: 15px; }
+.pf__row { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.pf__field { display: grid; gap: 2px; font-size: 12.5px; color: var(--ink-soft); }
+.pf__field input { min-width: 9em; }
+.pf__error { flex-basis: 100%; margin: 0; color: var(--loss); font-size: 12.5px; }
+.pf__add { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.pf__tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.pf__tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+.pf__tile dt { color: var(--ink-faint); font-size: 12.5px; }
+.pf__tile dd { margin: 2px 0 0; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pf__alt { display: grid; gap: 8px; margin-bottom: 20px; }
+.pf__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.button--quiet { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--line-strong); }

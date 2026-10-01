@@ -263,6 +263,10 @@ pushes one commit to `gh-pages`. Measured on the first full build, 2026-09-26:
   an index fund that declares the same benchmark on its Groww page, named as such.
   The crawl map gained that column on 2026-09-26, so proxies fill in as pages are
   read, about 100 a night.
+- **Your portfolio** (V1-82): pick funds, enter lump sums and SIPs; value, XIRR,
+  look-through and the same money in up to three other funds of each category, all
+  worked out in the browser and pinned to the ledger's arithmetic by
+  `tests/fixtures/portfolio_cases.json`.
 
 ## Benchmarks
 
@@ -594,10 +598,10 @@ Phase 2 (every fund, its peers and its cost, built nightly) is done. In order:
 
 - **Compare**: two to four funds side by side, with how much their portfolios
   overlap.
-- **Your portfolio**: import a CAS statement in the browser rather than the
-  terminal; a home page of what you have, what it has returned, and what the
-  same money would be in the benchmark index; the Regular-plan cost in rupees;
-  the nine portfolio views gathered into two pages.
+- **Your portfolio, next**: redemptions and switches, IDCW plans, what a
+  Regular plan cost you in rupees, and the local app's nine portfolio views
+  gathered into two pages. Building a portfolio in the browser is done
+  (V1-82).
 
 Then the data work already planned:
 

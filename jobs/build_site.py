@@ -50,7 +50,6 @@ from src.m0_data.store import (
     restore,
     restore_fetched,
     restore_holdings,
-    save,
     save_fetched,
     save_holdings,
 )
@@ -150,7 +149,7 @@ def build(out: Path, store_root: Path | None, base: str, workdir: Path,
         print("\n== the pages", flush=True)
         summary = publish_site.build_site(
             conn, out, base, today, declared_benchmarks(workdir / "groww.csv"))
-        kept = save(conn, out, live_funds(conn))
+        kept = summary["nav_files"]
         save_fetched(conn, out)
         print(f"  the store: {kept:,} funds, "
               f"{save_holdings(conn, out):,} of Groww's portfolios")

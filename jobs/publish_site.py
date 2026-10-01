@@ -52,6 +52,7 @@ from src.m0_data.categories import FAMILIES, category_of
 from src.m0_data.config import REPO_ROOT, warehouse_path
 from src.m0_data.normalise.index_id import index_key
 from src.m0_data.providers.warehouse import SchemeFacts, WarehouseMarketDataProvider
+from src.m0_data.store import save as save_navs
 from src.m0_data.universe import ISIN, live_funds
 from src.m1_ledger.db import apply_ledger_schema, connect_ledger
 from src.m1_ledger.providers.position import SqlitePositionProvider
@@ -81,6 +82,7 @@ STATIC_FILES = (
     "vendor/echarts.v6.1.0.min.js", "vendor/lenis.v1.3.26.min.js",
     "vendor/islands.v1.js", "fonts/rubik-latin-wght-normal.woff2",
     "fonts/terminess-Regular.woff2", "fonts/terminess-Bold.woff2",
+    "portfolio-math.js", "portfolio.js",
 )
 #: A file only this job writes, so a rebuild can tell its own output from a
 #: directory it must not delete.
@@ -202,6 +204,7 @@ def funds_to_publish(warehouse: Any) -> list[dict[str, str]]:
             "scheme_id": fund.scheme_id,
             "name": fund.name,
             "category": fund.category,
+            "amfi_code": fund.amfi_code or "",
             "detail": " · ".join(
                 str(x).title() if x in (fund.plan, fund.option) else str(x)
                 for x in (fund.category, fund.plan, fund.option)
@@ -273,6 +276,65 @@ def explorer_row(
         "rank_value": str(rank["quartile"]) if rank.get("quartile") else "",
         "rank_label": rank.get("label") or DASH,
         "rank_quarter": rank.get("quarter") or "",
+    }
+
+
+def fund_record(
+    row: dict[str, Any], detail: ViewEnvelope | None, prices_from: str | None,
+) -> dict[str, Any]:
+    """One fund for the portfolio page's picker and alternatives (V1-82).
+
+    The same figures the `/funds/` table shows, as text: the page compares and
+    sorts on them, and never re-derives them.
+    """
+    windows: dict[str, dict[str, Any]] = {}
+    if detail is not None and detail.state.value == "ok":
+        windows = {
+            r["window_key"]: r for r in detail.payload.get("rows", [])
+            if r["window_key"] in RETURN_WINDOWS and r.get("obs_days") is not None
+            and spans(int(r["obs_days"]), r["window_key"])
+        }
+
+    def text(value: Any) -> str | None:
+        return None if value in (None, "") else str(value)
+
+    three = windows.get("3y", {})
+    return {
+        "id": row["scheme_id"],
+        "amfi": row["amfi_code"],
+        "name": row["name"],
+        "category": row["category_key"],
+        "category_name": row["category_short"],
+        "prices_from": prices_from,
+        "ter": text(row["ter_value"]),
+        "size": text(row["size_value"]),
+        "r1": text(windows.get("1y", {}).get("return_ann")),
+        "r3": text(three.get("return_ann")),
+        "r5": text(windows.get("5y", {}).get("return_ann")),
+        "vol3": text(three.get("volatility_ann")),
+        "fall3": text(three.get("max_dd")),
+    }
+
+
+def lookthrough_file(lookthrough: Any, scheme: str, today: date) -> dict[str, Any] | None:
+    """What one fund holds, for the portfolio page's look-through (V1-82): the
+    figures its own `fund_portfolio` panel draws, by issuer id so the page can
+    add a company up across funds. None when no disclosure is loaded."""
+    found = lookthrough.fund_composition(SchemeId(scheme), today)
+    if found is None:
+        return None
+    fund, disclosed, tier = found
+    return {
+        "as_of": disclosed.isoformat(),
+        "aggregator": tier == "aggregator",
+        "holdings": [
+            [str(h.issuer_id), lookthrough.issuer_name(h.issuer_id),
+             h.instrument_class, str(h.weight)]
+            for h in fund.holdings
+        ],
+        "mix": [[k, str(v)] for k, v in fund.by_class],
+        "sectors": [[k, str(v)] for k, v in fund.by_sector],
+        "sizes": [[t.dimension_value, str(t.exposure_pct)] for t in fund.size],
     }
 
 
@@ -377,6 +439,12 @@ def build_site(
     engine = templates(root=base, static=True)
     shell = {"catalogue": [], "health": {}, "qs": "", "active": "", "built": today}
     funds = funds_to_publish(warehouse)
+    firsts = {
+        str(sid): str(first)[:10] for sid, first in warehouse.execute(
+            "SELECT scheme_id, min(nav_date) FROM nav_daily GROUP BY scheme_id")
+    }
+    records: list[dict[str, Any]] = []
+    (out / "data" / "lookthrough").mkdir(parents=True)
     rows: list[dict[str, Any]] = []
     houses: set[str] = set()
     with_holdings = 0
@@ -399,6 +467,11 @@ def build_site(
         panels = {p["env"].view_id: p["env"] for p in context["panels"]}
         rows.append(explorer_row(fund, facts, context["detail"]["env"],
                                  panels.get("fund_peers")))
+        records.append(fund_record(rows[-1], context["detail"]["env"], firsts.get(sid)))
+        held = lookthrough_file(deps.lookthrough, sid, today)
+        if held is not None:
+            (out / "data" / "lookthrough" / f"{sid}.json").write_text(
+                json.dumps(held, ensure_ascii=False), encoding="utf-8")
         if facts is not None and facts.amc_name:
             houses.add(facts.amc_name)
         for panel in context["panels"]:
@@ -456,6 +529,11 @@ def build_site(
     (out / "404.html").write_text(
         engine.get_template("notfound.html").render(shell), encoding="utf-8"
     )
+    (out / "portfolio").mkdir()
+    (out / "portfolio" / "index.html").write_text(
+        engine.get_template("portfolio.html").render({**shell, "active": "portfolio"}),
+        encoding="utf-8",
+    )
     (out / "search.json").write_text(
         json.dumps(
             [{"name": f["name"], "detail": f["detail"],
@@ -464,6 +542,9 @@ def build_site(
         ),
         encoding="utf-8",
     )
+    (out / "funds.json").write_text(
+        json.dumps(records, ensure_ascii=False), encoding="utf-8")
+    nav_files = save_navs(warehouse, out, live_funds(warehouse))
     for name in STATIC_FILES:
         target = out / "static" / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -472,7 +553,7 @@ def build_site(
 
     size = sum(p.stat().st_size for p in out.rglob("*") if p.is_file())
     check_budget(size)
-    return {"funds": len(funds), "bytes": size}
+    return {"funds": len(funds), "bytes": size, "nav_files": nav_files}
 
 
 def check_budget(size: int, budget: int = SITE_BUDGET_BYTES) -> None:

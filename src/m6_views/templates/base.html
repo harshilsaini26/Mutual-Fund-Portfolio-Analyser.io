@@ -72,6 +72,8 @@
   <nav class="topnav" aria-label="Main">
     <a class="topnav__link" href="{{ root }}/funds/"
        {% if active == 'funds' %}aria-current="page"{% endif %}>Explore funds</a>
+    <a class="topnav__link" href="{{ root }}/portfolio/"
+       {% if active == 'portfolio' %}aria-current="page"{% endif %}>Your portfolio</a>
     <a class="topnav__link" href="{{ root }}/#categories">Categories</a>
     <a class="topnav__link" href="{{ root }}/#about">About the data</a>
   </nav>

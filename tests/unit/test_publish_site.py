@@ -68,18 +68,18 @@ def warehouse(tmp_path: Path) -> sqlite3.Connection:
         "INSERT INTO benchmark_index (index_id, index_name, is_total_return)"
         " VALUES ('NSE:TEST_TRI', 'Test 50', 1)"
     )
-    for sid, plan, family in (
-        (DIRECT, "direct", "fund one"),
-        (REGULAR, "regular", "fund one"),  # one fund, two share classes
-        (AGGREGATED, "direct", "fund two"),
-        (SHORT, "direct", "fund three"),
+    for sid, plan, family, code in (
+        (DIRECT, "direct", "fund one", "900001"),
+        (REGULAR, "regular", "fund one", "900002"),  # one fund, two share classes
+        (AGGREGATED, "direct", "fund two", "900003"),
+        (SHORT, "direct", "fund three", "900004"),
     ):
         c.execute(
-            "INSERT INTO scheme (scheme_id, scheme_name, fund_name, plan, option,"
-            " amc_id, scheme_family, sebi_category, benchmark_id, status, last_seen)"
-            " VALUES (?,?,?,?,'growth','amc1',?,'Equity Scheme - Flexi Cap Fund',"
-            " 'NSE:TEST_TRI','active',?)",
-            (sid, family.title(), family.title(), plan, family, TODAY),
+            "INSERT INTO scheme (scheme_id, amfi_code, scheme_name, fund_name, plan,"
+            " option, amc_id, scheme_family, sebi_category, benchmark_id, status,"
+            " last_seen) VALUES (?,?,?,?,?,'growth','amc1',?,"
+            "'Equity Scheme - Flexi Cap Fund','NSE:TEST_TRI','active',?)",
+            (sid, code, family.title(), family.title(), plan, family, TODAY),
         )
     for sid in (DIRECT, REGULAR, AGGREGATED):
         _prices(c, sid, 300)
@@ -144,7 +144,7 @@ def test_one_page_per_fund_with_a_year_of_prices(site: Path) -> None:
 def test_every_link_works_from_the_project_subdirectory(site: Path) -> None:
     for html in site.rglob("*.html"):
         text = html.read_text(encoding="utf-8")
-        for link in re.findall(r'(?:href|src|action)="([^"]*)"', text):
+        for link in re.findall(r'(?<![\w-])(?:href|src|action)="([^"]*)"', text):
             assert link.startswith((BASE, "https://")), f"{html.name}: {link}"
         assert f'data-index="{BASE}/search.json"' in text  # the search box's list
         assert "/api/" not in text and "/view/" not in text and "/fragment/" not in text
@@ -174,6 +174,47 @@ def test_no_index_level_reaches_the_public_copy(site: Path) -> None:
     )
     # The benchmark column is there and empty.
     assert all(line.endswith(",") for line in growth.splitlines()[-3:])
+
+
+def test_funds_json_lists_every_published_fund_for_the_portfolio_page(site: Path) -> None:
+    funds = json.loads((site / "funds.json").read_text(encoding="utf-8"))
+    assert {f["id"] for f in funds} == {DIRECT, AGGREGATED}
+    one = next(f for f in funds if f["id"] == DIRECT)
+    assert set(one) == {"id", "amfi", "name", "category", "category_name",
+                        "prices_from", "ter", "size", "r1", "r3", "r5",
+                        "vol3", "fall3"}
+    assert one["amfi"] == "900001"
+    assert one["category"] == "equity/flexi_cap"
+    assert one["prices_from"] == (TODAY - timedelta(days=300)).isoformat()
+    assert one["r1"] is None or isinstance(one["r1"], str)  # Decimal as text
+
+
+def test_each_fund_with_a_disclosure_has_a_look_through_file(site: Path) -> None:
+    mine = json.loads((site / "data" / "lookthrough" / f"{DIRECT}.json")
+                      .read_text(encoding="utf-8"))
+    assert mine["as_of"] == "2026-08-31" and mine["aggregator"] is False
+    assert mine["holdings"] == [["ACME", "Acme", "equity", "100"]]
+    assert sum(Decimal(w) for _, _, _, w in mine["holdings"]) == 100
+    theirs = json.loads((site / "data" / "lookthrough" / f"{AGGREGATED}.json")
+                        .read_text(encoding="utf-8"))
+    assert theirs["aggregator"] is True
+
+
+def test_the_prices_the_page_reads_are_published_with_the_site(site: Path) -> None:
+    assert (site / "data" / "nav" / "900001.csv.gz").is_file()
+
+
+def test_the_portfolio_page_is_published_and_runs_only_from_this_site(site: Path) -> None:
+    page = (site / "portfolio" / "index.html").read_text(encoding="utf-8")
+    assert f'src="{BASE}/static/portfolio-math.js"' in page
+    assert f'src="{BASE}/static/portfolio.js"' in page
+    assert f'data-root="{BASE}"' in page
+    assert "nothing you enter is sent anywhere" in page
+    assert "default-src 'self'" in page  # the CSP meta tag is unchanged
+    assert (site / "static" / "portfolio.js").is_file()
+    assert (site / "static" / "portfolio-math.js").is_file()
+    home = (site / "index.html").read_text(encoding="utf-8")
+    assert f'href="{BASE}/portfolio/"' in home
 
 
 def test_an_index_funds_price_stands_in_for_the_benchmark_it_declares(
@@ -229,7 +270,10 @@ def test_the_policy_travels_in_the_page(site: Path) -> None:
     assert '<meta http-equiv="Content-Security-Policy"' in page
     assert "script-src 'self'" in page
     assert "A public copy of the fund pages" in page
-    assert "Your portfolio" not in page  # no portfolio navigation
+    # The local app's portfolio views stay out (V1-72); the public page that
+    # builds one in the browser is linked instead (V1-82).
+    assert "/view/" not in page and "sidenav" not in page
+    assert f'href="{BASE}/portfolio/"' in page
     assert f'href="{BASE}/fund/{DIRECT}/fund_growth.csv"' in page
 
 

@@ -103,6 +103,16 @@ jobs:
       - name: Tests
         run: python -m pytest -q
 
+      # The portfolio page's arithmetic runs in the visitor's browser
+      # (DECISIONS V1-82), so it is checked in JavaScript against the same
+      # cases the pytest above derives from the ledger. Built into Node: no npm.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Browser arithmetic
+        run: node --test "tests/js/*.test.mjs"
+
       # The golden portfolio, recomputed by a verifier that imports nothing from
       # `src/`. Exits 1 on any drift from the committed expectations, which is
       # what makes the fixtures a regression baseline rather than a snapshot.

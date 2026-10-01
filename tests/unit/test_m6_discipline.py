@@ -243,6 +243,14 @@ def test_no_prescriptive_language_in_the_templates() -> None:
     assert not offences, f"prescriptive language in templates: {offences}"
 
 
+def test_no_prescriptive_language_in_the_portfolio_page_script() -> None:
+    """The portfolio page writes its sentences in JavaScript (V1-82), out of
+    reach of the template lint, and it is the page most tempted to advise."""
+    script = (TEMPLATES.parent / "static" / "portfolio.js").read_text(encoding="utf-8")
+    offences = [p for p in PRESCRIPTIVE_PATTERNS if re.search(p, script, re.I)]
+    assert not offences, offences
+
+
 def test_no_template_carries_inline_style_or_script() -> None:
     """The CSP is `script-src 'self'; style-src 'self'`: an inline style is
     silently dropped and an inline handler never runs, so either is a page that
