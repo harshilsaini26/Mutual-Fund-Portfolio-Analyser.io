@@ -650,23 +650,6 @@ p.chart-table { font-size: 0.78125rem; color: var(--ink-faint); }
 /* --- sankey ---------------------------------------------------------------------- */
 
 .sankey { margin: 0; }
-.sankey svg { width: 100%; }
-.link { fill: none; stroke: var(--accent); stroke-opacity: 0.2; }
-.link:hover { stroke-opacity: 0.5; }
-/* Flow into missing mass is dashed as well as grey. */
-.link--synthetic { stroke: var(--synthetic); stroke-opacity: 0.4; stroke-dasharray: 5 3; }
-.node text {
-  font-size: 0.6875rem; fill: var(--ink); paint-order: stroke;
-  stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round;
-}
-.node--synthetic text { font-style: italic; }
-.node rect { stroke: var(--surface); stroke-width: 0.5; }
-.node--left rect { fill: var(--accent); }
-.node--right rect { fill: var(--sankey-right); }
-.node--aggregate rect { fill: var(--synthetic); }
-.node--synthetic rect { fill: url(#hatch); }
-.hatch__ground { fill: var(--surface-3); }
-.hatch__stripe { stroke: var(--synthetic); stroke-width: 3; }
 
 /* --- heatmap ----------------------------------------------------------------------- */
 

@@ -7,7 +7,7 @@
   "use strict";
   var M = window.PortfolioMath;
   var page = document.querySelector("[data-portfolio]");
-  if (!page || !M) return;
+  if (!page || !M || !window.Kit) return;
 
   var BASE = page.getAttribute("data-root") || "";
   var KEY = "lookthrough.portfolio.v1";
@@ -16,12 +16,12 @@
     "not a statement. Fund houses round units differently, by up to 0.001 of a unit.";
   var FUNDS = new Map();
   var BY_NAME = new Map();
-  var series = new Map();
   var replacing = null;         // {id: held fund's ISIN, slot: 0..2} while "Replace" is picking
   var generation = 0;           // the newest results() run; older runs do not draw
   var state = { version: 1, funds: [] };
 
-  var INR = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+  var K = window.Kit;
+  var el = K.el, fill = K.fill, bar = K.bar, CLASS = K.CLASS, INR = K.INR;
   function rupees(paise) { return INR.format(Math.round(paise / 100)); }
   function pct(x, dp) { return x.toFixed(dp == null ? 1 : dp) + "%"; }
   function signedPct(fraction) {
@@ -29,25 +29,7 @@
     return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1) + "%";
   }
 
-  function el(tag, attrs) {
-    var node = document.createElement(tag);
-    Object.keys(attrs || {}).forEach(function (k) {
-      if (attrs[k] != null && attrs[k] !== false) node.setAttribute(k, attrs[k] === true ? "" : attrs[k]);
-    });
-    for (var i = 2; i < arguments.length; i++) {
-      var c = arguments[i];
-      if (c == null || c === false) continue;
-      node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
-    }
-    return node;
-  }
   function out(name) { return page.querySelector('[data-out="' + name + '"]'); }
-  // replaceChildren writes null and false as text; this leaves them out.
-  function fill(box) {
-    box.replaceChildren.apply(box, Array.prototype.slice.call(arguments, 1).filter(function (c) {
-      return c != null && c !== false;
-    }));
-  }
   function say(text) { document.getElementById("pf-status").textContent = text; }
   function entries(n) { return n + (n === 1 ? " entry" : " entries"); }
 
@@ -68,26 +50,6 @@
   }
 
   // --- data ------------------------------------------------------------------
-  var gzipText = M.gzipText;
-  function navSeries(fund) {
-    if (!series.has(fund.id)) {
-      series.set(fund.id, fetch(BASE + "/data/nav/" + fund.amfi + ".csv.gz").then(function (r) {
-        if (!r.ok) throw new Error("its prices did not load (" + r.status + ")");
-        return gzipText(r).then(M.parseNavFile);
-      }));
-    }
-    return series.get(fund.id);
-  }
-
-  var looks = new Map();
-  function lookFile(id) {
-    if (!looks.has(id)) {
-      looks.set(id, fetch(BASE + "/data/lookthrough/" + id + ".json")
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .catch(function () { return null; }));
-    }
-    return looks.get(id);
-  }
 
   // --- entry -----------------------------------------------------------------
   function rowError(fund, kind, row) { return M.rowError(fund, kind, row, TODAY); }
@@ -268,7 +230,7 @@
       if (!fund) return { h: h, fund: null, pos: null, error: "not published here" };
       if (!fund.amfi) return { h: h, fund: fund, pos: null, error: "its prices are not published" };
       var e = M.entriesOf(h, fund, TODAY);
-      return navSeries(fund).then(function (s) {
+      return K.navSeries(BASE, fund).then(function (s) {
         return { h: h, fund: fund, pos: M.position(e.buys, s), excluded: e.excluded, error: null };
       }, function (err) { return { h: h, fund: fund, pos: null, excluded: e.excluded, error: err.message }; });
     }));
@@ -329,28 +291,8 @@
       : el("p", { "class": "pf__note" }, "No funds yet."));
   }
 
-  var CLASS = { equity: "Shares", debt: "Bonds and other debt", cash: "Cash and equivalents",
-                derivative: "Derivatives", mfunit: "Other funds", other: "REITs, InvITs and other" };
   var SIZE = { large: "Large companies", mid: "Mid-sized companies", small: "Small companies",
                unranked: "Not ranked by AMFI" };
-  var SVG = "http://www.w3.org/2000/svg";
-
-  function bar(pctValue) {
-    var svg = document.createElementNS(SVG, "svg");
-    svg.setAttribute("class", "bar");
-    svg.setAttribute("viewBox", "0 0 100 6");
-    svg.setAttribute("preserveAspectRatio", "none");
-    svg.setAttribute("aria-hidden", "true");
-    [["bar__track", 100], ["bar__fill", Math.max(0, Math.min(100, pctValue))]].forEach(function (r) {
-      var rect = document.createElementNS(SVG, "rect");
-      rect.setAttribute("class", r[0]);
-      rect.setAttribute("width", r[1].toFixed(2));
-      rect.setAttribute("height", "6");
-      rect.setAttribute("rx", "3");
-      svg.appendChild(rect);
-    });
-    return el("span", { "class": "bar-cell" }, svg, el("span", null, pct(pctValue)));
-  }
 
   function bars(title, rowsIn, names) {
     return el("div", null, el("h3", null, title),
@@ -361,7 +303,7 @@
     var held = list.filter(function (x) { return x.pos && x.pos.valuePaise > 0; });
     var box = out("look");
     if (!held.length) { box.replaceChildren(el("p", { "class": "pf__note" }, "Shown once a fund is valued.")); return Promise.resolve(); }
-    return Promise.all(held.map(function (x) { return lookFile(x.fund.id); })).then(function (files) {
+    return Promise.all(held.map(function (x) { return K.lookFile(BASE, x.fund.id); })).then(function (files) {
       if (!live()) return;
       var byId = {};
       held.forEach(function (x, i) { byId[x.fund.id] = files[i]; });
@@ -440,7 +382,7 @@
       var buys = M.pricedBuys(x.pos);
       return Promise.all(slots.map(function (s) {
         if (!s.fund) return Promise.resolve({ s: s, pos: null, error: null });
-        return navSeries(s.fund).then(function (series) {
+        return K.navSeries(BASE, s.fund).then(function (series) {
           return { s: s, pos: M.position(buys, series), error: null };
         }, function (e) { return { s: s, pos: null, error: e.message }; });
       })).then(function (valued) {

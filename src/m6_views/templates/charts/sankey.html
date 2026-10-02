@@ -5,9 +5,9 @@
   look-through in one glance, which is the product thesis.
 
   The payload crosses into JavaScript as JSON with **every Decimal still a
-  string** (§15.2). `d3-sankey` needs numbers for layout, so `sankey.js` parses
-  them at the one point where a pixel width is being computed — a coordinate, not
-  a figure anyone reads. Every number the user actually sees is formatted here,
+  string** (§15.2). ECharts' sankey series needs numbers for layout, so
+  `charts.js` parses them at the one point where a flow's width is computed — a
+  coordinate, not a figure anyone reads (V1-86; it was d3-sankey before). Every number the user actually sees is formatted here,
   server-side, and shipped as text.
 
   Two hard requirements from Appendix A, both enforced in the builder and
@@ -16,15 +16,18 @@
   pinned outside `top_n`. Missing mass that disappears into "smaller holdings" is
   the one outcome this project exists to prevent.
 #}
-<figure class="sankey" data-chart="sankey">
+<figure class="sankey" data-chart="echart">
   <figcaption class="sr-only">
     Sankey diagram: {{ env.payload.links | length }} flows from
     {{ env.payload.nodes | selectattr('side', 'equalto', 'left') | list | length }} funds to
     {{ env.payload.nodes | selectattr('side', 'equalto', 'right') | list | length }} companies.
     The table below the chart carries the same figures.
   </figcaption>
-  <svg id="sankey" role="img"
-       aria-label="Look-through exposure from funds to companies"></svg>
+  {# Height by node count, as d3's layout was: about 22px a node, 7 rows at least. #}
+  <div class="echart__canvas" data-index="0"
+       data-bars="{{ [((env.payload.nodes | length) * 0.75) | round(0, 'ceil') | int, 7] | max }}"
+       role="img" aria-label="Look-through exposure from funds to companies"></div>
+  <script id="sankey-data" class="echart-data" type="application/json">{{ payload_json | safe }}</script>
 </figure>
 
 {#
@@ -51,4 +54,3 @@
   </div>
 </details>
 
-<script id="sankey-data" type="application/json">{{ payload_json | safe }}</script>

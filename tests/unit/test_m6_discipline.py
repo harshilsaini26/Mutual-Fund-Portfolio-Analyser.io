@@ -243,7 +243,7 @@ def test_no_prescriptive_language_in_the_templates() -> None:
     assert not offences, f"prescriptive language in templates: {offences}"
 
 
-@pytest.mark.parametrize("name", ["portfolio.js", "compare.js"])
+@pytest.mark.parametrize("name", ["portfolio.js", "compare.js", "kit.js"])
 def test_no_prescriptive_language_in_the_page_scripts(name: str) -> None:
     """The portfolio (V1-82) and compare (V1-85) pages write their sentences in
     JavaScript, out of reach of the template lint, and they are the pages most

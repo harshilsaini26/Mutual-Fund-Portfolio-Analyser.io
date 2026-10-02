@@ -92,10 +92,6 @@
       .sort(function (a, b) { return b.total - a.total || (a.name < b.name ? -1 : 1); });
   }
 
-  // The children worth drawing: text and nodes. `list.length && x` gives 0 for an
-  // empty list, and a stray "0" on a page of figures reads as one.
-  function present(children) { return children.filter(function (c) { return !!c; }); }
-
   // After a fund at `index` is removed: the column now in its place, else the new
   // last one, else none (the picker).
   function nextFocus(idsAfter, index) {
@@ -105,16 +101,17 @@
   var api = {
     parseHash: parseHash, writeHash: writeHash, sharedStart: sharedStart,
     growthSeries: growthSeries, highLow: highLow, commonHoldings: commonHoldings,
-    shownFigure: shownFigure, present: present, nextFocus: nextFocus, MAX: MAX,
+    shownFigure: shownFigure, nextFocus: nextFocus, MAX: MAX,
   };
   if (typeof module === "object" && module.exports) { module.exports = api; return; }
   window.Compare = api;
 
   // --- in the browser -----------------------------------------------------------
   // Built with createElement/textContent only, never innerHTML.
-  var M = window.PortfolioMath;
+  var M = window.PortfolioMath, K = window.Kit;
   var page = document.querySelector("[data-compare]");
-  if (!page || !M) return;
+  if (!page || !M || !K) return;
+  var el = K.el, fill = K.fill, bar = K.bar, CLASS = K.CLASS, INR = K.INR;
 
   var BASE = page.getAttribute("data-root") || "";
   var FUNDS = new Map();
@@ -122,20 +119,7 @@
   var ids = [];                 // the funds on show, in the address's order
   var generation = 0;           // the newest render; older ones do not draw
 
-  function el(tag, attrs) {
-    var node = document.createElement(tag);
-    Object.keys(attrs || {}).forEach(function (k) {
-      if (attrs[k] != null && attrs[k] !== false) node.setAttribute(k, attrs[k] === true ? "" : attrs[k]);
-    });
-    present(Array.prototype.slice.call(arguments, 2)).forEach(function (c) {
-      node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
-    });
-    return node;
-  }
   function out(name) { return page.querySelector('[data-out="' + name + '"]'); }
-  function fill(box) {
-    box.replaceChildren.apply(box, present(Array.prototype.slice.call(arguments, 1)));
-  }
   function note(text) { return el("p", { "class": "cmp__note" }, text); }
   function say(text) { document.getElementById("cmp-status").textContent = text; }
 
@@ -259,27 +243,7 @@
       funds.length === 1 && note("Add another fund to compare."));
   }
 
-  // --- data ------------------------------------------------------------------------
-  var navs = new Map(), looks = new Map();
-  function navSeries(f) {
-    if (!navs.has(f.id)) {
-      navs.set(f.id, !f.amfi ? Promise.resolve(null)
-        : fetch(BASE + "/data/nav/" + f.amfi + ".csv.gz")
-          .then(function (r) { return r.ok ? M.gzipText(r).then(M.parseNavFile) : null; })
-          .catch(function () { return null; }));
-    }
-    return navs.get(f.id);
-  }
-  function lookFile(id) {
-    if (!looks.has(id)) {
-      looks.set(id, fetch(BASE + "/data/lookthrough/" + id + ".json")
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .catch(function () { return null; }));
-    }
-    return looks.get(id);
-  }
-
-  var INR = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+  // --- formatting -------------------------------------------------------------------
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   // DD Mon YYYY, as every date the server prints (§9.4).
   function day(iso) { return iso.slice(8, 10) + " " + MONTHS[Number(iso.slice(5, 7)) - 1] + " " + iso.slice(0, 4); }
@@ -307,27 +271,11 @@
       more.length && el("details", { "class": "tuck" }, el("summary", null, more.length + " more"), table(head, more))];
   }
 
-  var SVG = "http://www.w3.org/2000/svg";
-  function bar(value) {
-    var svg = document.createElementNS(SVG, "svg");
-    svg.setAttribute("class", "bar");
-    svg.setAttribute("viewBox", "0 0 100 6");
-    svg.setAttribute("preserveAspectRatio", "none");
-    svg.setAttribute("aria-hidden", "true");
-    [["bar__track", 100], ["bar__fill", Math.max(0, Math.min(100, value))]].forEach(function (r) {
-      var rect = document.createElementNS(SVG, "rect");
-      rect.setAttribute("class", r[0]);
-      rect.setAttribute("width", r[1].toFixed(2));
-      rect.setAttribute("height", "6");
-      rect.setAttribute("rx", "3");
-      svg.appendChild(rect);
-    });
-    return el("span", { "class": "bar-cell" }, svg, el("span", null, pct(value)));
-  }
-
   // --- 2. what Rs 10,000 became ----------------------------------------------------------
   function drawGrowth(funds, live) {
-    return Promise.all(funds.map(navSeries)).then(function (series) {
+    return Promise.all(funds.map(function (f) {
+      return f.amfi ? K.navSeries(BASE, f).catch(function () { return null; }) : null;
+    })).then(function (series) {
       if (!live()) return;
       var box = out("growth");
       var old = box.querySelector(".echart__canvas");
@@ -376,8 +324,6 @@
   }
 
   // --- 3. overlap and 4. mix -------------------------------------------------------------
-  var CLASS = { equity: "Shares", debt: "Bonds and other debt", cash: "Cash and equivalents",
-                derivative: "Derivatives", mfunit: "Other funds", other: "REITs, InvITs and other" };
 
   function disclosures(funds, files) {
     var ul = el("ul", { "class": "cmp__note" });
@@ -463,7 +409,7 @@
       return;
     }
     drawGrowth(funds, live);
-    Promise.all(funds.map(function (f) { return lookFile(f.id); })).then(function (files) {
+    Promise.all(funds.map(function (f) { return K.lookFile(BASE, f.id); })).then(function (files) {
       if (!live()) return;
       drawOverlap(funds, files);
       drawMix(funds, files);

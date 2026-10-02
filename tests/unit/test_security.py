@@ -118,7 +118,7 @@ def test_the_escaped_payload_is_still_the_same_data(tmp_path: Path) -> None:
     assert block
 
     payload = json.loads(block.group(1))
-    labels = [n["label"] for n in payload["nodes"]]
+    labels = [n["label"] for n in payload["charts"][0]["nodes"]]
     assert XSS_NAME in labels, "the escaping changed the data, not just its encoding"
 
 
@@ -273,13 +273,13 @@ def test_the_portfolio_never_reaches_the_disk_cache(
     assert client.get(path).headers.get("cache-control") == rule
 
 
-def test_the_csp_still_allows_the_vendored_d3(tmp_path: Path) -> None:
+def test_the_csp_still_allows_the_vendored_echarts(tmp_path: Path) -> None:
     """`script-src 'self'` must not block the scripts the page actually needs —
     a policy that breaks the flagship chart would be reverted within a day."""
     client = _client(tmp_path, "Acme Ltd.")
     html = client.get(f"/view/lookthrough_sankey{QS}").text
-    assert '<script src="/static/vendor/d3.v7.min.js"></script>' in html
-    assert client.get("/static/vendor/d3.v7.min.js").status_code == 200
+    assert '<script src="/static/vendor/echarts.v6.1.0.min.js"></script>' in html
+    assert client.get("/static/vendor/echarts.v6.1.0.min.js").status_code == 200
 
 
 # --- vendored third-party code ------------------------------------------------
@@ -288,7 +288,7 @@ VENDOR = Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static" / "
 
 
 def test_the_vendored_javascript_matches_its_recorded_hashes() -> None:
-    """d3 is committed to this repository rather than loaded from a CDN, which
+    """ECharts is committed to this repository rather than loaded from a CDN, which
     removes a third party from every page load and replaces it with a question:
     is the copy in the tree the one that was reviewed?
 

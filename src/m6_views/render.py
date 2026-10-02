@@ -12,7 +12,7 @@ into a viewBox is the presentation-only arithmetic it permits.
 
 **Chart selection** — one template per `chart_type`.
 
-The Sankey is the narrow exception: `d3-sankey` needs numbers to compute widths,
+The Sankey is the narrow exception: its layout needs numbers to compute widths,
 so the payload crosses as JSON with Decimals still as strings (§15.2). Every
 number the USER sees in that view is still formatted here, including the
 accessible table beneath the diagram.
@@ -76,14 +76,6 @@ def fmt_datetime(value: datetime | str | None) -> str:
     if isinstance(value, str):
         value = datetime.fromisoformat(value)
     return value.strftime("%d %b %Y, %H:%M")
-
-
-def fmt_pct(value: Decimal | None) -> str:
-    return format_pct(value)
-
-
-def fmt_staleness(value: int | None) -> str:
-    return format_staleness(value)
 
 
 def fmt_inr_full(value: Decimal | None) -> str:
@@ -180,8 +172,8 @@ FILTERS: dict[str, Callable[..., str]] = {
     "fmt_count": fmt_count,
     "fmt_date": fmt_date,
     "fmt_datetime": fmt_datetime,
-    "fmt_pct": fmt_pct,
-    "fmt_staleness": fmt_staleness,
+    "fmt_pct": format_pct,
+    "fmt_staleness": format_staleness,
     "fmt_inr_full": fmt_inr_full,
     "fmt_metric": fmt_metric,
     "fmt_tile": fmt_tile,
@@ -430,24 +422,21 @@ def chart_context(env: ViewEnvelope) -> dict[str, Any]:
         context["ranges"] = range_bars(env)
     elif chart_type == "sankey":
         context["labels"] = sankey_labels(env)
-        # Decimals stay strings across this boundary — §15.2. `sankey.js` parses
-        # them only where a pixel width is being computed.
-        context["payload_json"] = embeddable_json(env.payload)
+        # Decimals stay strings across this boundary — §15.2. `charts.js` parses
+        # them only where a flow's width is being computed.
+        context["payload_json"] = embeddable_json({"charts": [{
+            "kind": "sankey",
+            "nodes": env.payload.get("nodes", []),
+            "links": env.payload.get("links", []),
+        }]})
     return context
 
 
 def needs_echarts(envelopes: list[ViewEnvelope]) -> bool:
-    """ECharts is 1.1 MB. It loads where a view draws with it and nowhere else."""
+    """ECharts is 1.1 MB. It loads where a view draws with it (the Sankey
+    included, V1-86) and nowhere else."""
     return any(
-        VIEW_DEFS[e.view_id].chart_type == "echart" and e.state.value == "ok"
-        for e in envelopes
-    )
-
-
-def needs_sankey_script(envelopes: list[ViewEnvelope]) -> bool:
-    """d3 is 280 KB. It loads on the pages that draw a Sankey and nowhere else."""
-    return any(
-        VIEW_DEFS[e.view_id].chart_type == "sankey" and e.state.value == "ok"
+        VIEW_DEFS[e.view_id].chart_type in ("echart", "sankey") and e.state.value == "ok"
         for e in envelopes
     )
 
@@ -463,6 +452,5 @@ __all__ = [
     "heatmap_grid",
     "lorenz_path",
     "needs_echarts",
-    "needs_sankey_script",
     "sankey_labels",
 ]

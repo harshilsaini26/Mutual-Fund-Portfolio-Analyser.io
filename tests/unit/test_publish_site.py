@@ -212,6 +212,7 @@ def test_the_portfolio_page_is_published_and_runs_only_from_this_site(site: Path
     page = (site / "portfolio" / "index.html").read_text(encoding="utf-8")
     assert f'src="{BASE}/static/portfolio-math.js"' in page
     assert f'src="{BASE}/static/portfolio.js"' in page
+    assert f'src="{BASE}/static/kit.js"' in page
     assert f'data-root="{BASE}"' in page
     assert "nothing you enter is sent anywhere" in page
     assert "default-src 'self'" in page  # the CSP meta tag is unchanged
@@ -420,7 +421,7 @@ def test_every_generation_of_category_name_finds_its_family(
 
 def test_the_compare_page_is_published_and_linked(site: Path) -> None:
     page = (site / "compare" / "index.html").read_text(encoding="utf-8")
-    for script in ("portfolio-math.js", "charts.js", "compare.js"):
+    for script in ("portfolio-math.js", "kit.js", "charts.js", "compare.js"):
         assert f'src="{BASE}/static/{script}"' in page, script
     assert "needs JavaScript" in page and 'id="cmp-pick"' in page
     assert (site / "static" / "compare.js").is_file()

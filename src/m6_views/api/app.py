@@ -171,8 +171,8 @@ def create_app(
         one that still holds if the first regresses.
 
         The policy can afford to be strict because the page has no inline
-        script, no inline style, no external font and no image host: d3 and
-        ECharts are vendored under `/static`, so `'self'` covers everything the
+        script, no inline style, no external font and no image host: ECharts
+        is vendored under `/static`, so `'self'` covers everything the
         page loads. `form-action 'self'` lets the search box submit to this
         server and nowhere else. `frame-ancestors 'none'` matters even on
         loopback — a page in another tab must not be able to frame the

@@ -12,9 +12,12 @@
 personal.db*
 canonical.duckdb*
 
-# CAS statements and anything derived from them
+# CAS statements and anything derived from them. Every PDF, not only those
+# named "CAS": a statement downloads as whatever the RTA calls it. The two
+# synthetic encrypted fixtures are the only PDFs the repository carries.
 *.cas
-*CAS*.pdf
+*.pdf
+!tests/fixtures/encrypted/*.pdf
 /imports/
 /quarantine/
 /backups/
@@ -104,3 +107,8 @@ docs/PLAN.md
 
 # Read-only design references cloned from other repositories; never published.
 /reference/
+
+# Local tooling: the editor's launch and permission settings (they name paths
+# on this machine) and the working specs and plans. Never published.
+/.claude/
+/docs/superpowers/

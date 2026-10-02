@@ -510,23 +510,21 @@ def test_every_view_is_reachable(client: TestClient) -> None:
             assert f'data-view-id="{view_id}"' in fund, view_id
 
 
-def test_d3_is_vendored_not_fetched_from_a_cdn(client: TestClient) -> None:
+def test_the_sankey_draws_with_the_vendored_echarts(client: TestClient) -> None:
     """`PLAN.md` §6. A page that phones a CDN stops working offline and tells a
-    third party when the user looks at their portfolio."""
+    third party when the user looks at their portfolio. The Sankey is an ECharts
+    series (V1-86), so d3 and d3-sankey are gone, not merely unloaded."""
     html = page(client, "lookthrough_sankey")
     # An UNESCAPED script tag. The first version of this test matched the
     # substring and passed while Jinja was escaping the whole block into
     # `&lt;script&gt;`, so d3 never loaded and the diagram never drew — a test
     # that passes on the text of a tag it cannot execute is not testing loading.
-    assert '<script src="/static/vendor/d3.v7.min.js"></script>' in html
-    assert '<script src="/static/sankey.js"></script>' in html
-    assert "cdn." not in html
-    assert client.get("/static/vendor/d3-sankey.v0.12.3.min.js").status_code == 200
-
-
-def test_d3_only_loads_where_a_sankey_is_drawn(client: TestClient) -> None:
-    """280 KB on a page with a table on it is 280 KB of nothing."""
-    assert "/static/vendor/d3" not in page(client, "fund_list")
+    assert '<script src="/static/vendor/echarts.v6.1.0.min.js"></script>' in html
+    assert '<script src="/static/charts.js"></script>' in html
+    drawn = r'data-chart="echart"[^>]*>(?:(?!</figure>).)*"kind": "sankey"'
+    assert re.search(drawn, html, re.S)
+    assert "cdn." not in html and "/static/vendor/d3" not in html
+    assert client.get("/static/vendor/d3.v7.min.js").status_code == 404
 
 
 def test_an_unknown_view_is_a_404_that_names_the_known_ones(

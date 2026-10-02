@@ -82,14 +82,13 @@ SITE_BUDGET_BYTES = 900 * 1024 * 1024
 #: About a year of trading days: below this a fund page is mostly empty panels.
 MIN_PRICES = 250
 PUBLIC_USER = UserId("PUBLIC")
-#: What the public pages load. d3 draws only the portfolio Sankey, which the
-#: public copy does not have.
+#: What the public pages load.
 STATIC_FILES = (
     "app.css", "app.js", "charts.js", "settings.js", "sections.js", "lenis.css",
     "vendor/echarts.v6.1.0.min.js", "vendor/lenis.v1.3.26.min.js",
     "vendor/islands.v1.js", "fonts/rubik-latin-wght-normal.woff2",
     "fonts/terminess-Regular.woff2", "fonts/terminess-Bold.woff2",
-    "portfolio-math.js", "portfolio.js", "compare.js",
+    "portfolio-math.js", "kit.js", "portfolio.js", "compare.js",
     "fonts/atkinson-hyperlegible-latin-400-normal.woff2",
     "fonts/atkinson-hyperlegible-latin-700-normal.woff2",
 )

@@ -49,7 +49,6 @@ from src.m6_views.render import (
     FILTERS,
     chart_context,
     needs_echarts,
-    needs_sankey_script,
 )
 from src.m6_views.states import error_envelope
 
@@ -85,23 +84,9 @@ VIEW_ICONS = {
 #: A search is a few words; anything longer is not a query anyone typed.
 SEARCH_MAX_CHARS = 80
 
-SANKEY_SCRIPTS = (
-    '<script src="{root}/static/vendor/d3.v7.min.js"></script>\n'
-    '<script src="{root}/static/vendor/d3-sankey.v0.12.3.min.js"></script>\n'
-    '<script src="{root}/static/sankey.js"></script>'
-)
-
-
 def chart_scripts(envelopes: list[ViewEnvelope], root: str = "") -> str:
     """The script tags a page's charts need, and none it does not."""
-    return "\n".join(
-        tags.format(root=root)
-        for tags, needed in (
-            (SANKEY_SCRIPTS, needs_sankey_script(envelopes)),
-            (ECHART_SCRIPTS, needs_echarts(envelopes)),
-        )
-        if needed
-    )
+    return ECHART_SCRIPTS.format(root=root) if needs_echarts(envelopes) else ""
 
 
 def templates(root: str = "", static: bool = False) -> Jinja2Templates:

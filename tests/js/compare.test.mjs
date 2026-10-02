@@ -62,11 +62,6 @@ test("shownFigure reads the number a label shows", () => {
     ["highest", "lowest", "highest"]);
 });
 
-test("present keeps only what should be drawn: a count of nothing is not a child", () => {
-  const node = { nodeType: 1 };
-  assert.deepEqual(C.present([0, null, false, undefined, "", "a", node]), ["a", node]);
-});
-
 test("nextFocus goes to the column that took the removed one's place, else the last", () => {
   assert.equal(C.nextFocus(["A", "C"], 1), "C");   // B removed from A,B,C
   assert.equal(C.nextFocus(["A", "B"], 2), "B");   // C removed: the new last

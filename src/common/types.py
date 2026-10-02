@@ -79,12 +79,6 @@ class Confidence(str, Enum):
     UNRESOLVED = "unresolved"
 
 
-class ValidationStatus(str, Enum):
-    OK = "ok"
-    WARN = "warn"
-    QUARANTINED = "quarantined"
-
-
 class ViewState(str, Enum):
     """MODULE_6.md §3.3. `state_reason` is required for every non-OK state."""
 
@@ -121,13 +115,6 @@ class WeightBasis(str, Enum):
 
     DISCLOSED = "disclosed"
     DRIFT_ADJUSTED = "drift_adj"
-
-
-class McapBucket(str, Enum):
-    LARGE = "large"
-    MID = "mid"
-    SMALL = "small"
-    UNCLASSIFIED = "unclassified"
 
 
 class ClassificationBasis(str, Enum):

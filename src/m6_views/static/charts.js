@@ -5,7 +5,7 @@
  * vendored ECharts. MODULE_6.md §16.4 holds: every figure a reader is shown --
  * a tooltip, a bar's label, a tile's caption -- is a string formatted in
  * Python and shipped in the payload. The numbers beside those strings are used
- * only to place a point, exactly as sankey.js uses them for widths. Axis tick
+ * only to place a point, exactly as the Sankey uses them for widths. Axis tick
  * labels are the one thing formatted here, because they are the scale rather
  * than a figure from the data.
  *
@@ -198,6 +198,47 @@
     },
 
     area: function (c, p) { return KINDS.line(c, p, true); },
+
+    // The look-through (MODULE_6 §8.1): funds on the left, companies on the right,
+    // flow width in rupees. The values are parsed only to size the flows; every
+    // figure the reader sees is in the table beneath it, formatted in Python.
+    // Missing mass is hatched as well as coloured, and its label italic (§10.3).
+    sankey: function (c, p) {
+      var o = base(p);
+      delete o.legend;
+      var hatch = { symbol: "rect", symbolSize: 1, dashArrayX: [1, 0], dashArrayY: [2, 4],
+                    rotation: Math.PI / 4, color: p.decal };
+      var fill = { left: p.fund, right: token("--sankey-right") };
+      var kind = {}, label = {};
+      c.nodes.forEach(function (n) { kind[n.id] = n.kind; label[n.id] = n.label; });
+      o.tooltip.trigger = "item";
+      o.tooltip.formatter = function (it) {
+        return it.dataType === "edge" ? label[it.data.source] + " to " + label[it.data.target]
+                                      : label[it.data.name];
+      };
+      o.series = [{
+        type: "sankey", left: 4, right: 4, top: 6, bottom: 6, nodeWidth: 14, nodeGap: 8,
+        draggable: false, emphasis: { focus: "adjacency" },
+        lineStyle: { color: "source", opacity: 0.25, curveness: 0.5 },
+        label: { color: p.ink, fontSize: textSize(), textBorderColor: p.bg, textBorderWidth: 3,
+                 formatter: function (it) { return label[it.name]; } },
+        data: c.nodes.map(function (n) {
+          var missing = n.kind === "synthetic";
+          return {
+            name: n.id,
+            itemStyle: { color: n.kind === "aggregate" || missing ? p.others : fill[n.side],
+                         decal: missing ? hatch : null, borderColor: p.bg, borderWidth: 0.5 },
+            label: { position: n.side === "left" ? "right" : "left",
+                     fontStyle: missing ? "italic" : "normal" },
+          };
+        }),
+        links: c.links.map(function (l) {
+          return { source: l.source, target: l.target, value: number(l.value),
+                   lineStyle: kind[l.target] === "synthetic" ? { color: p.others, opacity: 0.4 } : null };
+        }),
+      }];
+      return o;
+    },
 
     bar: function (c, p) {
       var o = base(p);
