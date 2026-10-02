@@ -199,6 +199,53 @@
     new MutationObserver(matrix).observe(html, { attributes: true, attributeFilter: ["data-theme"] });
   }
 
+  // --- phones: tucked detail and a top bar that steps aside (V1-84) ----------
+  //
+  // `details.tuck` blocks are open in the HTML, so a wide screen and a page
+  // without scripts show everything; on a narrow screen they start closed, one
+  // tap from open. They are not reopened on resize: a reader may have opened one.
+  var narrowScreen = window.matchMedia("(max-width: 720px)");
+  if (narrowScreen.matches) {
+    document.querySelectorAll("details.tuck").forEach(function (d) { d.open = false; });
+  }
+
+  // --bar-h: the top bar's height, for scroll-padding-top and the navigator's
+  // pinned position. It follows the reader's text size and font.
+  var topbar = document.querySelector(".topbar");
+  var root = document.documentElement;
+  if (topbar) {
+    var barHeight = function () { root.style.setProperty("--bar-h", topbar.offsetHeight + "px"); };
+    barHeight();
+    window.addEventListener("resize", barHeight);
+    new MutationObserver(barHeight).observe(root, {
+      attributes: true, attributeFilter: ["data-size", "data-font"],
+    });
+
+    // On a phone, with motion on, the bar slides away while the reader scrolls
+    // down and comes back on any scroll up. It stays while anything in it has
+    // focus (typing a search), and it never moves with motion off.
+    // The 8px is measured over the whole downward run, not per scroll event: a
+    // reader's slow drag moves a few pixels a frame and must hide it too.
+    var lastY = window.scrollY;
+    var runStart = lastY;
+    var setAway = function (away) {
+      topbar.classList.toggle("topbar--away", away);
+      document.body.classList.toggle("bar-away", away);
+    };
+    window.addEventListener("scroll", function () {
+      var y = window.scrollY;
+      var still = !narrowScreen.matches || root.getAttribute("data-motion") !== "on" ||
+        topbar.contains(document.activeElement);
+      if (y < lastY) runStart = y;
+      if (still || y < lastY) setAway(false);
+      else if (y - runStart > 8 && y > topbar.offsetHeight) setAway(true);
+      lastY = y;
+    }, { passive: true });
+    // Keyboard focus arriving in the bar (Shift+Tab, a dialog handing focus back)
+    // brings it back at once: a focused control must never sit out of view.
+    topbar.addEventListener("focusin", function () { setAway(false); });
+  }
+
   // --- the menu on a narrow screen --------------------------------------------
 
   var menu = document.querySelector("[data-sidebar-toggle]");

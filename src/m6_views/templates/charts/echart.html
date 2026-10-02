@@ -77,11 +77,14 @@
   <script type="application/json" class="echart-data">{{ payload_json | safe }}</script>
 </div>
 {% if env.payload.ranks %}
+{#- One tap away on a phone (V1-84): open in the HTML, closed by app.js there. -#}
+<details class="tuck" open><summary>All ranks ({{ env.payload.ranks | length }})</summary>
 <dl class="facts-list facts-list--ranks">
   {% for r in env.payload.ranks %}
   <div><dt>{{ r.label }}</dt><dd>{{ r.value }}</dd><dd class="facts-list__note">{{ r.note }}</dd></div>
   {% endfor %}
 </dl>
+</details>
 {% endif %}
 {% if static and env.export_url %}
 <p class="chart-table"><a href="{{ env.export_url }}">The same figures as a table</a>

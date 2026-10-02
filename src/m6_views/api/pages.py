@@ -37,7 +37,13 @@ from fastapi.templating import Jinja2Templates
 from src.common.types import UserId
 from src.m6_views.builder import Scope
 from src.m6_views.envelope import ViewEnvelope
-from src.m6_views.registry import FUND_PAGE, VIEW_DEFS, VIEW_REGISTRY, catalogue
+from src.m6_views.registry import (
+    FUND_PAGE,
+    SECTION_LABELS,
+    VIEW_DEFS,
+    VIEW_REGISTRY,
+    catalogue,
+)
 from src.m6_views.render import (
     ECHART_SCRIPTS,
     FILTERS,
@@ -149,6 +155,8 @@ def fund_context(
         "fund_id": scope.scope_id,
         "panels": [safe_chart_context(env, scope) for env in envelopes],
         "detail": safe_chart_context(detail, scope),
+        # The section navigator's links, in page order (V1-84).
+        "sections": [(v, SECTION_LABELS[v]) for v in (*FUND_PAGE, "fund_xray_header")],
         "chart_scripts": chart_scripts([*envelopes, detail], root),
     }
 

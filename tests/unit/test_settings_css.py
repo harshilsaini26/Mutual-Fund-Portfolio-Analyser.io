@@ -79,3 +79,31 @@ def test_every_chart_axis_label_follows_the_text_size() -> None:
     charts = (CSS.parent / "charts.js").read_text(encoding="utf-8")
     labels = re.findall(r"axisLabel:\s*\{[^}]*\}", charts)
     assert labels and all("fontSize: textSize()" in label for label in labels), labels
+
+
+def test_jumps_clear_both_pinned_bars() -> None:
+    css = CSS.read_text(encoding="utf-8")
+    padding = "scroll-padding-top: calc(var(--bar-h, 63px) + var(--nav-h, 0px) + 12px)"
+    assert padding in css
+    assert re.search(r":root:has\(nav\.sections\)\s*\{\s*--nav-h:\s*44px", css)
+    assert re.search(r"\.sections\s*\{[^}]*position:\s*sticky", css)
+
+
+def test_phones_get_full_width_charts_and_large_tap_targets() -> None:
+    css = CSS.read_text(encoding="utf-8")
+    block = css[css.index("@media (max-width: 720px)"):]
+    assert re.search(r"\.echart--line \.echart__canvas[^{]*\{[^}]*height:\s*280px", block)
+    scatter = r"\.echart--scatter \.echart__canvas[^{]*\{[^}]*height:\s*300px"
+    assert re.search(scatter, block)
+    assert re.search(r"\.zoom button[^{]*\{[^}]*min-height:\s*40px", block)
+
+
+def test_a_mouse_can_reach_every_section_chip() -> None:
+    # The chip row overflows between 721px and about 1,000px too; its scrollbar
+    # may be hidden only where a finger scrolls it.
+    css = CSS.read_text(encoding="utf-8")
+    base = re.search(r"\.sections\s*\{([^}]*)\}", css)
+    assert base and "scrollbar-width: none" not in base.group(1)
+    phone = (r"@media \(max-width: 720px\)\s*\{\s*"
+             r"\.sections\s*\{\s*scrollbar-width:\s*none")
+    assert re.search(phone, css)

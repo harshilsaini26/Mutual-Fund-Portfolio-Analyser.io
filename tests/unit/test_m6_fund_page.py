@@ -15,7 +15,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 from src.m6_views.format import format_inr
-from src.m6_views.registry import FUND_PAGE
+from src.m6_views.registry import FUND_PAGE, SECTION_LABELS
 
 from tests.unit.test_m6_render import QS, client  # noqa: F401  (fixture)
 
@@ -186,3 +186,47 @@ def test_the_price_history_is_the_published_nav_from_its_first_day(
     line = env["payload"]["charts"][0]["series"][0]["points"]
     assert line[0][0] == rows[0]["date"] and line[-1][0] == rows[-1]["date"]
     assert env["payload"]["headline"].startswith("Its NAV was ₹")
+
+
+def test_every_fund_panel_has_a_section_label() -> None:
+    assert set(SECTION_LABELS) == {*FUND_PAGE, "fund_xray_header"}
+
+
+def test_the_navigator_links_every_section_in_page_order(
+    client: TestClient,  # noqa: F811
+) -> None:
+    html = client.get(f"/fund/S1{QS}").text
+    nav = re.search(r'<nav class="sections"[^>]*>(.*?)</nav>', html, re.S)
+    assert nav, "no navigator"
+    links = re.findall(r'href="#([a-z_]+)"[^>]*>([^<]+)<', nav.group(1))
+    assert links == [(v, SECTION_LABELS[v]) for v in (*FUND_PAGE, "fund_xray_header")]
+    for view_id, _ in links:
+        # `data-view-id="x"` contains `id="x"`; only a whole id attribute counts.
+        assert len(re.findall(rf'(?<![\w-])id="{view_id}"', html)) == 1, view_id
+    assert "/static/sections.js" in html
+
+
+def test_a_swapped_panel_brings_no_second_id(client: TestClient) -> None:  # noqa: F811
+    page = client.get(f"/fund/S1{QS}").text
+    tab = re.search(r'data-fragment="([^"]+window=1y)"', page)
+    assert tab
+    fragment = client.get(tab.group(1).replace("&amp;", "&")).text
+    assert not re.search(r'(?<![\w-])id="fund_growth"', fragment)
+
+
+def test_performance_reads_on_a_phone(client: TestClient) -> None:  # noqa: F811
+    html = client.get(f"/fund/S1{QS}").text
+    panel = html[html.index('data-view-id="fund_performance"'):
+                 html.index('data-view-id="fund_growth"')]
+    assert 'data-label="3 years"' in panel and 'data-label="What it says"' in panel
+    tuck = re.search(r'<details class="tuck" open><summary>What each measure says'
+                     r'</summary>(.*?)</details>', panel, re.S)
+    assert tuck and tuck.group(1).count("<dt>") == 14
+    assert "Return above cash for each unit of beta." in tuck.group(1)
+
+
+def test_the_ranks_list_is_one_tap_away(client: TestClient) -> None:  # noqa: F811
+    html = client.get(f"/fund/S1{QS}").text
+    tuck = re.search(r'<details class="tuck" open><summary>All ranks \((\d+)\)</summary>'
+                     r'\s*<dl class="facts-list facts-list--ranks">', html)
+    assert tuck and int(tuck.group(1)) > 0

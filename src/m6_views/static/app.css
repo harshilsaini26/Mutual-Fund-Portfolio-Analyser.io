@@ -225,7 +225,14 @@
 
 * { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: 84px; }  /* clear the sticky bar */
+/* A jump lands below the pinned top bar and, on a fund page, the section
+   navigator (V1-84): scripts measure both into --bar-h and --nav-h; these are
+   the defaults without them. */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--bar-h, 63px) + var(--nav-h, 0px) + 12px);
+}
+:root:has(nav.sections) { --nav-h: 44px; }
 
 /* Text size and density (V1-83). Every font size is in rem, so the root's size is
    the reader's text size; standard is the browser's own, as before. */
@@ -390,6 +397,17 @@ h1, h2, h3 { text-wrap: balance; }
   width: 100%; max-width: 1680px; margin: 0 auto;
   padding: 8px 28px 32px;
   font-size: 0.75rem; color: var(--ink-faint);
+}
+.public-note p { margin: 0; }
+.public-note details, .public-note summary { display: inline; }
+.public-note summary { cursor: pointer; color: var(--accent); }
+@media (min-width: 721px) { .public-note summary { display: none; } }
+/* On a phone the note is one line: the sentence trimmed with an ellipsis and
+   "More" beside it; opening "More" lets the whole note wrap. */
+@media (max-width: 720px) {
+  .public-note { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; }
+  .public-note > p { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .public-note:has(details[open]) > p { white-space: normal; }
 }
 .public-note {
   margin: 0; padding: 8px 28px;
@@ -1372,3 +1390,96 @@ body, .topbar, .card, .view, .settings {
   margin-top: 22px; padding: 0; border: 0; background: none; font: inherit;
   font-size: 0.8125rem; color: var(--accent); text-decoration: underline; cursor: pointer;
 }
+
+/* The fund page's section navigator (V1-84): pinned under the top bar; on a
+   narrow screen the row scrolls sideways and the current chip is kept in view. */
+.sections {
+  position: sticky; top: var(--bar-h, 63px); z-index: 20;
+  display: flex; gap: 4px; margin: 0 0 16px; padding: 6px 0;
+  overflow-x: auto; scrollbar-width: thin;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+/* A phone scrolls the row with a finger; a mouse needs the scrollbar to reach
+   the chips past the edge, so it is hidden on narrow screens only. */
+@media (max-width: 720px) {
+  .sections { scrollbar-width: none; }
+  .sections::-webkit-scrollbar { display: none; }
+}
+.sections__chip {
+  flex: none; display: inline-flex; align-items: center;
+  padding: 6px 12px; border-radius: 999px;
+  font-size: 0.8125rem; color: var(--ink-soft); text-decoration: none; white-space: nowrap;
+}
+.sections__chip:hover { color: var(--ink); background: var(--surface-2); }
+.sections__chip[aria-current="true"] { color: var(--on-accent); background: var(--accent); }
+/* On a phone the top bar slides away while the reader scrolls down (app.js), and
+   the navigator moves up into its place. */
+.topbar { transition: transform 0.2s ease; }
+.topbar--away { transform: translateY(-100%); }
+body.bar-away .sections { top: 0; }
+
+/* Fund pages on phones (V1-84) */
+.measure-notes { margin: 8px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 0.8125rem; }
+.measure-notes dt { font-weight: 600; }
+.measure-notes dd { margin: 0; color: var(--ink-soft); }
+details.tuck > summary { cursor: pointer; color: var(--accent); font-size: 0.8125rem; margin-top: 8px; }
+/* A wide screen shows the meanings in the table's own column, so not twice. */
+@media (min-width: 721px) { [data-view-id="fund_performance"] details.tuck { display: none; } }
+@media (max-width: 720px) {
+  /* Performance: one compact block per measure, its name over the three periods,
+     each figure under its own period's name; the meanings move to the list below. */
+  /* The period names once, as a header over the three columns, not under every figure. */
+  [data-view-id="fund_performance"] thead { display: block; }
+  [data-view-id="fund_performance"] thead tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  [data-view-id="fund_performance"] thead th { padding: 0 0 4px; border: 0; text-align: left; }
+  [data-view-id="fund_performance"] thead th:first-child,
+  [data-view-id="fund_performance"] thead th:last-child { display: none; }
+  [data-view-id="fund_performance"] tr {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 6px 0; border-bottom: 1px solid var(--line);
+  }
+  [data-view-id="fund_performance"] td { padding: 0; border: 0; text-align: left; }
+  [data-view-id="fund_performance"] td:first-child { grid-column: 1 / -1; font-weight: 600; margin-bottom: 2px; }
+  [data-view-id="fund_performance"] td:last-child { display: none; }
+  .measure-notes { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .measure-notes dd { margin-bottom: 6px; }
+}
+@media (max-width: 720px) {
+  /* Width: less padding around the page and inside each panel, so charts get it. */
+  main.content { padding-left: 12px; padding-right: 12px; }
+  .view__header, .view__chart, .view__footer { padding-left: 12px; padding-right: 12px; }
+  .echart--line .echart__canvas, .echart--area .echart__canvas { height: 280px; }
+  .echart--scatter .echart__canvas { height: 300px; }
+  /* The header card: two compact columns of facts, smaller tiles. */
+  .fundcard { gap: 14px; }
+  .facts--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .facts--grid div { padding: 8px 10px; }
+  .fundcard .kpi__tile { padding: 10px 12px; }
+  .fundcard .kpi__spark svg { height: 22px; }
+  /* Peers: the range bars closer together. */
+  .ranges { gap: 8px; margin-bottom: 12px; }
+  .range { padding: 10px 12px 8px; }
+  /* Touch: every period button and section chip at least 40px tall. */
+  .zoom button, .sections__chip { min-height: 40px; }
+}
+@media (max-width: 720px) {
+  /* Every panel's own furniture, tighter: its question, notes and footer. */
+  .view__header { padding-top: 10px; padding-bottom: 4px; gap: 8px; }
+  .view__header h2 { font-size: 0.9375rem; }
+  .view__eyebrow { margin-bottom: 2px; }
+  .caveats { margin: 0 12px 8px; padding: 6px 10px; }
+  .view__footer { padding: 6px 12px; font-size: 0.6875rem; }
+  .view__footer dl { gap: 2px 14px; }
+  .fundcard .kpi__spark { margin-top: 4px; }
+  .fundcard .kpi__spark svg { height: 16px; }
+  .range__head { margin-bottom: 6px; }
+  .range__value { font-size: 1.0625rem; }
+  /* The header card's tiles three to a row, with smaller figures and labels. */
+  .fundcard .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .fundcard .kpi__tile { padding: 8px 10px; }
+  .fundcard .kpi__tile dt { font-size: 0.625rem; letter-spacing: 0.04em; }
+  .fundcard .kpi__value { font-size: 1.0625rem; overflow-wrap: anywhere; }
+  .fundcard__chips { gap: 6px; margin-top: 8px; }
+  .fundcard__chips .chip { padding: 2px 8px; font-size: 0.6875rem; }
+}
+@media (max-width: 360px) { .fundcard .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

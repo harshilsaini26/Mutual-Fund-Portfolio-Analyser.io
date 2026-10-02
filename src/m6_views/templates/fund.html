@@ -16,6 +16,13 @@
 #}
 {% block content %}
 <div class="fund-page">
+{#- The section navigator (V1-84): plain links, pinned under the top bar;
+    sections.js marks the one the reader is in. -#}
+<nav class="sections" aria-label="Sections of this page">
+  {%- for view_id, label in sections %}
+  <a class="sections__chip" href="#{{ view_id }}">{{ label }}</a>
+  {%- endfor %}
+</nav>
 {% for panel in panels %}
   {% with env = panel.env,
           labels = panel.labels,
@@ -24,7 +31,7 @@
           payload_json = panel.payload_json,
           ranges = panel.ranges,
           sparks = panel.sparks %}
-  <div class="fund-page__panel fund-page__panel--{{ env.view_id }}">
+  <div class="fund-page__panel fund-page__panel--{{ env.view_id }}" id="{{ env.view_id }}">
     {% call vc.view_container(env, expanded=False, quiet=(env.view_id == 'fund_header')) %}
       {% include panel.chart_template %}
     {% endcall %}
@@ -32,7 +39,7 @@
   {% endwith %}
 {% endfor %}
 {% if detail %}
-<details class="fund-page__detail">
+<details class="fund-page__detail" id="fund_xray_header">
   <summary>Every figure for this fund, in one table</summary>
   {% with env = detail.env, payload_json = detail.payload_json, sparks = detail.sparks %}
     {% call vc.view_container(env, expanded=False) %}
@@ -44,4 +51,7 @@
 </div>
 {% endblock %}
 
-{% block scripts %}{{ chart_scripts | safe }}{% endblock %}
+{% block scripts %}
+<script src="{{ root }}/static/sections.js" defer></script>
+{{ chart_scripts | safe }}
+{% endblock %}

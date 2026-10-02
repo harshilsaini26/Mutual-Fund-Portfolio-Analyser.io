@@ -40,7 +40,7 @@
       {% for column in env.payload.columns %}
       {% set value = row[column.key] %}
       {% set kind = row.kind if column.kind == 'row' else column.kind %}
-      <td class="col--{{ kind }}"{% if kind != 'text' and value is not none %} data-value="{{ value }}"{% endif %}>
+      <td class="col--{{ kind }}" data-label="{{ column.label }}"{% if kind != 'text' and value is not none %} data-value="{{ value }}"{% endif %}>
         {% if column.key == 'confidence' and row.reconciled is defined %}
           {{ value }}{% if not row.reconciled %}
           <abbr class="flag" title="This folio did not reconcile against the statement's own closing balance.">!</abbr>
@@ -61,3 +61,12 @@
   </tbody>
 </table>
 </div>
+{#- On a phone the "What it says" column gives way to this list (V1-84): open in
+    the HTML, closed by app.js on a narrow screen. -#}
+{% if env.view_id == "fund_performance" %}
+<details class="tuck" open><summary>What each measure says</summary>
+  <dl class="measure-notes">
+    {% for row in env.payload.rows %}<dt>{{ row.measure }}</dt><dd>{{ row.meaning }}</dd>{% endfor %}
+  </dl>
+</details>
+{% endif %}

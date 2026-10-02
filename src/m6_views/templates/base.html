@@ -124,12 +124,16 @@
     <span>Self-hosted app</span>{{ icon.i("external") }}</a>
   {{ settings_button() }}
 </header>
-<p class="public-note">
-  A public copy of the fund pages, built {{ built | fmt_date }} from AMFI's prices
-  and fund houses' own disclosures. Descriptive, not advice. Benchmark comparisons
-  and your own portfolio are in the
-  <a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">self-hosted app</a>.
-</p>
+{#- One line on a phone (V1-84): the first sentence, then the rest behind "More",
+    open in the HTML and closed by app.js on a narrow screen. -#}
+<div class="public-note">
+  <p>A public copy of the fund pages, built {{ built | fmt_date }} from AMFI's prices
+  and fund houses' own disclosures.</p>
+  <details class="tuck" open><summary>More</summary>
+    <p>Descriptive, not advice. Benchmark comparisons and your own portfolio are in the
+    <a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">self-hosted app</a>.</p>
+  </details>
+</div>
 {% else %}
 <div class="shell">
   <aside class="sidebar" id="sidebar">

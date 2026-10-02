@@ -145,7 +145,8 @@ def test_every_link_works_from_the_project_subdirectory(site: Path) -> None:
     for html in site.rglob("*.html"):
         text = html.read_text(encoding="utf-8")
         for link in re.findall(r'(?<![\w-])(?:href|src|action)="([^"]*)"', text):
-            assert link.startswith((BASE, "https://")), f"{html.name}: {link}"
+            # A same-page anchor (the fund page's section navigator) works anywhere.
+            assert link.startswith((BASE, "https://", "#")), f"{html.name}: {link}"
         assert f'data-index="{BASE}/search.json"' in text  # the search box's list
         assert "/api/" not in text and "/view/" not in text and "/fragment/" not in text
 
@@ -229,6 +230,21 @@ def test_the_zoom_row_is_reserved_before_scripts_run(site: Path) -> None:
     page = _page(site, DIRECT)
     growth = page[page.index('data-view-id="fund_growth"'):]
     assert growth.index("data-zoom-slot") < growth.index("echart__canvas")
+
+
+def test_the_public_fund_page_has_its_navigator(site: Path) -> None:
+    page = _page(site, DIRECT)
+    assert '<nav class="sections"' in page and 'href="#fund_peers"' in page
+    assert (site / "static" / "sections.js").is_file()
+
+
+def test_the_public_note_keeps_its_first_sentence_out_of_the_toggle(site: Path) -> None:
+    page = _page(site, DIRECT)
+    note = re.search(r'<div class="public-note">(.*?)</div>', page, re.S)
+    assert note
+    first, _, rest = note.group(1).partition('<details class="tuck" open>')
+    assert "A public copy of the fund pages" in first
+    assert "<summary>More</summary>" in rest and "self-hosted app" in rest
 
 
 def test_an_index_funds_price_stands_in_for_the_benchmark_it_declares(

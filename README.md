@@ -129,7 +129,9 @@ and each page leads with charts, each under one plain sentence:
 - **What it owns:** an asset-mix ring, its largest holdings as a treemap, and bars by
   company size and by sector.
 
-Charts respond to hover, zoom and a click on the legend. Every panel exports to CSV, and
+A row of section links stays pinned at the top of every fund page and marks where you
+are; on a phone the panels are laid out for a narrow screen, with secondary detail one
+tap away. Charts respond to hover, zoom and a click on the legend. Every panel exports to CSV, and
 carries its as-of date, how stale its data is, and how much of it could not be resolved.
 
 A fund whose price history is not loaded yet says so on its page, with the command that

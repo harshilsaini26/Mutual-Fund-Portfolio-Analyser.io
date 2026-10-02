@@ -260,6 +260,21 @@ FUND_PAGE = (
     "fund_portfolio",
 )
 
+#: The fund page's section navigator (DECISIONS V1-84): a short name per panel, in
+#: `FUND_PAGE` order, then the closed "every figure" table at the end.
+SECTION_LABELS = {
+    "fund_header": "Overview",
+    "fund_performance": "Performance",
+    "fund_growth": "Growth",
+    "fund_nav": "Price",
+    "fund_returns": "Returns",
+    "fund_peers": "Peers",
+    "fund_drawdown": "Falls",
+    "fund_consistency": "Consistency",
+    "fund_portfolio": "Holdings",
+    "fund_xray_header": "Every figure",
+}
+
 BuilderT = TypeVar("BuilderT", bound=ViewBuilder)
 
 #: view_id -> the builder class, which is exactly a `Deps -> ViewBuilder`
@@ -320,6 +335,7 @@ def catalogue() -> list[dict[str, Any]]:
 
 __all__ = [
     "FUND_PAGE",
+    "SECTION_LABELS",
     "VIEW_DEFS",
     "VIEW_REGISTRY",
     "ViewDef",
