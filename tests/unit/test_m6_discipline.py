@@ -243,6 +243,24 @@ def test_no_prescriptive_language_in_the_templates() -> None:
     assert not offences, f"prescriptive language in templates: {offences}"
 
 
+def test_no_prescriptive_language_in_the_learn_content() -> None:
+    """Every word of the explanations and guides (V1-87): teaching what a term
+    means is the place a sentence most easily slides into telling someone what
+    to do."""
+    from src.m6_views.learn import load
+
+    learn = load()
+    texts = [t for term in learn.terms.values() for t in (term.title, term.short)]
+    for guide in learn.guides:
+        texts += [guide.title, guide.summary]
+        for section in guide.sections:
+            texts += [section.heading, *section.paragraphs]
+    offences = [
+        (p, t) for t in texts for p in PRESCRIPTIVE_PATTERNS if re.search(p, t, re.I)
+    ]
+    assert not offences, offences
+
+
 @pytest.mark.parametrize("name", ["portfolio.js", "compare.js", "kit.js"])
 def test_no_prescriptive_language_in_the_page_scripts(name: str) -> None:
     """The portfolio (V1-82) and compare (V1-85) pages write their sentences in

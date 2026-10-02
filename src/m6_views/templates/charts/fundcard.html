@@ -42,7 +42,7 @@
   </div>
   <dl class="facts facts--grid">
     {% for fact in env.payload.facts %}
-    <div><dt>{{ fact.label }}</dt><dd>{{ fact.value }}</dd></div>
+    <div><dt>{{ fact.label }}{% if term_for.fact.get(fact.label) %}{{ vc.term(term_for.fact[fact.label], 'fact-' ~ loop.index) }}{% endif %}</dt><dd>{{ fact.value }}</dd></div>
     {% endfor %}
   </dl>
   {% if env.payload.tiles %}

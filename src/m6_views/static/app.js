@@ -15,6 +15,19 @@
 
   var ROOT = document.body.getAttribute("data-root") || "";
 
+  // A browser without popovers (V1-87): each `?` becomes a link to its entry in
+  // the glossary, so the explanation is still one tap away.
+  if (!("popover" in HTMLElement.prototype)) {
+    document.querySelectorAll("button.term").forEach(function (button) {
+      var link = document.createElement("a");
+      link.className = "term";
+      link.href = ROOT + "/learn/glossary/#" + button.getAttribute("data-key");
+      link.setAttribute("aria-label", button.getAttribute("aria-label"));
+      link.textContent = "?";
+      button.replaceWith(link);
+    });
+  }
+
   function store(key, value) {
     try {
       if (value === undefined) return window.localStorage.getItem(key);

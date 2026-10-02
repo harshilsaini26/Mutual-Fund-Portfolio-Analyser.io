@@ -118,6 +118,8 @@
        {% if active == 'compare' %}aria-current="page"{% endif %}>Compare</a>
     <a class="topnav__link" href="{{ root }}/portfolio/"
        {% if active == 'portfolio' %}aria-current="page"{% endif %}>Your portfolio</a>
+    <a class="topnav__link" href="{{ root }}/learn/"
+       {% if active == 'learn' %}aria-current="page"{% endif %}>Learn</a>
     <a class="topnav__link" href="{{ root }}/#categories">Categories</a>
     <a class="topnav__link" href="{{ root }}/#about">About the data</a>
   </nav>
@@ -159,6 +161,9 @@
       <a class="sidenav__link" href="{{ root }}/search"
          {% if active == 'search' %}aria-current="page"{% endif %}>
         {{ icon.i("search") }}<span>Find a fund</span></a>
+      <a class="sidenav__link" href="{{ root }}/learn/"
+         {% if active == 'learn' %}aria-current="page"{% endif %}>
+        {{ icon.i("file") }}<span>Learn</span></a>
     </nav>
     {#
       §15.3: report freshness so the page can say "last updated" honestly rather

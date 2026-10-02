@@ -37,6 +37,8 @@ from fastapi.templating import Jinja2Templates
 from src.common.types import UserId
 from src.m6_views.builder import Scope
 from src.m6_views.envelope import ViewEnvelope
+from src.m6_views.learn import GROUPS, TERMS_FOR, link_terms
+from src.m6_views.learn import load as load_learn
 from src.m6_views.registry import (
     FUND_PAGE,
     SECTION_LABELS,
@@ -103,7 +105,14 @@ def templates(root: str = "", static: bool = False) -> Jinja2Templates:
     """
     engine = Jinja2Templates(directory=str(TEMPLATES))
     engine.env.filters.update(FILTERS)
+    # The explanations and guides (V1-87): checked when loaded, so a bad entry
+    # stops the server and the build rather than reaching a page.
+    learn = load_learn()
+    engine.env.filters["link_terms"] = lambda text: link_terms(text, learn, root)
     engine.env.globals.update(
+        learn=learn,
+        learn_groups=GROUPS,
+        term_for=TERMS_FOR,
         root=root,
         static=static,
         view_names={view_id: view.view_name for view_id, view in VIEW_DEFS.items()},
@@ -295,6 +304,26 @@ def make_router(
                 "hits": search(q) if q.strip() else [],
             },
         )
+
+    @router.get("/learn/", response_class=HTMLResponse)
+    async def learn_index(request: Request) -> Any:
+        return engine.TemplateResponse(
+            request, "learn.html", _shell("USER-01", None, active="learn"))
+
+    @router.get("/learn/glossary/", response_class=HTMLResponse)
+    async def learn_glossary(request: Request) -> Any:
+        return engine.TemplateResponse(
+            request, "learn_glossary.html", _shell("USER-01", None, active="learn"))
+
+    @router.get("/learn/{slug}/", response_class=HTMLResponse)
+    async def learn_guide(request: Request, slug: str) -> Any:
+        try:
+            guide = load_learn().guide(slug)
+        except KeyError:
+            return HTMLResponse(status_code=404, content="<p>No such guide.</p>")
+        return engine.TemplateResponse(
+            request, "learn_guide.html",
+            {**_shell("USER-01", None, active="learn"), "guide": guide})
 
     @router.get("/view/{view_id}", response_class=HTMLResponse)
     async def one_view(

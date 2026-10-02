@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "macros.html" as vc %}
+{% block title %}{{ guide.title }}{% endblock %}
+
+{#
+  One guide (DECISIONS V1-87). Paragraphs pass through `link_terms`, which escapes
+  the text and turns [[key]] into a glossary link; every other string is
+  autoescaped.
+#}
+{% block content %}
+<article class="plain learn learn--guide">
+  <p class="eyebrow"><a href="{{ root }}/learn/">Learn</a> · {{ guide.group }}</p>
+  <h1>{{ guide.title }}</h1>
+  <p class="lede">{{ guide.summary }}</p>
+  {{ vc.learn_note() }}
+  {% for section in guide.sections %}
+  <h2>{{ section.heading }}</h2>
+  {% for paragraph in section.paragraphs %}<p>{{ paragraph | link_terms }}</p>{% endfor %}
+  {% endfor %}
+  <h2>Sources</h2>
+  {{ vc.learn_sources(guide.sources) }}
+  <p class="learn__more"><a href="{{ root }}/learn/">All guides</a> ·
+    <a href="{{ root }}/learn/glossary/">Glossary</a></p>
+</article>
+{% endblock %}

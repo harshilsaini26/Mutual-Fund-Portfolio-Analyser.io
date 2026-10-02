@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "icons.html" as icon %}
+{% import "macros.html" as vc %}
 {% block title %}Every fund · Look-through{% endblock %}
 
 {#
@@ -44,12 +45,12 @@
       <thead><tr>
         <th scope="col"><button type="button" data-sort="text">Fund</button></th>
         <th scope="col"><button type="button" data-sort="text">Category</button></th>
-        <th scope="col" class="num"><button type="button" data-sort="number">Fund size</button></th>
-        <th scope="col" class="num"><button type="button" data-sort="number">Expense ratio</button></th>
-        <th scope="col" class="num"><button type="button" data-sort="number">1 year</button></th>
+        <th scope="col" class="num"><button type="button" data-sort="number">Fund size</button>{{ vc.term("aum", "col-0") }}</th>
+        <th scope="col" class="num"><button type="button" data-sort="number">Expense ratio</button>{{ vc.term("expense_ratio", "col-1") }}</th>
+        <th scope="col" class="num"><button type="button" data-sort="number">1 year</button>{{ vc.term("annualised_return", "col-2") }}</th>
         <th scope="col" class="num"><button type="button" data-sort="number">3 years</button></th>
         <th scope="col" class="num"><button type="button" data-sort="number">5 years</button></th>
-        <th scope="col" class="num"><button type="button" data-sort="number">Rank in category, 3 years</button></th>
+        <th scope="col" class="num"><button type="button" data-sort="number">Rank in category, 3 years</button>{{ vc.term("category_rank", "col-3") }}</th>
       </tr></thead>
       <tbody>
         {% for fund in funds %}

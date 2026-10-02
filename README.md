@@ -318,7 +318,9 @@ highest three-year returns; `/funds/` lists every published fund in one table yo
 sort by size, cost, return or category rank, and narrow by category. The gear in the
 top bar sets the theme (device, light, dark or Matrix), the font (Terminess, Rubik or
 Atkinson Hyperlegible), text size, density, motion and accent, remembered in your
-browser. `/compare/` sets two to four funds side by side — their figures, what
+browser. `/learn/` explains, in plain words and with the pages each explanation
+was checked against, every term the site shows, and a `?` beside each term opens
+its explanation in place. `/compare/` sets two to four funds side by side — their figures, what
 ₹10,000 became in each, how much of their portfolios is the same companies, and what
 they hold — from a "Compare" link on any fund page. `/portfolio/`
 builds your own portfolio from the funds you pick and what you put in, works out its

@@ -137,7 +137,8 @@ def test_one_page_per_fund_with_a_year_of_prices(site: Path) -> None:
     # twenty days of prices get no page.
     assert pages == {DIRECT, AGGREGATED}
     listed = json.loads((site / "search.json").read_text(encoding="utf-8"))
-    assert {h["url"] for h in listed} == {
+    # The list also carries the learn pages (V1-87); this is about the funds.
+    assert {h["url"] for h in listed if "/fund/" in h["url"]} == {
         f"{BASE}/fund/{DIRECT}/", f"{BASE}/fund/{AGGREGATED}/"
     }
 
@@ -427,3 +428,54 @@ def test_the_compare_page_is_published_and_linked(site: Path) -> None:
     assert (site / "static" / "compare.js").is_file()
     assert f'href="{BASE}/compare/"' in _page(site, DIRECT)
     assert f'href="{BASE}/compare/#f={DIRECT}"' in _page(site, DIRECT)
+
+
+LEARN_NOTE = ("This explains how things work. "
+              "It is not advice about what to buy, sell or hold.")
+
+
+def test_the_learn_pages_are_published(site: Path) -> None:
+    from markupsafe import escape
+    from src.m6_views.learn import load
+
+    learn = load()
+    assert LEARN_NOTE in (site / "learn" / "index.html").read_text(encoding="utf-8")
+    for guide in learn.guides:
+        page = (site / "learn" / guide.slug / "index.html").read_text(encoding="utf-8")
+        assert LEARN_NOTE in page and str(escape(guide.title)) in page, guide.slug
+        for ref in guide.sources:
+            assert ref.url in page and format_date(ref.checked) in page, ref.url
+    glossary = (site / "learn" / "glossary" / "index.html").read_text(encoding="utf-8")
+    assert LEARN_NOTE in glossary
+    for key in learn.terms:
+        assert f'id="{key}"' in glossary, key
+
+
+def test_the_top_bar_links_learn(site: Path) -> None:
+    assert f'href="{BASE}/learn/"' in _page(site, DIRECT)
+
+
+def test_search_finds_terms_and_guides(site: Path) -> None:
+    from src.m6_views.learn import load
+
+    entries = json.loads((site / "search.json").read_text(encoding="utf-8"))
+    assert {"name": "Expense ratio (TER)", "detail": "Glossary",
+            "url": f"{BASE}/learn/glossary/#expense_ratio"} in entries
+    guides = {e["url"] for e in entries if e["detail"] == "Guide"}
+    assert guides == {f"{BASE}/learn/{g.slug}/" for g in load().guides}
+
+
+def test_the_public_copy_says_why_a_fund_has_no_portfolio(tmp_path: Path) -> None:
+    """The public page is read by people with no command line: it gets the reason
+    in words, not the local app's commands."""
+    from src.m6_views.builder import Scope
+    from src.m6_views.states import empty_envelope
+
+    scope = Scope(user_id=publish.PUBLIC_USER, as_of=date(2026, 10, 2),
+                  scope_type="scheme", scope_id=DIRECT)
+    local = empty_envelope("fund_portfolio", "What does this fund own?", scope,
+                           "No portfolio. Run python -m jobs.fetch_groww.")
+    shown = publish._adapter(tmp_path, f"{BASE}/fund/{DIRECT}/", scope)(local)
+    assert shown.state_reason == publish.NO_PORTFOLIO
+    assert "python -m" not in shown.state_reason
+    assert "about 100 a night" in shown.state_reason

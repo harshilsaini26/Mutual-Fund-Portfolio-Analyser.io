@@ -126,3 +126,11 @@ def test_a_chart_of_several_funds_keeps_its_legend_to_one_row() -> None:
     charts = (CSS.parent / "charts.js").read_text(encoding="utf-8")
     many = charts[charts.index("var many ="):charts.index("o.series = c.series.map")]
     assert re.search(r'type\s*[:=]\s*"scroll"', many) and '"truncate"' in many
+
+
+def test_an_explanation_stays_hidden_where_popovers_are_not_supported() -> None:
+    """Hiding a closed popover comes only from the browser's own stylesheet, so a
+    browser without popovers would show every explanation inline (V1-87)."""
+    css = CSS.read_text(encoding="utf-8")
+    assert re.search(r"\.term-pop\s*\{[^}]*display:\s*none", css)
+    assert re.search(r"\.term-pop:popover-open\s*\{[^}]*display:\s*block", css)

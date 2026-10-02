@@ -84,7 +84,7 @@
     <h2 id="q-{{ env.view_id }}" class="sr-only">{{ env.question }}</h2>
     {% else %}
     <div>
-      <p class="view__eyebrow">{{ icon.i(view_icons.get(env.view_id, "list")) }}{{ view_names.get(env.view_id, "") }}</p>
+      <p class="view__eyebrow">{{ icon.i(view_icons.get(env.view_id, "list")) }}{{ view_names.get(env.view_id, "") }}{% if term_for.view.get(env.view_id) %}{{ term(term_for.view[env.view_id], "view") }}{% endif %}</p>
       <h2 id="q-{{ env.view_id }}">{{ env.question }}</h2>
     </div>
     {% endif %}
@@ -162,7 +162,7 @@
   which would be a claim.
 #}
 <div class="kpi__tile{% if tile.value is none %} kpi__tile--absent{% endif %}{% if tile.tone %} kpi__tile--{{ tile.tone }}{% endif %}">
-  <dt>{{ tile.label }}</dt>
+  <dt>{{ tile.label }}{% if term_for.tile.get(tile.key) %}{{ term(term_for.tile[tile.key], tile.key) }}{% endif %}</dt>
   <dd class="kpi__value"{% if tile.value is none %} title="{{ tile.context or why }}"{% else %} data-island="count-up"{% endif %}>{{ tile | fmt_tile }}</dd>
   {% if tile.context %}
   <dd class="kpi__context">{% if tile.symbol %}<span class="kpi__symbol" aria-hidden="true">{{ tile.symbol }}</span>{% endif %}<span>{{ tile.context }}</span></dd>
@@ -171,4 +171,36 @@
   <dd class="kpi__spark"><svg viewBox="0 0 120 32" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polygon points="{{ spark.area }}"/><polyline points="{{ spark.line }}"/></svg></dd>
   {% endif %}
 </div>
+{%- endmacro %}
+
+
+{#- Learn (V1-87): the note every learn page carries, and a list of the pages an
+    entry was checked against, each with its date. -#}
+{% macro learn_note() -%}
+<p class="learn__note" role="note">This explains how things work. It is not advice about what to buy, sell or hold.</p>
+{%- endmacro %}
+
+{% macro learn_sources(refs) -%}
+<ul class="learn__sources">
+  {% for ref in refs %}
+  <li><span class="learn__source">{{ learn.sources[ref.source].name }}</span>
+    <a href="{{ ref.url }}" rel="noopener">{{ ref.url.split('//', 1)[1] }}</a>
+    <span class="learn__checked">checked {{ ref.checked | fmt_date }}</span></li>
+  {% endfor %}
+</ul>
+{%- endmacro %}
+
+
+{#- A term explained in place (V1-87): a `?` button and the native popover it
+    opens, which needs no script. Spans, so it is valid inside a heading, a
+    paragraph or a table cell. `where` makes the id unique on the page.
+    `term_pop` is the popover alone, for buttons a page's script builds. -#}
+{% macro term_pop(key, where) -%}
+{%- set t = learn.term(key) -%}
+<span id="t-{{ key }}-{{ where }}" popover class="term-pop" data-title="{{ t.title }}"><span class="term-pop__title">{{ t.title }}</span><span class="term-pop__text">{{ t.short }}</span><span class="term-pop__more"><a href="{{ root }}/learn/glossary/#{{ key }}">More in the glossary</a> · {{ learn.source_names(t.sources) | join(", ") }}</span></span>
+{%- endmacro %}
+
+{% macro term(key, where) -%}
+<button type="button" class="term" popovertarget="t-{{ key }}-{{ where }}" data-key="{{ key }}"
+        aria-label="What is {{ learn.term(key).title }}?">?</button>{{ term_pop(key, where) }}
 {%- endmacro %}

@@ -190,8 +190,8 @@
   }
 
   // --- 1. key facts and returns ------------------------------------------------------
-  // [label, the shown text, the figure the high/low tags compare (tagged rows only):
-  // the one shown, so the tags never disagree with the text]
+  // The figure the high/low tags compare: the one shown, so the tags never
+  // disagree with the text.
   function raw(key, abs) {
     return function (f) {
       var n = shownFigure(f.labels[key]);
@@ -199,20 +199,21 @@
     };
   }
   function label(key) { return function (f) { return f.labels[key]; }; }
+  // [label, the shown text, the figure tagged high/low (or null), the term explained]
   var ROWS = [
-    ["Fund house", function (f) { return f.house; }],
-    ["Category", function (f) { return f.category_name; }],
-    ["Fund size", label("size"), raw("size")],
-    ["Expense ratio", label("ter"), raw("ter")],
-    ["Prices from", label("prices_from")],
-    ["Benchmark", function (f) { return f.benchmark; }],
-    ["Return a year, 1 year", label("r1"), raw("r1")],
-    ["Return a year, 3 years", label("r3"), raw("r3")],
-    ["Return a year, 5 years", label("r5"), raw("r5")],
-    ["Volatility, 3 years", label("vol3"), raw("vol3")],
-    ["Deepest fall, 3 years", label("fall3"), raw("fall3", true)],
-    ["Sharpe ratio, 3 years", label("sharpe3"), raw("sharpe3")],
-    ["Rank in category, 3 years", function (f) { return f.rank3; }],
+    ["Fund house", function (f) { return f.house; }, null, "amc"],
+    ["Category", function (f) { return f.category_name; }, null, "sebi_categories"],
+    ["Fund size", label("size"), raw("size"), "aum"],
+    ["Expense ratio", label("ter"), raw("ter"), "expense_ratio"],
+    ["Prices from", label("prices_from"), null, null],
+    ["Benchmark", function (f) { return f.benchmark; }, null, "benchmark"],
+    ["Return a year, 1 year", label("r1"), raw("r1"), "annualised_return"],
+    ["Return a year, 3 years", label("r3"), raw("r3"), "annualised_return"],
+    ["Return a year, 5 years", label("r5"), raw("r5"), "annualised_return"],
+    ["Volatility, 3 years", label("vol3"), raw("vol3"), "volatility"],
+    ["Deepest fall, 3 years", label("fall3"), raw("fall3", true), "max_drawdown"],
+    ["Sharpe ratio, 3 years", label("sharpe3"), raw("sharpe3"), "sharpe"],
+    ["Rank in category, 3 years", function (f) { return f.rank3; }, null, "category_rank"],
   ];
 
   function heading(f) {
@@ -231,7 +232,7 @@
     var body = el("tbody");
     ROWS.forEach(function (row) {
       var tags = row[2] ? highLow(funds.map(row[2])) : [];
-      var tr = el("tr", null, el("th", { scope: "row" }, row[0]));
+      var tr = el("tr", null, el("th", { scope: "row" }, row[0], row[3] && K.termButton(row[3], "cmp")));
       funds.forEach(function (f, i) {
         var text = row[1](f);
         tr.appendChild(el("td", { "class": row[2] ? "num" : null }, text == null ? "—" : text,

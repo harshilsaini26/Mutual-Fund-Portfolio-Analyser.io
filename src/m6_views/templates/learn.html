@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import "macros.html" as vc %}
+{% block title %}Learn{% endblock %}
+
+{#
+  The guides, by group (DECISIONS V1-87). Content from learn.yaml, checked when
+  loaded; every entry links the pages it was checked against.
+#}
+{% block content %}
+<section class="plain learn">
+  <p class="eyebrow">Learn</p>
+  <h1>How mutual funds work, in plain words</h1>
+  <p class="lede">Short guides to the ideas behind every figure on this site, and a
+    glossary of its terms. Each is written for this site and links the pages it was
+    checked against, from SEBI, AMFI and other reputable sources.</p>
+  {{ vc.learn_note() }}
+  {% for group in learn_groups %}
+  <section class="learn__group" aria-labelledby="learn-g{{ loop.index }}">
+    <h2 id="learn-g{{ loop.index }}">{{ group }}</h2>
+    <ul class="learn__cards">
+      {% for guide in learn.guides if guide.group == group %}
+      <li class="card learn__card"><a href="{{ root }}/learn/{{ guide.slug }}/">
+        <h3>{{ guide.title }}</h3><p>{{ guide.summary }}</p></a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endfor %}
+  <p><a class="button" href="{{ root }}/learn/glossary/">Every term, A to Z</a></p>
+</section>
+{% endblock %}

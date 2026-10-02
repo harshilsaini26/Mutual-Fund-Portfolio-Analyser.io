@@ -722,3 +722,13 @@ def test_the_sidebar_marks_where_the_reader_is(client: TestClient) -> None:
     assert html.count('name="setting-accent"') == 4
     # Without site data, settings cannot follow the reader to the next page.
     assert "apply to this page only" in html
+
+
+def test_the_local_app_serves_learn(client: TestClient) -> None:
+    """The explanations' "More" links stay on this machine (V1-87)."""
+    note = ("This explains how things work. "
+            "It is not advice about what to buy, sell or hold.")
+    for path in ("/learn/", "/learn/glossary/", "/learn/what-a-fund-costs/"):
+        response = client.get(path)
+        assert response.status_code == 200 and note in response.text, path
+    assert client.get("/learn/nope/").status_code == 404

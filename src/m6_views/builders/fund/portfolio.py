@@ -65,9 +65,11 @@ class FundPortfolioBuilder:
             return empty_envelope(
                 VIEW_ID, question, scope,
                 "No portfolio is loaded for this fund. Portfolios come from each "
-                "fund house's monthly disclosure; HDFC, ICICI Prudential, Kotak, "
-                "Nippon India and PPFAS are read directly, and any other fund can "
-                "be added with python -m jobs.fetch_groww.",
+                "fund house's monthly disclosure: Kotak's and ICICI Prudential's "
+                "are fetched by python -m jobs.fetch_amc; HDFC, Nippon India and "
+                "PPFAS workbooks saved in data/inbox/ are read by python -m "
+                "jobs.ingest_inbox; any other fund can be added from its Groww "
+                "page with python -m jobs.fetch_groww.",
             )
         fund, disclosed, tier = found
         name = self.lookthrough.issuer_name

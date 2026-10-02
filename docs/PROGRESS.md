@@ -263,6 +263,12 @@ pushes one commit to `gh-pages`. Measured on the first full build, 2026-09-26:
   an index fund that declares the same benchmark on its Groww page, named as such.
   The crawl map gained that column on 2026-09-26, so proxies fill in as pages are
   read, about 100 a night.
+- **Learn** (V1-87): 26 terms and 11 guides, each written for this site and
+  linked to the SEBI, AMFI or Zerodha Varsity pages it was checked against, with
+  the date. A `?` beside a term on the fund, `/funds/`, compare and portfolio pages
+  opens its explanation in place; `/learn/` has the guides and an A to Z glossary.
+  The build refuses a source off the allowed list, advice-style wording, or any
+  tax figure.
 - **Compare** (V1-85): `/compare/` sets two to four funds side by side, chosen from
   a "Compare" link on each fund page or a picker, the choice kept in the address:
   key figures with the highest and lowest of each marked, what ₹10,000 became in

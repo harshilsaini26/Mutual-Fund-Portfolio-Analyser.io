@@ -235,3 +235,15 @@ def test_the_ranks_list_is_one_tap_away(client: TestClient) -> None:  # noqa: F8
 def test_the_local_app_has_no_compare_link(client: TestClient) -> None:  # noqa: F811
     """`/compare/` exists only on the public site (V1-85)."""
     assert "/compare/" not in client.get(f"/fund/S1{QS}").text
+
+
+def test_a_fund_without_a_portfolio_says_where_portfolios_come_from(
+    client: TestClient,  # noqa: F811
+) -> None:
+    """Only Kotak and ICICI are fetched; the other three houses' workbooks are
+    read from the inbox, so "read directly" told the reader something untrue."""
+    env = client.get(f"/api/views/fund_portfolio{QS}&scope_id=NOPORTFOLIO").json()
+    reason = env["state_reason"]
+    assert "read directly" not in reason
+    assert "python -m jobs.fetch_amc" in reason and "data/inbox/" in reason
+    assert "python -m jobs.fetch_groww" in reason

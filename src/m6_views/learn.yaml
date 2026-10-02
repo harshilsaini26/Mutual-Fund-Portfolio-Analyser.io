@@ -1,0 +1,748 @@
+# What the site's terms mean, and guides (DECISIONS V1-87). Loaded and checked
+# by learn.py: read its docstring before editing. Every entry is written in this
+# project's own words; nothing is copied or quoted from a source. Each source
+# below is a page that was read on the date given.
+#
+# Investopedia is on the allowed list but cited nowhere yet: its site refuses
+# the automated reader this content was researched with, and an entry cites
+# only a page that was actually read.
+
+sources:
+  investopedia: {name: Investopedia, hosts: [www.investopedia.com]}
+  zerodha: {name: Zerodha Varsity, hosts: [zerodha.com], path: /varsity/}
+  nism: {name: NISM, hosts: [www.nism.ac.in]}
+  sebi: {name: SEBI, hosts: [www.sebi.gov.in]}
+  amfi: {name: AMFI, hosts: [www.amfiindia.com, www.mutualfundssahihai.com]}
+
+# The pages, once each, referred to below by YAML anchor.
+refs:
+  sebi_faq: &sebi_faq {source: sebi, url: "https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf", checked: 2026-10-02}
+  sebi_categories: &sebi_categories {source: sebi, url: "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2017/1509103633344.pdf", checked: 2026-10-02}
+  sebi_tri: &sebi_tri {source: sebi, url: "https://www.sebi.gov.in/sebi_data/attachdocs/jan-2018/1515066187290.pdf", checked: 2026-10-02}
+  amfi_nav: &amfi_nav {source: amfi, url: "https://www.amfiindia.com/investor/knowledge-center-info?zoneName=NetAssetValueNAV", checked: 2026-10-02}
+  amfi_direct: &amfi_direct {source: amfi, url: "https://www.amfiindia.com/investor/knowledge-center-info?zoneName=DirectPlan", checked: 2026-10-02}
+  amfi_ter: &amfi_ter {source: amfi, url: "https://www.amfiindia.com/investor/knowledge-center-info?zoneName=expenseRatio", checked: 2026-10-02}
+  amfi_tax: &amfi_tax {source: amfi, url: "https://www.amfiindia.com/investor/knowledge-center-info?zoneName=TaxRegimeForMutualFunds", checked: 2026-10-02}
+  amfi_aaum: &amfi_aaum {source: amfi, url: "https://www.amfiindia.com/aum-data/average-aum", checked: 2026-10-02}
+  mfsh_direct: &mfsh_direct {source: amfi, url: "https://www.mutualfundssahihai.com/en/what-direct-plan-regular-plan", checked: 2026-10-02}
+  mfsh_idcw: &mfsh_idcw {source: amfi, url: "https://www.mutualfundssahihai.com/en/idcw-plans-simplifying-income-and-capital-distributions-mutual-funds", checked: 2026-10-02}
+  v_ter: &v_ter {source: zerodha, url: "https://zerodha.com/varsity/chapter/mutual-fund-expense-ratio-direct-and-regular-plans/", checked: 2026-10-02}
+  v_returns: &v_returns {source: zerodha, url: "https://zerodha.com/varsity/chapter/measuring-mutual-fund-returns/", checked: 2026-10-02}
+  v_rolling: &v_rolling {source: zerodha, url: "https://zerodha.com/varsity/chapter/rolling-returns/", checked: 2026-10-02}
+  v_risk: &v_risk {source: zerodha, url: "https://zerodha.com/varsity/chapter/mutual-fund-risk-metrics/", checked: 2026-10-02}
+  v_know: &v_know {source: zerodha, url: "https://zerodha.com/varsity/chapter/know-your-fund/", checked: 2026-10-02}
+  v_bench: &v_bench {source: zerodha, url: "https://zerodha.com/varsity/chapter/mutual-benchmarking/", checked: 2026-10-02}
+  v_index: &v_index {source: zerodha, url: "https://zerodha.com/varsity/chapter/introduction-to-index-funds/", checked: 2026-10-02}
+  v_portfolio: &v_portfolio {source: zerodha, url: "https://zerodha.com/varsity/chapter/the-mutual-fund-portfolio/", checked: 2026-10-02}
+  v_equity: &v_equity {source: zerodha, url: "https://zerodha.com/varsity/chapter/the-equity-scheme-part-1/", checked: 2026-10-02}
+  v_analyse: &v_analyse {source: zerodha, url: "https://zerodha.com/varsity/chapter/how-to-analyse-an-equity-mutual-fund/", checked: 2026-10-02}
+  v_allocation: &v_allocation {source: zerodha, url: "https://zerodha.com/varsity/chapter/asset-allocation-an-introduction/", checked: 2026-10-02}
+
+terms:
+  nav:
+    title: NAV (net asset value)
+    short: >-
+      The price of one unit of a fund: the value of everything the fund holds, less
+      what it owes, divided by the number of units in issue. It changes every
+      business day as the prices of the holdings move, and every fund publishes it
+      daily, on its own website and AMFI's.
+    sources: [*sebi_faq, *amfi_nav]
+    related: [units, direct_plan]
+  units:
+    title: Units
+    short: >-
+      What an investor owns in a mutual fund. Money put in buys units at the day's
+      NAV, so ₹10,000 at a NAV of ₹50 buys 200 units. Every unit shares equally in
+      the fund's gains and losses, and units are sold back to the fund at the NAV
+      of the day the request counts for.
+    sources: [*sebi_faq, *amfi_nav]
+    related: [nav, amc]
+  amc:
+    title: Fund house (AMC)
+    short: >-
+      The asset management company that invests a fund's money. In India a mutual
+      fund is set up as a trust: a sponsor establishes it, trustees oversee it for
+      the unitholders, the AMC manages the investments and a custodian holds the
+      securities. The fund, its AMC and its custodian are each registered with or
+      approved by SEBI.
+    sources: [*sebi_faq]
+    related: [units]
+  direct_plan:
+    title: Direct plan
+    short: >-
+      A plan bought from the fund house with no distributor; since 1 January 2013
+      SEBI has required one beside every Regular plan. It holds the same portfolio,
+      under the same manager, but pays no distribution commission, so its expense
+      ratio is lower and its NAV, kept separately, grows a little faster.
+    sources: [*sebi_faq, *amfi_direct]
+    related: [regular_plan, expense_ratio]
+  regular_plan:
+    title: Regular plan
+    short: >-
+      A plan bought through a distributor, such as an agent, broker or bank. It holds
+      the same portfolio as the scheme's Direct plan, but its expense ratio is higher
+      because it includes the commission the fund house pays the distributor. Its NAV
+      is kept separately and is lower than the Direct plan's.
+    sources: [*mfsh_direct, *amfi_direct]
+    related: [direct_plan, expense_ratio]
+  growth_idcw:
+    title: Growth and IDCW options
+    short: >-
+      Two ways a plan can handle what it earns. Under Growth the fund keeps it, and
+      the gain shows as a rising NAV. Under IDCW, which SEBI renamed from "dividend"
+      in April 2021, the fund pays part out, and the NAV falls by the amount paid.
+      A payout can include some of the investor's own capital.
+    sources: [*sebi_faq, *mfsh_idcw]
+    related: [nav]
+  lump_sum:
+    title: Lump sum
+    short: >-
+      Money put into a fund in one go, as a single purchase, rather than in
+      instalments. The units are priced at the NAV of the day the purchase counts
+      for. A lump sum and a SIP can both be used in either plan, Direct or Regular.
+    sources: [*sebi_faq]
+    related: [sip, units]
+  sip:
+    title: SIP (systematic investment plan)
+    short: >-
+      A fixed amount put into a fund at regular intervals, often each month. Each
+      instalment buys units at that day's NAV, so the same amount buys more units
+      when the NAV is lower and fewer when it is higher, which averages the cost of
+      a unit over time.
+    sources: [*sebi_faq]
+    related: [lump_sum, xirr]
+  expense_ratio:
+    title: Expense ratio (TER)
+    short: >-
+      The total expense ratio: a fund's yearly running cost, as a share of its
+      assets. It covers management, administration, distribution and similar costs.
+      It is not billed separately; a small part is taken from the fund's assets each
+      day, so the published NAV is already net of it. SEBI sets the most a fund may
+      charge.
+    sources: [*sebi_faq, *amfi_ter, *v_ter]
+    related: [direct_plan, regular_plan]
+  aum:
+    title: Fund size (AUM)
+    short: >-
+      Assets under management: the total value of the money a fund manages. AMFI
+      publishes each scheme's average for every quarter, and that average is the fund
+      size this site shows. Size says how much money a fund runs, not how it has done.
+    sources: [*amfi_aaum, *v_analyse]
+    related: [amc]
+  annualised_return:
+    title: Annualised return
+    short: >-
+      The steady yearly rate, compounding, that would take an investment from its
+      starting value to its ending value. ₹10,000 that became ₹15,000 in three years
+      returned about 14.5% a year. Annualising lets periods of different lengths be
+      set side by side.
+    sources: [*v_returns]
+    related: [xirr, rolling_returns]
+  xirr:
+    title: XIRR
+    short: >-
+      A yearly return for money that went in on different dates and in different
+      amounts, such as a SIP. Each amount is counted from its own date. For one
+      purchase held more than a year it equals the annualised return; over less than
+      a year it can look extreme, because a short gain is scaled up to a year.
+    sources: [*v_returns]
+    related: [annualised_return, sip]
+  volatility:
+    title: Volatility
+    short: >-
+      How much a fund's returns swing up and down: the standard deviation of its
+      returns, stated as a yearly percentage. A higher figure means larger swings in
+      both directions. Two funds with the same return can differ widely in how bumpy
+      the way there was. This site measures it from daily prices over each period
+      it shows.
+    sources: [*v_risk, *v_know]
+    related: [sharpe, max_drawdown]
+  max_drawdown:
+    title: Deepest fall (maximum drawdown)
+    short: >-
+      The largest drop in a fund's NAV from a high to a later low. A NAV that rose to
+      ₹200 and fell to ₹160 had a 20% drawdown: the worst loss a buyer at the peak
+      would have seen. This site also shows how long the fund took to climb back, or
+      that it has not yet.
+    sources: [*v_know]
+    related: [volatility]
+  sharpe:
+    title: Sharpe ratio
+    short: >-
+      Return per unit of risk: the fund's return above a risk-free rate, divided
+      by its volatility. A higher figure means more return per unit of swing. It sees
+      only the swings that happened, so it can miss rare, sudden risks such as a
+      borrower's default in a debt fund. Its risk-free rate here is the 91-day Treasury
+      bill yield.
+    sources: [*v_risk]
+    related: [volatility]
+  rolling_returns:
+    title: Rolling returns
+    short: >-
+      Returns over every window of one length in a fund's history, such as every
+      three-year stretch, each starting a little after the last (a week apart on
+      this site). A single figure depends
+      on the dates chosen; rolling returns show the whole range: the best, the worst
+      and how often each kind of result happened.
+    sources: [*v_rolling]
+    related: [annualised_return]
+  category_rank:
+    title: Rank in category
+    short: >-
+      Where a fund stands among the funds of its category on one measure, such as
+      "10th of 37" on three-year return. Quartiles split the category into four equal
+      groups, the first holding the top quarter. Ranks compare funds with the same
+      mandate; a rank describes the past, not what comes next.
+    sources: [*v_know, *sebi_faq]
+    related: [sebi_categories]
+  benchmark:
+    title: Benchmark and Total Return Index
+    short: >-
+      The index a fund names as its yardstick, chosen to match what it invests in.
+      Since 2018 SEBI has required funds to measure themselves against the Total
+      Return Index (TRI) version, which counts the dividends the index's companies
+      pay as well as their price changes, as a fund's own return does.
+    sources: [*sebi_tri, *v_bench]
+    related: [index_fund]
+  index_fund:
+    title: Index fund
+    short: >-
+      A fund that holds the shares of an index, such as the Nifty 50, in the same
+      proportions, aiming to match the index rather than beat it. No one picks
+      stocks, so its costs are usually lower than an active fund's. Tracking error
+      measures how closely it follows the index. This site uses one as a stand-in
+      benchmark.
+    sources: [*sebi_faq, *v_index]
+    related: [benchmark]
+  sebi_categories:
+    title: SEBI fund categories
+    short: >-
+      SEBI's 2017 rules sort every open-ended scheme into five groups (equity, debt,
+      hybrid, solution-oriented and other) and into defined categories within them,
+      such as large cap, mid cap or liquid. Each category fixes what a fund must
+      mostly hold, and a fund house may offer one scheme per category, with a few
+      exceptions.
+    sources: [*sebi_categories]
+    related: [market_cap, category_rank]
+  asset_mix:
+    title: Asset mix
+    short: >-
+      How a fund's money is split across kinds of assets: shares, bonds and other
+      debt, cash and its equivalents, and sometimes gold or units of other funds.
+      Shares respond mostly to company earnings, debt to interest rates and credit,
+      so the mix shapes how a fund behaves.
+    sources: [*sebi_faq, *v_allocation]
+    related: [sectors]
+  sectors:
+    title: Sectors
+    short: >-
+      The industries the companies in a fund belong to, such as banking, information
+      technology or energy, each shown as a share of the fund's shares. A sectoral
+      fund stays within one industry; a diversified fund spreads across many, so one
+      industry's fortunes move it less.
+    sources: [*sebi_faq]
+    related: [asset_mix]
+  market_cap:
+    title: Large, mid and small cap
+    short: >-
+      Size bands for listed companies, set by SEBI: large cap is the 1st to 100th
+      company by full market value, mid cap the 101st to 250th, and small cap the
+      251st onwards. AMFI publishes the list every six months, from data at the end
+      of June and December.
+    sources: [*sebi_categories, *v_equity]
+    related: [sebi_categories]
+  portfolio_disclosure:
+    title: Portfolio disclosure
+    short: >-
+      The list of everything a fund holds, with each holding's quantity, value and
+      share of the fund. Funds publish it every month, within ten days of month end,
+      on their own website and AMFI's; debt schemes also publish every fortnight.
+      This site reads these lists, or an aggregator's copy where marked.
+    sources: [*sebi_faq]
+    related: [look_through]
+  look_through:
+    title: Look-through
+    short: >-
+      Seeing past funds to the companies inside them. Each fund's holdings are
+      weighted by the money in that fund and added up, so a company held by several
+      funds shows its total. It describes what is owned in the end, which a list of
+      funds alone does not.
+    sources: [*v_portfolio, *sebi_faq]
+    related: [overlap, portfolio_disclosure]
+  overlap:
+    title: Portfolio overlap
+    short: >-
+      How much of two funds' portfolios is the same companies. For each company both
+      hold, the smaller of its two weights is counted, and the counts are added: 100%
+      means identical portfolios, 0% nothing in common. Funds with a high overlap
+      tend to rise and fall together.
+    sources: [*v_portfolio]
+    related: [look_through]
+
+guides:
+  - slug: what-a-mutual-fund-is
+    title: What a mutual fund is
+    group: Basics
+    summary: Many people's money pooled and invested together, owned in units and priced every business day.
+    sections:
+      - heading: Pooling money
+        paragraphs:
+          - >-
+            A mutual fund collects money from many investors and invests it in
+            securities, following the objective set out in its offer document. Each
+            investor receives [[units]] in proportion to the money put in, and the
+            fund's gains and losses are shared in the same proportion. Because the
+            money is spread across many companies or bonds, a fall in any one holding
+            moves the whole fund less than it would move that holding alone.
+      - heading: The price of a unit
+        paragraphs:
+          - >-
+            The [[nav]] is the value of everything the fund holds, less what it owes,
+            divided by the units in issue. It is worked out at the end of each
+            business day and published by every fund. For most schemes, a request
+            received before the cut-off time, with the money for a purchase already with
+            the fund, gets that day's NAV; a later one gets the next business day's.
+            Liquid and overnight funds follow their own timings.
+      - heading: Who runs it
+        paragraphs:
+          - >-
+            A mutual fund is set up as a trust. A sponsor establishes it; trustees hold
+            its property for the unitholders and supervise the [[amc]], which manages
+            the investments; a custodian holds the securities. SEBI regulates every
+            mutual fund under the same rules, whoever sponsors it, and requires a
+            share of the trustee and AMC boards to be independent of the sponsor.
+      - heading: Plans, options and ways to invest
+        paragraphs:
+          - >-
+            Each scheme comes as a [[direct_plan]] and a [[regular_plan]], which hold
+            the same portfolio at different costs. Within each plan there are
+            [[growth_idcw|Growth and IDCW options]], which differ in whether gains stay
+            in the fund or are paid out. Money can go in as a [[lump_sum]] or through
+            a [[sip]].
+      - heading: What it does not promise
+        paragraphs:
+          - >-
+            A mutual fund does not guarantee a return: the NAV rises and falls with the
+            prices of what the fund holds. Every scheme carries SEBI's product label,
+            including a riskometer with six levels from low to very high, describing
+            the kind of risk the scheme takes. A past return describes the past; it
+            does not say what the next period will bring.
+    sources: [*sebi_faq, *amfi_nav]
+
+  - slug: equity-debt-and-hybrid
+    title: Equity, debt and hybrid
+    group: Basics
+    summary: What shares, bonds and a mix of the two are, and what moves the price of each.
+    sections:
+      - heading: Equity funds
+        paragraphs:
+          - >-
+            An equity fund invests mostly in shares of companies. Its value follows
+            those companies' prospects and the market's mood, so it can move a lot
+            from year to year, in both directions. Equity funds aim at growth in the
+            value of the money over the medium to long term rather than at a regular
+            income.
+      - heading: Debt funds
+        paragraphs:
+          - >-
+            A debt fund lends money, by holding bonds, debentures, government
+            securities and money market instruments. Its NAV moves with interest
+            rates: when rates fall, the prices of existing bonds tend to rise, and the
+            reverse when rates rise. Gilt funds hold mostly government securities, which
+            carry no default risk but still move with rates; liquid and money market
+            funds hold very short-term paper, whose prices move least.
+      - heading: Hybrid funds
+        paragraphs:
+          - >-
+            A hybrid fund holds both shares and debt, in proportions its category sets.
+            SEBI's 2017 rules define the categories by how much is in shares: a
+            conservative hybrid fund held mostly debt with a smaller part in shares,
+            while an aggressive hybrid fund held mostly shares. Holding both means the
+            NAV usually swings less than a pure equity fund's.
+      - heading: Seeing the mix on this site
+        paragraphs:
+          - >-
+            Every fund page shows the fund's [[asset_mix]] from its latest disclosure,
+            and, for the share part, its [[sectors]] and the split between
+            [[market_cap|large, mid and small companies]]. A fund's name and category
+            say what it is meant to hold; the disclosure shows what it actually held
+            on that date.
+    sources: [*sebi_faq, *sebi_categories, *v_allocation]
+
+  - slug: how-funds-are-grouped
+    title: How funds are grouped
+    group: Basics
+    summary: SEBI's categories, what each one commits a fund to hold, and why funds are compared within a category.
+    sections:
+      - heading: The 2017 rules
+        paragraphs:
+          - >-
+            In October 2017 SEBI sorted every open-ended scheme into five groups:
+            equity, debt, hybrid, solution-oriented and other. Within each group it
+            defined categories and the kind of holdings each must mostly have. A fund
+            house may offer only one scheme in each category; the exceptions are
+            index funds and ETFs that track different indices, funds of funds with
+            different underlying schemes, and sector or theme funds covering different
+            sectors or themes. These are the [[sebi_categories]].
+      - heading: Equity categories by company size
+        paragraphs:
+          - >-
+            Several equity categories are defined by [[market_cap|company size]]. The
+            1st to 100th listed companies by full market value count as large cap,
+            the 101st to 250th as mid cap, and the rest as small cap. AMFI publishes
+            the list twice a year and funds rebalance to it within a month. Under the
+            2017 rules a mid cap fund and a small cap fund each kept at least 65% of
+            assets in its own band.
+      - heading: Debt categories by duration and credit
+        paragraphs:
+          - >-
+            Debt categories are defined mainly by how long the fund's holdings run.
+            An overnight fund holds securities maturing in a day, a liquid fund up to
+            91 days, and the duration funds (ultra short, low, short, medium and long)
+            are set by the Macaulay duration of their portfolios. Other debt
+            categories are set by the borrowers they lend to, such as government
+            securities only.
+      - heading: Why the category matters here
+        paragraphs:
+          - >-
+            Because a category fixes what a fund may hold, its funds do much the same
+            job, and comparing them with each other is like with like. This site
+            takes each fund's category from AMFI's scheme list and shows its
+            [[category_rank]] among the funds of that category. Funds in different
+            categories are not ranked against each other.
+    sources: [*sebi_categories, *v_equity, *sebi_faq]
+
+  - slug: direct-and-regular-plans
+    title: Direct and Regular plans
+    group: Costs
+    summary: The same fund sold two ways, directly or through a distributor, and what the difference in cost does over time.
+    sections:
+      - heading: Two plans, one portfolio
+        paragraphs:
+          - >-
+            Since 1 January 2013 every scheme has offered a [[direct_plan]] beside its
+            [[regular_plan]]. Both hold exactly the same investments, chosen by the same
+            fund manager. What differs is how the plan is sold and, because of that,
+            what it costs.
+      - heading: Where the difference in cost goes
+        paragraphs:
+          - >-
+            A Regular plan is bought through a distributor, such as an agent, a broker
+            or a bank, and the fund house pays that distributor a commission out of the
+            plan. That commission is part of the Regular plan's [[expense_ratio]]. A
+            Direct plan is bought from the fund house itself, pays no commission, and
+            so has a lower expense ratio.
+      - heading: Two NAVs
+        paragraphs:
+          - >-
+            Each plan has its own [[nav]]. Because less is taken from the Direct plan
+            each day, its NAV grows a little faster and stands above the Regular plan's.
+            The gap is small in any one year, but it compounds: the longer the money
+            stays, the wider the difference in what the same purchase is worth.
+      - heading: What a distributor provides
+        paragraphs:
+          - >-
+            The commission pays for a service. A distributor can help choose schemes,
+            handle forms and keep track of investments. A Direct plan is bought without
+            that help, through the fund house's own website or office, or a platform
+            that sells Direct plans.
+      - heading: On this site
+        paragraphs:
+          - >-
+            The public pages list Direct plans. On the portfolio page, a Regular-plan
+            holding can be entered as its Direct version; its value there then reads
+            higher than the statement shows, by the difference in cost.
+    sources: [*sebi_faq, *amfi_direct, *mfsh_direct, *v_ter]
+
+  - slug: what-a-fund-costs
+    title: What a fund costs
+    group: Costs
+    summary: The expense ratio, how it is taken, how a yearly cost adds up, and the other charges a fund can carry.
+    sections:
+      - heading: The expense ratio
+        paragraphs:
+          - >-
+            A fund's running costs (managing the money, administration, registrar and
+            custodian fees, distribution and the like) are added up and stated as a
+            yearly percentage of its assets: the total [[expense_ratio]]. SEBI sets the
+            maximum, in regulation 52 of its mutual fund rules, and within that total a
+            fund may spend on any allowed kind of cost.
+      - heading: Taken every day, not billed
+        paragraphs:
+          - >-
+            No bill arrives. A sliver of the yearly cost is taken from the fund's assets
+            every day, so a 1% yearly ratio means about a 365th of 1% each day. The
+            [[nav]] published each evening is already net of it, which is why the cost
+            never appears as a separate line.
+      - heading: How a yearly cost adds up
+        paragraphs:
+          - >-
+            A cost is taken whatever the year brings, and what is taken no longer
+            grows. Suppose ₹1,00,000 earns 10% a year before costs for twenty years.
+            With a 1% yearly cost it grows at about 9% and ends near ₹5.60 lakh; with a
+            2% cost it grows at about 8% and ends near ₹4.66 lakh. The arithmetic is
+            only an illustration of compounding, not a forecast of any fund.
+      - heading: Other charges
+        paragraphs:
+          - >-
+            SEBI abolished entry loads, so no load is charged on buying, though a
+            distributor may deduct a small transaction charge from a large purchase, as
+            the scheme's documents state. A scheme may
+            charge an exit load: a percentage of the NAV deducted from the proceeds
+            when units are redeemed within a period it states, such as 1% within 90
+            days. The scheme information document sets out its loads.
+      - heading: On this site
+        paragraphs:
+          - >-
+            Each fund page shows the expense ratio from AMFI's monthly list, and the
+            Peers section sets it beside those of the category. The guide to Direct and
+            Regular plans explains why the same scheme has two ratios.
+    sources: [*sebi_faq, *amfi_ter, *v_ter]
+
+  - slug: risk-and-return
+    title: Risk and return
+    group: Risk and return
+    summary: What returns, volatility, falls and the Sharpe ratio measure, and why a past return is not a forecast.
+    sections:
+      - heading: Return over a period
+        paragraphs:
+          - >-
+            A return over several years is easiest to compare as an
+            [[annualised_return]]: the steady yearly rate that would have produced the
+            same result. A single figure depends on its start and end dates, so this
+            site also shows [[rolling_returns]], the return of every stretch of the same
+            length, which shows the range a buyer could have met.
+      - heading: How bumpy the way was
+        paragraphs:
+          - >-
+            [[volatility]] measures how widely returns swung around their average. Two
+            funds can end at the same place, one rising steadily and the other lurching
+            up and down; volatility tells them apart. It describes swings in both
+            directions, not only losses.
+      - heading: How far it fell
+        paragraphs:
+          - >-
+            The [[max_drawdown]] is the largest drop from a high to a later low: the
+            worst loss someone who bought at a peak would have seen before the fund
+            recovered. This site also shows how long each recovery took, because a
+            fall that takes years to make good is a different experience from one that
+            reverses in weeks.
+      - heading: Return for the risk taken
+        paragraphs:
+          - >-
+            The [[sharpe]] divides the return above a risk-free rate by the volatility,
+            giving the return earned per unit of swing. It treats every swing as risk,
+            and only the swings that happened, so it can miss a risk that shows up rarely
+            and suddenly, such as a default by a borrower a debt fund has lent to.
+      - heading: What the past does not say
+        paragraphs:
+          - >-
+            Every figure here describes what happened. None of them says what will
+            happen: markets change, managers change and funds grow. A fund's riskometer,
+            a SEBI label with six levels from low to very high, describes the kind of
+            risk the scheme is built to take, which is a separate thing from how it has
+            done.
+    sources: [*v_risk, *v_know, *v_rolling, *v_returns, *sebi_faq]
+
+  - slug: index-and-active-funds
+    title: Index funds and active funds
+    group: Risk and return
+    summary: Funds that copy an index and funds that pick their holdings, how each works, and how each is measured.
+    sections:
+      - heading: Two ways to run a fund
+        paragraphs:
+          - >-
+            An actively managed fund has a manager and analysts who choose what to
+            hold, trying to do better than an index. An [[index_fund]] holds the shares
+            of an index, such as the Nifty 50, in the same proportions, and aims only to
+            match it. Its NAV rises and falls with the index, though not by exactly the
+            same amount.
+      - heading: What each costs
+        paragraphs:
+          - >-
+            Choosing holdings takes research staff and trading, and those costs are in
+            an active fund's [[expense_ratio]]. An index fund needs neither, so its
+            expense ratio is usually lower. The difference is taken every day, whatever
+            the market does.
+      - heading: Tracking error
+        paragraphs:
+          - >-
+            An index fund's return differs a little from its index's, because of its
+            costs and because buying and selling cannot match the index exactly.
+            Tracking error measures that difference: the yearly standard deviation of
+            the gap between the fund's daily return and the index's. A smaller figure
+            means the fund follows its index more closely.
+      - heading: Measuring an active fund
+        paragraphs:
+          - >-
+            An active fund is measured against its [[benchmark]], in the Total Return
+            version that counts dividends. The return above the benchmark is its lead;
+            alpha, as the Performance table shows it, is the return beyond what its beta
+            (how strongly it moves with the market) accounts for. Whether a fund was ahead or behind depends on the period
+            chosen, which is why [[rolling_returns]] compare every stretch.
+      - heading: Why this site uses index funds as benchmarks
+        paragraphs:
+          - >-
+            The public site cannot publish NSE's index levels, which are licensed. Where
+            an index fund tracks the same benchmark a fund declares, this site shows that
+            index fund's NAV in its place and names it. Because the index fund carries
+            costs and tracking error, the stand-in trails the index itself slightly.
+    sources: [*sebi_faq, *sebi_tri, *v_index, *v_bench]
+
+  - slug: sip-and-lump-sum
+    title: SIP and lump sum
+    group: Your portfolio
+    summary: Two ways money goes into a fund, all at once or a fixed amount at intervals, and how each is measured.
+    sections:
+      - heading: A lump sum
+        paragraphs:
+          - >-
+            A [[lump_sum]] is a single purchase. All the money buys [[units]] at the NAV
+            of the day the purchase counts for, so the price paid is that one day's
+            price, high or low.
+      - heading: A SIP
+        paragraphs:
+          - >-
+            A [[sip]] puts a fixed amount in at regular intervals, often monthly. Each
+            instalment buys units at that day's NAV, so the same amount buys more units
+            when the NAV is low and fewer when it is high. The cost per unit ends up an
+            average of the prices over the period.
+      - heading: SEBI's worked example
+        paragraphs:
+          - >-
+            SEBI's investor FAQ follows ₹1,000 a month for a year while the NAV moves
+            between ₹9 and ₹11.50. The twelve instalments buy about 1,186 units, at an
+            average cost near ₹10.12. The same ₹12,000 in one purchase would have bought
+            1,000 units at a NAV of ₹10, about 1,043 at ₹11.50 or about 1,333 at ₹9.
+            Which comes out ahead depends on the path prices take, which is not known
+            in advance.
+      - heading: Measuring the return of each
+        paragraphs:
+          - >-
+            A single purchase held for more than a year is measured by its
+            [[annualised_return]]. Money that went in on many dates is measured by
+            [[xirr]], which counts each instalment from its own date. The portfolio page
+            on this site takes both lump sums and SIPs and works out the XIRR in the
+            browser.
+    sources: [*sebi_faq, *v_returns]
+
+  - slug: how-gains-are-taxed
+    title: How mutual fund gains are taxed
+    group: Your portfolio
+    summary: The ideas behind the tax on fund gains and payouts. Rates change with each Budget, so none are printed here.
+    sections:
+      - heading: What is taxed
+        paragraphs:
+          - >-
+            Selling units for more than they cost produces a capital gain, and the gain
+            is what is taxed, not the whole amount received. Payouts under the IDCW
+            option are different: they are taxed as income of the investor in the year
+            they are paid, as described under [[growth_idcw|Growth and IDCW options]].
+      - heading: Short term and long term
+        paragraphs:
+          - >-
+            A gain is short-term or long-term depending on how long the units were held
+            before being sold. The holding period that makes a gain long-term is not
+            the same for every kind of fund, and long-term gains are generally treated
+            more lightly than short-term ones. For many debt funds bought since April
+            2023, every gain counts as short-term, however long the units are held.
+      - heading: Equity funds and the rest
+        paragraphs:
+          - >-
+            Funds that invest mainly in shares of Indian companies are taxed as
+            equity-oriented funds; debt funds and many other funds are taxed
+            differently, and recent Finance Acts have changed how debt fund gains are
+            treated. Equity Linked Savings Schemes carry a deduction under the old tax
+            regime, with a lock-in.
+      - heading: Where the current rules are
+        paragraphs:
+          - >-
+            Tax rates and holding periods are set by Parliament in each year's Finance
+            Act and change from Budget to Budget, so this site prints none of them. AMFI
+            keeps a page on the treatment, dated by financial year, linked below; check
+            the year it covers. A fund's scheme information document describes it too.
+    sources: [*amfi_tax, *sebi_faq, *sebi_categories]
+
+  - slug: look-through-and-overlap
+    title: Your portfolio's look-through
+    group: Your portfolio
+    summary: Why two funds can own the same companies, and how this site works out what a set of funds owns between them.
+    sections:
+      - heading: Funds hold companies
+        paragraphs:
+          - >-
+            A fund is a basket of holdings, and every month it publishes the basket: its
+            [[portfolio_disclosure]] lists each holding with its share of the fund. Two
+            funds with different names, from different fund houses, can hold many of
+            the same companies, especially in the same category.
+      - heading: Adding funds up
+        paragraphs:
+          - >-
+            A [[look_through]] weights each fund's holdings by the money in that fund
+            and adds them together. A company held by three funds then shows once, with
+            its total, which can be larger than any one fund's holding of it suggests.
+      - heading: When funds hold the same things
+        paragraphs:
+          - >-
+            Zerodha Varsity looked at three large cap funds from different fund houses:
+            each held one bank at about a tenth of its money, and about half their top
+            holdings were shared. Funds with a high [[overlap]] tend to rise and fall
+            together, and each charges its own expense ratio on the shared part.
+      - heading: How this site works it out
+        paragraphs:
+          - >-
+            The portfolio page weights each fund's latest disclosure by what that
+            holding is worth, in the browser. Companies are matched by issuer, so a
+            company's shares and its bonds count as one. Holdings a disclosure names in
+            ways that cannot be matched are shown separately rather than dropped. The
+            compare page shows the overlap of each pair of funds.
+    sources: [*v_portfolio, *sebi_faq]
+
+  - slug: reading-a-fund-page
+    title: Reading a fund page here
+    group: Using this site
+    summary: What each part of a fund page on this site shows, in the order it appears, and where each figure comes from.
+    sections:
+      - heading: The header
+        paragraphs:
+          - >-
+            The top of the page names the fund, its fund house, [[sebi_categories|category]]
+            and plan, with the latest [[nav]] and its change on the day. Below come the
+            facts: fund house, category, plan, launch date, [[aum|fund size]] and the
+            span of prices on record. Then tiles: the [[annualised_return]] over one,
+            three and five years, the [[category_rank]], the deepest fall, volatility,
+            size and [[expense_ratio]].
+      - heading: Performance, growth and price
+        paragraphs:
+          - >-
+            Performance sets the fund's return, volatility, deepest fall, Sharpe ratio
+            and other measures beside its [[benchmark]] over one, three and five years.
+            Growth shows what ₹10,000 became over the fund's whole record, and Price
+            shows the NAV itself, with buttons to narrow the period.
+      - heading: Returns and peers
+        paragraphs:
+          - >-
+            Returns sets the fund's return in each period against its benchmark's. Peers
+            places the fund among the funds of its category on return, risk, falls and
+            cost, with where it stands in each and its quartile.
+      - heading: Falls and consistency
+        paragraphs:
+          - >-
+            Falls shows how far below its last high the fund stood on each day, its
+            [[max_drawdown]], and how long it took to recover. Consistency shows the
+            [[rolling_returns]] of every three-year stretch, not only the one ending
+            today.
+      - heading: Holdings and every figure
+        paragraphs:
+          - >-
+            Holdings shows the [[asset_mix]], the largest holdings and the [[sectors]],
+            from the fund's latest [[portfolio_disclosure]], or from an aggregator's
+            page where marked. Every figure lists all the computed measures for every
+            period in one table.
+      - heading: Dates, sources and gaps
+        paragraphs:
+          - >-
+            Each section says how old its data is and where it came from. A figure that
+            could not be computed shows a dash with the reason, never a zero, because a
+            zero would be a claim. Every figure describes the past.
+    sources: [*sebi_faq, *v_analyse]

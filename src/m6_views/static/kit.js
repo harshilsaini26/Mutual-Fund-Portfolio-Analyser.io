@@ -71,8 +71,22 @@
     return looks.get(id);
   }
 
+  // The `?` for a term whose explanation the server rendered (macros.html
+  // term_pop, V1-87): a native popover, so it opens without further script.
+  function termButton(key, where) {
+    var pop = document.getElementById("t-" + key + "-" + where);
+    if (!pop) return null;
+    var label = "What is " + pop.getAttribute("data-title") + "?";
+    if (!("popover" in HTMLElement.prototype)) {   // no popovers: the glossary entry instead
+      return el("a", { "class": "term", href: pop.querySelector("a").getAttribute("href"),
+                       "aria-label": label }, "?");
+    }
+    return el("button", { type: "button", "class": "term", popovertarget: pop.id, "data-key": key,
+                          "aria-label": label }, "?");
+  }
+
   var api = { present: present, el: el, fill: fill, bar: bar, INR: INR, CLASS: CLASS,
-              navSeries: navSeries, lookFile: lookFile };
+              navSeries: navSeries, lookFile: lookFile, termButton: termButton };
   if (typeof module === "object" && module.exports) module.exports = api;
   else window.Kit = api;
 })();

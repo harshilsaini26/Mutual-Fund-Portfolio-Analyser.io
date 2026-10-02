@@ -72,6 +72,8 @@ from src.m6_views.format import (
     format_pct,
     format_return,
 )
+from src.m6_views.learn import load as load_learn
+from src.m6_views.learn import stale
 from src.m6_views.registry import VIEW_DEFS, VIEW_REGISTRY
 from src.m6_views.states import empty_envelope, error_envelope
 
@@ -97,6 +99,14 @@ STATIC_FILES = (
 MARKER = ".nojekyll"
 
 NOT_BUILT = "This picture could not be built for the public copy."
+#: The holdings panel's empty state on the public site. The local app's names
+#: commands to run; a public reader has none to run, so they get the reason.
+NO_PORTFOLIO = (
+    "No portfolio is loaded for this fund yet. This site reads Kotak's and ICICI "
+    "Prudential's own monthly disclosures and, for other funds, one aggregator "
+    "page per fund, about 100 a night. This fund's turn has not come yet, or its "
+    "page lists no holdings this site can match to companies."
+)
 
 RETURN_WINDOWS = ("1y", "3y", "5y")
 #: The front page's category cards (DECISIONS V1-80, after MF Zone's): the six
@@ -440,6 +450,8 @@ def _adapter(folder: Path, url: str, scope: Scope) -> Any:
             # the public page.
             print(f"  ! {scope.scope_id} {env.view_id}: {env.state_reason}")
             env = empty_envelope(env.view_id, env.question, scope, NOT_BUILT)
+        elif env.view_id == "fund_portfolio" and env.state.value == "empty":
+            env = empty_envelope(env.view_id, env.question, scope, NO_PORTFOLIO)
         name = f"{env.view_id}.csv"
         env = replace(
             env,
@@ -572,10 +584,30 @@ def build_site(
         engine.get_template("compare.html").render({**shell, "active": "compare"}),
         encoding="utf-8",
     )
+    learn = load_learn()
+    learn_page = {**shell, "active": "learn"}
+    (out / "learn" / "glossary").mkdir(parents=True)
+    (out / "learn" / "index.html").write_text(
+        engine.get_template("learn.html").render(learn_page), encoding="utf-8")
+    (out / "learn" / "glossary" / "index.html").write_text(
+        engine.get_template("learn_glossary.html").render(learn_page), encoding="utf-8")
+    for guide in learn.guides:
+        (out / "learn" / guide.slug).mkdir()
+        (out / "learn" / guide.slug / "index.html").write_text(
+            engine.get_template("learn_guide.html").render(
+                {**learn_page, "guide": guide}),
+            encoding="utf-8",
+        )
+    for line in stale(learn, today):
+        print(f"  ! learn source not checked for a year: {line}")
     (out / "search.json").write_text(
         json.dumps(
             [{"name": f["name"], "detail": f["detail"],
-              "url": f"{base}/fund/{f['scheme_id']}/"} for f in funds],
+              "url": f"{base}/fund/{f['scheme_id']}/"} for f in funds]
+            + [{"name": t.title, "detail": "Glossary",
+                "url": f"{base}/learn/glossary/#{t.key}"} for t in learn.terms.values()]
+            + [{"name": g.title, "detail": "Guide",
+                "url": f"{base}/learn/{g.slug}/"} for g in learn.guides],
             ensure_ascii=False,
         ),
         encoding="utf-8",
