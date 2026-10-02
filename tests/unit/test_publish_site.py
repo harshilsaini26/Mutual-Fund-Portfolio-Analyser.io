@@ -21,6 +21,7 @@ from src.common.decimals import connect
 from src.common.types import IndexId, SchemeId
 from src.m0_data.categories import category_of
 from src.m6_views.builders.fund.common import INDEX_WITHHELD
+from src.m6_views.format import format_date
 
 from tests.conftest import migrated
 
@@ -183,7 +184,9 @@ def test_funds_json_lists_every_published_fund_for_the_portfolio_page(site: Path
     one = next(f for f in funds if f["id"] == DIRECT)
     assert set(one) == {"id", "amfi", "name", "category", "category_name",
                         "prices_from", "ter", "size", "r1", "r3", "r5",
-                        "vol3", "fall3"}
+                        "vol3", "fall3",
+                        # for the compare page (V1-85)
+                        "house", "benchmark", "sharpe3", "rank3", "labels"}
     assert one["amfi"] == "900001"
     assert one["category"] == "equity/flexi_cap"
     assert one["prices_from"] == (TODAY - timedelta(days=300)).isoformat()
@@ -245,6 +248,16 @@ def test_the_public_note_keeps_its_first_sentence_out_of_the_toggle(site: Path) 
     first, _, rest = note.group(1).partition('<details class="tuck" open>')
     assert "A public copy of the fund pages" in first
     assert "<summary>More</summary>" in rest and "self-hosted app" in rest
+
+
+def test_funds_json_carries_what_the_compare_page_shows(site: Path) -> None:
+    funds = json.loads((site / "funds.json").read_text(encoding="utf-8"))
+    one = next(f for f in funds if f["id"] == DIRECT)
+    assert {"house", "benchmark", "sharpe3", "rank3", "labels"} <= set(one)
+    assert set(one["labels"]) == {"size", "ter", "r1", "r3", "r5", "vol3", "fall3",
+                                  "sharpe3", "prices_from"}
+    assert one["labels"]["prices_from"] == format_date(TODAY - timedelta(days=300))
+    assert one["labels"]["r5"] is None and one["r5"] is None  # no five years yet
 
 
 def test_an_index_funds_price_stands_in_for_the_benchmark_it_declares(
@@ -403,3 +416,13 @@ def test_every_generation_of_category_name_finds_its_family(
     """AMFI's list mixes naming generations; the tiles must count them all, or a
     legacy "Income" fund is filed under index funds and ETFs."""
     assert category_of(category).family == family
+
+
+def test_the_compare_page_is_published_and_linked(site: Path) -> None:
+    page = (site / "compare" / "index.html").read_text(encoding="utf-8")
+    for script in ("portfolio-math.js", "charts.js", "compare.js"):
+        assert f'src="{BASE}/static/{script}"' in page, script
+    assert "needs JavaScript" in page and 'id="cmp-pick"' in page
+    assert (site / "static" / "compare.js").is_file()
+    assert f'href="{BASE}/compare/"' in _page(site, DIRECT)
+    assert f'href="{BASE}/compare/#f={DIRECT}"' in _page(site, DIRECT)

@@ -1319,11 +1319,11 @@ body, .topbar, .card, .view, .settings {
 
 /* Your portfolio (V1-82) */
 .pf__toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
-.pf__status { min-height: 1.4em; color: var(--ink-soft); font-size: 0.8125rem; }
-.pf__note, .pf__hint, .pf__estimate { color: var(--ink-soft); font-size: 0.8125rem; max-width: 72ch; }
-.pf__entry { display: grid; gap: 10px; margin-bottom: 28px; }
-.pf__label { font-weight: 650; }
-.pf__pick { width: min(100%, 560px); }
+.pf__status, .cmp__status { min-height: 1.4em; color: var(--ink-soft); font-size: 0.8125rem; }
+.pf__note, .pf__hint, .pf__estimate, .cmp__note { color: var(--ink-soft); font-size: 0.8125rem; max-width: 72ch; }
+.pf__entry, .cmp__entry { display: grid; gap: 10px; margin-bottom: 28px; }
+.pf__label, .cmp__label { font-weight: 650; }
+.pf__pick, .cmp__pick { width: min(100%, 560px); }
 .pf__holding { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 8px; }
 .pf__holding-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
 .pf__holding-head h3 { margin: 0; font-size: 0.9375rem; }
@@ -1339,6 +1339,43 @@ body, .topbar, .card, .view, .settings {
 .pf__alt { display: grid; gap: 8px; margin-bottom: 20px; }
 .pf__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
 .button--quiet { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+/* Compare (V1-85). The high/low tags are plain text in the ink's own colour:
+   which end of a measure is wanted depends on the reader, so none is toned. */
+.cmp__suggest { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cmp__chip { cursor: pointer; color: var(--ink); white-space: normal; text-align: left; min-height: 40px; }
+.cmp__chip:hover { border-color: var(--line-strong); }
+.cmp__why { color: var(--ink-faint); }
+.cmp__lead { font-size: 1rem; max-width: 72ch; }
+.cmp__table thead th {
+  text-transform: none; letter-spacing: 0; white-space: normal; vertical-align: bottom;
+  font-size: 0.8125rem; color: var(--ink); min-width: 11em;
+}
+.cmp__table thead th:first-child { min-width: 0; }
+.cmp__table tbody th { font-weight: 500; color: var(--ink-soft); white-space: nowrap; }
+.cmp__fund { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
+.cmp__remove {
+  flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px;
+  border-radius: var(--radius-sm); color: var(--ink-soft); cursor: pointer; font-size: 1.125rem;
+}
+.cmp__remove:hover { color: var(--ink); background: var(--surface); }
+.cmp__remove::after { content: none; }  /* not a sort button (th button::after) */
+.cmp-tag {
+  display: block; margin-top: 2px; font-size: 0.6875rem; letter-spacing: 0.02em;
+  color: var(--ink-faint);
+}
+.fundcard__compare { margin-top: 10px; }
+/* On a phone the fund columns swipe inside their own box while the measure stays
+   pinned, so a figure is never read without its label. */
+@media (max-width: 720px) {
+  .cmp table th:first-child, .cmp table td:first-child {
+    position: sticky; left: 0; z-index: 1; background: var(--surface);
+  }
+  .cmp table thead th:first-child { z-index: 2; }  /* the corner, over the headings that scroll */
+  .cmp__table tbody th { white-space: normal; min-width: 7.5em; max-width: 9.5em; }
+  .cmp__table thead th { min-width: 9.5em; }
+  .cmp__remove { width: 40px; height: 40px; }
+}
 
 /* Settings (V1-83): a slide-over <dialog> at the right edge. The backdrop is barely
    tinted, so the page behind stays readable and each change can be judged live. */

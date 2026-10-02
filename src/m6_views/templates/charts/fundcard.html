@@ -23,6 +23,10 @@
         {% endfor %}
         <li class="chip chip--mono">{{ env.payload.scheme_id }}</li>
       </ul>
+      {% if static %}
+      <a class="button button--quiet fundcard__compare"
+         href="{{ root }}/compare/#f={{ env.payload.scheme_id }}">Compare</a>
+      {% endif %}
     </div>
     {% if env.payload.nav %}
     <div class="fundcard__nav">

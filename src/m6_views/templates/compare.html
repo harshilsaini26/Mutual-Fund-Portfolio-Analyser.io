@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Compare funds{% endblock %}
+
+{#
+  Compare two to four funds (DECISIONS V1-85). A shell: `compare.js` fills it in
+  the browser from funds.json, the NAV files and the look-through files this site
+  publishes. The chosen funds live in the address (#f=ISIN,ISIN), so a
+  comparison is its link; nothing is stored.
+#}
+{% block content %}
+<section class="plain cmp" data-compare data-root="{{ root }}">
+  <p class="eyebrow">Compare</p>
+  <h1>Compare funds</h1>
+  <p class="lede">
+    Up to four funds side by side: their figures, what ₹10,000 became in each, how
+    much of their portfolios is the same companies, and what they hold.
+  </p>
+  <noscript><p class="cmp__note">This page compares funds in your browser, so it needs JavaScript.</p></noscript>
+
+  <div class="card cmp__entry">
+    <label class="cmp__label" for="cmp-pick">Add a fund to compare</label>
+    <input id="cmp-pick" class="cmp__pick" list="cmp-funds" autocomplete="off"
+           placeholder="Type part of a fund's name" disabled>
+    <datalist id="cmp-funds"></datalist>
+    <p class="cmp__status" id="cmp-status" role="status"></p>
+    <div data-out="suggest"></div>
+  </div>
+
+  <section class="home-section" aria-labelledby="cmp-facts-h">
+    <div class="section-head"><h2 id="cmp-facts-h">Key facts and returns</h2></div>
+    <div data-out="facts"></div>
+  </section>
+  <section class="home-section" aria-labelledby="cmp-growth-h">
+    <div class="section-head"><h2 id="cmp-growth-h">What ₹10,000 became</h2></div>
+    <div data-out="growth"></div>
+  </section>
+  <section class="home-section" aria-labelledby="cmp-overlap-h">
+    <div class="section-head"><h2 id="cmp-overlap-h">How much of their portfolios is the same</h2></div>
+    <div data-out="overlap"></div>
+  </section>
+  <section class="home-section" aria-labelledby="cmp-mix-h">
+    <div class="section-head"><h2 id="cmp-mix-h">Asset mix and sectors</h2></div>
+    <div data-out="mix"></div>
+  </section>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ root }}/static/portfolio-math.js" defer></script>
+<script src="{{ root }}/static/vendor/echarts.v6.1.0.min.js" defer></script>
+<script src="{{ root }}/static/charts.js" defer></script>
+<script src="{{ root }}/static/compare.js" defer></script>
+{% endblock %}

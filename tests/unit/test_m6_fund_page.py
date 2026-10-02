@@ -230,3 +230,8 @@ def test_the_ranks_list_is_one_tap_away(client: TestClient) -> None:  # noqa: F8
     tuck = re.search(r'<details class="tuck" open><summary>All ranks \((\d+)\)</summary>'
                      r'\s*<dl class="facts-list facts-list--ranks">', html)
     assert tuck and int(tuck.group(1)) > 0
+
+
+def test_the_local_app_has_no_compare_link(client: TestClient) -> None:  # noqa: F811
+    """`/compare/` exists only on the public site (V1-85)."""
+    assert "/compare/" not in client.get(f"/fund/S1{QS}").text

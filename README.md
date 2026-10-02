@@ -318,7 +318,9 @@ highest three-year returns; `/funds/` lists every published fund in one table yo
 sort by size, cost, return or category rank, and narrow by category. The gear in the
 top bar sets the theme (device, light, dark or Matrix), the font (Terminess, Rubik or
 Atkinson Hyperlegible), text size, density, motion and accent, remembered in your
-browser. `/portfolio/`
+browser. `/compare/` sets two to four funds side by side — their figures, what
+₹10,000 became in each, how much of their portfolios is the same companies, and what
+they hold — from a "Compare" link on any fund page. `/portfolio/`
 builds your own portfolio from the funds you pick and what you put in, works out its
 value, return and look-through in your browser, and sets each fund beside others of
 its category, with nothing you enter leaving the browser. It carries AMFI's figures

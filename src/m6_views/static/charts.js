@@ -143,16 +143,29 @@
           textStyle: { color: p.faint },
           labelFormatter: function (v) { return day(v); } },
       ];
-      o.series = c.series.map(function (s) {
+      // Several funds on one chart (compare.js, V1-85): a hue each, and no fills,
+      // which would cover one another.
+      var many = c.series.filter(function (s) { return s.role === "fund"; }).length > 1;
+      // Fund names run to 80 characters: one scrolling row, each name cut to fit
+      // and whole on hover, so the legend never lies over the lines.
+      if (many) {
+        o.legend.type = "scroll";
+        o.legend.right = 0;
+        o.legend.pageTextStyle = { color: p.faint };
+        o.legend.textStyle = { color: p.ink, width: 150, overflow: "truncate" };
+        o.legend.tooltip = { show: true };
+      }
+      o.series = c.series.map(function (s, i) {
         var fund = s.role === "fund";
+        var hue = many && fund ? p.cats[i % p.cats.length] : colour(s.role, p);
         var series = {
           name: s.name,
           type: "line",
           showSymbol: false,
           // §10.3: the benchmark is dashed as well as a different colour.
           lineStyle: { width: fund ? 2.4 : 1.6, type: fund ? "solid" : "dashed",
-                       color: colour(s.role, p) },
-          itemStyle: { color: colour(s.role, p) },
+                       color: hue },
+          itemStyle: { color: hue },
           data: s.points.map(function (pt) {
             return { value: [pt[0], number(pt[1])], caption: pt[2] };
           }),
@@ -161,7 +174,7 @@
         // none where the chart is read against a zero line.
         if (filled) {
           series.areaStyle = { color: fade(colour(s.role, p), fund ? 0.32 : 0.08) };
-        } else if (fund && !c.zero_line) {
+        } else if (fund && !c.zero_line && !many) {
           series.areaStyle = { color: fade(p.fund, 0.18) };
         }
         if (fund && c.zero_line) {
@@ -498,4 +511,6 @@
   });
   init(document);
   watch(document);
+  // For pages that build a chart after load (compare.js, V1-85).
+  window.Charts = { draw: function (box) { init(box); watch(box); } };
 })();

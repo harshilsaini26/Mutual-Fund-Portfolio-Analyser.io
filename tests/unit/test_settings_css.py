@@ -107,3 +107,22 @@ def test_a_mouse_can_reach_every_section_chip() -> None:
     phone = (r"@media \(max-width: 720px\)\s*\{\s*"
              r"\.sections\s*\{\s*scrollbar-width:\s*none")
     assert re.search(phone, css)
+
+
+def test_charts_can_be_drawn_after_the_page_loads() -> None:
+    charts = (CSS.parent / "charts.js").read_text(encoding="utf-8")
+    assert re.search(r"window\.Charts\s*=\s*\{\s*draw:", charts)
+
+
+def test_compare_tables_keep_the_measure_in_view_on_phones() -> None:
+    css = CSS.read_text(encoding="utf-8")
+    pinned = r"\.cmp table (th|td):first-child[^{]*\{[^}]*position:\s*sticky"
+    assert re.search(pinned, css)
+
+
+def test_a_chart_of_several_funds_keeps_its_legend_to_one_row() -> None:
+    """Long fund names in a wrapping legend covered the compare chart (V1-85):
+    several funds get a scrolling, truncated legend with the full name on hover."""
+    charts = (CSS.parent / "charts.js").read_text(encoding="utf-8")
+    many = charts[charts.index("var many ="):charts.index("o.series = c.series.map")]
+    assert re.search(r'type\s*[:=]\s*"scroll"', many) and '"truncate"' in many

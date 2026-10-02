@@ -68,16 +68,7 @@
   }
 
   // --- data ------------------------------------------------------------------
-  function gzipText(response) {
-    return response.arrayBuffer().then(function (buf) {
-      var bytes = new Uint8Array(buf);
-      if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
-        var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
-        return new Response(stream).text();
-      }
-      return new TextDecoder().decode(bytes);   // a server that already unpacked it
-    });
-  }
+  var gzipText = M.gzipText;
   function navSeries(fund) {
     if (!series.has(fund.id)) {
       series.set(fund.id, fetch(BASE + "/data/nav/" + fund.amfi + ".csv.gz").then(function (r) {

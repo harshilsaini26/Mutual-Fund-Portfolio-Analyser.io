@@ -243,10 +243,12 @@ def test_no_prescriptive_language_in_the_templates() -> None:
     assert not offences, f"prescriptive language in templates: {offences}"
 
 
-def test_no_prescriptive_language_in_the_portfolio_page_script() -> None:
-    """The portfolio page writes its sentences in JavaScript (V1-82), out of
-    reach of the template lint, and it is the page most tempted to advise."""
-    script = (TEMPLATES.parent / "static" / "portfolio.js").read_text(encoding="utf-8")
+@pytest.mark.parametrize("name", ["portfolio.js", "compare.js"])
+def test_no_prescriptive_language_in_the_page_scripts(name: str) -> None:
+    """The portfolio (V1-82) and compare (V1-85) pages write their sentences in
+    JavaScript, out of reach of the template lint, and they are the pages most
+    tempted to advise."""
+    script = (TEMPLATES.parent / "static" / name).read_text(encoding="utf-8")
     offences = [p for p in PRESCRIPTIVE_PATTERNS if re.search(p, script, re.I)]
     assert not offences, offences
 

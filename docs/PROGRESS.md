@@ -263,6 +263,12 @@ pushes one commit to `gh-pages`. Measured on the first full build, 2026-09-26:
   an index fund that declares the same benchmark on its Groww page, named as such.
   The crawl map gained that column on 2026-09-26, so proxies fill in as pages are
   read, about 100 a night.
+- **Compare** (V1-85): `/compare/` sets two to four funds side by side, chosen from
+  a "Compare" link on each fund page or a picker, the choice kept in the address:
+  key figures with the highest and lowest of each marked, what ₹10,000 became in
+  each from the first date all have prices, how much of their portfolios is the same
+  companies, and their asset mix and sectors. Worked out in the browser from files
+  the site already publishes.
 - **Fund pages, navigable** (V1-84): a pinned row of section links marks where you
   are; on a phone the page is about 9 screens instead of 12, with nothing scrolling
   sideways and secondary detail one tap away.
@@ -601,10 +607,9 @@ workflow once by hand; the nightly schedule takes over from there.
 
 Phase 2 (every fund, its peers and its cost, built nightly) is done. In order:
 
-- **Compare**: two to four funds side by side, with how much their portfolios
-  overlap.
-- **UX, part 3**: search everywhere, `/funds/` filters, compare two to four funds,
-  and the mobile pass for those pages.
+- **UX, part 3a — finding**: search everywhere, richer `/funds/` filters, `/funds/`
+  laid out for phones, and ticks there to add funds to a comparison. Comparing (3b)
+  is done (V1-85).
 - **Your portfolio, next**: redemptions and switches, IDCW plans, what a
   Regular plan cost you in rupees, and the local app's nine portfolio views
   gathered into two pages. Building a portfolio in the browser is done

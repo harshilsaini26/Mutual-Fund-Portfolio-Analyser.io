@@ -64,7 +64,14 @@ from src.m6_views.builders import portfolio  # noqa: F401  — registers the bui
 from src.m6_views.deps import Deps
 from src.m6_views.envelope import ViewEnvelope
 from src.m6_views.export.csv import ENCODING, to_csv
-from src.m6_views.format import DASH, format_inr, format_pct
+from src.m6_views.format import (
+    DASH,
+    format_date,
+    format_fraction,
+    format_inr,
+    format_pct,
+    format_return,
+)
 from src.m6_views.registry import VIEW_DEFS, VIEW_REGISTRY
 from src.m6_views.states import empty_envelope, error_envelope
 
@@ -82,7 +89,7 @@ STATIC_FILES = (
     "vendor/echarts.v6.1.0.min.js", "vendor/lenis.v1.3.26.min.js",
     "vendor/islands.v1.js", "fonts/rubik-latin-wght-normal.woff2",
     "fonts/terminess-Regular.woff2", "fonts/terminess-Bold.woff2",
-    "portfolio-math.js", "portfolio.js",
+    "portfolio-math.js", "portfolio.js", "compare.js",
     "fonts/atkinson-hyperlegible-latin-400-normal.woff2",
     "fonts/atkinson-hyperlegible-latin-700-normal.woff2",
 )
@@ -283,11 +290,14 @@ def explorer_row(
 
 def fund_record(
     row: dict[str, Any], detail: ViewEnvelope | None, prices_from: str | None,
+    benchmark: str | None = None,
 ) -> dict[str, Any]:
-    """One fund for the portfolio page's picker and alternatives (V1-82).
+    """One fund for the portfolio page's picker and alternatives (V1-82) and the
+    compare page (V1-85).
 
-    The same figures the `/funds/` table shows, as text: the page compares and
-    sorts on them, and never re-derives them.
+    The same figures the `/funds/` table shows, as text: the pages compare and
+    sort on them, and never re-derive them. `labels` are those figures as a
+    reader sees them, formatted here (§16.4), so the compare page formats none.
     """
     windows: dict[str, dict[str, Any]] = {}
     if detail is not None and detail.state.value == "ok":
@@ -301,7 +311,11 @@ def fund_record(
         return None if value in (None, "") else str(value)
 
     three = windows.get("3y", {})
-    return {
+
+    def shown(value: str | None, fmt: Any) -> str | None:
+        return None if value is None else str(fmt(Decimal(value)))
+
+    record = {
         "id": row["scheme_id"],
         "amfi": row["amfi_code"],
         "name": row["name"],
@@ -315,7 +329,24 @@ def fund_record(
         "r5": text(windows.get("5y", {}).get("return_ann")),
         "vol3": text(three.get("volatility_ann")),
         "fall3": text(three.get("max_dd")),
+        "house": row["house"] or None,
+        "benchmark": benchmark,
+        "sharpe3": text(three.get("sharpe")),
+        "rank3": None if row["rank_label"] in (None, "", DASH) else row["rank_label"],
     }
+    record["labels"] = {
+        "size": None if row["size_label"] in (None, "", DASH) else row["size_label"],
+        "ter": shown(record["ter"], lambda v: format_pct(v, precision=2)),
+        "r1": shown(record["r1"], lambda v: format_return(v, True)),
+        "r3": shown(record["r3"], lambda v: format_return(v, True)),
+        "r5": shown(record["r5"], lambda v: format_return(v, True)),
+        "vol3": shown(record["vol3"], format_fraction),
+        "fall3": shown(record["fall3"], format_fraction),
+        "sharpe3": shown(record["sharpe3"], lambda v: f"{v:.2f}"),
+        "prices_from": None if prices_from is None
+        else format_date(date.fromisoformat(prices_from)),
+    }
+    return record
 
 
 def lookthrough_file(lookthrough: Any, scheme: str, today: date) -> dict[str, Any] | None:
@@ -469,7 +500,8 @@ def build_site(
         panels = {p["env"].view_id: p["env"] for p in context["panels"]}
         rows.append(explorer_row(fund, facts, context["detail"]["env"],
                                  panels.get("fund_peers")))
-        records.append(fund_record(rows[-1], context["detail"]["env"], firsts.get(sid)))
+        records.append(fund_record(rows[-1], context["detail"]["env"], firsts.get(sid),
+                                   facts.benchmark_name if facts else None))
         held = lookthrough_file(deps.lookthrough, sid, today)
         if held is not None:
             (out / "data" / "lookthrough" / f"{sid}.json").write_text(
@@ -534,6 +566,11 @@ def build_site(
     (out / "portfolio").mkdir()
     (out / "portfolio" / "index.html").write_text(
         engine.get_template("portfolio.html").render({**shell, "active": "portfolio"}),
+        encoding="utf-8",
+    )
+    (out / "compare").mkdir()
+    (out / "compare" / "index.html").write_text(
+        engine.get_template("compare.html").render({**shell, "active": "compare"}),
         encoding="utf-8",
     )
     (out / "search.json").write_text(

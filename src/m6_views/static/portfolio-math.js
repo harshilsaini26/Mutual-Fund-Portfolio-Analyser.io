@@ -372,13 +372,26 @@
     return { portfolio: { version: 1, funds: Array.from(byId.values()) }, dropped: dropped };
   }
 
+  // A NAV file's text, whether the server sent it packed (.csv.gz) or unpacked.
+  // Browser only (DecompressionStream). Used by portfolio.js and compare.js.
+  function gzipText(response) {
+    return response.arrayBuffer().then(function (buf) {
+      var bytes = new Uint8Array(buf);
+      if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
+        var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+        return new Response(stream).text();
+      }
+      return new TextDecoder().decode(bytes);   // a server that already unpacked it
+    });
+  }
+
   var api = {
     toPaise: toPaise, toMicro: toMicro, parseNavFile: parseNavFile, allot: allot,
     sipDates: sipDates, purchasesOf: purchasesOf, position: position, xirr: xirr,
     showsXirr: showsXirr, isSynthetic: isSynthetic, lookThrough: lookThrough,
     overlap: overlap, alternatives: alternatives, parsePortfolio: parsePortfolio,
     localDay: localDay, rowError: rowError, entriesOf: entriesOf, altSlots: altSlots,
-    pricedBuys: pricedBuys,
+    pricedBuys: pricedBuys, gzipText: gzipText,
   };
   if (typeof module === "object" && module.exports) module.exports = api;
   else globalThis.PortfolioMath = api;
