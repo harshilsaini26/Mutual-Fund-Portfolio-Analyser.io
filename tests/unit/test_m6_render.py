@@ -713,4 +713,14 @@ def test_range_bars_place_the_fund_between_its_categorys_ends() -> None:
 def test_the_sidebar_marks_where_the_reader_is(client: TestClient) -> None:
     html = page(client, "fund_list")
     assert re.search(r'href="/view/fund_list[^"]*"\s+aria-current="page"', html)
-    assert 'data-theme-toggle' in html and '/static/theme.js' in html
+    assert "/static/settings.js" in html and "/static/theme.js" not in html
+    assert "data-theme-toggle" not in html and "data-settings-open" in html
+    dialog = re.search(r'<dialog id="settings"[^>]*>', html)
+    # The wheel stays in the panel.
+    assert dialog and "data-lenis-prevent" in dialog.group(0)
+    for key in ("theme", "font", "size", "density", "motion", "accent"):
+        assert f'data-setting="{key}"' in html, key
+    assert html.count('name="setting-font"') == 3
+    assert html.count('name="setting-accent"') == 4
+    # Without site data, settings cannot follow the reader to the next page.
+    assert "apply to this page only" in html

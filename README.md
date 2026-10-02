@@ -313,7 +313,10 @@ python -m http.server -d site 8000                      # then open http://127.0
 
 Its front page maps how funds are organised and shows each large equity category's
 highest three-year returns; `/funds/` lists every published fund in one table you can
-sort by size, cost, return or category rank, and narrow by category; `/portfolio/`
+sort by size, cost, return or category rank, and narrow by category. The gear in the
+top bar sets the theme (device, light, dark or Matrix), the font (Terminess, Rubik or
+Atkinson Hyperlegible), text size, density, motion and accent, remembered in your
+browser. `/portfolio/`
 builds your own portfolio from the funds you pick and what you put in, works out its
 value, return and look-through in your browser, and sets each fund beside others of
 its category, with nothing you enter leaving the browser. It carries AMFI's figures

@@ -31,7 +31,12 @@
   var INR = new Intl.NumberFormat("en-IN", {
     style: "currency", currency: "INR", maximumFractionDigits: 0,
   });
-  var calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  // The reader's settings (V1-83): motion and text size, read at each draw.
+  function moving() { return document.documentElement.getAttribute("data-motion") !== "off"; }
+  function textSize() {
+    // 12px at standard text, ECharts' own default; scaled with the reader's choice.
+    return parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.75;
+  }
 
   function token(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -84,13 +89,13 @@
 
   function base(p) {
     return {
-      animation: !calm.matches,
-      textStyle: { color: p.ink, fontFamily: "inherit" },
+      animation: moving(),
+      textStyle: { color: p.ink, fontFamily: "inherit", fontSize: textSize() },
       grid: { left: 8, right: 18, top: 40, bottom: 12, containLabel: true },
       legend: { top: 0, left: 0, textStyle: { color: p.ink }, itemGap: 18 },
       tooltip: {
         renderMode: "richText", backgroundColor: p.raised, borderColor: p.rule,
-        borderWidth: 1, padding: [8, 12], textStyle: { color: p.ink, fontSize: 12 },
+        borderWidth: 1, padding: [8, 12], textStyle: { color: p.ink, fontSize: textSize() },
         axisPointer: { lineStyle: { color: p.faint, type: "dashed" } },
       },
     };
@@ -116,13 +121,13 @@
         type: "time",
         axisLine: { lineStyle: { color: p.rule } },
         axisTick: { show: false },
-        axisLabel: { color: p.faint, hideOverlap: true },
+        axisLabel: { fontSize: textSize(), color: p.faint, hideOverlap: true },
         splitLine: { show: false },
       };
       o.yAxis = {
         type: "value",
         max: c.kind === "area" ? 0 : null,
-        axisLabel: { color: p.faint, formatter: ticks(c.y) },
+        axisLabel: { fontSize: textSize(), color: p.faint, formatter: ticks(c.y) },
         splitLine: { lineStyle: { color: p.rule } },
       };
       o.dataZoom = [
@@ -191,8 +196,8 @@
         })).join("\n");
       };
       o.xAxis = { type: "category", data: c.categories, axisTick: { show: false },
-                  axisLabel: { color: p.soft }, axisLine: { lineStyle: { color: p.rule } } };
-      o.yAxis = { type: "value", axisLabel: { color: p.faint, formatter: ticks(c.y) },
+                  axisLabel: { fontSize: textSize(), color: p.soft }, axisLine: { lineStyle: { color: p.rule } } };
+      o.yAxis = { type: "value", axisLabel: { fontSize: textSize(), color: p.faint, formatter: ticks(c.y) },
                   splitLine: { lineStyle: { color: p.rule } } };
       o.series = c.series.map(function (s) {
         var bench = s.role === "benchmark";
@@ -213,7 +218,7 @@
             return { value: n, caption: v[1],
                      label: { position: n !== null && n < 0 ? "bottom" : "top" } };
           }),
-          label: { show: true, color: p.ink, fontSize: 11,
+          label: { show: true, color: p.ink, fontSize: textSize() * 11 / 12,
                    formatter: function (d) { return d.data.caption; } },
         };
       });
@@ -264,7 +269,7 @@
         nodeClick: false,
         breadcrumb: { show: false },
         width: "100%", height: "100%", top: 0, left: 0,
-        label: { show: true, color: p.onCat, overflow: "truncate", fontSize: 11,
+        label: { show: true, color: p.onCat, overflow: "truncate", fontSize: textSize() * 11 / 12,
                  formatter: function (d) { return d.name + "\n" + d.data.caption; } },
         itemStyle: { borderColor: p.bg, borderWidth: 2, gapWidth: 2, borderRadius: 4 },
         data: c.cells.map(function (cell) {
@@ -301,7 +306,7 @@
         return {
           type: "value", scale: true, name: name, nameLocation: "middle",
           nameGap: where === "x" ? 28 : 44, nameTextStyle: { color: p.soft },
-          axisLabel: { color: p.faint, formatter: ticks(kind) },
+          axisLabel: { fontSize: textSize(), color: p.faint, formatter: ticks(kind) },
           axisLine: { lineStyle: { color: p.rule } },
           splitLine: { lineStyle: { color: p.rule } },
         };
@@ -341,7 +346,7 @@
       o.xAxis = { type: "value", show: false };
       o.yAxis = { type: "category", inverse: true,
                   data: c.bars.map(function (b) { return b.name; }),
-                  axisLabel: { color: p.ink, width: 170, overflow: "truncate" },
+                  axisLabel: { fontSize: textSize(), color: p.ink, width: 170, overflow: "truncate" },
                   axisLine: { show: false }, axisTick: { show: false } };
       o.series = [{
         type: "bar",
@@ -366,6 +371,7 @@
     chart.setOption(KINDS[spec.kind](spec, palette()));
     specs.set(el, spec);
     if (spec.kind === "line" || spec.kind === "area") zoomButtons(el, chart, spec);
+    el.classList.add("is-drawn");
   }
 
   // 1Y / 3Y / 5Y / All above a time chart (V1-80, after Fundoo's range buttons):
@@ -378,7 +384,7 @@
     var panel = el.closest("section.view");
     if (panel && panel.querySelector(".tabs")) return;
     var existing = el.previousElementSibling;
-    if (existing && existing.classList.contains("zoom")) {
+    if (existing && existing.classList.contains("zoom") && !existing.hasAttribute("data-zoom-slot")) {
       // Redrawn (a theme switch starts every chart at its full range): put
       // back the period the reader chose, so the pressed button is still true.
       var pressed = existing.querySelector('button[aria-pressed="true"]');
@@ -390,10 +396,15 @@
       s.points.forEach(function (pt) { if (!last || pt[0] > last) last = pt[0]; });
     });
     if (!last) return;
-    var group = document.createElement("div");
-    group.className = "zoom";
-    group.setAttribute("role", "group");
-    group.setAttribute("aria-label", "Show a period");
+    // The row's place is held in the page (echart.html), so filling it moves
+    // nothing; a chart drawn elsewhere without one gets a row of its own.
+    var slot = existing && existing.hasAttribute("data-zoom-slot") ? existing : null;
+    var group = slot || document.createElement("div");
+    if (!slot) {
+      group.className = "zoom";
+      group.setAttribute("role", "group");
+      group.setAttribute("aria-label", "Show a period");
+    }
     ZOOMS.forEach(function (z) {
       var button = document.createElement("button");
       button.type = "button";
@@ -412,7 +423,8 @@
       });
       group.appendChild(button);
     });
-    el.parentNode.insertBefore(group, el);
+    if (!slot) el.parentNode.insertBefore(group, el);
+    slot && slot.removeAttribute("data-zoom-slot");
   }
 
   function init(root) {
@@ -480,7 +492,9 @@
   // redraws every chart in the new colours.
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawAll);
   new MutationObserver(redrawAll).observe(document.documentElement, {
-    attributes: true, attributeFilter: ["data-theme"],
+    attributes: true,
+    attributeFilter: ["data-theme", "data-font", "data-size", "data-density",
+                      "data-motion", "data-accent"],
   });
   init(document);
   watch(document);

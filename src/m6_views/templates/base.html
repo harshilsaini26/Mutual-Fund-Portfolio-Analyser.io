@@ -18,8 +18,9 @@
   it has the top bar alone, and carries its security policy in a <meta> tag
   because Pages sends no headers.
 
-  `theme.js` runs in <head>, before anything is drawn, so a reader who chose the
-  light theme never sees a dark page flash first.
+  `settings.js` runs in <head>, before anything is drawn, and sets the reader's
+  theme, font, text size, density, motion and accent as attributes on <html>
+  (DECISIONS V1-83), so nobody sees one look flash before another.
 #}
 {% import "icons.html" as icon %}
 <!doctype html>
@@ -33,7 +34,7 @@
   <meta name="referrer" content="no-referrer">
   {% endif %}
   <title>{% block title %}Look-through{% endblock %}</title>
-  <script src="{{ root }}/static/theme.js"></script>
+  <script src="{{ root }}/static/settings.js"></script>
   <link rel="stylesheet" href="{{ root }}/static/lenis.css">
   <link rel="stylesheet" href="{{ root }}/static/app.css">
 </head>
@@ -58,12 +59,53 @@
 </form>
 {%- endmacro %}
 
-{% macro theme_toggle() -%}
-{#- Each theme shows the next one's icon: moon (dark), terminal (Matrix), sun (light). -#}
-<button class="icon-button" type="button" data-theme-toggle
-        aria-label="Switch theme: light, dark or Matrix">
-  {{ icon.i("moon", "icon icon--moon") }}{{ icon.i("terminal", "icon icon--term") }}{{ icon.i("sun", "icon icon--sun-next") }}
-</button>
+{% macro settings_button() -%}
+{#- Hidden until app.js shows it: without scripts the panel cannot open. -#}
+<button class="icon-button" type="button" data-settings-open aria-haspopup="dialog"
+        aria-controls="settings" aria-label="Settings" hidden>{{ icon.i("settings") }}</button>
+{%- endmacro %}
+
+{% macro settings_panel() -%}
+{#
+  The reader's settings (DECISIONS V1-83). A native <dialog>: opened with
+  showModal(), it keeps focus inside, closes on Esc and hands focus back to the
+  gear. Native radio groups, so arrow keys and screen readers need no extra code.
+  Every change applies at once (app.js -> settings.js).
+#}
+{%- set rows = [
+  ("theme", "Theme", [("device", "Device"), ("light", "Light"), ("dark", "Dark"), ("matrix", "Matrix")]),
+  ("font", "Font", [("terminess", "Terminess"), ("rubik", "Rubik"), ("atkinson", "Atkinson Hyperlegible")]),
+  ("size", "Text size", [("small", "Small"), ("standard", "Standard"), ("large", "Large")]),
+  ("density", "Density", [("comfortable", "Comfortable"), ("compact", "Compact")]),
+  ("motion", "Motion", [("device", "Device"), ("on", "On"), ("off", "Off")]),
+  ("accent", "Accent", [("navy", "Navy"), ("violet", "Violet"), ("raspberry", "Raspberry"), ("graphite", "Graphite")]),
+] %}
+<dialog id="settings" class="settings" aria-labelledby="settings-h" data-lenis-prevent>
+  <div class="settings__head">
+    <h2 id="settings-h">Settings</h2>
+    <button type="button" class="icon-button" data-settings-close
+            aria-label="Close settings">{{ icon.i("close") }}</button>
+  </div>
+  {% for key, legend, options in rows %}
+  <fieldset class="settings__group" data-setting="{{ key }}">
+    <legend>{{ legend }}</legend>
+    <div class="settings__chips">
+      {% for value, label in options %}
+      <label class="settings__chip">
+        <input type="radio" name="setting-{{ key }}" value="{{ value }}">
+        {% if key == "accent" %}<span class="settings__swatch settings__swatch--{{ value }}" aria-hidden="true"></span>{% endif %}
+        <span>{{ label }}</span>
+        {% if key == "font" %}<span class="settings__sample settings__sample--{{ value }}" aria-hidden="true">Aa ₹1,23,456.78</span>{% endif %}
+      </label>
+      {% endfor %}
+    </div>
+    {% if key == "accent" %}<p class="settings__hint" data-matrix-note hidden>Matrix is green by design.</p>{% endif %}
+  </fieldset>
+  {% endfor %}
+  <p class="settings__note" data-settings-note hidden>This browser is not keeping site data,
+    so these settings apply to this page only; another page opens with the defaults.</p>
+  <button type="button" class="settings__reset" data-settings-reset>Reset to defaults</button>
+</dialog>
 {%- endmacro %}
 
 {% if static %}
@@ -80,7 +122,7 @@
   {{ search_box() }}
   <a class="topbar__link" href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">
     <span>Self-hosted app</span>{{ icon.i("external") }}</a>
-  {{ theme_toggle() }}
+  {{ settings_button() }}
 </header>
 <p class="public-note">
   A public copy of the fund pages, built {{ built | fmt_date }} from AMFI's prices
@@ -138,7 +180,7 @@
       <span class="chip chip--quiet" title="The newest fund disclosure loaded">
         Disclosures to {{ health.latest_disclosure | fmt_date }}</span>
       {% endif %}
-      {{ theme_toggle() }}
+      {{ settings_button() }}
     </header>
 {% endif %}
 {#- One content block for both shells: Jinja allows a block once per template. -#}
@@ -159,6 +201,7 @@
   </div>
 </div>
 {% endif %}
+{{ settings_panel() }}
 {#- In this order: app.js starts Lenis, and deferred scripts run as listed. -#}
 <script src="{{ root }}/static/vendor/lenis.v1.3.26.min.js" defer></script>
 <script src="{{ root }}/static/app.js" defer></script>

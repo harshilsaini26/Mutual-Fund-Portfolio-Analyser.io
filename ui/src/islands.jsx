@@ -4,7 +4,9 @@
  *
  * Every island enhances an element that already says what it means: the headline
  * is already in the heading, the figure already in the tile. With scripts off, or
- * under `prefers-reduced-motion`, nothing here runs and the page is complete.
+ * with the reader's Motion setting off (`data-motion`, DECISIONS V1-83), nothing here
+ * runs and the page is complete. Turning motion off mid-way stops the aurora and
+ * finishes a running blur or count at once, on the server's own text.
  *
  *   [data-island="blur-text"]  the words fade in, one by one
  *   [data-island="count-up"]   the first number counts up, then the server's exact
@@ -21,7 +23,15 @@ import BlurText from './components/BlurText.jsx';
 import CountUp from './components/CountUp.jsx';
 import spotlight from './components/spotlight.js';
 
-const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const html = document.documentElement;
+const calm = () => html.getAttribute('data-motion') === 'off';
+// What to do at once if motion is turned off while an effect is running.
+const finishers = new Set();
+new MutationObserver(() => {
+  if (!calm()) return;
+  finishers.forEach(finish => finish());
+  finishers.clear();
+}).observe(html, { attributes: true, attributeFilter: ['data-motion'] });
 
 function each(name, fn) {
   document.querySelectorAll(`[data-island="${name}"]`).forEach(el => {
@@ -39,6 +49,11 @@ function blurText(el) {
   el.setAttribute('aria-label', text);
   // Preact's render adds to what is there; the server's words go first.
   el.textContent = '';
+  finishers.add(() => {
+    render(null, el);
+    el.removeAttribute('aria-label');
+    el.textContent = text;
+  });
   render(
     <span aria-hidden="true">
       <BlurText text={text} delay={90} animateBy="words" direction="top" />
@@ -58,6 +73,7 @@ function countUp(el) {
   const to = parseFloat(digits.replace(/,/g, ''));
   if (!Number.isFinite(to)) return;
   const done = () => {
+    finishers.delete(done);
     render(null, el);
     el.removeAttribute('aria-label');
     el.textContent = original;
@@ -65,6 +81,8 @@ function countUp(el) {
   // Mounted only when it comes into view: CountUp shows its starting value at
   // once, and a figure off-screen must never read as 0 (MODULE_6 §9.3).
   const start = () => {
+    if (calm()) return;
+    finishers.add(done);
     el.setAttribute('aria-label', original.trim());
     el.textContent = '';
     render(
@@ -108,15 +126,18 @@ function aurora(el) {
     const now = entries.some(e => e.isIntersecting);
     if (now === shown) return;
     shown = now;
-    if (shown) draw(); else render(null, el);
+    if (shown && !calm()) draw(); else render(null, el);
   }).observe(el);
-  new MutationObserver(() => shown && draw()).observe(document.documentElement, {
-    attributes: true, attributeFilter: ['data-theme'],
-  });
+  // A new theme redraws it; motion turned off stops it, leaving the hero's own
+  // still colours; motion turned back on starts it again.
+  new MutationObserver(() => {
+    if (calm()) render(null, el);
+    else if (shown) draw();
+  }).observe(html, { attributes: true, attributeFilter: ['data-theme', 'data-motion'] });
 }
 
 each('spotlight', el => spotlight(el));
-if (!calm) {
+if (!calm()) {
   each('blur-text', blurText);
   each('count-up', countUp);
   each('aurora', aurora);

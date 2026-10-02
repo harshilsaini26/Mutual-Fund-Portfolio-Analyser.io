@@ -217,6 +217,20 @@ def test_the_portfolio_page_is_published_and_runs_only_from_this_site(site: Path
     assert f'href="{BASE}/portfolio/"' in home
 
 
+def test_the_settings_travel_with_the_site(site: Path) -> None:
+    for name in ("settings.js", "fonts/atkinson-hyperlegible-latin-400-normal.woff2",
+                 "fonts/atkinson-hyperlegible-latin-700-normal.woff2"):
+        assert (site / "static" / name).is_file(), name
+    assert not (site / "static" / "theme.js").exists()
+    assert '<dialog id="settings"' in _page(site, DIRECT)
+
+
+def test_the_zoom_row_is_reserved_before_scripts_run(site: Path) -> None:
+    page = _page(site, DIRECT)
+    growth = page[page.index('data-view-id="fund_growth"'):]
+    assert growth.index("data-zoom-slot") < growth.index("echart__canvas")
+
+
 def test_an_index_funds_price_stands_in_for_the_benchmark_it_declares(
     warehouse: sqlite3.Connection,
 ) -> None:

@@ -62,6 +62,13 @@ copyFileSync(join(modules, 'lenis', 'dist', 'lenis.min.js'), join(vendor, 'lenis
 copyFileSync(join(modules, 'lenis', 'dist', 'lenis.css'), join(statics, 'lenis.css'));
 copyFileSync(join(modules, '@fontsource-variable', 'rubik', 'files', 'rubik-latin-wght-normal.woff2'),
   join(fonts, 'rubik-latin-wght-normal.woff2'));
+// Atkinson Hyperlegible, the third font a reader can choose (V1-83): OFL, Latin subset.
+const atkinson = join(modules, '@fontsource', 'atkinson-hyperlegible');
+for (const weight of ['400', '700']) {
+  const name = `atkinson-hyperlegible-latin-${weight}-normal.woff2`;
+  copyFileSync(join(atkinson, 'files', name), join(fonts, name));
+}
+copyFileSync(join(atkinson, 'LICENSE'), join(fonts, 'atkinson-hyperlegible-LICENSE.txt'));
 
 // Keep SHA256SUMS in step with what this script writes.
 const sums = join(vendor, 'SHA256SUMS');

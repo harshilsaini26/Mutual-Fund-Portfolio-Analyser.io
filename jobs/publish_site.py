@@ -78,11 +78,13 @@ PUBLIC_USER = UserId("PUBLIC")
 #: What the public pages load. d3 draws only the portfolio Sankey, which the
 #: public copy does not have.
 STATIC_FILES = (
-    "app.css", "app.js", "charts.js", "theme.js", "lenis.css",
+    "app.css", "app.js", "charts.js", "settings.js", "lenis.css",
     "vendor/echarts.v6.1.0.min.js", "vendor/lenis.v1.3.26.min.js",
     "vendor/islands.v1.js", "fonts/rubik-latin-wght-normal.woff2",
     "fonts/terminess-Regular.woff2", "fonts/terminess-Bold.woff2",
     "portfolio-math.js", "portfolio.js",
+    "fonts/atkinson-hyperlegible-latin-400-normal.woff2",
+    "fonts/atkinson-hyperlegible-latin-700-normal.woff2",
 )
 #: A file only this job writes, so a rebuild can tell its own output from a
 #: directory it must not delete.

@@ -142,25 +142,62 @@
 
   document.querySelectorAll("input[data-suggest], input[data-index]").forEach(suggestions);
 
-  // --- theme ------------------------------------------------------------------
+  // --- settings (DECISIONS V1-83) ----------------------------------------------
   //
-  // theme.js applied a stored choice before the page was drawn; this is the
-  // switch. charts.js watches the attribute and redraws in the new colours.
+  // settings.js applied the reader's choices before the page was drawn and owns
+  // storage; this is the panel that changes them. Each radio applies at once.
+  // charts.js and the islands watch the attributes and follow.
 
-  // Light unless the reader chose another (V1-80); three themes, in turn (V1-81).
-  var THEMES = ["light", "dark", "matrix"];
+  var panel = document.getElementById("settings");
+  if (panel && window.Settings && panel.showModal) {
+    var S = window.Settings;
+    var html = document.documentElement;
 
-  function currentTheme() {
-    return document.documentElement.getAttribute("data-theme") || "light";
-  }
+    var check = function () {
+      var chosen = Object.assign({}, S.DEFAULTS, S.current().stored || {});
+      Object.keys(S.DEFAULTS).forEach(function (key) {
+        panel.querySelectorAll('input[name="setting-' + key + '"]').forEach(function (input) {
+          input.checked = input.value === chosen[key];
+        });
+      });
+      panel.querySelector("[data-settings-note]").hidden = S.current().ok;
+    };
 
-  document.querySelectorAll("[data-theme-toggle]").forEach(function (button) {
-    button.addEventListener("click", function () {
-      var next = THEMES[(THEMES.indexOf(currentTheme()) + 1) % THEMES.length];
-      document.documentElement.setAttribute("data-theme", next);
-      store("theme", next);
+    // Matrix is one colour by design: the accent waits, kept, until it is left.
+    var matrix = function () {
+      var on = html.getAttribute("data-theme") === "matrix";
+      panel.querySelectorAll('input[name="setting-accent"]').forEach(function (input) {
+        input.disabled = on;
+      });
+      panel.querySelector("[data-matrix-note]").hidden = !on;
+    };
+
+    document.querySelectorAll("[data-settings-open]").forEach(function (button) {
+      button.hidden = false;
+      button.addEventListener("click", function () { check(); matrix(); panel.showModal(); });
     });
-  });
+    panel.querySelector("[data-settings-close]").addEventListener("click", function () { panel.close(); });
+    // A click on the backdrop lands on the dialog itself, and so does one on the
+    // panel's own blank space: only a click outside its box closes it.
+    panel.addEventListener("click", function (event) {
+      if (event.target !== panel) return;
+      var box = panel.getBoundingClientRect();
+      var inside = event.clientX >= box.left && event.clientX <= box.right &&
+        event.clientY >= box.top && event.clientY <= box.bottom;
+      if (!inside) panel.close();
+    });
+    panel.addEventListener("change", function (event) {
+      var input = event.target;
+      if (!input.name || input.name.indexOf("setting-") !== 0) return;
+      S.set(input.name.slice("setting-".length), input.value);
+      panel.querySelector("[data-settings-note]").hidden = S.current().ok;
+    });
+    panel.querySelector("[data-settings-reset]").addEventListener("click", function () {
+      S.reset();
+      check();
+    });
+    new MutationObserver(matrix).observe(html, { attributes: true, attributeFilter: ["data-theme"] });
+  }
 
   // --- the menu on a narrow screen --------------------------------------------
 
@@ -329,9 +366,22 @@
   // table -- keeps the wheel (`allowNestedScroll`; Lenis's default hands every
   // wheel to the page, which left the fund table unscrollable).
 
-  if (window.Lenis && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    new window.Lenis({ autoRaf: true, anchors: true, allowNestedScroll: true });
+  // Started and stopped by the reader's Motion setting (`data-motion`, V1-83),
+  // live: turning motion off hands scrolling straight back to the browser.
+  var lenis = null;
+  function motion() {
+    var on = document.documentElement.getAttribute("data-motion") === "on";
+    if (on && !lenis && window.Lenis) {
+      lenis = new window.Lenis({ autoRaf: true, anchors: true, allowNestedScroll: true });
+    } else if (!on && lenis) {
+      lenis.destroy();
+      lenis = null;
+    }
   }
+  motion();
+  new MutationObserver(motion).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-motion"],
+  });
 
   document.querySelectorAll("[data-recent]").forEach(function (box) {
     var funds = recent();
