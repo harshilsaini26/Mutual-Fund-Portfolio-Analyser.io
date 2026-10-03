@@ -885,3 +885,22 @@ def test_the_nav_box_explains_nav(site: Path) -> None:
     box = html[html.index('class="fundcard__nav"'):]
     box = box[:box.index("</div>")]
     assert 'data-key="nav"' in box
+
+
+def test_the_site_tells_vercel_how_to_serve_it(site: Path) -> None:
+    """V1-92: the site is hosted on Vercel from the gh-pages branch, with no build
+    there. Pages are linked as folders (/fund/<id>/), so a path without its slash
+    is redirected to it; files with an extension are not (Vercel's rule)."""
+    config = json.loads((site / "vercel.json").read_text(encoding="utf-8"))
+    assert config["trailingSlash"] is True
+
+
+def test_vercel_deploys_the_built_site_and_never_the_source() -> None:
+    """main holds the source; deploying it publishes a 404. Only gh-pages, which
+    the nightly build pushes, is deployed; and that build links from the root,
+    since a vercel.app site is served from /."""
+    repo = Path(__file__).resolve().parents[2]
+    config = json.loads((repo / "vercel.json").read_text(encoding="utf-8"))
+    assert config["git"]["deploymentEnabled"] == {"main": False}
+    workflow = (repo / ".github" / "workflows" / "site.yml").read_text(encoding="utf-8")
+    assert re.search(r'python -m jobs\.build_site [^\n]*--base ""', workflow)

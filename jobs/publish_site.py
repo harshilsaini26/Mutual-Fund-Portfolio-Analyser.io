@@ -99,6 +99,13 @@ STATIC_FILES = (
 #: A file only this job writes, so a rebuild can tell its own output from a
 #: directory it must not delete.
 MARKER = ".nojekyll"
+#: How Vercel serves the site (V1-92): it deploys the gh-pages branch as it is,
+#: with no build. Pages are linked as folders (/fund/<id>/), so a path without its
+#: slash is redirected to it; a file with an extension never is (Vercel's rule).
+VERCEL_CONFIG = {
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "trailingSlash": True,
+}
 
 NOT_BUILT = "This picture could not be built for the public copy."
 #: The holdings panel's empty state on the public site. The local app's names
@@ -631,6 +638,8 @@ def build_site(
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(STATIC / name, target)
     (out / MARKER).write_text("", encoding="utf-8")
+    (out / "vercel.json").write_text(json.dumps(VERCEL_CONFIG, indent=2) + "\n",
+                                     encoding="utf-8")
 
     size = sum(p.stat().st_size for p in out.rglob("*") if p.is_file())
     check_budget(size)

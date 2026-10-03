@@ -58,4 +58,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          python -m jobs.build_site --store previous --out site --push
+          # Links from the root: Vercel serves the gh-pages branch at its own
+          # address (V1-92), not under /<repository>/ as GitHub Pages did.
+          python -m jobs.build_site --store previous --out site --base "" --push
