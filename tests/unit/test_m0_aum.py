@@ -547,10 +547,13 @@ class _Client:
         self,
         periods: dict[int, list[tuple[int, str]]],
         aaum: list[tuple[str, str, str]] | None = None,
+        by_period: dict[int, list[tuple[str, str, str]]] | None = None,
     ) -> None:
         self.periods = periods
         #: (amfi_code, scheme name, AAUM in lakh)
         self.aaum = aaum or []
+        #: The same, per period id, where quarters differ.
+        self.by_period = by_period or {}
         self.calls: list[str] = []
 
     def get(self, url: str, **kw: object) -> Any:
@@ -566,6 +569,8 @@ class _Client:
         self.calls.append(url)
         body: dict[str, Any]
         if "periodId=" in url:
+            period = int(url.split("periodId=")[1].split("&")[0])
+            rows = self.by_period.get(period, self.aaum)
             body = {
                 "data": [
                     {
@@ -576,7 +581,7 @@ class _Client:
                                 "SchemeNAVName": name,
                                 "AverageAumForTheMonth": {AAUM_FIELD: lakh},
                             }
-                            for code, name, lakh in self.aaum
+                            for code, name, lakh in rows
                         ],
                     }
                 ]
@@ -1179,3 +1184,64 @@ class TestRunEndToEnd:
         assert sum("robots.txt" in c for c in client.calls) == 1, (
             "one robots cache for the run, not one per request"
         )
+
+
+class TestAPartlyPublishedQuarterStrandsNobody:
+    """V1-90. AMFI publishes a quarter as fund houses report: on 3 Oct 2026 its
+    July-September file held 250 share classes from 4 houses, against 8,545 from
+    51 for April-June. Loading only the newest quarter left the nightly site,
+    which starts from an empty warehouse, with a fund size for 62 of 1,662
+    funds. The newest two are loaded, so each scheme keeps its newest figure."""
+
+    def test_a_scheme_missing_from_the_newest_quarter_keeps_the_one_before(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        db = tmp_path / "w.db"
+        _warehouse(db, [("INF1", "100001", "abc", None),
+                        ("INF2", "100002", "xyz", None)]).close()
+        monkeypatch.setattr("jobs.fetch_aum.warehouse_path", lambda: db)
+        monkeypatch.setattr("jobs.fetch_aum.raw_root", lambda: tmp_path / "raw")
+        client = _Client(
+            {1: [(2, "July - September 2026"), (1, "April - June 2026")]},
+            by_period={
+                2: [("100001", "One - Direct Plan", "1000")],
+                1: [("100001", "One - Direct Plan", "900"),
+                    ("100002", "Two - Direct Plan", "500")],
+            },
+        )
+        rows = run(client=client)
+
+        assert [r["period"] for r in rows] == [
+            "April - June 2026", "July - September 2026"]
+        conn = connect(str(db))
+        newest = {
+            sid: (aum, as_of) for sid, aum, as_of in conn.execute(
+                "SELECT scheme_id, aum_inr, as_of_date FROM scheme_aum"
+                " ORDER BY scheme_id, as_of_date")
+        }
+        conn.close()
+        assert newest["INF1"] == (to_inr(Decimal(1000), AAUM_UNIT), date(2026, 9, 30))
+        assert newest["INF2"] == (to_inr(Decimal(500), AAUM_UNIT), date(2026, 6, 30))
+
+    def test_the_quarter_before_is_found_across_a_financial_year(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """April-June is a new financial year's only quarter; January-March sits
+        in the year before, which a one-year walk never reached."""
+        db = tmp_path / "w.db"
+        _warehouse(db, [("INF2", "100002", "xyz", None)]).close()
+        monkeypatch.setattr("jobs.fetch_aum.warehouse_path", lambda: db)
+        monkeypatch.setattr("jobs.fetch_aum.raw_root", lambda: tmp_path / "raw")
+        client = _Client(
+            {1: [(1, "April - June 2026")], 2: [(4, "January - March 2026")]},
+            # The new year has one house reported, for a scheme not in this warehouse.
+            by_period={1: [("100009", "Other - Direct Plan", "70")],
+                       4: [("100002", "Two - Direct Plan", "500")]},
+        )
+        rows = run(client=client)
+        assert [r["period"] for r in rows] == [
+            "January - March 2026", "April - June 2026"]
+        conn = connect(str(db))
+        assert conn.execute("SELECT as_of_date FROM scheme_aum").fetchone() == (
+            date(2026, 3, 31),)
+        conn.close()

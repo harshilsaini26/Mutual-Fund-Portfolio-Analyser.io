@@ -1,7 +1,7 @@
 """Load AMFI's scheme-wise average AUM. S3, DECISIONS V1-49.
 
     python -m jobs.fetch_aum --list --years 4    # what AMFI has published
-    python -m jobs.fetch_aum                     # the newest quarter
+    python -m jobs.fetch_aum                     # the newest two quarters
     python -m jobs.fetch_aum --quarter 2026-03-31
 
 This is what §10's V2 needs: V2 reconciles a disclosure's summed market value
@@ -539,20 +539,31 @@ def run(
     # continues until it is found rather than stopping at a fixed depth --
     # and stops the moment it IS found, which is usually the first year.
     polite = _polite(cfg, client)
-    quarters = published(cfg, years=years, stop_at=wanted_end, polite=polite)
+    # By default the newest TWO quarters, oldest first (V1-90). AMFI publishes a
+    # quarter as fund houses report: on 3 Oct 2026 its July-September file held
+    # 4 houses' schemes against April-June's 51, and a build that loaded only the
+    # newest knew the size of 62 funds in 1,662. Each scheme keeps its newest
+    # figure (`scheme_facts` reads the latest `as_of_date`). Two financial years
+    # are walked, because a new year's first quarter has its predecessor in the
+    # year before.
+    walk = years if (list_only or wanted_end) else max(years, 2)
+    quarters = published(cfg, years=walk, stop_at=wanted_end, polite=polite)
     if list_only:
         return [
             {"quarter": str(q.ends), "label": q.label, "financial_year_id": q.fy_id}
             for q in quarters
         ]
 
-    wanted = [q for q in quarters if q.ends == wanted_end] if wanted_end else quarters[:1]
+    wanted = (
+        [q for q in quarters if q.ends == wanted_end]
+        if wanted_end
+        else sorted(quarters, key=lambda q: q.ends, reverse=True)[:2][::-1]
+    )
     if not wanted:
         raise SystemExit(
             f"AMFI has not published a quarter ending {quarter};"
             f" `--list --years 4` shows {[str(q.ends) for q in quarters][:8]}"
         )
-    fy_id, pid, label = wanted[0].fy_id, wanted[0].period_id, wanted[0].label
 
     # `finally`, because every exit from here used to leak the handle: the
     # SystemExit paths above, `AumScaleError` from `load_quarter`, and the
@@ -561,50 +572,56 @@ def run(
     # three runs later, in a session with nothing to do with this one.
     conn = connect(str(warehouse_path()))
     try:
-        url = data_url(fy_id, pid)
-        content = _get(url, cfg, polite)
-
-        result, path = archive(
-            content,
-            FetchCandidate(url=url, source_id=SOURCE_ID),
-            "application/json",
-            raw_root(),
-            lambda fid: _archived(conn, fid),
-        )
-        if path is not None:
-            conn.execute(
-                "INSERT INTO raw_file (file_id, source_id, url, fetched_at,"
-                " byte_size, storage_path, parse_status)"
-                " VALUES (?,?,?,?,?,?, 'pending')",
-                (
-                    result.file_id,
-                    SOURCE_ID,
-                    url,
-                    datetime.now(UTC),
-                    result.byte_size,
-                    str(path),
-                ),
-            )
-            conn.commit()
-
-        rows = parse_aaum(content)
-        counts = load_quarter(conn, rows, label, str(result.file_id))
-        conn.execute(
-            "UPDATE raw_file SET parse_status='ok', parser_id='aum.amfi',"
-            " parser_version='1', parsed_at=?, as_of_date=? WHERE file_id=?",
-            (datetime.now(UTC), counts["as_of"], result.file_id),
-        )
-        conn.commit()
-        return [
-            {
-                "period": label,
-                "share_classes": len(rows),
-                "fetch": result.status,
-                **counts,
-            }
-        ]
+        return [_load(conn, q, cfg, polite) for q in wanted]
     finally:
         conn.close()
+
+
+def _load(
+    conn: Any, quarter: Quarter, cfg: dict[str, Any], polite: _Polite
+) -> dict[str, object]:
+    """Fetch, archive, parse and load one quarter."""
+    fy_id, pid, label = quarter.fy_id, quarter.period_id, quarter.label
+    url = data_url(fy_id, pid)
+    content = _get(url, cfg, polite)
+
+    result, path = archive(
+        content,
+        FetchCandidate(url=url, source_id=SOURCE_ID),
+        "application/json",
+        raw_root(),
+        lambda fid: _archived(conn, fid),
+    )
+    if path is not None:
+        conn.execute(
+            "INSERT INTO raw_file (file_id, source_id, url, fetched_at,"
+            " byte_size, storage_path, parse_status)"
+            " VALUES (?,?,?,?,?,?, 'pending')",
+            (
+                result.file_id,
+                SOURCE_ID,
+                url,
+                datetime.now(UTC),
+                result.byte_size,
+                str(path),
+            ),
+        )
+        conn.commit()
+
+    rows = parse_aaum(content)
+    counts = load_quarter(conn, rows, label, str(result.file_id))
+    conn.execute(
+        "UPDATE raw_file SET parse_status='ok', parser_id='aum.amfi',"
+        " parser_version='1', parsed_at=?, as_of_date=? WHERE file_id=?",
+        (datetime.now(UTC), counts["as_of"], result.file_id),
+    )
+    conn.commit()
+    return {
+        "period": label,
+        "share_classes": len(rows),
+        "fetch": result.status,
+        **counts,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
