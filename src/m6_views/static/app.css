@@ -1552,13 +1552,50 @@ body, .topbar, .card, .view, .settings {
 .pf__note, .pf__hint, .pf__estimate, .cmp__note { color: var(--ink-soft); font-size: var(--text-sm); max-width: 72ch; }
 .pf__entry, .cmp__entry { display: grid; gap: 10px; margin-bottom: 28px; }
 .pf__label, .cmp__label { font-weight: 650; }
-.pf__pick, .cmp__pick { width: min(100%, 560px); }
-.pf__holding { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 8px; }
+.pf__holding { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 12px; }
 .pf__holding-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
 .pf__holding-head h3 { margin: 0; font-size: var(--text-base); }
-.pf__row { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
-.pf__field { display: grid; gap: 2px; font-size: var(--text-sm); color: var(--ink-soft); }
-.pf__field input { min-width: 9em; }
+.pf__row { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.pf__field { display: grid; gap: 6px; font-size: var(--text-sm); font-weight: 500; color: var(--ink-soft); }
+
+/* Entry fields (V1-93), after Apple's text field: the label above, the field
+   sized to what goes in it, a navy edge and soft ring while it is in use, and
+   the loss colour on its edge beside a row's error. The design bucket has no
+   field of its own; its fuse-button is the Undo on "Remove fund". */
+.cmp__pick, .pf__pick, .pf__field input {
+  box-sizing: border-box; height: 44px; padding: 0 14px;
+  font: inherit; font-size: var(--text-base); font-weight: 400; color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  background: var(--surface); border: 1px solid var(--field-line); border-radius: 12px;
+  transition: border-color 0.15s ease, outline-color 0.15s ease;
+}
+.cmp__pick::placeholder, .pf__pick::placeholder { color: var(--ink-faint); }
+.cmp__pick:hover, .pf__pick:hover, .pf__field input:hover { border-color: var(--ink-faint); }
+.cmp__pick:focus-visible, .pf__pick:focus-visible, .pf__field input:focus-visible {
+  border-color: var(--accent);
+  outline: 3px solid color-mix(in srgb, var(--accent) 30%, transparent); outline-offset: 0;
+}
+.pf__field input[aria-invalid="true"] {
+  border-color: var(--loss); box-shadow: 0 0 0 3px var(--loss-soft);
+}
+.pf__field input { width: 10.5em; }
+.pf__field input[data-field="day"] { width: 5em; }
+.pf__field input[type="month"], .pf__field input[type="date"] { width: 11.5em; }
+.pf__field input::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.7; }
+/* ₹ inside the field, before the figure; the label names the field. */
+.pf__affix { position: relative; display: block; }
+.pf__prefix {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: var(--text-base); font-weight: 400; color: var(--ink-faint); pointer-events: none;
+}
+.pf__affix input { padding-left: 30px; }
+/* The fund pickers read as search fields, like the top bar's. */
+.field-search { position: relative; width: min(100%, 560px); }
+.field-search__icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; color: var(--ink-faint); pointer-events: none;
+}
+.field-search input { width: 100%; padding-left: 44px; border-radius: 999px; }
 .pf__error { flex-basis: 100%; margin: 0; color: var(--loss); font-size: var(--text-sm); }
 .pf__error:empty { position: absolute; }
 .pf__add { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
@@ -1569,6 +1606,27 @@ body, .topbar, .card, .view, .settings {
 .pf__alt { display: grid; gap: 8px; margin-bottom: 20px; }
 .pf__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
 .button--quiet { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1px var(--line-strong); }
+/* A secondary action (V1-93): tinted, so a card's one solid button stays its own. */
+.button--tinted { padding: 10px 16px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.button--tinted:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+/* An icon alone; its name is in aria-label and title (portfolio.js iconButton). */
+.button--icon {
+  width: 44px; height: 44px; padding: 0; justify-content: center; border-radius: 999px;
+  background: transparent; color: var(--ink-soft); box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.button--icon:hover { background: var(--surface-2); color: var(--ink); }
+/* Remove fund's Undo: a line burns down its edge while Undo is on offer
+   (FUSE_MS in portfolio.js). With motion off it stays whole; the card's own
+   line counts the seconds either way. */
+.fuse { position: relative; overflow: hidden; border-radius: 999px; }
+.fuse__line {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: var(--accent); transform-origin: left;
+  animation: fuse-burn 4s linear forwards;
+}
+@keyframes fuse-burn { to { transform: scaleX(0); } }
+.pf__holding--leaving h3, .pf__holding--leaving > :not(.pf__holding-head, .pf__leaving) { opacity: 0.5; }
+.pf__leaving { margin: 0; color: var(--ink-soft); font-size: var(--text-sm); }
 
 /* Compare (V1-85). The high/low tags are plain text in the ink's own colour:
    which end of a measure is wanted depends on the reader, so none is toned. */

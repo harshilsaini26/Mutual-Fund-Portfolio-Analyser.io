@@ -31,8 +31,11 @@
 
   <div class="card pf__entry">
     <label class="pf__label" for="pf-pick" id="pf-pick-label">Add a fund</label>
-    <input id="pf-pick" class="pf__pick" list="pf-funds" autocomplete="off"
-           placeholder="Type part of a fund's name" disabled>
+    <div class="field-search">
+      {{ icon.i("search", "icon field-search__icon") }}
+      <input id="pf-pick" class="pf__pick" list="pf-funds" autocomplete="off"
+             placeholder="Type part of a fund's name" disabled>
+    </div>
     <datalist id="pf-funds"></datalist>
     <p class="pf__hint">Direct plans are listed. A Regular plan can be entered as its
       Direct version; its value here then reads higher than your statement, by the

@@ -85,8 +85,54 @@
                           "aria-label": label }, "?");
   }
 
+  // An action that waits `ms` for an Undo, then runs `done` once (the design
+  // bucket's fuse-button, V1-93). The clock is passed in for tests.
+  function fuse(ms, done, clock) {
+    // Wrapped: a browser's timers refuse to be called as another object's methods.
+    var c = clock || {
+      now: function () { return Date.now(); },
+      set: function (fn, wait) { return setTimeout(fn, wait); },
+      clear: function (t) { clearTimeout(t); },
+    };
+    var end = c.now() + ms;
+    var id = c.set(function () { id = null; done(); }, ms);
+    return {
+      remaining: function () { return id === null ? 0 : Math.max(0, end - c.now()); },
+      cancel: function () {
+        if (id === null) return false;
+        c.clear(id);
+        id = null;
+        return true;
+      },
+    };
+  }
+
+  // The few icons drawn by script, stroked like icons.html's; beside a word, or
+  // on a button that carries its name in aria-label.
+  var ICONS = {
+    close: ["M6 6l12 12M18 6L6 18"],
+    plus: ["M12 5v14M5 12h14"],
+    bin: ["M4 7h16", "M10 11v6M14 11v6", "M6 7l1 12.5A1.5 1.5 0 0 0 8.5 21h7a1.5 1.5 0 0 0 1.5-1.5L18 7",
+          "M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"],
+    undo: ["M9 14L4 9l5-5", "M4 9h10.5a5.5 5.5 0 0 1 0 11H11"],
+  };
+  function icon(name) {
+    var svg = document.createElementNS(SVG, "svg");
+    svg.setAttribute("class", "icon");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    ICONS[name].forEach(function (d) {
+      var path = document.createElementNS(SVG, "path");
+      path.setAttribute("d", d);
+      svg.appendChild(path);
+    });
+    return svg;
+  }
+
   var api = { present: present, el: el, fill: fill, bar: bar, INR: INR, CLASS: CLASS,
-              navSeries: navSeries, lookFile: lookFile, termButton: termButton };
+              navSeries: navSeries, lookFile: lookFile, termButton: termButton,
+              fuse: fuse, icon: icon };
   if (typeof module === "object" && module.exports) module.exports = api;
   else window.Kit = api;
 })();

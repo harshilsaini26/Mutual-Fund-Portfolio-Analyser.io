@@ -727,6 +727,28 @@ def test_headings_carry_only_their_words(site: Path) -> None:
         assert re.search(r"</h2>\s*<button[^>]*class=\"term\"", html), page
 
 
+def test_the_fund_pickers_are_search_fields(site: Path) -> None:
+    """Compare's and Your portfolio's fund box reads like the top bar's search: a
+    magnifier beside it, the list of names still the browser's own (V1-93)."""
+    for page, pick in (("compare/index.html", "cmp-pick"),
+                       ("portfolio/index.html", "pf-pick")):
+        html = (site / page).read_text(encoding="utf-8")
+        box = re.search(r'<div class="field-search">(.*?)</div>', html, re.S)
+        assert box and 'class="icon field-search__icon"' in box.group(1), page
+        assert f'id="{pick}"' in box.group(1) and ' list="' in box.group(1), page
+
+
+def test_icon_buttons_say_what_they_do() -> None:
+    """The bin and the cross on Your portfolio carry no word, so each has a name
+    that a screen reader reads and a pointer shows (V1-93)."""
+    script = (Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
+              / "portfolio.js").read_text(encoding="utf-8")
+    calls = re.findall(r'el\("button", \{[^}]*button--icon[^}]*\}', script)
+    assert calls
+    for call in calls:
+        assert '"aria-label"' in call and "title:" in call, call
+
+
 def test_row_errors_are_tied_to_their_fields() -> None:
     """A row's error marks its fields invalid, points them at the message, and is
     announced; clearing it undoes all three (V1-88)."""

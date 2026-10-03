@@ -19,6 +19,9 @@
   var replacing = null;         // {id: held fund's ISIN, slot: 0..2} while "Replace" is picking
   var generation = 0;           // the newest results() run; older runs do not draw
   var state = { version: 1, funds: [] };
+  var FUSE_MS = 4000;           // how long Undo is on offer after "Remove"
+  var leaving = new Map();      // fund id -> its fuse (Kit.fuse) while Undo is on offer
+  var ticking = null;           // the countdown's interval while any fund is leaving
 
   var K = window.Kit;
   var el = K.el, fill = K.fill, bar = K.bar, CLASS = K.CLASS, INR = K.INR;
@@ -78,43 +81,122 @@
     });
   }
 
-  function field(label, attrs) {
+  // A labelled field (V1-93); `prefix` sits inside it, before the figure (₹).
+  function field(label, attrs, prefix) {
     var id = "pf-" + Math.random().toString(36).slice(2, 9);
-    return el("label", { "class": "pf__field", "for": id }, label, el("input", Object.assign({ id: id }, attrs)));
+    var input = el("input", Object.assign({ id: id }, attrs));
+    return el("label", { "class": "pf__field", "for": id }, label,
+      prefix ? el("span", { "class": "pf__affix" }, el("span", { "class": "pf__prefix" }, prefix), input) : input);
+  }
+
+  // A button that shows only an icon: its name is read out, and shown on hover.
+  function iconButton(action, name, glyph) {
+    return el("button", { type: "button", "class": "button button--icon", "data-action": action,
+                          "aria-label": name, title: name }, K.icon(glyph));
   }
 
   function holdingCard(h, i) {
     var fund = FUNDS.get(h.id);
+    var gone = leaving.get(h.id);
     var title = fund
       ? el("a", { href: BASE + "/fund/" + h.id + "/" }, fund.name)
       : el("span", null, h.id + " (no longer published here, so it is not valued)");
-    var card = el("article", { "class": "pf__holding", "data-fund": i },
+    var card = el("article", { "class": "pf__holding" + (gone ? " pf__holding--leaving" : ""), "data-fund": i },
       el("header", { "class": "pf__holding-head" },
         el("h3", null, title),
-        el("button", { type: "button", "class": "button button--quiet", "data-action": "remove-fund" }, "Remove fund")));
+        gone ? undoButton(gone) : iconButton("remove-fund", "Remove " + nameOf(h.id), "bin")),
+      gone && el("p", { "class": "pf__leaving", "data-leaving": h.id }, leftText(gone)));
     h.purchases.forEach(function (p, r) {
-      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "purchase", "data-row": r },
+      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "purchase", "data-row": r, inert: !!gone },
         field("Date", { type: "date", value: p.date, max: TODAY, min: fund ? fund.prices_from : null, "data-field": "date" }),
-        field("Amount (₹)", { type: "text", inputmode: "decimal", value: p.amount, "data-field": "amount" }),
-        el("button", { type: "button", "class": "button button--quiet", "data-action": "remove-row" }, "Remove"),
+        field("Amount", { type: "text", inputmode: "decimal", value: p.amount, "data-field": "amount" }, "₹"),
+        iconButton("remove-row", "Remove this lump sum", "close"),
         errorSlot()));
       showRowError(row, rowError(fund, "purchase", p));
     });
     h.sips.forEach(function (s, r) {
-      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "sip", "data-row": r },
-        field("SIP a month (₹)", { type: "text", inputmode: "decimal", value: s.amount, "data-field": "amount" }),
+      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "sip", "data-row": r, inert: !!gone },
+        field("SIP a month", { type: "text", inputmode: "decimal", value: s.amount, "data-field": "amount" }, "₹"),
         field("Day", { type: "number", min: 1, max: 31, value: s.day, "data-field": "day" }),
         field("From", { type: "month", value: s.start, "data-field": "start" }),
         field("Until (blank if running)", { type: "month", value: s.stop || "", "data-field": "stop" }),
-        el("button", { type: "button", "class": "button button--quiet", "data-action": "remove-row" }, "Remove"),
+        iconButton("remove-row", "Remove this SIP", "close"),
         errorSlot()));
       showRowError(row, rowError(fund, "sip", s));
     });
-    card.appendChild(el("p", { "class": "pf__add" },
-      el("button", { type: "button", "class": "button", "data-action": "add-lump" }, "Add a lump sum"),
-      el("button", { type: "button", "class": "button", "data-action": "add-sip" }, "Add a SIP")));
+    card.appendChild(el("p", { "class": "pf__add", inert: !!gone },
+      el("button", { type: "button", "class": "button button--tinted", "data-action": "add-lump" },
+        K.icon("plus"), "Add a lump sum"),
+      el("button", { type: "button", "class": "button button--tinted", "data-action": "add-sip" },
+        K.icon("plus"), "Add a SIP")));
     return card;
   }
+
+  // --- removing a fund, with Undo (the design bucket's fuse-button, V1-93) ------
+  // The fund stays, dimmed, while a line burns down its Undo button; only when
+  // the fuse ends is it taken out. Undo or Esc keeps it.
+
+  function nameOf(id) { var f = FUNDS.get(id); return f ? f.name : id; }
+  function leftText(f) {
+    var s = Math.ceil(f.remaining() / 1000);
+    return "Removing in " + s + (s === 1 ? " second" : " seconds") + ". Undo or Esc keeps it.";
+  }
+  function undoButton(f) {
+    var line = el("span", { "class": "fuse__line", "aria-hidden": "true" });
+    line.style.animationDelay = (f.remaining() - FUSE_MS) + "ms";   // a redrawn card burns on from where it was
+    return el("button", { type: "button", "class": "button button--quiet fuse", "data-action": "undo-remove" },
+      K.icon("undo"), "Undo", line);
+  }
+  function focusIn(id, action) {
+    var at = state.funds.findIndex(function (h) { return h.id === id; });
+    var b = out("holdings").querySelector('[data-fund="' + at + '"] [data-action="' + action + '"]');
+    if (b) b.focus();
+  }
+  function tick() {
+    out("holdings").querySelectorAll("[data-leaving]").forEach(function (p) {
+      var f = leaving.get(p.getAttribute("data-leaving"));
+      if (f) p.textContent = leftText(f);
+    });
+    if (leaving.size && !ticking) ticking = setInterval(tick, 250);
+    if (!leaving.size && ticking) { clearInterval(ticking); ticking = null; }
+  }
+  function arm(id) {
+    leaving.set(id, K.fuse(FUSE_MS, function () {
+      leaving.delete(id);
+      var at = state.funds.findIndex(function (h) { return h.id === id; });
+      if (at >= 0) {
+        state.funds.splice(at, 1);
+        stopReplacing();
+        changed();
+        say(nameOf(id) + " removed.");
+      }
+      tick();
+    }));
+    entry();
+    focusIn(id, "undo-remove");
+    say(nameOf(id) + " will be removed in " + FUSE_MS / 1000 + " seconds. Undo keeps it.");
+    tick();
+  }
+  function undo(id) {
+    var f = leaving.get(id);
+    if (!f) return;
+    f.cancel();
+    leaving.delete(id);
+    entry();
+    focusIn(id, "remove-fund");
+    say(nameOf(id) + " kept.");
+    tick();
+  }
+  // A new portfolio (cleared or loaded) has nothing on its way out.
+  function defuse() {
+    leaving.forEach(function (f) { f.cancel(); });
+    leaving.clear();
+    tick();
+  }
+  page.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape" || !leaving.size || e.target.id === "pf-pick") return;
+    undo(Array.from(leaving.keys()).pop());
+  });
 
   function entry() {
     var box = out("holdings");
@@ -177,7 +259,8 @@
       case "add-lump": h.purchases.push({ date: "", amount: "" }); break;
       case "add-sip": h.sips.push({ amount: "", day: 1, start: TODAY.slice(0, 7), stop: null }); break;
       case "remove-row": (row.dataset.kind === "sip" ? h.sips : h.purchases).splice(Number(row.dataset.row), 1); break;
-      case "remove-fund": state.funds.splice(Number(card.dataset.fund), 1); stopReplacing(); break;
+      case "remove-fund": arm(h.id); return;
+      case "undo-remove": undo(h.id); return;
       case "replace":
         replacing = { id: b.dataset.held, slot: Number(b.dataset.slot) };
         document.getElementById("pf-pick-label").textContent = "Pick a fund to compare in this place (Esc to cancel)";
@@ -189,6 +272,7 @@
         if (window.confirm("Remove every fund and purchase from this page and this browser?")) {
           state = { version: 1, funds: [] };
           stopReplacing();
+          defuse();
         } else { return; }
         break;
       default: return;
@@ -214,6 +298,7 @@
       if (got.error) { say(got.error + " Your portfolio is unchanged."); return; }
       state = got.portfolio;
       stopReplacing();
+      defuse();
       say("Loaded " + file.name + (got.dropped ? "; " + entries(got.dropped) + " could not be read and were left out." : "."));
       changed();
     });

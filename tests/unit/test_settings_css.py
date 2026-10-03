@@ -196,8 +196,30 @@ def test_field_borders_meet_3_to_1() -> None:
             for decl in re.findall(r"border(?:-color)?\s*:\s*([^;]+);", body):
                 if "radius" in decl:
                     continue
-                ok = "--field-line" in decl or decl.strip() in ("0", "none")
+                ok = ("--field-line" in decl or decl.strip() in ("0", "none")
+                      or ("aria-invalid" in last and "--loss" in decl))
                 assert ok, (sel.strip(), decl)
+
+
+def test_an_invalid_field_shows_it_on_its_border() -> None:
+    """V1-93: a field with an error takes the loss colour on its border, beside the
+    message that says what is wrong; that colour shows where to type at 3:1 too."""
+    css = CSS.read_text(encoding="utf-8")
+    rule = re.search(r'([^{}]*\[aria-invalid="true"\][^{}]*)\{([^}]*)\}', css)
+    assert rule and re.search(r"border-color:\s*var\(--loss\)", rule.group(2))
+    for theme in THEMES:
+        t = _tokens(theme)
+        for bg in ("surface", "surface-2"):
+            assert _ratio(t["loss"], t[bg]) >= 3.0, (theme, bg)
+
+
+def test_entry_fields_are_44px_tall() -> None:
+    """Apple's comfortable touch target, with room for the figures (V1-93)."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    for sel in (".cmp__pick", ".pf__pick", ".pf__field input"):
+        rules = [body for s, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+                 if sel in [x.strip() for x in s.split(",")]]
+        assert any(re.search(r"(?<![-\w])height:\s*44px", b) for b in rules), sel
 
 
 def test_fields_have_a_focus_ring() -> None:

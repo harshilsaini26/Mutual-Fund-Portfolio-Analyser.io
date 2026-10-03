@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "icons.html" as icon %}
 {% import "macros.html" as vc %}
 {% block title %}Compare funds{% endblock %}
 
@@ -20,8 +21,11 @@
 
   <div class="card cmp__entry">
     <label class="cmp__label" for="cmp-pick">Add a fund to compare</label>
-    <input id="cmp-pick" class="cmp__pick" list="cmp-funds" autocomplete="off"
-           placeholder="Type part of a fund's name" disabled>
+    <div class="field-search">
+      {{ icon.i("search", "icon field-search__icon") }}
+      <input id="cmp-pick" class="cmp__pick" list="cmp-funds" autocomplete="off"
+             placeholder="Type part of a fund's name" disabled>
+    </div>
     <datalist id="cmp-funds"></datalist>
     <p class="cmp__status" id="cmp-status" role="status"></p>
     <div data-out="suggest"></div>
