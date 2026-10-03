@@ -15,7 +15,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const BASE = (process.argv[2] ||
-  "https://harshilsaini26.github.io/Mutual-Fund-Portfolio-Analyser.io").replace(/\/$/, "");
+  "https://didmysipwork.vercel.app").replace(/\/$/, "");
 const OUT = fileURLToPath(new URL("../public/shots/", import.meta.url));
 const PORT = 9333;
 const CHROME = [

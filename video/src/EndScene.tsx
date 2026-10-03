@@ -42,7 +42,7 @@ export const EndScene: React.FC = () => {
           }),
         }}
       >
-        harshilsaini26.github.io/Mutual-Fund-Portfolio-Analyser.io
+        didmysipwork.vercel.app
       </Interactive.Div>
     </AbsoluteFill>
   );

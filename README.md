@@ -24,7 +24,7 @@ describes one fund and overlap is a property of the set.
 ### The public site
 
 Every fund's page is also published, free and rebuilt every night, at
-<https://harshilsaini26.github.io/Mutual-Fund-Portfolio-Analyser.io/>. Nothing you enter
+<https://didmysipwork.vercel.app/>. Nothing you enter
 there leaves your browser.
 
 ![A 20-second tour of the public site: the front page, a fund page, Explore funds, Compare, Your portfolio](video/tour.gif)
@@ -297,7 +297,7 @@ and ICICI what they have published.
 
 ## 6. Publish the public fund explorer (optional)
 
-A static copy of the fund pages, for anyone to browse on GitHub Pages without installing
+A static copy of the fund pages, for anyone to browse on the web without installing
 anything: every open fund with a Direct plan and a year of prices, about 1,800.
 
 **It builds itself.** A GitHub Actions workflow (`.github/workflows/site.yml`) runs every
@@ -305,7 +305,8 @@ night and whenever you start it by hand. It builds on a fresh machine from the p
 sources alone (AMFI's daily prices, categories, fund sizes and expense ratios; mfapi.in
 for price history; fund houses' own portfolio files where they fetch themselves, and
 Groww's fund pages for the rest), computes every figure in Python as the app does, and
-publishes to the `gh-pages` branch. Nothing is kept between runs except the site itself,
+pushes the site to the `gh-pages` branch, which Vercel serves as it is. Nothing is kept
+between runs except the site itself,
 which carries a compact copy of every fund's prices (`data/nav/`, about 30 MB) and of the
 portfolios read from Groww (`data/holdings/`), so a normal night asks mfapi for nothing.
 The first run fetches every fund's history, about an hour. Groww's pages are read a
@@ -316,9 +317,16 @@ To turn it on, once:
 
 1. **Settings → Secrets and variables → Actions → Variables:** add `MF_CONTACT_EMAIL`,
    the address sent with every request (the build stops without it).
-2. **Settings → Pages → Deploy from a branch → `gh-pages` / root.**
+2. **On [Vercel](https://vercel.com) (the free Hobby plan is enough):** import this
+   repository with the application preset **Other**, and override the build, install
+   and output settings to empty, `.` for the output. The first deployment is of `main`
+   and shows a 404: `main` holds the source, and its `vercel.json` switches its own
+   deployments off.
 3. **Actions → site → Run workflow**, to publish the first time rather than waiting
-   for the night.
+   for the night. Its push to `gh-pages` gives Vercel that branch's first deployment.
+4. **On Vercel, Settings → Environments → Production:** track the `gh-pages` branch,
+   promote that deployment to production, and check that Deployment Protection's
+   Vercel Authentication is off, so visitors are not asked to log in.
 
 To build the same thing on your own machine, into a folder you can preview:
 
@@ -351,10 +359,11 @@ and fund houses' own disclosures, and nothing else:
   apply to what it publishes.
 - **None of your data.** The build never opens your ledger.
 
-The site appears at `https://<user>.github.io/<repository>/`; for this repository,
-<https://harshilsaini26.github.io/Mutual-Fund-Portfolio-Analyser.io/>.
-`python -m jobs.publish_site --push` still publishes from this machine's own warehouse,
-which the next nightly build replaces.
+The site appears at `https://<project>.vercel.app/`; for this repository,
+<https://didmysipwork.vercel.app/>. Its links start at the address's root, which is why the workflow builds with
+`--base ""`; the site carries a `vercel.json` that redirects a page's address without
+its slash to the address with one. `python -m jobs.publish_site --base "" --push` still
+publishes from this machine's own warehouse, which the next nightly build replaces.
 
 ---
 

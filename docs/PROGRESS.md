@@ -196,7 +196,7 @@ look-through rather than today's. A third was found beside them: a figure labell
 span it.
 
 **A public copy of the fund pages** -- 754 funds -- builds with
-`python -m jobs.publish_site` and publishes to GitHub Pages with `--push`. It carries
+`python -m jobs.publish_site` and publishes to `gh-pages` with `--push`. It carries
 AMFI's prices and fund houses' own disclosures only: NSE's index levels are licensed for
 personal use, so benchmark comparisons stay in the self-hosted app, and the build never
 opens a personal ledger. Publishing is only ever the user's own command. Its front
@@ -239,10 +239,10 @@ open fund's (about an hour). The public site has all of them: see below.
 
 ## The public site
 
-<https://harshilsaini26.github.io/Mutual-Fund-Portfolio-Analyser.io/>, built
-every night by GitHub Actions from the APIs alone (DECISIONS V1-75):
-`.github/workflows/site.yml` runs `jobs.build_site` on a fresh machine and
-pushes one commit to `gh-pages`. Measured on the first full build, 2026-09-26:
+<https://didmysipwork.vercel.app/>, built every night by GitHub Actions from the APIs alone
+(DECISIONS V1-75): `.github/workflows/site.yml` runs `jobs.build_site` on a fresh
+machine and pushes one commit to `gh-pages`, which Vercel serves from the root of its
+address (V1-92; GitHub Pages served it until 2026-10-03). Measured on the first full build, 2026-09-26:
 
 - **1,864 open funds with a Direct plan**; 1,661 have a year of prices and a page.
 - **History**: the first build fetches every fund from mfapi.in (~1 hour at the
