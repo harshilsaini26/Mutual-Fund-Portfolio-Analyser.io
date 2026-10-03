@@ -3,7 +3,8 @@
 A public website built from the same warehouse as the private app, so every
 test here is about what must NOT reach it -- index levels, the portfolio --
 what must reach it only marked (an aggregator's holdings), and about the links
-still working from the subdirectory GitHub Pages serves a project site under.
+working both from the root of an address (Vercel, V1-92) and from a folder
+(`--base`).
 """
 
 from __future__ import annotations
@@ -362,8 +363,8 @@ PRIVACY = (
     "No accounts, no cookies, no analytics.",
     "The page loads nothing from any other site: its content security policy allows"
     " only this one.",
-    "Like any web host, GitHub Pages keeps ordinary request logs (the address and the"
-    " page asked for), never what you type into a page.",
+    "Like any web host, Vercel keeps ordinary request logs (the address and the page"
+    " asked for), never what you type into a page.",
 )
 SECTIONS = (("lookup", "Look up a fund"), ("categories", "Understand funds"),
             ("portfolio", "See your portfolio"), ("privacy", "Your data stays yours"),

@@ -98,10 +98,11 @@ def templates(root: str = "", static: bool = False) -> Jinja2Templates:
     keeps §16.4 true: a template can render a figure but cannot make one, and
     every conversion from `Decimal` to text happens in `format.py`.
 
-    `root` prefixes every link the templates write: empty for this server, the
-    repository's name for the public copy on GitHub Pages, which is served from
-    a subdirectory. `static` is that copy: no server behind it, so no portfolio,
-    no search API and no fragments (DECISIONS V1-72).
+    `root` prefixes every link the templates write: empty for this server and for
+    the public copy, which Vercel serves from its address's root (V1-92); a
+    folder's name only when the copy is built with `--base` to be served from
+    one. `static` is that copy: no server behind it, so no portfolio, no search
+    API and no fragments (DECISIONS V1-72).
     """
     engine = Jinja2Templates(directory=str(TEMPLATES))
     engine.env.filters.update(FILTERS)

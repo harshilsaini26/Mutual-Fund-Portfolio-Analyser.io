@@ -13,9 +13,9 @@
 
   Two shells, one design. The app has a sidebar -- the portfolio's views and a
   way to any fund -- and a top bar with search and the theme switch. The public
-  copy on GitHub Pages (`static`, DECISIONS V1-72) has only funds to navigate, so
-  it has the top bar alone, and carries its security policy in a <meta> tag
-  because Pages sends no headers.
+  copy (`static`, DECISIONS V1-72) has only funds to navigate, so it has the top
+  bar alone, and carries its security policy in a <meta> tag, which travels with
+  the files whichever host serves them (Vercel since V1-92).
 
   `settings.js` runs in <head>, before anything is drawn, and sets the reader's
   theme, font, text size, density, motion and accent as attributes on <html>
