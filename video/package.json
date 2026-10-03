@@ -1,0 +1,29 @@
+{
+  "name": "look-through-tour",
+  "version": "1.0.0",
+  "description": "The README's tour of the public site, rendered with Remotion",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.532",
+    "@remotion/fonts": "4.0.532",
+    "@remotion/transitions": "4.0.532",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.532"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.532",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "9.39.5",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "shots": "node scripts/capture.mjs",
+    "studio": "remotion studio",
+    "gif": "remotion render Tour tour.gif --codec=gif --every-nth-frame=3 --scale=0.6 --number-of-gif-loops=0",
+    "lint": "eslint src && tsc"
+  }
+}

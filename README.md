@@ -21,6 +21,20 @@ Five equity funds look like diversification. Opened up, they are often one portf
 bought five times, with five sets of fees. No factsheet shows this, because a factsheet
 describes one fund and overlap is a property of the set.
 
+### The public site
+
+Every fund's page is also published, free and rebuilt every night, at
+<https://harshilsaini26.github.io/Mutual-Fund-Portfolio-Analyser.io/>. Nothing you enter
+there leaves your browser.
+
+![A 20-second tour of the public site: the front page, a fund page, Explore funds, Compare, Your portfolio](video/tour.gif)
+
+| The front page | A fund page |
+| --- | --- |
+| ![The front page: what every fund owns and how it has done, with three ways in](video/public/shots/home.png) | ![A fund page: returns, falls, costs and holdings against its category](video/public/shots/fund.png) |
+| **Compare** | **Your portfolio** |
+| ![Compare: up to four funds side by side](video/public/shots/compare.png) | ![Your portfolio: what your funds add up to, company by company](video/public/shots/portfolio.png) |
+
 ---
 
 ## Contents
@@ -480,6 +494,7 @@ src/m2_fund/          returns, risk, benchmark analytics        fund x-ray
 src/m3_lookthrough/   exposure, overlap, concentration          look-through
 src/m6_views/         pages, charts, export, local API          what you see
 migrations/           numbered, forward-only schema changes
+video/                the README's tour and screenshots (Remotion), made by hand
 ```
 
 The pages are server-rendered and complete without JavaScript. The front page's motion
