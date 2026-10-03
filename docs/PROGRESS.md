@@ -263,6 +263,11 @@ pushes one commit to `gh-pages`. Measured on the first full build, 2026-09-26:
   an index fund that declares the same benchmark on its Groww page, named as such.
   The crawl map gained that column on 2026-09-26, so proxies fill in as pages are
   read, about 100 a night.
+- **UX fixes and polish** (V1-88): measured against an audit (375/768/1440px, three
+  themes, a 320–1600px sweep) and Apple's design principles. The top bar folds into a Menu
+  on tablets, every text colour passes 4.5:1, fields have a 3:1 outline and a focus ring,
+  a skip link, an eight-size type scale with prose in Atkinson, no animated figures,
+  Explore funds' filters in the address, and 40px tap targets on phones.
 - **Learn** (V1-87): 26 terms and 11 guides, each written for this site and
   linked to the SEBI, AMFI or Zerodha Varsity pages it was checked against, with
   the date. A `?` beside a term on the fund, `/funds/`, compare and portfolio pages

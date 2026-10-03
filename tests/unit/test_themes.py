@@ -13,7 +13,11 @@ from pathlib import Path
 
 CSS = (Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static" / "app.css")
 #: Shape and type, the same in every theme.
-SHARED = {"--radius", "--radius-sm", "--font", "--mono"}
+SHARED = {"--radius", "--radius-sm", "--font", "--mono", "--font-prose",
+          # the type scale (V1-88) is the same in every theme
+          "--text-xs", "--text-sm", "--text-md", "--text-base", "--text-lead",
+          "--text-h3", "--text-h2", "--text-display", "--track-label", "--track-tight",
+          "--lh-body", "--lh-tight", "--lh-display"}
 #: light (accent, strong), dark (accent, strong): the spec's values. Navy is the
 #: bare `:root` and the dark block, as before.
 ACCENTS = {

@@ -15,14 +15,19 @@
   request, as a plain fact with its period stated -- "highest three-year return"
   -- beside the category's size, and never as "best" or "top performers".
 #}
+{% block main_class %} content--bleed{% endblock %}
+
+{#- The hero runs edge to edge inside a full-width <main>; the sections after it sit in
+    .home-body, as wide as every other page's content (V1-88: no 100vw, which counts
+    the scrollbar and spilled 8px sideways). -#}
 {% block content %}
 <section class="home-hero">
   <div class="home-hero__aurora" data-island="aurora" aria-hidden="true"></div>
   <div class="home-hero__inner">
     <p class="eyebrow">Indian mutual funds, looked through</p>
-    <h1 class="home-hero__title" data-island="blur-text">See what every fund owns, and how it has done</h1>
+    <h1 class="home-hero__title">See what every fund owns, and how it has done</h1>
     <p class="home-hero__lede">
-      {{ count }} funds, each set against the funds that do the same job: returns,
+      {{ count }} fund{{ '' if count == 1 else 's' }}, each set against the funds that do the same job: returns,
       falls and recoveries, costs, and the companies it holds, from AMFI's prices
       and the fund houses' own disclosures.
     </p>
@@ -30,18 +35,19 @@
       <label class="sr-only" for="q-hero">Find a fund by name</label>
       {{ icon.i("search", "icon search__icon") }}
       <input id="q-hero" name="q" type="search" autocomplete="off" spellcheck="false"
-             placeholder="Search {{ count }} funds by name" data-index="{{ root }}/search.json">
+             placeholder="Search {{ count }} fund{{ '' if count == 1 else 's' }} by name" data-index="{{ root }}/search.json">
       <ul class="search__suggest" hidden data-lenis-prevent></ul>
     </form>
     <dl class="home-stats">
-      <div><dt>funds with a page</dt><dd data-island="count-up">{{ count | fmt_count }}</dd></div>
-      <div><dt>fund houses</dt><dd data-island="count-up">{{ stats.houses | fmt_count }}</dd></div>
-      <div><dt>categories</dt><dd data-island="count-up">{{ stats.categories | fmt_count }}</dd></div>
+      <div><dt>funds with a page</dt><dd>{{ count | fmt_count }}</dd></div>
+      <div><dt>fund houses</dt><dd>{{ stats.houses | fmt_count }}</dd></div>
+      <div><dt>categories</dt><dd>{{ stats.categories | fmt_count }}</dd></div>
       <div><dt>prices through</dt><dd>{{ stats.prices_to | fmt_date if stats.prices_to else '—' }}</dd></div>
     </dl>
   </div>
 </section>
 
+<div class="home-body">
 <section id="map" class="home-section" aria-labelledby="map-h">
   <div class="section-head">
     <h2 id="map-h">How mutual funds are organised</h2>
@@ -54,12 +60,12 @@
     the keyboard or a screen reader, and without scripts.
   #}
   <div class="fundmap">
-    <p class="fundmap__root">Mutual funds <span>{{ count | fmt_count }} funds</span></p>
+    <p class="fundmap__root">Mutual funds <span>{{ count | fmt_count }} fund{{ '' if count == 1 else 's' }}</span></p>
     <ul class="fundmap__families">
       {% for family in fund_map %}
       <li class="fundmap__family">
         <p class="fundmap__node"><strong>{{ family.name }}</strong>
-          <span>{{ family.count | fmt_count }} funds · {{ family.hint }}</span></p>
+          <span>{{ family.count | fmt_count }} fund{{ '' if family.count == 1 else 's' }} · {{ family.hint }}</span></p>
         <ul class="fundmap__cats">
           {% for c in family.categories %}
           <li><details class="fundmap__cat">
@@ -87,7 +93,7 @@
     <article class="leader" data-island="spotlight" aria-labelledby="leader-{{ loop.index }}">
       <header class="leader__head">
         <h3 id="leader-{{ loop.index }}">{{ card.name }}</h3>
-        <a class="leader__all" href="{{ root }}/funds/#category={{ card.key }}">All {{ card.count }} funds
+        <a class="leader__all" href="{{ root }}/funds/#category={{ card.key }}">All {{ card.count }} fund{{ '' if card.count == 1 else 's' }}
           {{ icon.i("arrow") }}</a>
       </header>
       <table class="leader__table" data-sortable>
@@ -115,7 +121,7 @@
     </article>
     {% endfor %}
   </div>
-  <p class="home-section__more"><a class="button" href="{{ root }}/funds/">Explore all {{ count }} funds {{ icon.i("arrow") }}</a></p>
+  <p class="home-section__more"><a class="button" href="{{ root }}/funds/">Explore all {{ count }} fund{{ '' if count == 1 else 's' }} {{ icon.i("arrow") }}</a></p>
 </section>
 
 <section id="about" class="home-section" aria-labelledby="about-h">
@@ -123,7 +129,9 @@
     <h2 id="about-h">What every fund page shows</h2>
     <p>From public sources only, rebuilt every night, with each figure's date and source beside it.
       <a href="{{ root }}/learn/reading-a-fund-page/">Reading a fund page here</a> walks through
-      each part, and <a href="{{ root }}/learn/">Learn</a> explains the terms.</p>
+      each part, and <a href="{{ root }}/learn/">Learn</a> explains the terms. Benchmark
+      comparisons and your own portfolio are in the
+      <a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">self-hosted app</a>.</p>
   </div>
   <div class="features">
     <div class="feature" data-island="spotlight">{{ icon.i("growth") }}
@@ -146,4 +154,5 @@
       <p>Asset mix, largest holdings and sectors, from the fund house's disclosure or, marked, an aggregator's page.</p></div>
   </div>
 </section>
+</div>
 {% endblock %}

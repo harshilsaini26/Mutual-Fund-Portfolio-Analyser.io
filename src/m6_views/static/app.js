@@ -13,7 +13,71 @@
 (function () {
   "use strict";
 
+  // Explore funds' filters in the address (V1-88): "#category=…&family=…&q=…", each
+  // left out when empty, so a filtered list can be shared, bookmarked and reloaded.
+  var FILTER_KEYS = ["category", "family", "q"];
+  function filterHash(state) {
+    var parts = FILTER_KEYS.filter(function (k) { return state[k]; })
+      .map(function (k) { return k + "=" + encodeURIComponent(state[k]); });
+    return parts.length ? "#" + parts.join("&") : "";
+  }
+  // Unknown keys, broken escapes and repeats (the first wins) are ignored; whether
+  // a value is one of the page's options is the page's to check.
+  function parseFilterHash(hash) {
+    var out = { category: "", family: "", q: "" }, seen = {};
+    String(hash || "").replace(/^#/, "").split("&").forEach(function (pair) {
+      var at = pair.indexOf("=");
+      if (at < 0) return;
+      var key = pair.slice(0, at), value;
+      if (FILTER_KEYS.indexOf(key) < 0 || seen[key]) return;
+      seen[key] = true;
+      try { value = decodeURIComponent(pair.slice(at + 1)); } catch (e) { return; }
+      out[key] = value;
+    });
+    return out;
+  }
+  // Any other hash ("#content", the skip link's target) is not ours to follow.
+  function isFilterHash(hash) {
+    return /(^#|&)(category|family|q)=/.test(String(hash || ""));
+  }
+  // On load the hash wins; "?q=" (the search box's plain form) only fills a missing q.
+  function initialFilters(search, hash) {
+    var state = isFilterHash(hash) ? parseFilterHash(hash) : { category: "", family: "", q: "" };
+    var query = /(^#|&)q=/.test(String(hash || "")) ? null : /[?&]q=([^&]*)/.exec(search || "");
+    if (query) {
+      try { state.q = decodeURIComponent(query[1].replace(/\+/g, " ")); } catch (e) { /* none */ }
+    }
+    return state;
+  }
+  // fn once the calls have paused for ms, with the last call's arguments.
+  function later(fn, ms) {
+    var timer;
+    return function () {
+      var args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function () { fn.apply(null, args); }, ms);
+    };
+  }
+  if (typeof module === "object" && module.exports) {
+    module.exports = { filterHash: filterHash, parseFilterHash: parseFilterHash,
+                       isFilterHash: isFilterHash, initialFilters: initialFilters,
+                       later: later };
+    return;
+  }
+
   var ROOT = document.body.getAttribute("data-root") || "";
+
+  // The top bar's menu (V1-88) is a native popover: Esc and a tap outside close it
+  // already. Choosing a link on this same page (Categories, About) and widening
+  // past 1180px, where the links sit inline, close it too.
+  var topnav = document.getElementById("topnav");
+  if (topnav && topnav.hidePopover) {
+    var shut = function () { if (topnav.matches(":popover-open")) topnav.hidePopover(); };
+    topnav.addEventListener("click", function (e) { if (e.target.closest("a")) shut(); });
+    window.matchMedia("(min-width: 1180px)").addEventListener("change", function (e) {
+      if (e.matches) shut();
+    });
+  }
 
   // A browser without popovers (V1-87): each `?` becomes a link to its entry in
   // the glossary, so the explanation is still one tap away.
@@ -333,6 +397,12 @@
     var count = document.querySelector("[data-filter-count]");
     var all = table.tBodies[0].rows;
 
+    // The view is the address: replaced, not pushed, so Back still leaves; written
+    // once typing pauses, since Safari refuses a burst of replaceState calls. The
+    // hash carries q, so a "?q=" the page was opened with is dropped.
+    var writeAddress = later(function (hash) {
+      history.replaceState(null, "", location.pathname + hash);
+    }, 250);
     var apply = function () {
       var wanted = family ? family.value : "";
       var kind = category ? category.value : "";
@@ -351,34 +421,35 @@
           ? all.length + " funds"
           : shown + " of " + all.length + " funds";
       }
+      writeAddress(filterHash({ category: category ? category.value : "",
+                                family: family ? family.value : "",
+                                q: text ? text.value.trim() : "" }));
     };
     if (family) family.addEventListener("change", apply);
     if (category) category.addEventListener("change", apply);
     if (text) text.addEventListener("input", apply);
 
-    // A malformed address ("?q=%E0") names nothing; it must not stop the
-    // rest of this file from running.
-    var decoded = function (raw) {
-      try { return decodeURIComponent(raw); } catch (e) { return null; }
+    // "#category=…&family=…&q=…": the front page's category cards, a shared or
+    // bookmarked view, or Back and Forward; "?q=hdfc": the search box's plain form.
+    // A value the page has no option for is ignored.
+    var choose = function (select, value) {
+      if (!select) return;
+      var known = Array.prototype.some.call(select.options, function (o) { return o.value === value; });
+      select.value = known ? value : "";
     };
-
-    // "?q=hdfc": the search box's plain form, with scripts off, lands here.
-    var query = /[?&]q=([^&]*)/.exec(window.location.search);
-    var typedQuery = query ? decoded(query[1].replace(/\+/g, " ")) : null;
-    if (typedQuery !== null && text) {
-      text.value = typedQuery;
+    var follow = function (asked) {
+      choose(family, asked.family);
+      choose(category, asked.category);
+      if (text) text.value = asked.q;
       apply();
+    };
+    if (isFilterHash(location.hash) || /[?&]q=/.test(location.search)) {
+      follow(initialFilters(location.search, location.hash));
     }
-
-    // "#category=equity/flexi_cap": the front page's category cards link here.
-    var asked = /(?:^#|&)category=([^&]+)/.exec(window.location.hash);
-    if (asked && category) {
-      var key = decoded(asked[1]);
-      if (key !== null && Array.prototype.some.call(category.options, function (o) { return o.value === key; })) {
-        category.value = key;
-        apply();
-      }
-    }
+    // An emptied hash resets the view; "#content" and other anchors leave it be.
+    window.addEventListener("hashchange", function () {
+      if (!location.hash || isFilterHash(location.hash)) follow(parseFilterHash(location.hash));
+    });
 
     // A category tile narrows the table rather than jumping to the plain lists
     // below it, which are the way through with scripts off.

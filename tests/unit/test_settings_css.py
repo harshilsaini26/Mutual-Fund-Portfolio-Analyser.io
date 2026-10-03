@@ -134,3 +134,217 @@ def test_an_explanation_stays_hidden_where_popovers_are_not_supported() -> None:
     css = CSS.read_text(encoding="utf-8")
     assert re.search(r"\.term-pop\s*\{[^}]*display:\s*none", css)
     assert re.search(r"\.term-pop:popover-open\s*\{[^}]*display:\s*block", css)
+
+
+# --- colour and focus (UX audit, V1-88) -----------------------------------------
+
+
+def _block(css: str, opener: str) -> str:
+    """The body of the first rule block whose selector is exactly `opener`."""
+    start = re.search(r"(?m)^" + re.escape(opener) + r"\s*\{", css)
+    assert start, opener
+    depth, i = 1, start.end()
+    while depth:
+        depth += {"{": 1, "}": -1}.get(css[i], 0)
+        i += 1
+    return css[start.end():i - 1]
+
+
+def _tokens(theme: str) -> dict[str, str]:
+    css = CSS.read_text(encoding="utf-8")
+    hexes = r"--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})\b"
+    tokens = dict(re.findall(hexes, _block(css, ":root")))
+    if theme != "light":
+        tokens |= dict(re.findall(hexes, _block(css, f':root[data-theme="{theme}"]')))
+    return tokens
+
+
+def _ratio(a: str, b: str) -> float:
+    def lum(h: str) -> float:
+        c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+        c = [v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4 for v in c]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+    x, y = lum(a), lum(b)
+    return (max(x, y) + 0.05) / (min(x, y) + 0.05)
+
+
+THEMES = ("light", "dark", "matrix")
+SURFACES = ("bg", "surface", "surface-2", "surface-3")
+TEXT = ("ink", "ink-soft", "ink-faint", "accent", "gain", "loss", "warn", "bench")
+
+
+def test_text_tokens_meet_aa_on_every_surface() -> None:
+    """WCAG AA 4.5:1 for every text colour on every surface it can sit on."""
+    low = []
+    for theme in THEMES:
+        t = _tokens(theme)
+        for fg in TEXT:
+            for bg in SURFACES:
+                if fg in t and bg in t and _ratio(t[fg], t[bg]) < 4.5:
+                    low.append(f"{theme} {fg} on {bg} {_ratio(t[fg], t[bg]):.2f}")
+    assert not low, low
+
+
+def test_field_borders_meet_3_to_1() -> None:
+    """WCAG 1.4.11: a field's outline is what shows where to type."""
+    css = CSS.read_text(encoding="utf-8")
+    for theme in THEMES:
+        t = _tokens(theme)
+        for bg in ("surface", "surface-2"):
+            assert _ratio(t["field-line"], t[bg]) >= 3.0, (theme, bg)
+    for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+        last = sel.split(",")[0].split()[-1]
+        if re.search(r"\b(input|select|textarea)\b", sel) and ":" not in last:
+            for decl in re.findall(r"border(?:-color)?\s*:\s*([^;]+);", body):
+                if "radius" in decl:
+                    continue
+                ok = "--field-line" in decl or decl.strip() in ("0", "none")
+                assert ok, (sel.strip(), decl)
+
+
+def test_fields_have_a_focus_ring() -> None:
+    css = CSS.read_text(encoding="utf-8")
+    ring = re.search(r"([^{}]*a:focus-visible[^{}]*)\{", css)
+    assert ring and "input:focus-visible" in ring.group(1)
+    assert "textarea:focus-visible" in ring.group(1)
+    for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+        if re.search(r"outline:\s*none", body):
+            assert re.search(r"outline:\s*(?!none)\S", body), sel.strip()
+
+
+# --- type scale and prose face (V1-88) ------------------------------------------
+
+SCALE = {
+    "text-xs": "0.75rem", "text-sm": "0.8125rem", "text-md": "0.875rem",
+    "text-base": "0.96875rem", "text-lead": "1.125rem", "text-h3": "1.375rem",
+    "text-h2": "1.75rem", "text-display": "clamp(2.125rem, 5.4vw, 3.75rem)",
+}
+
+
+def test_every_font_size_is_a_token() -> None:
+    """Eight sizes, none under 12px at standard text size; the reader's text-size
+    setting (V1-83) scales them all through the root."""
+    css = CSS.read_text(encoding="utf-8")
+    root = _block(css, ":root")
+    for name, value in SCALE.items():
+        assert re.search(rf"--{name}:\s*{re.escape(value)};", root), name
+    stray = []
+    for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+        for value in re.findall(r"(?<!-)font-size:\s*([^;]+);", body):
+            value = value.strip()
+            token = re.fullmatch(r"var\(--text-[a-z0-9]+\)", value)
+            if token or value in ("inherit", "1em"):
+                continue
+            if value.endswith("%") and re.search(r"html|:root\[data-size", sel):
+                continue  # the text-size setting itself
+            if value == "0.75em" and ".term" in sel:
+                continue  # the "?" sizes to the label it sits beside
+            stray.append(f"{sel.strip()[:50]}: {value}")
+    assert not stray, stray
+
+
+def test_prose_uses_the_prose_face() -> None:
+    """Running text reads in Atkinson Hyperlegible while the reader's font is
+    Terminess, the default; headings, figures and controls keep Terminess."""
+    css = CSS.read_text(encoding="utf-8")
+    assert re.search(r'--font-prose:\s*"Atkinson Hyperlegible"', _block(css, ":root"))
+    for font in ("rubik", "atkinson"):
+        assert "--font-prose: var(--font)" in _block(css, f':root[data-font="{font}"]')
+    for sel in (".learn--guide p", ".learn__term dd p", ".lede", ".public-note",
+                ".term-pop__text", ".placeholder__reason", ".pf__note", ".cmp__note"):
+        rules = re.findall(r"(?m)^([^{}]*" + re.escape(sel) + r"[^{}]*)\{([^{}]*)\}", css)
+        assert any("font-family: var(--font-prose)" in body for _, body in rules), sel
+
+
+def test_wide_screens_show_the_links_inline() -> None:
+    """Wide: the nav sits inline, the Menu button gone (a menu still open when the
+    window widens is closed by app.js; see test_widening_closes_an_open_menu).
+    Narrow: the nav is a popover panel under the bar."""
+    css = CSS.read_text(encoding="utf-8")
+    wide = _block(css, "@media (min-width: 1180px)")
+    assert re.search(r"\.topmenu__summary\s*\{[^}]*display:\s*none", wide)
+    inline = r"\.topnav\[popover\]\s*\{[^}]*display:\s*flex[^}]*position:\s*static"
+    assert re.search(inline, wide)
+    narrow = _block(css, "@media (max-width: 1179px)")
+    assert re.search(r"\.topnav\[popover\]\s*\{[^}]*position:\s*fixed", narrow)
+    assert not re.search(r"(?m)^\s*\.topnav\s*\{\s*display:\s*none", css)
+
+
+def test_the_menu_panel_opens_under_the_menu_button() -> None:
+    """The button sits at the bar's left after the brand, so the panel opens from
+    the left edge, not under Settings at the far right."""
+    narrow = _block(CSS.read_text(encoding="utf-8"), "@media (max-width: 1179px)")
+    panel = re.search(r"\.topnav\[popover\]\s*\{([^}]*)\}", narrow)
+    assert panel and re.search(r"(?<![-\w])left:\s*12px", panel.group(1))
+    assert "inset" not in panel.group(1)
+
+
+def test_widening_closes_an_open_menu() -> None:
+    """An open popover lives in the top layer, where no media query can put it back
+    in the bar; app.js closes it at 1180px, first thing, before any page code."""
+    script = (CSS.parent / "app.js").read_text(encoding="utf-8")
+    close = script.index('window.matchMedia("(min-width: 1180px)")')
+    assert "shut()" in script[close:close + 160]
+    assert close < script.index("// A browser without popovers")
+
+
+def test_no_rule_is_left_for_the_hero_islands() -> None:
+    """The headline is plain text now (V1-88); its BlurText rule had no reader."""
+    assert ".home-hero__title .blur-text" not in CSS.read_text(encoding="utf-8")
+
+
+def test_phone_targets_are_40px() -> None:
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    phone = " ".join(_block(css[m.start():], "@media (max-width: 720px)")
+                     for m in re.finditer(r"(?m)^@media \(max-width: 720px\)", css))
+    targets = ("th button", ".leader__all", ".cmp__pick", ".pf__pick",
+               ".topmenu__summary", ".colophon .topbar__link")
+    for sel in targets:
+        rules = [body for s, body in re.findall(r"([^{}]+)\{([^{}]*)\}", phone)
+                 if sel in s.split(",") or sel in [x.strip() for x in s.split(",")]]
+        assert any("min-height: 40px" in b for b in rules), sel
+
+
+def test_the_hero_does_not_use_the_viewport_width() -> None:
+    """100vw counts the scrollbar, so a hero sized with it is wider than the page."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+        if ".home-hero" in sel:
+            assert "vw" not in re.sub(r"clamp\([^)]*\)", "", body), sel.strip()
+
+
+def test_the_fund_table_grows_with_the_page() -> None:
+    css = CSS.read_text(encoding="utf-8")
+    wrap = re.search(r"\.table-card \.table-wrap\s*\{([^}]*)\}", css)
+    assert wrap and "max-height" not in wrap.group(1)
+    head = re.search(r"\.table-card thead th\s*\{([^}]*)\}", css)
+    assert head and "position: sticky" in head.group(1) and "var(--bar-h" in head.group(1)
+    # A sticky header sticks to its nearest scroll container: neither the card nor
+    # (where the table fits) its wrapper may be one, or it never reaches the bar.
+    card = re.search(r"(?m)^\.table-card\s*\{([^}]*)\}", css)
+    assert card and "overflow: clip" in card.group(1)
+    # Only where every column fits with the widest font and text size (final review:
+    # at 1000-1180px the clip hid the last columns, with nothing to scroll).
+    wide = _block(css, "@media (min-width: 1280px)")
+    assert re.search(r"\.table-card \.table-wrap\s*\{[^}]*overflow:\s*visible", wide)
+    narrow = r"@media \(min-width: 1000px\)\s*\{\s*\.table-card \.table-wrap"
+    assert not re.search(narrow, css)
+
+
+def test_the_public_note_wraps_so_its_link_stays_reachable() -> None:
+    """The note is one sentence now; trimming it on a phone hid "About this data"
+    off the edge, out of reach and out of sight when focused (final review)."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+        if ".public-note" in sel:
+            assert "nowrap" not in body and "ellipsis" not in body, sel.strip()
+
+
+def test_the_glossary_index_links_are_24px_on_phones() -> None:
+    """The A to Z list wraps tightly, so WCAG 2.5.8's spacing exception does not
+    cover its 22px links; each gets a 24px-plus target (V1-88 re-audit)."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    phone = " ".join(_block(css[m.start():], "@media (max-width: 720px)")
+                     for m in re.finditer(r"(?m)^@media \(max-width: 720px\)", css))
+    rule = re.search(r"\.learn__az a\s*\{([^}]*)\}", phone)
+    assert rule and "min-height: 32px" in rule.group(1)

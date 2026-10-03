@@ -16,6 +16,7 @@ from typing import Any
 
 from src.common.contracts.market import NavPoint
 from src.common.types import SchemeId
+from src.m0_data.categories import category_of
 from src.m2_fund.paths import day_change, price_history, rolling_path
 from src.m2_fund.peers import PeerContext, peer_context
 from src.m2_fund.windows import (
@@ -226,7 +227,10 @@ class FundHeaderBuilder:
             {"label": label, "value": value}
             for label, value in (
                 ("Fund house", facts.amc_name),
-                ("Category", facts.category),
+                # The short name a reader sees everywhere else (V1-88), not
+                # AMFI's "Equity Scheme - Flexi Cap Fund".
+                ("Category",
+                 category_of(facts.category).name if facts.category else None),
                 ("Plan", plan or None),
                 ("Launched", format_date(facts.inception) if facts.inception else None),
                 ("Fund size", size),
@@ -245,9 +249,9 @@ class FundHeaderBuilder:
             scope=scope,
             payload={
                 "name": facts.name,
-                "subtitle": " · ".join(
-                    x for x in (facts.amc_name, facts.category, plan) if x
-                ),
+                # The plan only: fund house and category are in the facts below,
+                # once (V1-88).
+                "subtitle": plan,
                 "scheme_id": str(scheme),
                 "nav": _nav(fw),
                 "tiles": _tiles(fw, facts, peer_context(self.market, scheme)),

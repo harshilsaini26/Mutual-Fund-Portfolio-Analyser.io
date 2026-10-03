@@ -56,11 +56,26 @@
 
   // Shows or clears one row's message in place, so editing a field never
   // rebuilds the form under the cursor.
+  // The message is tied to the row's fields and read out when it appears (V1-88):
+  // aria-invalid on each field, aria-describedby pointing at the message. Every row
+  // is drawn with an empty polite live region, since one inserted already filled is
+  // often not read out; an error only changes its text.
+  var errors = 0;
+  function errorSlot() {
+    return el("p", { "class": "pf__error", id: "row-err-" + (++errors), "aria-live": "polite" });
+  }
   function showRowError(rowNode, message) {
     var p = rowNode.querySelector(".pf__error");
-    if (!message) { if (p) p.remove(); return; }
-    if (!p) { p = el("p", { "class": "pf__error" }); rowNode.appendChild(p); }
-    p.textContent = message;
+    p.textContent = message || "";
+    rowNode.querySelectorAll("input").forEach(function (f) {
+      if (message) {
+        f.setAttribute("aria-invalid", "true");
+        f.setAttribute("aria-describedby", p.id);
+      } else {
+        f.removeAttribute("aria-invalid");
+        f.removeAttribute("aria-describedby");
+      }
+    });
   }
 
   function field(label, attrs) {
@@ -78,22 +93,22 @@
         el("h3", null, title),
         el("button", { type: "button", "class": "button button--quiet", "data-action": "remove-fund" }, "Remove fund")));
     h.purchases.forEach(function (p, r) {
-      var err = rowError(fund, "purchase", p);
-      card.appendChild(el("div", { "class": "pf__row", "data-kind": "purchase", "data-row": r },
+      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "purchase", "data-row": r },
         field("Date", { type: "date", value: p.date, max: TODAY, min: fund ? fund.prices_from : null, "data-field": "date" }),
         field("Amount (₹)", { type: "text", inputmode: "decimal", value: p.amount, "data-field": "amount" }),
         el("button", { type: "button", "class": "button button--quiet", "data-action": "remove-row" }, "Remove"),
-        err && el("p", { "class": "pf__error" }, err)));
+        errorSlot()));
+      showRowError(row, rowError(fund, "purchase", p));
     });
     h.sips.forEach(function (s, r) {
-      var err = rowError(fund, "sip", s);
-      card.appendChild(el("div", { "class": "pf__row", "data-kind": "sip", "data-row": r },
+      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "sip", "data-row": r },
         field("SIP a month (₹)", { type: "text", inputmode: "decimal", value: s.amount, "data-field": "amount" }),
         field("Day", { type: "number", min: 1, max: 31, value: s.day, "data-field": "day" }),
         field("From", { type: "month", value: s.start, "data-field": "start" }),
         field("Until (blank if running)", { type: "month", value: s.stop || "", "data-field": "stop" }),
         el("button", { type: "button", "class": "button button--quiet", "data-action": "remove-row" }, "Remove"),
-        err && el("p", { "class": "pf__error" }, err)));
+        errorSlot()));
+      showRowError(row, rowError(fund, "sip", s));
     });
     card.appendChild(el("p", { "class": "pf__add" },
       el("button", { type: "button", "class": "button", "data-action": "add-lump" }, "Add a lump sum"),

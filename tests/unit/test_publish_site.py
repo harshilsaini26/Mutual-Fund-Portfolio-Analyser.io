@@ -243,15 +243,6 @@ def test_the_public_fund_page_has_its_navigator(site: Path) -> None:
     assert (site / "static" / "sections.js").is_file()
 
 
-def test_the_public_note_keeps_its_first_sentence_out_of_the_toggle(site: Path) -> None:
-    page = _page(site, DIRECT)
-    note = re.search(r'<div class="public-note">(.*?)</div>', page, re.S)
-    assert note
-    first, _, rest = note.group(1).partition('<details class="tuck" open>')
-    assert "A public copy of the fund pages" in first
-    assert "<summary>More</summary>" in rest and "self-hosted app" in rest
-
-
 def test_funds_json_carries_what_the_compare_page_shows(site: Path) -> None:
     funds = json.loads((site / "funds.json").read_text(encoding="utf-8"))
     one = next(f for f in funds if f["id"] == DIRECT)
@@ -314,7 +305,7 @@ def test_the_policy_travels_in_the_page(site: Path) -> None:
     page = _page(site, DIRECT)
     assert '<meta http-equiv="Content-Security-Policy"' in page
     assert "script-src 'self'" in page
-    assert "A public copy of the fund pages" in page
+    assert "Descriptive, not advice." in page
     # The local app's portfolio views stay out (V1-72); the public page that
     # builds one in the browser is linked instead (V1-82).
     assert "/view/" not in page and "sidenav" not in page
@@ -365,7 +356,7 @@ def test_the_front_page_is_a_way_in_not_a_list(site: Path) -> None:
     """V1-80, after MF Zone: a hero with search, the category cards and what a
     fund page shows -- and small, now that the full list lives at /funds/."""
     index = (site / "index.html").read_text(encoding="utf-8")
-    assert 'data-island="blur-text">See what every fund owns' in index
+    assert '<h1 class="home-hero__title">See what every fund owns' in index
     assert 'data-index="/Repo/search.json"' in index
     assert f'href="{BASE}/funds/"' in index and 'id="about"' in index
     assert "<table data-sortable" not in index
@@ -375,8 +366,8 @@ def test_the_front_page_is_a_way_in_not_a_list(site: Path) -> None:
     assert "Flexi cap <span>2</span>" in index
     assert "At least 65% in shares, of any size, in any mix." in index
     assert f'href="{BASE}/funds/#category=equity/flexi_cap">See its 2 funds' in index
-    # Islands enhance text the server already wrote: with scripts off it reads.
-    assert re.search(r'data-island="count-up">2<', index)
+    # The counts are the server's text from the first frame (V1-88).
+    assert re.search(r'<dd>2</dd>', index)
     assert len(index.encode("utf-8")) < 200_000
 
 
@@ -479,3 +470,142 @@ def test_the_public_copy_says_why_a_fund_has_no_portfolio(tmp_path: Path) -> Non
     assert shown.state_reason == publish.NO_PORTFOLIO
     assert "python -m" not in shown.state_reason
     assert "about 100 a night" in shown.state_reason
+
+
+# --- the top bar, skip link and chrome (UX audit, V1-88) ------------------------
+
+
+def _published(site: Path) -> dict[str, str]:
+    pages = {"front": "index.html", "funds": "funds/index.html",
+             "learn": "learn/index.html",
+             "compare": "compare/index.html", "fund": f"fund/{DIRECT}/index.html"}
+    return {k: (site / v).read_text(encoding="utf-8") for k, v in pages.items()}
+
+
+def test_every_page_starts_with_a_skip_link(site: Path) -> None:
+    for name, html in _published(site).items():
+        body = html[html.index("<body"):]
+        first = re.search(r">\s*(<[a-z]+[^>]*>)", body)
+        assert first and 'class="skip-link"' in first.group(1), name
+        assert 'href="#content"' in first.group(1) and '<main id="content"' in html, name
+
+
+def test_the_public_menu_holds_every_link(site: Path) -> None:
+    """One nav, shown inline on wide screens and as a native popover below 1180px,
+    opened by a "Menu" button (V1-88): no script needed to open or close it."""
+    html = _published(site)["funds"]
+    menu = r'<button[^>]*class="topmenu__summary"[^>]*popovertarget="topnav"[^>]*>\s*Menu'
+    assert re.search(menu, html)
+    nav = re.search(r'<nav class="topnav" id="topnav" popover[^>]*>(.*?)</nav>',
+                    html, re.S)
+    assert nav
+    links = re.findall(r'class="topnav__link"[^>]*>([^<]+)<', nav.group(1))
+    assert [x.strip() for x in links] == ["Explore funds", "Compare", "Your portfolio",
+                                         "Learn", "Categories", "About the data"]
+    current = re.search(r'aria-current="page"[^>]*>([^<]+)<', nav.group(1))
+    assert current and current.group(1).strip() == "Explore funds"
+
+
+def test_the_top_bar_has_no_repository_link_and_the_footer_does(site: Path) -> None:
+    html = _published(site)["front"]
+    bar = re.search(r'<header class="topbar topbar--public">(.*?)</header>', html, re.S)
+    assert bar and "github.com" not in bar.group(1)
+    foot = re.search(r"<footer[^>]*>(.*?)</footer>", html, re.S)
+    assert foot and "github.com" in foot.group(1)
+
+
+def test_the_public_note_is_one_line(site: Path) -> None:
+    html = _published(site)["fund"]
+    note = re.search(r'<div class="public-note">(.*?)</div>', html, re.S)
+    assert note and "Descriptive, not advice." in note.group(1)
+    assert f'href="{BASE}/#about"' in note.group(1) and "<details" not in note.group(1)
+
+
+def test_no_figure_counts_up_and_no_headline_blurs_in(site: Path) -> None:
+    """Every figure shows its real value from the first frame (V1-88)."""
+    for name, html in _published(site).items():
+        assert 'data-island="count-up"' not in html, name
+        assert 'data-island="blur-text"' not in html, name
+
+
+# --- the fund card, badge and copy (design review, V1-88) -----------------------
+
+
+def test_the_fund_card_does_not_repeat_its_facts(site: Path) -> None:
+    """The chips carry the plan, the option and the ISIN; fund house and category
+    are said once, in the facts grid (V1-88)."""
+    page = _page(site, DIRECT)
+    chips = re.search(r'<ul class="fundcard__chips">(.*?)</ul>', page, re.S)
+    assert chips
+    shown = re.findall(r"<li[^>]*>([^<]+)</li>", chips.group(1))
+    assert shown == ["Direct", "Growth", DIRECT]
+    category = re.search(r"<dt>Category.*?</dt><dd>([^<]+)</dd>", page, re.S)
+    assert category and category.group(1).strip() == "Flexi cap"
+
+
+def test_the_badge_says_what_it_is(site: Path) -> None:
+    badges = re.findall(r'class="badge badge--\w+"[^>]*>([^<]+)<', _page(site, DIRECT))
+    assert badges and all(b.strip().startswith("Confidence: ") for b in badges), badges
+
+
+def test_counts_agree_with_their_nouns() -> None:
+    """Every count on the front page that is followed by "fund" picks the plural
+    by the number, so a family of one reads "1 fund"."""
+    home = (publish.TEMPLATES if hasattr(publish, "TEMPLATES") else
+            Path(__file__).resolve().parents[2] / "src" / "m6_views" / "templates")
+    text = (Path(home) / "home.html").read_text(encoding="utf-8")
+    for m in re.finditer(r"\{\{ ([^}]*?)(?: \| fmt_count)? \}\} funds?\b", text):
+        tail = text[m.end():m.end() + 40]
+        assert tail.startswith("{{ '' if"), m.group(0)
+
+
+def test_older_category_names_say_what_they_are() -> None:
+    config = Path(__file__).resolve().parents[2] / "config" / "categories.yaml"
+    yaml_text = config.read_text(encoding="utf-8")
+    assert "(older naming)" not in yaml_text
+    assert "(earlier AMFI heading)" in yaml_text
+    import yaml
+    earlier = [c for c in yaml.safe_load(yaml_text)["categories"]
+               if c["name"].endswith("(earlier AMFI heading)")]
+    assert len(earlier) == 10
+    for c in earlier:
+        assert re.search(r"AMFI has since (renamed|split|replaced)", c["about"]), c["key"]
+        assert "(earlier AMFI heading)" not in c["about"], c["key"]
+        for text in (c["about"], c.get("note", "")):
+            assert not re.search(r"\b(19|20)\d\d\b", text), c["key"]
+
+
+def test_headings_carry_only_their_words(site: Path) -> None:
+    """A "?" inside an <h2> becomes part of the heading's name, and of the section
+    it labels (V1-88); it sits just after the heading instead."""
+    for page in ("compare/index.html", "portfolio/index.html"):
+        html = (site / page).read_text(encoding="utf-8")
+        for heading in re.findall(r"<h2[^>]*>(.*?)</h2>", html, re.S):
+            assert 'class="term"' not in heading, page
+        assert re.search(r"</h2>\s*<button[^>]*class=\"term\"", html), page
+
+
+def test_row_errors_are_tied_to_their_fields() -> None:
+    """A row's error marks its fields invalid, points them at the message, and is
+    announced; clearing it undoes all three (V1-88)."""
+    script = (Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
+              / "portfolio.js").read_text(encoding="utf-8")
+    body = script[script.index("function showRowError"):]
+    body = body[:body.index("\n  }\n") + 4]
+    needles = ('"aria-invalid"', '"aria-describedby"', "removeAttribute")
+    for needle in needles:
+        assert needle in body, needle
+    # A live region inserted already filled is often not read out: every row gets
+    # an empty polite one when it is drawn, and errors only change its text.
+    slot = script[script.index("function errorSlot"):]
+    slot = slot[:slot.index("\n  }\n") + 4]
+    assert '"aria-live": "polite"' in slot
+    assert ".remove()" not in body
+    card = script[script.index("function holdingCard"):]
+    card = card[:card.index("\n  }\n") + 4]
+    assert card.count("errorSlot()") == 2 and 'err && el("p"' not in card
+    css = (Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
+           / "app.css").read_text(encoding="utf-8")
+    # Empty, it leaves the row's flex flow (a flex line's gap would remain) but
+    # stays in the accessibility tree, as display: none would not.
+    assert re.search(r"\.pf__error:empty\s*\{[^}]*position:\s*absolute", css)

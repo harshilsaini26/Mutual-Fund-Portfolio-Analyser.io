@@ -40,6 +40,7 @@
 </head>
 <body class="{{ 'is-public' if static else 'is-app' }}" data-root="{{ root }}"
       {% block body_attrs %}{% endblock %}>
+<a class="skip-link" href="#content">Skip to content</a>
 
 {% macro search_box() -%}
 {#
@@ -111,7 +112,10 @@
 {% if static %}
 <header class="topbar topbar--public">
   <a class="brand" href="{{ root }}/">{{ icon.i("logo", "icon brand__mark") }}<span>Look-through</span></a>
-  <nav class="topnav" aria-label="Main">
+  {#- One nav (V1-88): inline on wide screens, a native popover below 1180px opened
+      by "Menu" -- Esc and a tap outside close it, with no script. -#}
+  <button type="button" class="topmenu__summary" popovertarget="topnav">Menu</button>
+  <nav class="topnav" id="topnav" popover aria-label="Main">
     <a class="topnav__link" href="{{ root }}/funds/"
        {% if active == 'funds' %}aria-current="page"{% endif %}>Explore funds</a>
     <a class="topnav__link" href="{{ root }}/compare/"
@@ -124,19 +128,12 @@
     <a class="topnav__link" href="{{ root }}/#about">About the data</a>
   </nav>
   {{ search_box() }}
-  <a class="topbar__link" href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">
-    <span>Self-hosted app</span>{{ icon.i("external") }}</a>
   {{ settings_button() }}
 </header>
-{#- One line on a phone (V1-84): the first sentence, then the rest behind "More",
-    open in the HTML and closed by app.js on a narrow screen. -#}
+{#- One sentence (V1-88), wrapping on a phone so its link stays in reach. -#}
 <div class="public-note">
-  <p>A public copy of the fund pages, built {{ built | fmt_date }} from AMFI's prices
-  and fund houses' own disclosures.</p>
-  <details class="tuck" open><summary>More</summary>
-    <p>Descriptive, not advice. Benchmark comparisons and your own portfolio are in the
-    <a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">self-hosted app</a>.</p>
-  </details>
+  <p>Descriptive, not advice. Built {{ built | fmt_date }} from AMFI and fund houses'
+  disclosures · <a href="{{ root }}/#about">About this data</a></p>
 </div>
 {% else %}
 <div class="shell">
@@ -195,7 +192,7 @@
     </header>
 {% endif %}
 {#- One content block for both shells: Jinja allows a block once per template. -#}
-<main class="content{{ ' content--public' if static else '' }}">
+<main id="content" tabindex="-1" class="content{{ ' content--public' if static else '' }}{% block main_class %}{% endblock %}">
 {% block content %}{% endblock %}
 </main>
 <footer class="colophon">
@@ -203,6 +200,8 @@
     {% if static %}
     Built from public sources; every figure traces to an archived source file.
     No cookies, no tracking, and nothing loads from anywhere but this site.
+    <a class="topbar__link" href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">
+      <span>The self-hosted app, with benchmarks and your own ledger</span>{{ icon.i("external") }}</a>
     {% else %}
     Self-hosted. Every figure traces to an archived source file. Descriptive, not advice.
     {% endif %}

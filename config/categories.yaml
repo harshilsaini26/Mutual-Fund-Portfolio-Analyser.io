@@ -90,8 +90,8 @@ categories:
     family: equity
     merges: ["Equity Schemes - Thematic Fund"]
   - key: equity/sectoral_thematic
-    name: Sectoral or thematic (older naming)
-    about: "Sectoral and thematic funds, under the name used before they were split."
+    name: Sectoral or thematic (earlier AMFI heading)
+    about: "Sectoral and thematic funds, under a heading AMFI has since split in two."
     family: equity
     merges: ["Equity Scheme - Sectoral/ Thematic"]
     note: >-
@@ -187,8 +187,8 @@ categories:
 
   # --- debt: the older "Duration" names, kept apart from the newer "Term" ones --------
   - key: debt/ultra_short_duration
-    name: Ultra short duration (older naming)
-    about: "Bonds held for an average of 3 to 6 months (older naming)."
+    name: Ultra short duration (earlier AMFI heading)
+    about: "Bonds held for an average of 3 to 6 months, under a heading AMFI has since renamed."
     family: debt
     merges: ["Debt Scheme - Ultra Short Duration Fund"]
     note: &renamed_debt >-
@@ -196,32 +196,32 @@ categories:
       it corresponds to is not certain, so funds under the two names are not
       compared with each other.
   - key: debt/low_duration
-    name: Low duration (older naming)
-    about: "Bonds held for an average of 6 to 12 months (older naming)."
+    name: Low duration (earlier AMFI heading)
+    about: "Bonds held for an average of 6 to 12 months, under a heading AMFI has since renamed."
     family: debt
     merges: ["Debt Scheme - Low Duration Fund"]
     note: *renamed_debt
   - key: debt/short_duration
-    name: Short duration (older naming)
-    about: "Bonds held for an average of 1 to 3 years (older naming)."
+    name: Short duration (earlier AMFI heading)
+    about: "Bonds held for an average of 1 to 3 years, under a heading AMFI has since renamed."
     family: debt
     merges: ["Debt Scheme - Short Duration Fund"]
     note: *renamed_debt
   - key: debt/medium_duration
-    name: Medium duration (older naming)
-    about: "Bonds held for an average of 3 to 4 years (older naming)."
+    name: Medium duration (earlier AMFI heading)
+    about: "Bonds held for an average of 3 to 4 years, under a heading AMFI has since renamed."
     family: debt
     merges: ["Debt Scheme - Medium Duration Fund"]
     note: *renamed_debt
   - key: debt/medium_long_duration
-    name: Medium to long duration (older naming)
-    about: "Bonds held for an average of 4 to 7 years (older naming)."
+    name: Medium to long duration (earlier AMFI heading)
+    about: "Bonds held for an average of 4 to 7 years, under a heading AMFI has since renamed."
     family: debt
     merges: ["Debt Scheme - Medium to Long Duration Fund"]
     note: *renamed_debt
   - key: debt/dynamic_bond
-    name: Dynamic bond (older naming)
-    about: "Bonds of any maturity, changed as rates move (older naming)."
+    name: Dynamic bond (earlier AMFI heading)
+    about: "Bonds of any maturity, changed as rates move, under a heading AMFI has since renamed."
     family: debt
     merges: ["Debt Scheme - Dynamic Bond"]
     note: *renamed_debt
@@ -276,12 +276,12 @@ categories:
     family: debt
     merges: ["Income/Debt Oriented Schemes - Other Debt Scheme"]
   - key: debt/income_legacy
-    name: Income (older naming)
-    about: "Bond funds under a name used before SEBI's 2017 categories."
+    name: Income (earlier AMFI heading)
+    about: "Bond funds under a heading AMFI has since replaced with SEBI's debt categories."
     family: debt
     merges: ["Income"]
     note: >-
-      AMFI's pre-2018 heading, still used for fixed-term and interval series; it
+      AMFI's older heading, still used for fixed-term and interval series; it
       names no SEBI category, so these funds are compared only with each other.
 
   # --- index funds, ETFs, funds of funds ------------------------------------------------
@@ -301,8 +301,8 @@ categories:
     family: other
     merges: ["Index Funds - Hybrid Fund"]
   - key: index/undivided
-    name: Index funds (older naming)
-    about: "Index funds, under the name used before they were split by asset."
+    name: Index funds (earlier AMFI heading)
+    about: "Index funds, under a heading AMFI has since split by asset."
     family: other
     merges: ["Other Scheme - Index Funds"]
     note: >-
@@ -334,8 +334,8 @@ categories:
     family: other
     merges: ["Exchange Traded Funds (ETFs) - Other ETF"]
   - key: etf/undivided
-    name: ETFs (older naming)
-    about: "Exchange-traded funds, under the name used before they were split."
+    name: ETFs (earlier AMFI heading)
+    about: "Exchange-traded funds, under a heading AMFI has since split by kind."
     family: other
     merges: ["Other Scheme - Other ETFs"]
     note: >-
