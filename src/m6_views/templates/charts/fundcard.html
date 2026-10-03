@@ -30,7 +30,7 @@
     </div>
     {% if env.payload.nav %}
     <div class="fundcard__nav">
-      <p class="fundcard__nav-label">NAV on {{ env.payload.nav.date }}</p>
+      <p class="fundcard__nav-label">NAV on {{ env.payload.nav.date }}{{ vc.term("nav", "navbox") }}</p>
       <p class="fundcard__nav-value">₹{{ env.payload.nav.value | fmt_tile }}</p>
       {% if env.payload.nav.change %}
       <p class="fundcard__nav-change{% if env.payload.nav.tone %} ret--{{ env.payload.nav.tone }}{% endif %}">

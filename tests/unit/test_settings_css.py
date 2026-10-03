@@ -493,3 +493,27 @@ def test_the_leader_fold_looks_like_a_control() -> None:
     rules = [b for s, b in re.findall(r"([^{}]+)\{([^{}]*)\}", phone)
              if ".leaders-fold > summary" in [x.strip() for x in s.split(",")]]
     assert any("min-height: 40px" in b for b in rules)
+
+
+def test_the_fund_cards_badge_takes_its_own_room() -> None:
+    """The header card's confidence badge was laid over the card's corner, with
+    90px kept free for it; "Confidence: medium" (V1-88) is twice that and ran
+    over the NAV box on every fund page. It sits in the flow now, at any width,
+    so no gap has to guess its length (or the reader's text size)."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    quiet = re.findall(r"\.view__header--quiet\s*\{([^}]*)\}", css)
+    assert quiet and all("absolute" not in body for body in quiet)
+    for body in re.findall(r"\.fundcard__top\s*\{([^}]*)\}", css):
+        assert not re.search(r"padding-right:\s*[1-9]", body), body
+
+
+def test_a_hover_explanation_is_a_light_hint() -> None:
+    """V1-91: on hover the glossary card opens beside its label, placed by
+    app.js, with nothing dimmed behind it; a click still opens it as before."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    hint = re.search(r"\.term-pop--hint\s*\{([^}]*)\}", css)
+    assert hint
+    for decl in ("position: fixed", "margin: 0", "inset: auto"):
+        assert decl in hint.group(1), decl
+    backdrop = re.search(r"\.term-pop--hint::backdrop\s*\{([^}]*)\}", css)
+    assert backdrop and "transparent" in backdrop.group(1)

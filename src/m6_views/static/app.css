@@ -521,8 +521,10 @@ main.content.content--bleed { max-width: none; padding: 0; }
 .badge--low { color: var(--weak); border-style: dashed; }
 
 /* The fund page's header card names the fund itself; its question is for a
-   screen reader, and only the badge shows, in the corner. */
-.view__header--quiet { position: absolute; top: 0; right: 0; padding: 18px 20px 0; }
+   screen reader, and only the badge shows, on its own line at the right. In the
+   flow, not laid over the corner: "Confidence: medium" ran over the NAV box when
+   the card only kept a guessed gap for it. */
+.view__header--quiet { justify-content: flex-end; padding: 14px 20px 0; }
 
 /* --- caveats: never quiet --------------------------------------------------------- */
 
@@ -1032,8 +1034,6 @@ select:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:fo
 /* A phone in portrait: the public bar keeps the mark and drops the name. */
 @media (max-width: 480px) {
   .topbar--public .brand span { display: none; }
-  .fundcard__name { padding-right: 0; }
-  .view__header--quiet { position: static; padding: 14px 20px 0; }
 }
 
 /* --- V1-80: the front page after MF Zone, the fund page after Fundoo ----------------- */
@@ -1399,7 +1399,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 
 .fundcard__top {
   display: flex; align-items: flex-start; justify-content: space-between; gap: 20px 32px;
-  flex-wrap: wrap; padding-right: 90px;
+  flex-wrap: wrap;
 }
 .fundcard__id { min-width: 0; flex: 1 1 420px; }
 .fundcard__name { padding-right: 0; font-weight: 600; color: var(--ink); }
@@ -1456,7 +1456,6 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 }
 @media (max-width: 720px) {
   .leaders, .ranges { grid-template-columns: minmax(0, 1fr); }
-  .fundcard__top { padding-right: 0; }
   .fundcard__nav { text-align: left; }
   .fundcard__nav-value { font-size: var(--text-h3); }
 }
@@ -1807,6 +1806,10 @@ th .term::after, .term::after { content: none; }   /* not a sort button (th butt
 .term-pop { display: none; }
 .term-pop:popover-open { display: block; }
 .term-pop::backdrop { background: rgb(0 0 0 / 0.12); }
+/* On hover or keyboard focus (V1-91): beside its label, placed by app.js, nothing
+   dimmed behind it. */
+.term-pop--hint { position: fixed; margin: 0; inset: auto; }
+.term-pop--hint::backdrop { background: transparent; }
 .term-pop__title { display: block; font-weight: 650; margin-bottom: 4px; }
 .term-pop__text { display: block; }
 .term-pop__more { display: block; margin-top: 8px; color: var(--ink-faint); font-size: var(--text-sm); }

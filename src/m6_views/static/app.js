@@ -64,10 +64,21 @@
       timer = setTimeout(function () { fn.apply(null, args); }, ms);
     };
   }
+  // Where a hover explanation opens (V1-91): just under its label and aligned to
+  // its left edge; above it when the screen has no room below; never past an edge.
+  function hintPlace(rect, width, height, viewWidth, viewHeight) {
+    var gap = 8, edge = 8;
+    var top = rect.bottom + gap;
+    if (top + height > viewHeight - edge) top = rect.top - gap - height;
+    return {
+      left: Math.max(edge, Math.min(rect.left, viewWidth - width - edge)),
+      top: Math.max(edge, top),
+    };
+  }
   if (typeof module === "object" && module.exports) {
     module.exports = { filterHash: filterHash, parseFilterHash: parseFilterHash,
                        isFilterHash: isFilterHash, initialFilters: initialFilters,
-                       later: later, searchTarget: searchTarget };
+                       later: later, searchTarget: searchTarget, hintPlace: hintPlace };
     return;
   }
 
@@ -96,6 +107,80 @@
       link.textContent = "?";
       button.replaceWith(link);
     });
+  }
+
+  // Hover explanations (V1-91). The label of every figure with a glossary entry
+  // carries a `?` and its explanation (V1-87); pausing on the label, or tabbing to
+  // the `?`, opens that same card beside it as a light hint. A click or a tap on
+  // the `?` still opens it as before, and Esc closes either. One set of listeners
+  // for the page, not one per label.
+  if ("popover" in HTMLElement.prototype) {
+    var HINT_OPEN_MS = 300, HINT_CLOSE_MS = 200;
+    var hinted = null, hintHost = null, openTimer = null, closeTimer = null;
+    var popOf = function (button) {
+      return document.getElementById(button.getAttribute("popovertarget"));
+    };
+    var hostOf = function (node) {
+      return node && node.closest ? node.closest(":has(> .term)") : null;
+    };
+    var closeHint = function () {
+      if (hinted && hinted.matches(":popover-open") &&
+          hinted.classList.contains("term-pop--hint")) hinted.hidePopover();
+      hinted = hintHost = null;
+    };
+    var openHint = function (host) {
+      var button = host.querySelector(":scope > .term"), pop = button && popOf(button);
+      if (!pop || (pop === hinted && pop.matches(":popover-open"))) return;
+      closeHint();
+      pop.classList.add("term-pop--hint");
+      pop.showPopover();
+      var place = hintPlace(host.getBoundingClientRect(), pop.offsetWidth, pop.offsetHeight,
+                            window.innerWidth, window.innerHeight);
+      pop.style.left = place.left + "px";
+      pop.style.top = place.top + "px";
+      hinted = pop;
+      hintHost = host;
+    };
+    // A click on the `?` of an open hint keeps it open (it would otherwise
+    // toggle shut); on a closed one it opens the card as before, unplaced.
+    document.addEventListener("click", function (e) {
+      var button = e.target.closest && e.target.closest("button.term");
+      if (!button) return;
+      var pop = popOf(button);
+      if (!pop) return;
+      if (pop === hinted && pop.matches(":popover-open")) {
+        e.preventDefault();
+        hinted = hintHost = null;   // pinned: leaving the label no longer closes it
+      } else {
+        pop.classList.remove("term-pop--hint");
+        pop.style.left = pop.style.top = "";
+      }
+    });
+    document.addEventListener("focusin", function (e) {
+      if (e.target.matches && e.target.matches("button.term:focus-visible")) {
+        openHint(e.target.parentElement);
+      }
+    });
+    document.addEventListener("focusout", function (e) {
+      if (hinted && !(e.relatedTarget && hinted.contains(e.relatedTarget))) closeHint();
+    });
+    if (window.matchMedia("(hover: hover)").matches) {
+      document.addEventListener("mouseover", function (e) {
+        if (hinted && hinted.contains(e.target)) { clearTimeout(closeTimer); return; }
+        var host = hostOf(e.target);
+        if (!host) return;
+        clearTimeout(closeTimer);
+        clearTimeout(openTimer);
+        openTimer = setTimeout(function () { openHint(host); }, HINT_OPEN_MS);
+      });
+      document.addEventListener("mouseout", function (e) {
+        var to = e.relatedTarget;
+        if (to && ((hinted && hinted.contains(to)) || (hintHost && hintHost.contains(to)))) return;
+        if (hostOf(to) === hostOf(e.target) && hostOf(to)) return;
+        clearTimeout(openTimer);
+        closeTimer = setTimeout(closeHint, HINT_CLOSE_MS);
+      });
+    }
   }
 
   function store(key, value) {

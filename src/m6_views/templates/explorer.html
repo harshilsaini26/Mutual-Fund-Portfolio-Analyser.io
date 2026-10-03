@@ -41,10 +41,10 @@
       <table class="leader__table" data-sortable>
         <thead><tr>
           <th scope="col"><button type="button" data-sort="text">Fund</button></th>
-          <th scope="col" class="num"><button type="button" data-sort="number">Size</button></th>
-          <th scope="col" class="num"><button type="button" data-sort="number">1 year</button></th>
-          <th scope="col" class="num" aria-sort="descending"><button type="button" data-sort="number">3 years</button></th>
-          <th scope="col" class="num"><button type="button" data-sort="number">5 years</button></th>
+          <th scope="col" class="num"><button type="button" data-sort="number">Size</button>{{ vc.term("aum", "ld" ~ loop.index ~ "-size") }}</th>
+          <th scope="col" class="num"><button type="button" data-sort="number">1 year</button>{{ vc.term("annualised_return", "ld" ~ loop.index ~ "-1y") }}</th>
+          <th scope="col" class="num" aria-sort="descending"><button type="button" data-sort="number">3 years</button>{{ vc.term("annualised_return", "ld" ~ loop.index ~ "-3y") }}</th>
+          <th scope="col" class="num"><button type="button" data-sort="number">5 years</button>{{ vc.term("annualised_return", "ld" ~ loop.index ~ "-5y") }}</th>
         </tr></thead>
         <tbody>
           {% for fund in card.funds %}
@@ -92,8 +92,8 @@
         <th scope="col" class="num"><button type="button" data-sort="number">Fund size</button>{{ vc.term("aum", "col-0") }}</th>
         <th scope="col" class="num"><button type="button" data-sort="number">Expense ratio</button>{{ vc.term("expense_ratio", "col-1") }}</th>
         <th scope="col" class="num"><button type="button" data-sort="number">1 year</button>{{ vc.term("annualised_return", "col-2") }}</th>
-        <th scope="col" class="num"><button type="button" data-sort="number">3 years</button></th>
-        <th scope="col" class="num"><button type="button" data-sort="number">5 years</button></th>
+        <th scope="col" class="num"><button type="button" data-sort="number">3 years</button>{{ vc.term("annualised_return", "col-3y") }}</th>
+        <th scope="col" class="num"><button type="button" data-sort="number">5 years</button>{{ vc.term("annualised_return", "col-5y") }}</th>
         <th scope="col" class="num"><button type="button" data-sort="number">Rank in category, 3 years</button>{{ vc.term("category_rank", "col-3") }}</th>
       </tr></thead>
       <tbody>

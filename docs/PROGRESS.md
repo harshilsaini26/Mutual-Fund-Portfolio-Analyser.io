@@ -263,6 +263,9 @@ pushes one commit to `gh-pages`. Measured on the first full build, 2026-09-26:
   an index fund that declares the same benchmark on its Groww page, named as such.
   The crawl map gained that column on 2026-09-26, so proxies fill in as pages are
   read, about 100 a night.
+- **Explanations on hover** (V1-91): pausing on any labelled figure with a glossary
+  entry, or tabbing to its `?`, opens its plain explanation beside it; a click pins it.
+  The fund card's confidence badge no longer covers the NAV box.
 - **Fund sizes, every quarter** (V1-90): AMFI publishes a quarter's fund sizes as fund
   houses report, so the newest file can name only a few houses for weeks. The size job
   now loads the newest two quarters; each fund keeps its newest figure.

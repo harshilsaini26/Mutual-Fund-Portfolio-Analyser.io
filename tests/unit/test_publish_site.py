@@ -860,3 +860,28 @@ def test_push_publishes_and_leaves_nothing_writing_into_its_repository(
     before = calls[:commit]
     assert ("config", "gc.auto", "0") in before
     assert ("config", "maintenance.auto", "false") in before
+
+
+def test_every_labelled_figure_with_a_glossary_entry_explains_itself() -> None:
+    """V1-91: the NAV box and the leader tables' Size and year columns gain the
+    `?` (and so the hover explanation) their glossary entries already have; the
+    explanation's id is unique although the six leader tables repeat."""
+    engine = templates(root=BASE, static=True)
+    card = {"key": "equity/flexi_cap", "name": "Flexi cap", "count": 7, "funds": []}
+    page = engine.get_template("explorer.html").render({
+        "catalogue": [], "health": {}, "qs": "", "active": "funds", "built": TODAY,
+        "categories": [], "category_options": [], "count": 0, "funds": [],
+        "families": [], "stats": {"houses": 0, "categories": 0, "prices_to": None},
+        "leaders": [card, {**card, "key": "equity/mid_cap", "name": "Mid cap"}]})
+    fold = page[page.index('class="leaders-fold"'):page.index('id="funds"')]
+    keys = re.findall(r'class="term" popovertarget="[^"]+" data-key="([^"]+)"', fold)
+    assert keys.count("aum") == 2 and keys.count("annualised_return") == 6, keys
+    ids = re.findall(r'\bid="([^"]+)"', page)
+    assert len(ids) == len(set(ids)), sorted(i for i in ids if ids.count(i) > 1)
+
+
+def test_the_nav_box_explains_nav(site: Path) -> None:
+    html = _page(site, DIRECT)
+    box = html[html.index('class="fundcard__nav"'):]
+    box = box[:box.index("</div>")]
+    assert 'data-key="nav"' in box
