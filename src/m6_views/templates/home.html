@@ -3,63 +3,144 @@
 {% block title %}Look-through: Indian mutual funds, looked through{% endblock %}
 
 {#
-  The public copy's front page (DECISIONS V1-80, after MF Zone's).
+  The public copy's front page (DECISIONS V1-89): a product story told in one scroll.
 
-  A hero with the way in (search), then the six most-held equity categories,
-  each with the five funds whose three-year return was highest, then what every
-  fund page shows. Every figure was formatted by `jobs/publish_site.py`; the
-  islands (`data-island`) only animate what is already written here, so with
-  scripts off, or with reduced motion asked for, this page is complete.
+  A hero with three equal doors (look up a fund, understand funds, see your
+  portfolio), then one section per door, each named by its door, then where the
+  data comes from. Every word, figure and link is here at rest and with scripts
+  off; the motion in app.css only builds the pictures (bars, markers, lines), never
+  the words. Every figure was formatted by `jobs/publish_site.py` and
+  `jobs/landing.py`; geometry arrives as text for SVG attributes, so nothing here
+  needs a style attribute (the public CSP).
 
-  V1-74 kept "top" funds off the front page. V1-80 puts them back at the user's
-  request, as a plain fact with its period stated -- "highest three-year return"
-  -- beside the category's size, and never as "best" or "top performers".
+  The example fund is picked by a stated rule -- the largest flexi cap fund by size
+  with a complete page -- and the page says so, so it reads as an example and not
+  a pick. V1-74's line holds: no "best", no "top performers".
 #}
 {% block main_class %} content--bleed{% endblock %}
 
-{#- The hero runs edge to edge inside a full-width <main>; the sections after it sit in
-    .home-body, as wide as every other page's content (V1-88: no 100vw, which counts
-    the scrollbar and spilled 8px sideways). -#}
-{% block content %}
-<section class="home-hero">
-  <div class="home-hero__aurora" data-island="aurora" aria-hidden="true"></div>
-  <div class="home-hero__inner">
-    <p class="eyebrow">Indian mutual funds, looked through</p>
-    <h1 class="home-hero__title">See what every fund owns, and how it has done</h1>
-    <p class="home-hero__lede">
-      {{ count }} fund{{ '' if count == 1 else 's' }}, each set against the funds that do the same job: returns,
-      falls and recoveries, costs, and the companies it holds, from AMFI's prices
-      and the fund houses' own disclosures.
-    </p>
+{% macro doors(compact=False) -%}
+<ul class="lp-doors{% if compact %} lp-doors--compact{% endif %}">
+  <li class="lp-door">
+    <p class="lp-door__title">Look up a fund</p>
+    {% if compact %}
+    <a href="{{ root }}/funds/">Explore all {{ count | fmt_count }} fund{{ '' if count == 1 else 's' }}</a>
+    {% else %}
     <form class="search search--hero" action="{{ root }}/funds/" method="get" role="search">
       <label class="sr-only" for="q-hero">Find a fund by name</label>
       {{ icon.i("search", "icon search__icon") }}
-      <input id="q-hero" name="q" type="search" autocomplete="off" spellcheck="false"
-             placeholder="Search {{ count }} fund{{ '' if count == 1 else 's' }} by name" data-index="{{ root }}/search.json">
+      <input id="q-hero" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Search {{ count | fmt_count }} fund{{ '' if count == 1 else 's' }} by name"
+             data-index="{{ root }}/search.json">
       <ul class="search__suggest" hidden data-lenis-prevent></ul>
     </form>
-    <dl class="home-stats">
-      <div><dt>funds with a page</dt><dd>{{ count | fmt_count }}</dd></div>
-      <div><dt>fund houses</dt><dd>{{ stats.houses | fmt_count }}</dd></div>
-      <div><dt>categories</dt><dd>{{ stats.categories | fmt_count }}</dd></div>
-      <div><dt>prices through</dt><dd>{{ stats.prices_to | fmt_date if stats.prices_to else '—' }}</dd></div>
-    </dl>
+    <a class="lp-door__more" href="{{ root }}/funds/">or explore all {{ count | fmt_count }}</a>
+    {% endif %}
+  </li>
+  <li class="lp-door">
+    <p class="lp-door__title">Understand funds</p>
+    <a href="{{ root }}/learn/">How funds are organised, in plain words</a>
+  </li>
+  <li class="lp-door">
+    <p class="lp-door__title">See your portfolio</p>
+    <a href="{{ root }}/portfolio/">What your funds add up to, kept in your browser</a>
+  </li>
+</ul>
+{%- endmacro %}
+
+{% block content %}
+<section class="lp-hero" aria-labelledby="lp-title">
+  <div class="lp-hero__grid{% if not example %} lp-hero__grid--alone{% endif %}">
+    <div class="lp-hero__text">
+      <p class="eyebrow">Indian mutual funds, looked through</p>
+      <h1 id="lp-title" class="lp-hero__title">See what every fund owns, and how it has done</h1>
+      <p class="lp-hero__lede">{{ count | fmt_count }} fund{{ '' if count == 1 else 's' }}, each set
+        against the funds that do the same job, from AMFI's prices and the fund houses' own
+        disclosures. Free, rebuilt every night.</p>
+      <a class="lp-pill" href="#privacy">Nothing you enter leaves your browser</a>
+    </div>
+    {{ doors() }}
+    {% if example %}
+    <figure class="lp-fund">
+      <a class="lp-fund__name" href="{{ root }}/fund/{{ example.scheme_id }}/">{{ example.name }}</a>
+      <p class="lp-fund__detail">{{ example.detail }}</p>
+      <svg class="lp-mix" viewBox="0 0 100 8" preserveAspectRatio="none" role="img"
+           aria-label="What it holds: {% for m in example.mix %}{{ m.label }} {{ m.pct_label }}{{ ', ' if not loop.last }}{% endfor %}">
+        {% for m in example.mix %}<rect class="lp-mix__part lp-mix__part--{{ loop.index }}" x="{{ m.x }}" y="0" width="{{ m.width }}" height="8"/>{% endfor %}
+      </svg>
+      <p class="lp-mix__legend">{% for m in example.mix %}<span>{{ m.label }} {{ m.pct_label }}</span>{% endfor %}</p>
+      <ol class="lp-rows" aria-label="Its largest holdings">
+        {% for r in example.top %}
+        <li class="lp-row">
+          <span class="lp-row__name">{{ r.name }}</span>
+          <svg class="lp-row__track" viewBox="0 0 100 6" preserveAspectRatio="none" aria-hidden="true">
+            <rect class="lp-row__bar" x="0" y="0" width="{{ r.width }}" height="6"/>
+          </svg>
+          <span class="lp-row__value">{{ r.weight_label }}</span>
+        </li>
+        {% endfor %}
+      </ol>
+      <figcaption>An example: the largest flexi cap fund by size. Holdings as disclosed
+        {{ example.as_of_label }}{% if example.aggregator %}, from an aggregator's page{% endif %}.</figcaption>
+    </figure>
+    {% endif %}
   </div>
 </section>
 
 <div class="home-body">
-<section id="map" class="home-section" aria-labelledby="map-h">
-  <div class="section-head">
-    <h2 id="map-h">How mutual funds are organised</h2>
+<section id="lookup" class="lp-section" aria-labelledby="lookup-h">
+  <div class="lp-text">
+    <p class="eyebrow">Look up a fund</p>
+    <h2 id="lookup-h">Every fund, set against the funds that do the same job</h2>
+    <p>Each fund's page sets its returns beside the lowest and highest in its category,
+      with its cost, how far it fell and how fast it recovered, how steady its returns
+      have been, and what it owns.</p>
+    <p class="lp-links"><a class="button" href="{{ root }}/funds/">Explore funds</a>
+      <a href="{{ root }}/compare/">Compare funds</a>
+      <a href="{{ root }}/learn/reading-a-fund-page/">Reading a fund page</a></p>
+  </div>
+  <div class="lp-pic">
+    {% if example %}
+    <p class="lp-pic__title"><a href="{{ root }}/fund/{{ example.scheme_id }}/">{{ example.name }}</a>
+      within its category, {{ example.category }}</p>
+    <ul class="lp-ranges">
+      {% for r in example.ranges %}
+      <li class="lp-range">
+        <p class="lp-range__head"><span>{{ r.label }}</span> <strong>{{ r.value_label }}</strong></p>
+        <svg class="lp-range__bar" viewBox="0 0 100 10" preserveAspectRatio="none" role="img"
+             aria-label="{{ r.label }}: {{ r.value_label }}, between the category's lowest {{ r.low_label }} and highest {{ r.high_label }}">
+          <rect class="lp-range__track" x="0" y="3" width="100" height="4"/>
+          <rect class="lp-range__fill" x="0" y="3" width="{{ r.pos }}" height="4"/>
+          <line class="lp-range__marker" x1="{{ r.pos }}" y1="5" x2="{{ r.pos }}" y2="5"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <p class="lp-range__ends"><span>lowest {{ r.low_label }}</span><span>highest {{ r.high_label }}</span></p>
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="lp-pic__note">Total expense ratio {{ example.ter_label }}. The fund's page has the rest.</p>
+    {% else %}
+    <p class="lp-none">No example tonight: no flexi cap fund has holdings, five years of
+      prices, a cost figure and its category's ranges in this build.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section id="categories" class="lp-section lp-section--wide" aria-labelledby="categories-h">
+  <div class="lp-text">
+    <p class="eyebrow">Understand funds</p>
+    <h2 id="categories-h">How mutual funds are organised</h2>
     <p>SEBI sorts every fund into a family and a category by what it may hold.
       Open a category for its rule and its funds.</p>
+    <p class="lp-links"><a class="button" href="{{ root }}/learn/">Learn the basics</a>
+      <a href="{{ root }}/learn/glossary/">Glossary</a></p>
   </div>
   {#
     A flowchart of plain lists (V1-81): mutual funds, their families, each
     family's categories. Each category is a <details>, so it opens with a click,
     the keyboard or a screen reader, and without scripts.
   #}
-  <div class="fundmap">
+  <div class="lp-pic fundmap">
     <p class="fundmap__root">Mutual funds <span>{{ count | fmt_count }} fund{{ '' if count == 1 else 's' }}</span></p>
     <ul class="fundmap__families">
       {% for family in fund_map %}
@@ -81,78 +162,96 @@
   </div>
 </section>
 
-<section id="categories" class="home-section" aria-labelledby="categories-h">
-  <div class="section-head">
-    <h2 id="categories-h">Highest three-year returns, by category</h2>
-    <p>Annualised, Direct plans, to {{ stats.prices_to | fmt_date if stats.prices_to else 'the latest prices' }}.
-      Past returns only: each fund's page sets them against its whole category,
-      with its falls, its costs and what it holds.</p>
+<section id="portfolio" class="lp-section lp-section--flip" aria-labelledby="portfolio-h">
+  <div class="lp-text">
+    <p class="eyebrow">See your portfolio</p>
+    <h2 id="portfolio-h">What your funds add up to, company by company</h2>
+    <p>Two funds can hold the same companies. Add yours and see the companies, sectors
+      and overlap underneath, worked out in your browser.</p>
+    <p class="lp-links"><a class="button" href="{{ root }}/portfolio/">Add your funds</a></p>
   </div>
-  <div class="leaders">
-    {% for card in leaders %}
-    <article class="leader" data-island="spotlight" aria-labelledby="leader-{{ loop.index }}">
-      <header class="leader__head">
-        <h3 id="leader-{{ loop.index }}">{{ card.name }}</h3>
-        <a class="leader__all" href="{{ root }}/funds/#category={{ card.key }}">All {{ card.count }} fund{{ '' if card.count == 1 else 's' }}
-          {{ icon.i("arrow") }}</a>
-      </header>
-      <table class="leader__table" data-sortable>
-        <thead><tr>
-          <th scope="col"><button type="button" data-sort="text">Fund</button></th>
-          <th scope="col" class="num"><button type="button" data-sort="number">Size</button></th>
-          <th scope="col" class="num"><button type="button" data-sort="number">1 year</button></th>
-          <th scope="col" class="num" aria-sort="descending"><button type="button" data-sort="number">3 years</button></th>
-          <th scope="col" class="num"><button type="button" data-sort="number">5 years</button></th>
-        </tr></thead>
-        <tbody>
-          {% for fund in card.funds %}
-          <tr>
-            <td><a class="fund-name" href="{{ root }}/fund/{{ fund.scheme_id }}/">{{ fund.name }}</a></td>
-            <td class="num"{% if fund.size_value %} data-value="{{ fund.size_value }}"{% endif %}>{{ fund.size_label }}</td>
-            {% for r in fund.returns %}
-            <td class="num{% if r.tone %} ret--{{ r.tone }}{% endif %}{% if loop.index == 2 %} leader__key{% endif %}"{% if r.value %} data-value="{{ r.value }}"{% endif %}>
-              {%- if r.symbol %}<span class="ret__symbol" aria-hidden="true">{{ r.symbol }}</span>{% endif %}{{ r.label -}}
-            </td>
-            {% endfor %}
-          </tr>
+  <div class="lp-pic">
+    {% if pair %}
+    <div class="lp-pair">
+      {% for f in pair.funds %}
+      <article class="lp-pair__card" aria-labelledby="pair-{{ loop.index }}">
+        <h3 id="pair-{{ loop.index }}"><a href="{{ root }}/fund/{{ f.scheme_id }}/">{{ f.name }}</a></h3>
+        <p class="lp-pair__cat">{{ f.category }}</p>
+        <ul>
+          {% for r in f.top %}
+          <li class="lp-pair__row{% if r.shared %} lp-pair__row--shared{% endif %}">
+            <span class="lp-row__name">{{ r.name }}</span> <span>{{ r.weight_label }}</span>
+            {% if r.shared %}<span class="sr-only">(in both)</span>{% endif %}
+          </li>
           {% endfor %}
-        </tbody>
-      </table>
-    </article>
-    {% endfor %}
+        </ul>
+      </article>
+      {% endfor %}
+    </div>
+    <p class="lp-pair__total">
+      {%- if pair.common %}{{ pair.common | fmt_count }} compan{{ 'y' if pair.common == 1 else 'ies' }} in both
+      {%- if pair.lead %} · with ₹1 in each, {{ pair.lead.name }} is {{ pair.lead.share_label }} of what you own{% endif %}
+      · {{ pair.overlap_label }} of the two portfolios is the same
+      {%- else %}No companies in both: these two portfolios share nothing{% endif %}</p>
+    <p class="lp-pic__note">An example pair: the fund above and the largest fund, with holdings, from another equity category.</p>
+    {% elif not example %}
+    <p class="lp-none">No example tonight: there is no example fund above to pair with.</p>
+    {% else %}
+    <p class="lp-none">No example tonight: no second equity fund with holdings in this build.</p>
+    {% endif %}
   </div>
-  <p class="home-section__more"><a class="button" href="{{ root }}/funds/">Explore all {{ count }} fund{{ '' if count == 1 else 's' }} {{ icon.i("arrow") }}</a></p>
 </section>
 
-<section id="about" class="home-section" aria-labelledby="about-h">
-  <div class="section-head">
-    <h2 id="about-h">What every fund page shows</h2>
-    <p>From public sources only, rebuilt every night, with each figure's date and source beside it.
-      <a href="{{ root }}/learn/reading-a-fund-page/">Reading a fund page here</a> walks through
-      each part, and <a href="{{ root }}/learn/">Learn</a> explains the terms. Benchmark
-      comparisons and your own portfolio are in the
-      <a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">self-hosted app</a>.</p>
+<section id="privacy" class="lp-section" aria-labelledby="privacy-h">
+  <div class="lp-text">
+    <p class="eyebrow">Your data stays yours</p>
+    <h2 id="privacy-h">Nothing you enter leaves your browser</h2>
+    <p>Your portfolio and your settings are kept in this browser's own storage, on this
+      device. Nothing you enter is sent anywhere or kept on any server. You can clear
+      them at any time: Clear on Your portfolio, Reset to defaults in Settings.</p>
+    <details class="lp-how">
+      <summary>How this works</summary>
+      <ul>
+        <li>No accounts, no cookies, no analytics.</li>
+        <li>The page loads nothing from any other site: its content security policy
+          allows only this one.</li>
+        <li>Like any web host, GitHub Pages keeps ordinary request logs (the address and
+          the page asked for), never what you type into a page.</li>
+      </ul>
+    </details>
   </div>
-  <div class="features">
-    <div class="feature" data-island="spotlight">{{ icon.i("growth") }}
-      <h3>Returns</h3>
-      <p>What ₹10,000 became over one, three and five years and its whole record, from AMFI's daily prices.</p></div>
-    <div class="feature" data-island="spotlight">{{ icon.i("scatter") }}
-      <h3>Its peers</h3>
-      <p>Where it stands among the funds that do the same job, on return, risk, falls and cost.</p></div>
-    <div class="feature" data-island="spotlight">{{ icon.i("pie") }}
-      <h3>Its cost</h3>
-      <p>The total expense ratio AMFI publishes each month, and how it compares with the category's.</p></div>
-    <div class="feature" data-island="spotlight">{{ icon.i("fall") }}
-      <h3>Falls and recoveries</h3>
-      <p>How far below its last high it stood each day, and how long it took to climb back.</p></div>
-    <div class="feature" data-island="spotlight">{{ icon.i("wave") }}
-      <h3>Consistency</h3>
-      <p>The return of every three-year stretch, not only the one that ends today.</p></div>
-    <div class="feature" data-island="spotlight">{{ icon.i("box") }}
-      <h3>What it owns</h3>
-      <p>Asset mix, largest holdings and sectors, from the fund house's disclosure or, marked, an aggregator's page.</p></div>
+  <div class="lp-pic lp-flow">
+    <div class="lp-flow__box"><strong>This site</strong>Fund prices, holdings, categories (public)</div>
+    <svg class="lp-flow__arrows" viewBox="0 0 120 80" role="img"
+         aria-label="Public data goes from this site to your browser; nothing you enter goes back">
+      <path class="lp-flow__out" d="M8 26 H104" pathLength="1"/>
+      <path class="lp-flow__head lp-flow__head--out" d="M98 20 L108 26 L98 32"/>
+      <path class="lp-flow__back" d="M112 56 H16"/>
+      <path class="lp-flow__head lp-flow__head--back" d="M22 50 L12 56 L22 62"/>
+      <g class="lp-flow__cross"><path d="M54 46 L66 66"/><path d="M66 46 L54 66"/></g>
+    </svg>
+    <div class="lp-flow__box"><strong>Your browser</strong>Your funds, your settings</div>
+    <p class="lp-flow__labels"><span>public data →</span><span>← your entries: never sent</span></p>
   </div>
 </section>
+
+<section id="about" class="lp-section lp-section--flip" aria-labelledby="about-h">
+  <div class="lp-text">
+    <p class="eyebrow">About the data</p>
+    <h2 id="about-h">Where every figure comes from</h2>
+    <p>Rebuilt every night; each figure is dated. Descriptive, not advice. Benchmark
+      comparisons and your own ledger are in the
+      <a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">self-hosted app</a>.</p>
+  </div>
+  <ul class="lp-pic lp-sources">
+    <li class="lp-source"><strong>AMFI</strong>Daily prices, monthly expense ratios</li>
+    <li class="lp-source"><strong>The fund houses</strong>Monthly holdings disclosures</li>
+    <li class="lp-source"><strong>SEBI</strong>Fund categories and their rules</li>
+  </ul>
+</section>
+
+<nav class="lp-end" aria-label="Where to next">
+  {{ doors(compact=True) }}
+</nav>
 </div>
 {% endblock %}

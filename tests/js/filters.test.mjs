@@ -70,3 +70,10 @@ test("the filters write the address through later", async () => {
   assert.equal(src.match(/history\.replaceState/g).length, 1);
   assert.match(src, /later\(function \(hash\) \{\s*history\.replaceState/);
 });
+
+test("a submitted search goes in the fragment, which is never sent", () => {
+  assert.equal(A.searchTarget("/funds/", " hdfc top "), "/funds/#q=hdfc%20top");
+  assert.equal(A.searchTarget("/Repo/funds/", ""), "/Repo/funds/");
+  assert.equal(A.searchTarget("https://x.test/funds/?q=old#family=debt", "axis"),
+    "https://x.test/funds/#q=axis");
+});

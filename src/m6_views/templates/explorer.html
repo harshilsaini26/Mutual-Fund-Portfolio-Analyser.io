@@ -22,6 +22,50 @@
     option. Sort by any column; narrow by family, category or name.</p>
 </header>
 
+{#- Each category's highest three-year returns (V1-80), moved here from the front
+    page by V1-89: a plain fact with its period, folded so the table stays first. -#}
+{% if leaders %}
+<details class="leaders-fold">
+  <summary>Highest three-year returns in six categories</summary>
+  <p class="leaders-fold__note">Annualised, Direct plans, to {{ stats.prices_to | fmt_date if stats.prices_to else 'the latest prices' }}.
+    Past returns only: each fund's page sets them against its whole category,
+    with its falls, its costs and what it holds.</p>
+  <div class="leaders">
+    {% for card in leaders %}
+    <article class="leader" aria-labelledby="leader-{{ loop.index }}">
+      <header class="leader__head">
+        <h2 id="leader-{{ loop.index }}">{{ card.name }}</h2>
+        <a class="leader__all" href="{{ root }}/funds/#category={{ card.key }}">All {{ card.count }} fund{{ '' if card.count == 1 else 's' }}
+          {{ icon.i("arrow") }}</a>
+      </header>
+      <table class="leader__table" data-sortable>
+        <thead><tr>
+          <th scope="col"><button type="button" data-sort="text">Fund</button></th>
+          <th scope="col" class="num"><button type="button" data-sort="number">Size</button></th>
+          <th scope="col" class="num"><button type="button" data-sort="number">1 year</button></th>
+          <th scope="col" class="num" aria-sort="descending"><button type="button" data-sort="number">3 years</button></th>
+          <th scope="col" class="num"><button type="button" data-sort="number">5 years</button></th>
+        </tr></thead>
+        <tbody>
+          {% for fund in card.funds %}
+          <tr>
+            <td><a class="fund-name" href="{{ root }}/fund/{{ fund.scheme_id }}/">{{ fund.name }}</a></td>
+            <td class="num"{% if fund.size_value %} data-value="{{ fund.size_value }}"{% endif %}>{{ fund.size_label }}</td>
+            {% for r in fund.returns %}
+            <td class="num{% if r.tone %} ret--{{ r.tone }}{% endif %}{% if loop.index == 2 %} leader__key{% endif %}"{% if r.value %} data-value="{{ r.value }}"{% endif %}>
+              {%- if r.symbol %}<span class="ret__symbol" aria-hidden="true">{{ r.symbol }}</span>{% endif %}{{ r.label -}}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </article>
+    {% endfor %}
+  </div>
+</details>
+{% endif %}
+
 <section id="funds" aria-labelledby="funds-h">
   <h2 id="funds-h" class="sr-only">Every fund</h2>
   <div class="card table-card">

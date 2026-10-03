@@ -2,10 +2,9 @@
   The shell. MODULE_6.md §16; the layout is DECISIONS V1-74.
 
   Server-rendered Jinja rather than a React app, per DECISIONS V1-23 — which
-  overrides `PLAN.md` §9.10 and `MODULE_6.md` Appendix A. React arrives only as
-  islands (V1-80): a few React Bits components, on Preact, that animate what the
-  server already wrote (`static/vendor/islands.v1.js`, built from `ui/`). Every
-  page is complete without them.
+  overrides `PLAN.md` §9.10 and `MODULE_6.md` Appendix A. The V1-80 React islands
+  were retired with the front page that used them (V1-89); the landing page's motion
+  is CSS. Every page is complete without its scripts.
 
   Every script is **vendored**, not linked from a CDN. `PLAN.md` §6 makes this a
   self-hosted tool for one person's financial data; a page that phones a CDN on
@@ -53,7 +52,7 @@
       method="get" role="search">
   <label class="sr-only" for="q">Find a fund</label>
   {{ icon.i("search", "icon search__icon") }}
-  <input id="q" name="q" type="search" autocomplete="off" spellcheck="false"
+  <input id="q" {% if not static %}name="q" {% endif %}type="search" autocomplete="off" spellcheck="false"
          placeholder="Find a fund by name"
          {% if static %}data-index="{{ root }}/search.json"{% else %}data-suggest="/api/search"{% endif %}>
   <ul class="search__suggest" hidden data-lenis-prevent></ul>
@@ -215,7 +214,6 @@
 {#- In this order: app.js starts Lenis, and deferred scripts run as listed. -#}
 <script src="{{ root }}/static/vendor/lenis.v1.3.26.min.js" defer></script>
 <script src="{{ root }}/static/app.js" defer></script>
-<script src="{{ root }}/static/vendor/islands.v1.js" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

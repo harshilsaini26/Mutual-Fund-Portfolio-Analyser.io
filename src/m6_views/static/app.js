@@ -49,6 +49,12 @@
     }
     return state;
   }
+  // Where a submitted public search goes: /funds/ with the words in the fragment,
+  // which a browser never sends, so what is typed stays on this device (V1-89).
+  function searchTarget(action, value) {
+    return String(action).split("#")[0].split("?")[0] +
+      filterHash({ category: "", family: "", q: String(value).trim() });
+  }
   // fn once the calls have paused for ms, with the last call's arguments.
   function later(fn, ms) {
     var timer;
@@ -61,7 +67,7 @@
   if (typeof module === "object" && module.exports) {
     module.exports = { filterHash: filterHash, parseFilterHash: parseFilterHash,
                        isFilterHash: isFilterHash, initialFilters: initialFilters,
-                       later: later };
+                       later: later, searchTarget: searchTarget };
     return;
   }
 
@@ -187,6 +193,14 @@
         .catch(close);
     }
 
+    // The public search box has no name, so its form sends nothing; on submit the
+    // words go to /funds/ in the fragment instead (V1-89).
+    if (input.getAttribute("data-index") && input.form) {
+      input.form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        window.location.assign(searchTarget(input.form.action, input.value));
+      });
+    }
     input.setAttribute("aria-expanded", "false");
     input.setAttribute("aria-autocomplete", "list");
     input.addEventListener("input", function () {
@@ -223,7 +237,7 @@
   //
   // settings.js applied the reader's choices before the page was drawn and owns
   // storage; this is the panel that changes them. Each radio applies at once.
-  // charts.js and the islands watch the attributes and follow.
+  // charts.js watches the attributes and follows.
 
   var panel = document.getElementById("settings");
   if (panel && window.Settings && panel.showModal) {

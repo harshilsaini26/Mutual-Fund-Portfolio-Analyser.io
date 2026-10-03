@@ -1,6 +1,6 @@
 # SHA-256 of the vendored third-party JavaScript.
 #
-# ECharts and the islands bundle are committed here rather than loaded from a CDN, which removes a third
+# ECharts and Lenis are committed here rather than loaded from a CDN, which removes a third
 # party from every page load and replaces it with a question: is the copy in
 # the tree the one that was reviewed? This answers it, and
 # tests/unit/test_security.py fails if a file stops matching.
@@ -9,15 +9,9 @@
 #   echarts.v6.1.0.min.js     package/dist/echarts.min.js from
 #                             https://registry.npmjs.org/echarts/-/echarts-6.1.0.tgz
 #                             (tarball checked against the registry's sha512 integrity)
-#   lenis.v1.3.26.min.js      dist/lenis.min.js of lenis@1.3.26 (npm, ui/package-lock.json)
-#   islands.v1.js             built by ui/build.mjs from ui/src: React Bits components
-#                             with Preact 10.29.8, motion 13.4.4, ogl 1.0.11; its
-#                             first line records the SHA-256 of ui/src (test_islands)
-#   (both rewritten, with their lines below, by `cd ui && npm run build`)
+#   lenis.v1.3.26.min.js      dist/lenis.min.js from
+#                             https://registry.npmjs.org/lenis/-/lenis-1.3.26.tgz
 #
 # Verify by hand with:  sha256sum -c SHA256SUMS
 b66b25aeb4df84e33199dc21694014d336d222cbd9deb0e5a7c14bd6aa0d0fd0  echarts.v6.1.0.min.js
-e774d59795fc1370eaaea045c6f18e0cf7056fa25da12d6a17372ad220d266a5  islands.v1.js
-53195c9797e7ce7bf9d7fa9242b08209e57f46de4c9dac126a6494fa780e3346  lenis.v1.3.26.min.js
-f894319c14a24ba1903471664206692f128a285fc2ec119134355e34d5526116  islands.v1.js
 53195c9797e7ce7bf9d7fa9242b08209e57f46de4c9dac126a6494fa780e3346  lenis.v1.3.26.min.js

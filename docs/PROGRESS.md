@@ -263,6 +263,11 @@ pushes one commit to `gh-pages`. Measured on the first full build, 2026-09-26:
   an index fund that declares the same benchmark on its Groww page, named as such.
   The crawl map gained that column on 2026-09-26, so proxies fill in as pages are
   read, about 100 a night.
+- **Landing page** (V1-89): the front page is a scroll-told story. The hero shows a
+  real example fund opening into what it holds, with three equal ways in (look up a
+  fund, understand funds, see your portfolio), then one section per way in, a plain
+  privacy section, and where the data comes from. Motion is CSS only and builds marks,
+  never words; the leader tables moved to /funds/; the React islands are retired.
 - **UX fixes and polish** (V1-88): measured against an audit (375/768/1440px, three
   themes, a 320–1600px sweep) and Apple's design principles. The top bar folds into a Menu
   on tablets, every text colour passes 4.5:1, fields have a 3:1 outline and a focus ring,

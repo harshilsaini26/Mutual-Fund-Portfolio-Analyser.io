@@ -240,7 +240,7 @@
   --shadow-lift: 0 0 0 1px rgb(0 255 65 / 0.25), 0 0 24px rgb(0 255 65 / 0.18);
 }
 :root[data-theme="matrix"] h1, :root[data-theme="matrix"] h2,
-:root[data-theme="matrix"] .home-stats dd, :root[data-theme="matrix"] .kpi__value {
+:root[data-theme="matrix"] .kpi__value {
   text-shadow: 0 0 8px rgb(0 255 65 / 0.45);
 }
 
@@ -939,11 +939,6 @@ p.chart-table { font-size: var(--text-sm); color: var(--ink-faint); }
 .ret--loss { color: var(--loss); }
 .ret__symbol { font-size: var(--text-xs); margin-right: 3px; }
 
-.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-.feature { padding: 18px; }
-.feature .icon { width: 22px; height: 22px; color: var(--accent); }
-.feature h3 { margin: 12px 0 4px; font-size: var(--text-base); }
-.feature p { margin: 0; color: var(--ink-soft); font-size: var(--text-sm); }
 
 .fund-browser { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
 .explorer__group > summary {
@@ -1071,50 +1066,284 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 .button:hover { box-shadow: 0 0 0 4px color-mix(in srgb, var(--sky) 45%, transparent); }
 .button .icon { width: 16px; height: 16px; }
 
-/* The hero: a soft sky wash, the aurora (an island) behind it, the way in. */
-.home-hero {
-  position: relative; overflow: hidden; isolation: isolate;
-  /* Edge to edge: the front page's <main> is full width (V1-88). */
-  margin: 0; padding: 72px 28px 56px;
-  background: linear-gradient(180deg, var(--hero-a), var(--hero-b) 70%, var(--bg));
-  border-bottom: 1px solid var(--line);
+/* --- V1-89: the landing page -------------------------------------------------------
+   A product story: the hero with three doors, then one section per door. Marks (bars,
+   markers, lines) are SVG drawn from the build's geometry; the motion further down only
+   builds them, and every word is in place from the first frame. */
+.lp-hero {
+  margin: 0; padding: 56px 28px 40px;
+  background: var(--hero-a); border-bottom: 1px solid var(--line);
 }
-.home-hero__aurora {
-  position: absolute; inset: 0; z-index: -1; opacity: 0.7; pointer-events: none;
-  -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 85%);
-  mask-image: linear-gradient(180deg, #000 20%, transparent 85%);
+/* Words, doors, example: the page's order is the order read and tabbed; the grid
+   puts the example beside the words on a wide screen and the doors under both. */
+.lp-hero__grid {
+  width: 100%; max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-areas: "text fund" "doors doors"; gap: 36px 40px; align-items: center;
 }
-/* ogl sizes its canvas once, in pixels; the hero's height settles later. */
-.home-hero__aurora canvas { display: block; width: 100% !important; height: 100% !important; }
-.home-hero__inner { max-width: 880px; margin: 0 auto; text-align: center; }
-.home-hero .eyebrow { color: var(--accent); }
-.home-hero__title {
-  margin: 14px auto 16px; max-width: 20ch;
-  font-size: var(--text-display); font-weight: 600; line-height: var(--lh-display); letter-spacing: var(--track-tight);
-  color: var(--ink);
+.lp-hero__grid--alone { grid-template-columns: minmax(0, 1fr); grid-template-areas: "text" "doors"; }
+.lp-hero__text { grid-area: text; }
+.lp-hero__grid > .lp-doors { grid-area: doors; margin: 0; }
+.lp-fund { grid-area: fund; }
+.lp-hero .eyebrow { color: var(--accent); }
+.lp-hero__title {
+  margin: 12px 0 14px; max-width: 18ch; text-wrap: balance;
+  font-size: var(--text-display); font-weight: 600; line-height: var(--lh-display);
+  letter-spacing: var(--track-tight); color: var(--ink);
 }
-.home-hero__lede { margin: 0 auto 28px; max-width: 60ch; font-size: var(--text-lead); color: var(--ink-soft); }
-.home-hero .search--hero { margin: 0 auto; text-align: left; }
-.home-hero .search--hero input { box-shadow: var(--shadow); border-color: var(--field-line); }
-.home-stats {
-  display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 40px; margin: 34px 0 0;
+.lp-hero__lede { margin: 0 0 20px; max-width: 52ch; font-size: var(--text-lead); color: var(--ink-soft); }
+.lp-pill {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 4px 14px;
+  border-radius: 999px; background: var(--surface); border: 1px solid var(--line);
+  color: var(--gain); font-size: var(--text-sm); font-weight: 600; text-decoration: none;
 }
-.home-stats div { display: flex; flex-direction: column-reverse; align-items: center; }
-.home-stats dt { font-size: var(--text-sm); color: var(--ink-faint); }
-.home-stats dd {
-  margin: 0; font-size: var(--text-h2); font-weight: 600; letter-spacing: var(--track-tight);
-  color: var(--accent); font-variant-numeric: tabular-nums;
+.lp-pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+/* The example fund, opened up. */
+.lp-fund {
+  margin: 0; padding: 20px 22px; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+}
+.lp-fund__name {
+  display: block; overflow-wrap: anywhere;
+  font-size: var(--text-lead); font-weight: 700; color: var(--ink); text-decoration: none;
+}
+.lp-fund__name:hover { color: var(--accent); }
+.lp-fund__detail { margin: 2px 0 14px; font-size: var(--text-sm); color: var(--ink-faint); }
+.lp-mix { display: block; width: 100%; height: 10px; border-radius: 5px; overflow: hidden; }
+.lp-mix__part { fill: var(--accent); }
+.lp-mix__part--2 { fill: color-mix(in srgb, var(--accent) 55%, var(--surface)); }
+.lp-mix__part--3, .lp-mix__part--4, .lp-mix__part--5, .lp-mix__part--6 {
+  fill: color-mix(in srgb, var(--accent) 25%, var(--surface));
+}
+.lp-mix__legend {
+  display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0 14px;
+  font-size: var(--text-xs); color: var(--ink-soft);
+}
+.lp-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lp-row {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; gap: 10px;
+  align-items: center; font-size: var(--text-sm);
+}
+.lp-row__name { color: var(--ink); overflow-wrap: anywhere; }
+.lp-row__track { display: block; width: 100%; height: 6px; }
+.lp-row__bar { fill: var(--accent); }
+.lp-row__value { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.lp-fund figcaption { margin-top: 14px; font-size: var(--text-xs); color: var(--ink-faint); }
+
+/* The three doors, in the hero and again at the end. */
+.lp-doors {
+  list-style: none; width: 100%; max-width: 1200px; margin: 36px auto 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;
+}
+.lp-door {
+  display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 18px 20px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.lp-door__title { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--accent); }
+.lp-door .search--hero { width: 100%; max-width: none; }
+.lp-door__more { font-size: var(--text-sm); }
+.lp-end { max-width: 1200px; margin: 96px auto 24px; }
+.lp-end .lp-doors { margin: 0; }
+
+/* One section per door: words on one side, its picture on the other. */
+.lp-section {
+  max-width: 1200px; margin: 96px auto 0;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 48px; align-items: center;
+}
+.lp-section--flip .lp-pic { order: -1; }
+.lp-section--wide { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.lp-text h2 {
+  margin: 8px 0 12px; text-wrap: balance;
+  font-size: var(--text-h2); line-height: var(--lh-tight); letter-spacing: var(--track-tight);
+}
+.lp-text p { max-width: 58ch; color: var(--ink-soft); }
+.lp-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 18px; }
+.lp-pic {
+  min-width: 0; margin: 0; padding: 24px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.lp-pic__title { margin: 0 0 14px; font-weight: 600; }
+.lp-pic__note { margin: 14px 0 0; font-size: var(--text-sm); color: var(--ink-faint); }
+.lp-none { margin: 0; color: var(--ink-soft); }
+.lp-how { margin-top: 14px; }
+.lp-how summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+.lp-how ul { margin: 8px 0 0; padding-left: 20px; color: var(--ink-soft); }
+
+/* Look up a fund: where the fund sits between its category's lowest and highest. */
+.lp-ranges { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
+.lp-range__head {
+  display: flex; justify-content: space-between; gap: 8px; margin: 0 0 6px;
+  font-size: var(--text-sm); color: var(--ink-soft);
+}
+.lp-range__head strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+.lp-range__bar { display: block; width: 100%; height: 14px; overflow: visible; }
+.lp-range__track { fill: var(--surface-3); }
+.lp-range__fill { fill: color-mix(in srgb, var(--accent) 45%, var(--surface)); }
+/* A zero-length line with round caps: a dot that stays round on a stretched bar. */
+.lp-range__marker { stroke: var(--accent); stroke-width: 14px; stroke-linecap: round; }
+.lp-range__ends {
+  display: flex; justify-content: space-between; gap: 8px; margin: 4px 0 0;
+  font-size: var(--text-xs); color: var(--ink-faint);
 }
 
-/* Words that arrive one by one (BlurText, an island). */
-.blur-text { display: inline-flex; flex-wrap: wrap; }
-.blur-text__word { display: inline-block; will-change: transform, filter, opacity; }
+/* See your portfolio: two funds and what they hold in common. */
+.lp-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.lp-pair__card {
+  min-width: 0; padding: 14px 16px;
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+.lp-pair__card h3 { margin: 0; font-size: var(--text-md); }
+.lp-pair__card h3 a { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+.lp-pair__cat { margin: 2px 0 10px; font-size: var(--text-xs); color: var(--ink-faint); }
+.lp-pair__card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.lp-pair__row {
+  position: relative; isolation: isolate;
+  display: flex; justify-content: space-between; gap: 8px; padding: 4px 8px;
+  border-radius: 6px; font-size: var(--text-sm);
+}
+.lp-pair__row--shared { font-weight: 600; color: var(--accent); }
+.lp-pair__row--shared::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: var(--accent-soft);
+}
+.lp-pair__total { margin: 14px 0 0; font-weight: 600; }
+
+/* Your data stays yours: public data comes in; nothing goes back. */
+.lp-flow { display: grid; grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr); gap: 12px; align-items: center; }
+.lp-flow__box {
+  padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--bg); font-size: var(--text-sm); color: var(--ink-soft);
+}
+.lp-flow__box strong { display: block; color: var(--ink); }
+.lp-flow__arrows { display: block; width: 120px; height: 80px; }
+.lp-flow__arrows path { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.lp-flow__out { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.lp-flow__out, .lp-flow__head--out { stroke: var(--accent); }
+.lp-flow__back, .lp-flow__head--back { stroke: var(--ink-faint); }
+.lp-flow__back { stroke-dasharray: 4 6; }
+.lp-flow__cross path { stroke: var(--loss); stroke-width: 4; }
+.lp-flow__labels {
+  grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 8px; margin: 0;
+  font-size: var(--text-xs); color: var(--ink-faint);
+}
+
+/* About the data: the three sources. */
+.lp-sources { list-style: none; display: grid; gap: 12px; }
+.lp-source {
+  padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--bg); font-size: var(--text-sm); color: var(--ink-soft);
+}
+.lp-source strong { display: block; font-size: var(--text-base); color: var(--ink); }
+
+/* Narrow: one column; the hero's words, then its doors, then the example, so the
+   first screen holds the headline, the privacy line and all three ways in. */
+@media (max-width: 899px) {
+  .lp-hero__grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "text" "doors" "fund"; gap: 24px; }
+  .lp-hero__grid--alone { grid-template-areas: "text" "doors"; }
+  .lp-doors { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .lp-section { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .lp-section--flip .lp-pic { order: 0; }
+}
+@media (max-width: 720px) {
+  .lp-hero { padding: 28px 16px 28px; }
+  .lp-door { padding: 12px 14px; }
+  .lp-section { margin-top: 64px; }
+  .lp-pic { padding: 16px; }
+  .lp-door a, .lp-links a, .lp-pair__card h3 a { display: inline-flex; align-items: center; min-height: 40px; }
+  .leaders-fold > summary { display: flex; align-items: center; min-height: 40px; }
+  /* The search door spans the row; the other two share one, so all three fit the
+     first screen (375x812). */
+  .lp-doors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lp-door:first-child { grid-column: 1 / -1; }
+  .lp-hero__lede { font-size: var(--text-base); }
+  .lp-pair { grid-template-columns: minmax(0, 1fr); }
+  .lp-flow { grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr); gap: 8px; }
+  .lp-flow__arrows { width: 72px; height: 48px; }
+}
+
+/* The landing page's motion (V1-89). Only marks move: bars grow, the fill runs to the
+   fund, lines draw, two cards slide together, the sources settle. Every word is in
+   place from the first frame. All of it stops with the site's motion setting, or the
+   device's reduced-motion preference until the reader chooses (V1-83, below). The
+   scroll-linked pictures exist only where the browser has scroll timelines, and each
+   finishes by the time its section has fully entered -- so a section reached by a link
+   (/#about, #privacy) is already complete. Elsewhere every mark simply sits finished. */
+@keyframes lp-grow { from { transform: scaleX(0); } }
+@keyframes lp-drop { from { transform: scaleY(0); } }
+@keyframes lp-draw { from { stroke-dashoffset: 1; } }
+@keyframes lp-fade { from { opacity: 0; } }
+@keyframes lp-in-left { from { transform: translateX(-24px); } }
+@keyframes lp-in-right { from { transform: translateX(24px); } }
+@keyframes lp-rise { from { transform: translateY(12px); } }
+
+.lp-mix__part, .lp-row__bar, .lp-range__fill { transform-box: fill-box; transform-origin: left center; }
+/* The hero's example opens once, on load. */
+.lp-mix__part { animation: lp-grow 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.lp-row__bar { animation: lp-grow 600ms cubic-bezier(0.2, 0.7, 0.2, 1) 300ms both; }
+.lp-row:nth-child(2) .lp-row__bar { animation-delay: 380ms; }
+.lp-row:nth-child(3) .lp-row__bar { animation-delay: 460ms; }
+.lp-row:nth-child(4) .lp-row__bar { animation-delay: 540ms; }
+.lp-row:nth-child(5) .lp-row__bar { animation-delay: 620ms; }
+
+@supports (animation-timeline: view()) {
+  .lp-section { view-timeline: --lp-section block; }
+  .lp-range__fill {
+    animation: lp-grow linear both;
+    animation-timeline: --lp-section; animation-range: entry 10% entry 80%;
+  }
+  .lp-range__marker {
+    animation: lp-fade linear both;
+    animation-timeline: --lp-section; animation-range: entry 60% entry 100%;
+  }
+  #categories .fundmap__families::before, #categories .fundmap__family::before {
+    transform-origin: top;
+    animation: lp-drop linear both;
+    animation-timeline: --lp-section; animation-range: entry 10% entry 50%;
+  }
+  #categories .fundmap__families::after {
+    transform-origin: center;
+    animation: lp-grow linear both;
+    animation-timeline: --lp-section; animation-range: entry 20% entry 60%;
+  }
+  #categories .fundmap__cats > li::before {
+    transform-origin: left;
+    animation: lp-grow linear both;
+    animation-timeline: --lp-section; animation-range: entry 40% entry 100%;
+  }
+  .lp-pair__card:first-child {
+    animation: lp-in-left linear both;
+    animation-timeline: --lp-section; animation-range: entry 10% entry 70%;
+  }
+  .lp-pair__card:last-child {
+    animation: lp-in-right linear both;
+    animation-timeline: --lp-section; animation-range: entry 10% entry 70%;
+  }
+  .lp-pair__row--shared::before {
+    animation: lp-fade linear both;
+    animation-timeline: --lp-section; animation-range: entry 60% entry 100%;
+  }
+  .lp-flow__out {
+    animation: lp-draw linear both;
+    animation-timeline: --lp-section; animation-range: entry 10% entry 60%;
+  }
+  .lp-flow__cross {
+    animation: lp-fade linear both;
+    animation-timeline: --lp-section; animation-range: entry 60% entry 100%;
+  }
+  .lp-source {
+    animation: lp-rise linear both;
+    animation-timeline: --lp-section; animation-range: entry 10% entry 60%;
+  }
+  .lp-source:nth-child(2) { animation-range: entry 20% entry 80%; }
+  .lp-source:nth-child(3) { animation-range: entry 30% entry 100%; }
+}
 
 .home-section { margin-top: 48px; }
 .home-section .section-head { margin-bottom: 18px; }
 .home-section .section-head h2 { font-size: var(--text-h3); font-weight: 600; }
 .home-section .section-head p { max-width: 70ch; font-size: var(--text-md); }
-.home-section__more { display: flex; justify-content: center; margin: 26px 0 0; }
 .recent.card { max-width: 880px; margin: 22px auto 0; }
 
 /* Category cards: five highest three-year returns each. */
@@ -1126,7 +1355,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 }
 .leader:hover { box-shadow: var(--shadow-lift); border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); }
 .leader__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.leader__head h3 { margin: 0; font-size: var(--text-lead); font-weight: 600; color: var(--accent); }
+.leader__head h2 { margin: 0; font-size: var(--text-lead); font-weight: 600; color: var(--accent); }
 .leader__all {
   display: inline-flex; align-items: center; gap: 4px;
   font-size: var(--text-sm); font-weight: 500; text-decoration: none; white-space: nowrap;
@@ -1145,35 +1374,15 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 .leader__table .fund-name:hover { color: var(--accent); text-decoration: underline; }
 .leader__key { font-weight: 600; }
 
-/* Spotlight (an island): a soft light follows the cursor across a card.
-   After React Bits' SpotlightCard (MIT + Commons Clause), in this site's tokens. */
-.card-spotlight { position: relative; overflow: hidden; }
-.card-spotlight::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-                              var(--spotlight-color, rgb(19 69 133 / 0.12)), transparent 70%);
-  opacity: 0; transition: opacity 0.5s ease;
-}
-.card-spotlight:hover::before, .card-spotlight:focus-within::before { opacity: 1; }
-:root[data-theme="dark"] .card-spotlight::before {
-  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-                              rgb(143 180 255 / 0.14), transparent 70%);
-}
-
-.features { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.feature {
-  padding: 22px; background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius);
-}
-.feature .icon {
-  width: 38px; height: 38px; padding: 9px; border-radius: 10px;
-  color: var(--accent); background: var(--accent-soft);
-}
-.feature h3 { margin: 14px 0 6px; font-size: var(--text-base); font-weight: 600; }
-.feature p { font-size: var(--text-md); line-height: var(--lh-body); }
-
 /* /funds/ */
 .page-head { display: block; margin: 8px 0 22px; }
+/* Each category's highest three-year returns, folded above the table (V1-89). */
+.leaders-fold { margin: 0 0 22px; }
+.leaders-fold > summary {
+  cursor: pointer; width: fit-content; font-weight: 600; color: var(--accent);
+}
+.leaders-fold[open] > summary { margin-bottom: 12px; }
+.leaders-fold__note { max-width: 70ch; color: var(--ink-soft); font-size: var(--text-sm); }
 .page-head h1 { margin: 6px 0 6px; font-size: var(--text-h2); font-weight: 600; }
 .page-head__lede { max-width: 70ch; }
 .table-note { margin: 10px 2px 0; font-size: var(--text-sm); color: var(--ink-faint); }
@@ -1242,15 +1451,11 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 
 @media (max-width: 1099px) {
   .leaders { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .topnav__link[href$="#about"] { display: none; }
 }
 @media (max-width: 720px) {
-  .home-hero { padding: 44px 16px 36px; }
-  .home-stats { gap: 10px 24px; }
-  .home-stats dd { font-size: var(--text-h3); }
-  .leaders, .features, .ranges { grid-template-columns: minmax(0, 1fr); }
+  .leaders, .ranges { grid-template-columns: minmax(0, 1fr); }
   .fundcard__top { padding-right: 0; }
   .fundcard__nav { text-align: left; }
   .fundcard__nav-value { font-size: var(--text-h3); }
@@ -1322,7 +1527,8 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
   transition: none !important; animation: none !important; scroll-behavior: auto !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  :root:not([data-motion]) * { animation: none !important; transition: none !important; }
+  :root:not([data-motion]) *, :root:not([data-motion]) *::before,
+  :root:not([data-motion]) *::after { animation: none !important; transition: none !important; }
 }
 /* While motion is on: colours fade when the theme or accent changes, the panel
    slides in, and a chart fades in as it finishes drawing. */
@@ -1609,7 +1815,8 @@ th .term::after, .term::after { content: none; }   /* not a sort button (th butt
    font is Terminess; their own choice otherwise. Headings, figures, tables and
    controls keep --font. */
 .learn--guide p, .learn__term dd p, .lede, .public-note, .term-pop__text,
-.placeholder__reason, .pf__note, .cmp__note { font-family: var(--font-prose); }
+.placeholder__reason, .pf__note, .cmp__note,
+.lp-hero__lede, .lp-text p, .lp-how li, .lp-pic__note, .lp-none { font-family: var(--font-prose); }
 
 /* Skip link (V1-88): the keyboard's first stop, out of sight until focused. */
 .skip-link {

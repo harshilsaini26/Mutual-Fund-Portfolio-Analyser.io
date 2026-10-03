@@ -75,9 +75,11 @@ from src.m6_views.format import (
 from src.m6_views.learn import load as load_learn
 from src.m6_views.learn import stale
 from src.m6_views.registry import VIEW_DEFS, VIEW_REGISTRY
+from src.m6_views.render import range_bars
 from src.m6_views.states import empty_envelope, error_envelope
 
 from jobs.fetch_groww import declared_benchmarks
+from jobs.landing import landing_candidate, landing_example, landing_pair
 
 #: GitHub Pages publishes at most 1 GB. The build stops well short of it.
 SITE_BUDGET_BYTES = 900 * 1024 * 1024
@@ -88,7 +90,7 @@ PUBLIC_USER = UserId("PUBLIC")
 STATIC_FILES = (
     "app.css", "app.js", "charts.js", "settings.js", "sections.js", "lenis.css",
     "vendor/echarts.v6.1.0.min.js", "vendor/lenis.v1.3.26.min.js",
-    "vendor/islands.v1.js", "fonts/rubik-latin-wght-normal.woff2",
+    "fonts/rubik-latin-wght-normal.woff2",
     "fonts/terminess-Regular.woff2", "fonts/terminess-Bold.woff2",
     "portfolio-math.js", "kit.js", "portfolio.js", "compare.js",
     "fonts/atkinson-hyperlegible-latin-400-normal.woff2",
@@ -490,6 +492,7 @@ def build_site(
     records: list[dict[str, Any]] = []
     (out / "data" / "lookthrough").mkdir(parents=True)
     rows: list[dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []  # the landing page's example (V1-89)
     houses: set[str] = set()
     with_holdings = 0
     prices_to: date | None = None
@@ -514,6 +517,11 @@ def build_site(
         records.append(fund_record(rows[-1], context["detail"]["env"], firsts.get(sid),
                                    facts.benchmark_name if facts else None))
         held = lookthrough_file(deps.lookthrough, sid, today)
+        if rows[-1]["family"] == "equity":
+            peers = panels.get("fund_peers")
+            ok = peers is not None and peers.state.value == "ok"
+            ranged = range_bars(peers) if ok and peers is not None else []
+            candidates.append(landing_candidate(rows[-1], ranged, held))
         if held is not None:
             (out / "data" / "lookthrough" / f"{sid}.json").write_text(
                 json.dumps(held, ensure_ascii=False), encoding="utf-8")
@@ -547,10 +555,12 @@ def build_site(
         "prices_to": prices_to,
         "categories": len({r["category_key"] for r in rows}),
     }
+    example = landing_example(candidates)
     (out / "index.html").write_text(
         engine.get_template("home.html").render({
-            **shell, "count": len(funds), "stats": stats,
-            "leaders": category_leaders(rows), "fund_map": fund_map(funds),
+            **shell, "count": len(funds), "stats": stats, "fund_map": fund_map(funds),
+            "example": example,
+            "pair": landing_pair(example["scheme_id"], candidates) if example else None,
         }),
         encoding="utf-8",
     )
@@ -568,6 +578,7 @@ def build_site(
             "funds": rows,
             "families": families,
             "stats": stats,
+            "leaders": category_leaders(rows),
         }),
         encoding="utf-8",
     )

@@ -13,6 +13,7 @@ import re
 import sqlite3
 from datetime import date, timedelta
 from decimal import Decimal
+from itertools import pairwise
 from pathlib import Path
 
 import jobs.publish_site as publish
@@ -20,6 +21,7 @@ import pytest
 from src.common.decimals import connect
 from src.common.types import IndexId, SchemeId
 from src.m0_data.categories import category_of
+from src.m6_views.api.pages import templates
 from src.m6_views.builders.fund.common import INDEX_WITHHELD
 from src.m6_views.format import format_date
 
@@ -352,23 +354,162 @@ def test_every_fund_is_listed_in_one_table_on_its_own_page(site: Path) -> None:
     assert row.group(1).count("—") == 6
 
 
+PRIVACY = (
+    "Nothing you enter leaves your browser",
+    "Your portfolio and your settings are kept in this browser's own storage, on this"
+    " device. Nothing you enter is sent anywhere or kept on any server. You can clear"
+    " them at any time: Clear on Your portfolio, Reset to defaults in Settings.",
+    "No accounts, no cookies, no analytics.",
+    "The page loads nothing from any other site: its content security policy allows"
+    " only this one.",
+    "Like any web host, GitHub Pages keeps ordinary request logs (the address and the"
+    " page asked for), never what you type into a page.",
+)
+SECTIONS = (("lookup", "Look up a fund"), ("categories", "Understand funds"),
+            ("portfolio", "See your portfolio"), ("privacy", "Your data stays yours"),
+            ("about", "About the data"))
+
+
+def _flat(html: str) -> str:
+    """The page's text with tags dropped and whitespace collapsed."""
+    return " ".join(re.sub(r"<[^>]+>", " ", html).split()).replace("&#39;", "'")
+
+
 def test_the_front_page_is_a_way_in_not_a_list(site: Path) -> None:
-    """V1-80, after MF Zone: a hero with search, the category cards and what a
-    fund page shows -- and small, now that the full list lives at /funds/."""
+    """V1-89: a hero with three equal doors, then one section per door, each named
+    by its door; the fund map is kept as "Understand funds"."""
     index = (site / "index.html").read_text(encoding="utf-8")
-    assert '<h1 class="home-hero__title">See what every fund owns' in index
-    assert 'data-index="/Repo/search.json"' in index
-    assert f'href="{BASE}/funds/"' in index and 'id="about"' in index
-    assert "<table data-sortable" not in index
-    # V1-81: a map of families and categories where "Recently viewed" was, each
-    # category with SEBI's rule, its count and a way to its funds.
-    assert "Recently viewed" not in index and 'class="fundmap"' in index
+    assert len(re.findall(r"<h1[\s>]", index)) == 1
+    assert re.search(r"<h1[^>]*>\s*See what every fund owns, and how it has done", index)
+    assert re.search(r'<a[^>]*href="#privacy"[^>]*>[^<]*Nothing you enter leaves your'
+                     r' browser', index)
+    hero = index[index.index('class="lp-hero"'):index.index('id="lookup"')]
+    assert hero.count('class="lp-door"') == 3
+    assert 'data-index="/Repo/search.json"' in hero
+    assert 'href="/Repo/learn/"' in hero and 'href="/Repo/portfolio/"' in hero
+    at = [index.index(f'id="{key}"') for key, _ in SECTIONS]
+    assert at == sorted(at)
+    for (key, eyebrow), here, after in zip(SECTIONS, at, [*at[1:], len(index)],
+                                           strict=True):
+        part = index[here:after]
+        assert eyebrow in part and "<h2" in part, key
+    assert "Chapter" not in index and "data-island" not in index
     assert "Flexi cap <span>2</span>" in index
     assert "At least 65% in shares, of any size, in any mix." in index
     assert f'href="{BASE}/funds/#category=equity/flexi_cap">See its 2 funds' in index
-    # The counts are the server's text from the first frame (V1-88).
-    assert re.search(r'<dd>2</dd>', index)
+    levels = [int(n) for n in re.findall(r"<h([1-6])[\s>]", index)]
+    assert all(b <= a + 1 for a, b in pairwise(levels)), levels
     assert len(index.encode("utf-8")) < 200_000
+
+
+def test_the_privacy_promise_is_word_for_word(site: Path) -> None:
+    text = _flat((site / "index.html").read_text(encoding="utf-8"))
+    for sentence in PRIVACY:
+        assert sentence in text, sentence
+
+
+def test_the_front_page_is_built_without_an_example_when_none_qualifies(
+    site: Path,
+) -> None:
+    """The fixture's funds have 300 days of prices, so none has a five-year return:
+    the page says so where the example would be, and the build still succeeds."""
+    index = (site / "index.html").read_text(encoding="utf-8")
+    assert "No example tonight" in index and 'class="lp-fund"' not in index
+
+
+def test_every_picture_says_what_it_shows(site: Path) -> None:
+    """On the fixture's page (no example) and on one with the example and the pair,
+    whose asset mix and range bars are the pictures that carry figures."""
+    pages = [(site / "index.html").read_text(encoding="utf-8"), _home(EXAMPLE, PAIR)]
+    for index in pages:
+        main = index[index.index('<main'):index.index('</main>')]
+        svgs = re.findall(r"<svg\b[^>]*>", main)
+        assert svgs
+        for tag in svgs:
+            labelled = 'role="img"' in tag and re.search(r'aria-label="[^"]+"', tag)
+            assert labelled or 'aria-hidden="true"' in tag, tag
+    assert 'class="lp-mix"' in pages[1] and 'class="lp-range__bar"' in pages[1]
+
+
+EXAMPLE = {
+    "scheme_id": DIRECT, "name": "Fund One Flexi Cap",
+    "detail": "Flexi Cap · Direct · Growth",
+    "category": "Flexi cap", "ter_label": "0.75%", "as_of_label": "31 Aug 2026",
+    "aggregator": False,
+    "mix": [{"label": "Shares", "pct_label": "92.0%", "x": "0.00", "width": "92.00"},
+            {"label": "Cash and equivalents", "pct_label": "8.0%", "x": "92.00",
+             "width": "8.00"}],
+    "top": [{"name": f"Company {n}", "weight_label": f"{9 - n}.0%",
+             "width": f"{9 - n}.00"} for n in range(1, 6)],
+    "ranges": [{"label": p, "low_label": "1.0%", "high_label": "20.0%",
+                "value_label": "12.0%", "pos": "57.89"}
+               for p in ("1 year", "3 years", "5 years")],
+}
+PAIR = {
+    "funds": [
+        {"scheme_id": DIRECT, "name": "Fund One Flexi Cap", "category": "Flexi cap",
+         "top": [{"name": "Company 1", "weight_label": "8.0%", "shared": True},
+                 {"name": "Company 2", "weight_label": "7.0%", "shared": False}]},
+        {"scheme_id": AGGREGATED, "name": "Fund Two Mid Cap", "category": "Mid cap",
+         "top": [{"name": "Company 1", "weight_label": "6.0%", "shared": True}]},
+    ],
+    "common": 2, "overlap_label": "11.0%",
+    "lead": {"name": "Company 1", "share_label": "7.0%"},
+}
+
+
+def _home(example: object, pair: object) -> str:
+    return templates(root=BASE, static=True).get_template("home.html").render({
+        "catalogue": [], "health": {}, "qs": "", "active": "", "built": TODAY,
+        "count": 2, "stats": {"houses": 1, "categories": 1, "prices_to": TODAY},
+        "fund_map": [], "example": example, "pair": pair})
+
+
+def test_the_example_and_pair_render() -> None:
+    page = _home(EXAMPLE, PAIR)
+    text = _flat(page)
+    assert f'href="{BASE}/fund/{DIRECT}/"' in page and 'class="lp-fund"' in page
+    assert "An example: the largest flexi cap fund by size." in text
+    assert "Fund One Flexi Cap within its category, Flexi cap" in text
+    for n in range(1, 6):
+        assert f"Company {n}" in text
+    for period in ("1 year", "3 years", "5 years"):
+        assert period in text
+    assert "2 companies in both" in text and "7.0%" in text
+    assert "of the two portfolios is the same" in text
+    assert 'width="57.89"' in page  # the fill runs to the fund's position
+    none = _flat(_home(EXAMPLE, {**PAIR, "common": 0, "lead": None}))
+    assert "No companies in both" in none and "0 companies" not in none
+    alone = _flat(_home(EXAMPLE, None))
+    assert "No example tonight" in alone
+
+
+def test_the_leader_tables_live_on_the_funds_page(site: Path) -> None:
+    """V1-89: the front page tells the story; each category's highest three-year
+    returns sit on /funds/, folded above the table. The fixture's funds have no
+    three-year figure, so there is no card and no fold; a rendered card checks the
+    fold itself."""
+    funds = (site / "funds" / "index.html").read_text(encoding="utf-8")
+    index = (site / "index.html").read_text(encoding="utf-8")
+    assert 'class="leader"' not in index and 'class="leader"' not in funds
+    assert "leaders-fold" not in funds
+    card = {"key": "equity/flexi_cap", "name": "Flexi cap", "count": 7, "funds": [{
+        "scheme_id": DIRECT, "name": "Fund One", "size_label": "₹1,000 Cr",
+        "size_value": "1000", "returns": [
+            {"label": "10.0%", "value": "0.1", "tone": "gain", "symbol": "▲"}] * 3}]}
+    engine = templates(root=BASE, static=True)
+    page = engine.get_template("explorer.html").render({
+        "catalogue": [], "health": {}, "qs": "", "active": "funds", "built": TODAY,
+        "categories": [], "category_options": [], "count": 0, "funds": [],
+        "families": [], "stats": {"houses": 0, "categories": 0, "prices_to": None},
+        "leaders": [card]})
+    fold = (r'<details class="leaders-fold">\s*<summary>Highest three-year returns'
+            r' in six categories</summary>')
+    assert re.search(fold, page)
+    assert 'class="leader"' in page and f"{BASE}/fund/{DIRECT}/" in page
+    assert "data-island" not in page
+    levels = [int(n) for n in re.findall(r"<h([1-6])[\s>]", page)]
+    assert all(b <= a + 1 for a, b in pairwise(levels)), levels
 
 
 def _leader_row(sid: str, key: str, three: str | None) -> dict[str, object]:
@@ -609,3 +750,74 @@ def test_row_errors_are_tied_to_their_fields() -> None:
     # Empty, it leaves the row's flex flow (a flex line's gap would remain) but
     # stays in the accessibility tree, as display: none would not.
     assert re.search(r"\.pf__error:empty\s*\{[^}]*position:\s*absolute", css)
+
+
+def test_the_islands_are_gone() -> None:
+    """V1-89 retired the React islands with the front page that used them: no bundle,
+    no build folder, no script tag, no styles, and one checksum per vendored file."""
+    repo = Path(__file__).resolve().parents[2]
+    static = repo / "src" / "m6_views" / "static"
+    assert not (repo / "ui").exists()
+    assert not (static / "vendor" / "islands.v1.js").exists()
+    assert not any("islands" in name for name in publish.STATIC_FILES)
+    sums = (static / "vendor" / "SHA256SUMS").read_text(encoding="utf-8")
+    assert "islands" not in sums
+    listed = re.findall(r"(?m)^[0-9a-f]{64}  (\S+)$", sums)
+    assert sorted(listed) == sorted(set(listed))
+    assert sorted(listed) == sorted(p.name for p in (static / "vendor").glob("*.js"))
+    templates_dir = repo / "src" / "m6_views" / "templates"
+    for page in templates_dir.rglob("*.html"):
+        text = page.read_text(encoding="utf-8")
+        assert "data-island" not in text and "islands.v1.js" not in text, page.name
+    css = (static / "app.css").read_text(encoding="utf-8")
+    for gone in ("aurora", "blur-text", "card-spotlight", "count-up"):
+        assert gone not in css, gone
+
+
+def test_a_public_search_is_never_sent_to_the_server(site: Path) -> None:
+    """V1-89 final review: "Nothing you enter leaves your browser". A form field with a
+    name is sent in the address (`/funds/?q=…`) and lands in the host's request log, so
+    the public search boxes have none; app.js carries a submitted search in the
+    fragment (`/funds/#q=…`), which browsers never send."""
+    for page in sorted(site.rglob("*.html")):
+        html = page.read_text(encoding="utf-8")
+        for tag in re.findall(r"<input\b[^>]*data-index=[^>]*>", html):
+            assert " name=" not in tag, (page.name, tag)
+    script = (Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
+              / "app.js").read_text(encoding="utf-8")
+    handler = script[script.index('addEventListener("submit"'):][:400]
+    assert "preventDefault" in handler and "searchTarget(" in handler
+
+
+def test_each_fallback_gives_its_real_reason() -> None:
+    """With no example fund the pair has none to start from; say so, and name every
+    condition the example must meet (V1-89 final review)."""
+    text = _flat(_home(None, None))
+    assert ("No example tonight: no flexi cap fund has holdings, five years of prices,"
+            " a cost figure and its category's ranges in this build.") in text
+    assert "No example tonight: there is no example fund above to pair with." in text
+    assert "no second equity fund" not in text
+    alone = _flat(_home(EXAMPLE, None))
+    no_pair = "No example tonight: no second equity fund with holdings in this build."
+    assert no_pair in alone
+
+
+def test_the_hero_reads_in_the_order_it_shows() -> None:
+    """On a phone the hero shows its words, then the doors, then the example; the
+    page's order is the same, so Tab and a screen reader follow what is seen."""
+    page = _home(EXAMPLE, PAIR)
+    hero = page[page.index('class="lp-hero"'):page.index('id="lookup"')]
+    assert hero.index('class="lp-hero__text"') < hero.index('class="lp-doors') \
+        < hero.index('class="lp-fund"')
+
+
+def test_the_example_card_says_what_its_list_is() -> None:
+    page = _home(EXAMPLE, PAIR)
+    assert 'aria-label="Its largest holdings"' in page and "five largest" not in page
+
+
+def test_the_pair_count_is_formatted() -> None:
+    text = _flat(_home(EXAMPLE, {**PAIR, "common": 1234}))
+    assert "1,234 companies in both" in text
+    one = _flat(_home(EXAMPLE, {**PAIR, "common": 1}))
+    assert "1 company in both" in one

@@ -45,8 +45,6 @@ def test_everything_that_moves_asks_one_attribute() -> None:
         text = (static / name).read_text(encoding="utf-8")
         assert "prefers-reduced-motion" not in text, name
         assert "data-motion" in text, name
-    islands = static.parents[2] / "ui" / "src" / "islands.jsx"
-    assert "prefers-reduced-motion" not in islands.read_text(encoding="utf-8")
 
 
 def _inexact(css: str) -> list[str]:
@@ -309,7 +307,7 @@ def test_the_hero_does_not_use_the_viewport_width() -> None:
     """100vw counts the scrollbar, so a hero sized with it is wider than the page."""
     css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
     for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
-        if ".home-hero" in sel:
+        if ".lp-hero" in sel:
             assert "vw" not in re.sub(r"clamp\([^)]*\)", "", body), sel.strip()
 
 
@@ -348,3 +346,150 @@ def test_the_glossary_index_links_are_24px_on_phones() -> None:
                      for m in re.finditer(r"(?m)^@media \(max-width: 720px\)", css))
     rule = re.search(r"\.learn__az a\s*\{([^}]*)\}", phone)
     assert rule and "min-height: 32px" in rule.group(1)
+
+
+def test_landing_names_wrap() -> None:
+    """A long fund or company name wraps inside its card on a phone (V1-89)."""
+    css = CSS.read_text(encoding="utf-8")
+    for sel in (r"\.lp-fund__name", r"\.lp-row__name"):
+        rule = re.search(sel + r"[^{]*\{([^}]*)\}", css)
+        assert rule and "overflow-wrap: anywhere" in rule.group(1), sel
+
+
+# --- the landing page's motion (V1-89) --------------------------------------------
+
+LANDING = (".lp-", "#categories .fundmap")
+TEXT_SELECTORS = ("h1", "h2", "h3", " p", "figcaption", ".lp-row__name", ".lp-fund__name",
+        ".fundmap__node", ".lp-text", ".lp-hero__text", ".lp-range__head")
+
+
+def _rules(css: str) -> list[tuple[list[str], str, str]]:
+    """Every rule as (its enclosing at-rule preludes, its selector, its body)."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    out: list[tuple[list[str], str, str]] = []
+    stack: list[str] = []
+    buf = ""
+    for ch in css:
+        if ch == "{":
+            stack.append(buf.strip())
+            buf = ""
+        elif ch == "}":
+            prelude = stack.pop() if stack else ""
+            if not prelude.startswith("@"):
+                out.append(([p for p in stack if p.startswith("@")], prelude, buf))
+            buf = ""
+        else:
+            buf += ch
+    return out
+
+
+def _landing(rules: list[tuple[list[str], str, str]]) -> list[tuple[list[str], str, str]]:
+    return [r for r in rules if any(k in r[1] for k in LANDING)
+            and not any(a.startswith("@keyframes") for a in r[0])]
+
+
+def test_landing_motion_is_guarded() -> None:
+    """Scroll-linked pictures exist only where the browser has scroll timelines; all
+    motion stops with the site's motion setting, or the device's reduced-motion
+    preference when the reader has not chosen (V1-83)."""
+    css = CSS.read_text(encoding="utf-8")
+    rules = _rules(css)
+    for ats, sel, body in rules:
+        if "animation-timeline" in body or "view-timeline" in body:
+            assert any("@supports (animation-timeline: view())" in a for a in ats), sel
+    animated = [sel for _, sel, body in _landing(rules)
+                if re.search(r"animation(-name)?\s*:\s*lp-", body)]
+    assert len(animated) >= 6, animated
+    off = r'\[data-motion="off"\] \*[^{]*\{[^}]*animation: none !important'
+    assert re.search(off, css)
+    reduce = re.search(r"@media \(prefers-reduced-motion: reduce\)\s*\{([^}]*)\{"
+                       r"[^}]*animation: none !important", css)
+    # `*` matches no ::before or ::after, and the fund map's lines are pseudo-elements.
+    assert reduce, "no reduced-motion stop rule"
+    for part in (":root:not([data-motion]) *", ":root:not([data-motion]) *::before",
+                 ":root:not([data-motion]) *::after"):
+        assert part in [x.strip() for x in reduce.group(1).split(",")], part
+
+
+def test_landing_motion_moves_marks_not_words() -> None:
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    frames = re.findall(r"@keyframes (lp-[\w-]+)\s*\{(.*?\})\s*\}", css, flags=re.S)
+    assert frames
+    for name, body in frames:
+        props = set(re.findall(r"([\w-]+)\s*:", body))
+        assert props <= {"transform", "opacity", "stroke-dashoffset", "clip-path"}, name
+    for _, sel, body in _landing(_rules(css)):
+        if "animation" in body:
+            parts = [s.strip() for s in sel.split(",")]
+            for part in parts:
+                assert not any(part.endswith(t.strip()) or t in f" {part}"
+                               for t in TEXT_SELECTORS), part
+
+
+def test_every_scroll_animation_finishes_by_half_way() -> None:
+    """Arriving by an anchor (/#about, #privacy) finds each picture complete."""
+    css = CSS.read_text(encoding="utf-8")
+    ranges = re.findall(r"animation-range\s*:\s*([^;]+);", css)
+    assert ranges
+    for value in ranges:
+        end = value.split()[-2:]
+        # "contain 100%" of a section taller than the screen ends late; "entry"
+        # always ends by the time the section has fully entered.
+        assert end[0] in ("cover", "entry"), value
+        if end[0] == "cover":
+            assert int(end[1].rstrip("%")) <= 50, value
+
+
+def test_no_mark_is_hidden_outside_an_animation() -> None:
+    """Without scroll timelines, or with motion off, every mark sits finished."""
+    hidden = re.compile(r"opacity:\s*0(?![.\d])|scale[XY]?\(0[\s,)]|"
+                        r"stroke-dashoffset:\s*(?!0\b)[\d.]+")
+    for _, sel, body in _landing(_rules(CSS.read_text(encoding="utf-8"))):
+        assert not hidden.search(body), sel
+
+
+def test_landing_phone_targets() -> None:
+    """On a phone every landing link is a 40px target, the pair's fund names
+    included (V1-89 browser pass: they measured 15px)."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    block = r"@media \(max-width: 720px\)\s*\{((?:[^{}]*\{[^{}]*\})*)"
+    phone = "".join(re.findall(block, css))
+    for sel in (".lp-door a", ".lp-links a", ".lp-pair__card h3 a"):
+        rules = [body for s, body in re.findall(r"([^{}]+)\{([^{}]*)\}", phone)
+                 if sel in [x.strip() for x in s.split(",")]]
+        assert any("min-height: 40px" in b for b in rules), sel
+
+
+def test_landing_paragraphs_are_prose() -> None:
+    """The spec's Visual section: display face for headings, prose face for paragraphs."""
+    css = CSS.read_text(encoding="utf-8")
+    rule = re.search(r"([^{}]+)\{\s*font-family: var\(--font-prose\);\s*\}", css)
+    assert rule
+    selectors = [x.strip() for x in rule.group(1).split(",")]
+    prose = (".lp-hero__lede", ".lp-text p", ".lp-how li", ".lp-pic__note", ".lp-none")
+    for sel in prose:
+        assert sel in selectors, sel
+
+
+def test_the_hero_needs_no_display_contents() -> None:
+    """The page's own order is the order shown (words, doors, example), so the hero
+    is laid out by grid areas, not by re-ordering flattened children."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
+        if ".lp-hero" in sel or ".lp-fund" in sel or ".lp-doors" in sel:
+            assert "display: contents" not in body, sel.strip()
+            assert not re.search(r"(?<![\w-])order\s*:", body), sel.strip()
+
+
+def test_the_leader_fold_looks_like_a_control() -> None:
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    looks = [b for b in re.findall(r"\.leaders-fold > summary\s*\{([^}]*)\}", css)
+             if "cursor: pointer" in b and "var(--accent)" in b]
+    assert looks
+    fold = re.search(r"(?m)^\.leaders-fold\s*\{([^}]*)\}", css)
+    assert fold and "margin" in fold.group(1)
+    block = r"@media \(max-width: 720px\)\s*\{((?:[^{}]*\{[^{}]*\})*)"
+    phone = "".join(re.findall(block, css))
+    rules = [b for s, b in re.findall(r"([^{}]+)\{([^{}]*)\}", phone)
+             if ".leaders-fold > summary" in [x.strip() for x in s.split(",")]]
+    assert any("min-height: 40px" in b for b in rules)
