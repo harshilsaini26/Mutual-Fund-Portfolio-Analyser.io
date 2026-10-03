@@ -1,0 +1,28 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-03
+# Data as of: 31 Aug 2026 (33 days old)
+# Coverage: — of portfolio value | Unresolved: 13.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 13.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-03T15:35:05.438876+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,30.751791
+TREPS / Repo / Reverse Repo,Cash and equivalents,23.820078
+Unresolved Holdings,Shares,13.100772
+Aurobindo Pharma Ltd.,Shares,10.068181
+INDUS TOWERS LIMITED,Shares,8.558354
+Adani Green Energy Limited,Shares,8.144664
+Samvardhana Motherson International Limited,Shares,4.788800
+Premier Energies Limited,Shares,4.760810
+Adani Enterprises Ltd.,Shares,4.748146
+Government Securities,Bonds and other debt,4.437244
+Lloyds Metals and Energy Limited,Shares,4.186830
+Tata Chemicals Ltd,Shares,3.862765
+Zydus Wellness Limited,Shares,3.616688
+LG Electronics India Limited,Shares,3.204693
+BROOKS LABORATORIES LIMITED,Shares,1.970630
+Net Receivables / Payables,Cash and equivalents,-30.020446

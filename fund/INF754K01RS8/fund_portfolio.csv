@@ -1,0 +1,67 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-03
+# Data as of: 31 Aug 2026 (33 days old)
+# Coverage: — of portfolio value | Unresolved: 49.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 49.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-03T15:32:18.538105+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,49.089338
+Margin / Deposits,Cash and equivalents,40.706544
+Physical Commodity,"REITs, InvITs and other",8.648416
+Net Receivables / Payables,Cash and equivalents,7.758137
+Government Securities,Bonds and other debt,6.359811
+HDFC Bank Ltd.,Shares,5.030130
+Cash & Bank Balance,Cash and equivalents,5.015484
+Steel Authority of India Ltd.,Shares,3.562042
+VODAFONE IDEA LIMITED,Shares,3.262983
+Bharti Airtel  Ltd.,Shares,1.625873
+Reliance Industries Ltd,Shares,1.238628
+Units of Other Schemes,Other funds,1.022795
+Grasim Industries Ltd,Shares,0.718992
+ICICI Bank Ltd.,Shares,0.544431
+Bharat Electronics Ltd.,Shares,0.379895
+COFORGE LIMITED,Shares,0.367149
+Hindalco Industries Ltd.,Shares,0.356160
+Yes Bank Ltd.,Shares,0.346142
+Hindustan Aeronautics Limited,Shares,0.341375
+BSE Ltd.,Shares,0.333338
+Ashok Leyland Ltd.,Shares,0.309209
+Adani Green Energy Limited,Shares,0.222107
+Container Corporation Of India Ltd.,Shares,0.214466
+Aurobindo Pharma Ltd.,Shares,0.198222
+Kalyan Jewellers India Limited,Shares,0.192280
+AXIS Bank Ltd.,Shares,0.176047
+Oil And Natural Gas Corporation Ltd,Shares,0.173040
+Tata Consultancy Services Ltd.,Shares,0.166317
+INDUS TOWERS LIMITED,Shares,0.165589
+HCL Technologies Ltd,Shares,0.163483
+Hindustan Zinc Ltd.,Shares,0.158046
+ITC Ltd,Shares,0.155182
+TVS Motor Company Ltd.,Shares,0.154325
+Glenmark Pharmaceuticals ltd,Shares,0.141684
+JSW Steel Limited,Shares,0.128501
+Hindustan Petroleum Corporation Ltd,Shares,0.120358
+Fortis Healthcare Ltd,Shares,0.116597
+UPL Limited,Shares,0.108330
+Adani Enterprises Ltd.,Shares,0.107676
+IndusInd Bank Ltd.,Shares,0.098776
+Jio Financial Services Limited,Shares,0.080646
+Prestige Estates Projects Limited,Shares,0.079610
+Coal India Limited,Shares,0.073449
+National Aluminium Co. Ltd.,Shares,0.067808
+Bank of India,Shares,0.056518
+Mahindra & Mahindra Ltd.,Shares,0.042224
+Bank Of Baroda,Shares,0.037803
+InterGlobe Aviation Limited,Shares,0.029237
+TATA CONSUMER PRODUCTS LIMITED,Shares,0.028977
+Hero MotoCorp Limited,Shares,0.024911
+Britannia Industries Ltd.,Shares,0.019995
+Max Financial Services Limited,Shares,0.010651
+JSW Energy Limited,Shares,0.007577
+Derivative Positions,Derivatives,-40.537304

@@ -1,0 +1,318 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'">
+  <meta name="referrer" content="no-referrer">
+  
+  <title>Risk and return</title>
+  <script src="/static/settings.js"></script>
+  <link rel="stylesheet" href="/static/lenis.css">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="is-public" data-root=""
+      >
+<a class="skip-link" href="#content">Skip to content</a>
+
+
+
+
+
+
+
+
+<header class="topbar topbar--public">
+  <a class="brand" href="/"><svg class="icon brand__mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="7.5"/><path d="M16 16l5 5"/><path d="M7.5 13.5v-2M10.5 13.5v-6M13.5 13.5v-4"/></svg><span>Look-through</span></a><button type="button" class="topmenu__summary" popovertarget="topnav">Menu</button>
+  <nav class="topnav" id="topnav" popover aria-label="Main">
+    <a class="topnav__link" href="/funds/"
+       >Explore funds</a>
+    <a class="topnav__link" href="/compare/"
+       >Compare</a>
+    <a class="topnav__link" href="/portfolio/"
+       >Your portfolio</a>
+    <a class="topnav__link" href="/learn/"
+       aria-current="page">Learn</a>
+    <a class="topnav__link" href="/#categories">Categories</a>
+    <a class="topnav__link" href="/#about">About the data</a>
+  </nav>
+  
+<form class="search" action="/funds/"
+      method="get" role="search">
+  <label class="sr-only" for="q">Find a fund</label>
+  <svg class="icon search__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg>
+  <input id="q" type="search" autocomplete="off" spellcheck="false"
+         placeholder="Find a fund by name"
+         data-index="/search.json">
+  <ul class="search__suggest" hidden data-lenis-prevent></ul>
+</form>
+  <button class="icon-button" type="button" data-settings-open aria-haspopup="dialog"
+        aria-controls="settings" aria-label="Settings" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
+</header><div class="public-note">
+  <p>Descriptive, not advice. Built 03 Oct 2026 from AMFI and fund houses'
+  disclosures · <a href="/#about">About this data</a></p>
+</div>
+<main id="content" tabindex="-1" class="content content--public">
+
+<article class="plain learn learn--guide">
+  <p class="eyebrow"><a href="/learn/">Learn</a> · Risk and return</p>
+  <h1>Risk and return</h1>
+  <p class="lede">What returns, volatility, falls and the Sharpe ratio measure, and why a past return is not a forecast.</p>
+  <p class="learn__note" role="note">This explains how things work. It is not advice about what to buy, sell or hold.</p>
+  
+  <h2>Return over a period</h2>
+  <p>A return over several years is easiest to compare as an <a href="/learn/glossary/#annualised_return">Annualised return</a>: the steady yearly rate that would have produced the same result. A single figure depends on its start and end dates, so this site also shows <a href="/learn/glossary/#rolling_returns">Rolling returns</a>, the return of every stretch of the same length, which shows the range a buyer could have met.</p>
+  
+  <h2>How bumpy the way was</h2>
+  <p><a href="/learn/glossary/#volatility">Volatility</a> measures how widely returns swung around their average. Two funds can end at the same place, one rising steadily and the other lurching up and down; volatility tells them apart. It describes swings in both directions, not only losses.</p>
+  
+  <h2>How far it fell</h2>
+  <p>The <a href="/learn/glossary/#max_drawdown">Deepest fall (maximum drawdown)</a> is the largest drop from a high to a later low: the worst loss someone who bought at a peak would have seen before the fund recovered. This site also shows how long each recovery took, because a fall that takes years to make good is a different experience from one that reverses in weeks.</p>
+  
+  <h2>Return for the risk taken</h2>
+  <p>The <a href="/learn/glossary/#sharpe">Sharpe ratio</a> divides the return above a risk-free rate by the volatility, giving the return earned per unit of swing. It treats every swing as risk, and only the swings that happened, so it can miss a risk that shows up rarely and suddenly, such as a default by a borrower a debt fund has lent to.</p>
+  
+  <h2>What the past does not say</h2>
+  <p>Every figure here describes what happened. None of them says what will happen: markets change, managers change and funds grow. A fund&#39;s riskometer, a SEBI label with six levels from low to very high, describes the kind of risk the scheme is built to take, which is a separate thing from how it has done.</p>
+  
+  <h2>Sources</h2>
+  <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/mutual-fund-risk-metrics/" rel="noopener">zerodha.com/varsity/chapter/mutual-fund-risk-metrics/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/know-your-fund/" rel="noopener">zerodha.com/varsity/chapter/know-your-fund/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/rolling-returns/" rel="noopener">zerodha.com/varsity/chapter/rolling-returns/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/measuring-mutual-fund-returns/" rel="noopener">zerodha.com/varsity/chapter/measuring-mutual-fund-returns/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+  <p class="learn__more"><a href="/learn/">All guides</a> ·
+    <a href="/learn/glossary/">Glossary</a></p>
+</article>
+
+</main>
+<footer class="colophon">
+  <p>
+    
+    Built from public sources; every figure traces to an archived source file.
+    No cookies, no tracking, and nothing loads from anywhere but this site.
+    <a class="topbar__link" href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">
+      <span>The self-hosted app, with benchmarks and your own ledger</span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 4h6v6M20 4l-9 9M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a>
+    
+  </p>
+</footer>
+
+
+<dialog id="settings" class="settings" aria-labelledby="settings-h" data-lenis-prevent>
+  <div class="settings__head">
+    <h2 id="settings-h">Settings</h2>
+    <button type="button" class="icon-button" data-settings-close
+            aria-label="Close settings"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  
+  <fieldset class="settings__group" data-setting="theme">
+    <legend>Theme</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="device">
+        
+        <span>Device</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="light">
+        
+        <span>Light</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="dark">
+        
+        <span>Dark</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="matrix">
+        
+        <span>Matrix</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="font">
+    <legend>Font</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="terminess">
+        
+        <span>Terminess</span>
+        <span class="settings__sample settings__sample--terminess" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="rubik">
+        
+        <span>Rubik</span>
+        <span class="settings__sample settings__sample--rubik" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="atkinson">
+        
+        <span>Atkinson Hyperlegible</span>
+        <span class="settings__sample settings__sample--atkinson" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="size">
+    <legend>Text size</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="small">
+        
+        <span>Small</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="standard">
+        
+        <span>Standard</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="large">
+        
+        <span>Large</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="density">
+    <legend>Density</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-density" value="comfortable">
+        
+        <span>Comfortable</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-density" value="compact">
+        
+        <span>Compact</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="motion">
+    <legend>Motion</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="device">
+        
+        <span>Device</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="on">
+        
+        <span>On</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="off">
+        
+        <span>Off</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="accent">
+    <legend>Accent</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="navy">
+        <span class="settings__swatch settings__swatch--navy" aria-hidden="true"></span>
+        <span>Navy</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="violet">
+        <span class="settings__swatch settings__swatch--violet" aria-hidden="true"></span>
+        <span>Violet</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="raspberry">
+        <span class="settings__swatch settings__swatch--raspberry" aria-hidden="true"></span>
+        <span>Raspberry</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="graphite">
+        <span class="settings__swatch settings__swatch--graphite" aria-hidden="true"></span>
+        <span>Graphite</span>
+        
+      </label>
+      
+    </div>
+    <p class="settings__hint" data-matrix-note hidden>Matrix is green by design.</p>
+  </fieldset>
+  
+  <p class="settings__note" data-settings-note hidden>This browser is not keeping site data,
+    so these settings apply to this page only; another page opens with the defaults.</p>
+  <button type="button" class="settings__reset" data-settings-reset>Reset to defaults</button>
+</dialog><script src="/static/vendor/lenis.v1.3.26.min.js" defer></script>
+<script src="/static/app.js" defer></script>
+
+</body>
+</html>

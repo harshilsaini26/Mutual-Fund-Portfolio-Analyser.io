@@ -1,0 +1,311 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'">
+  <meta name="referrer" content="no-referrer">
+  
+  <title>Compare funds</title>
+  <script src="/static/settings.js"></script>
+  <link rel="stylesheet" href="/static/lenis.css">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="is-public" data-root=""
+      >
+<a class="skip-link" href="#content">Skip to content</a>
+
+
+
+
+
+
+
+
+<header class="topbar topbar--public">
+  <a class="brand" href="/"><svg class="icon brand__mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="7.5"/><path d="M16 16l5 5"/><path d="M7.5 13.5v-2M10.5 13.5v-6M13.5 13.5v-4"/></svg><span>Look-through</span></a><button type="button" class="topmenu__summary" popovertarget="topnav">Menu</button>
+  <nav class="topnav" id="topnav" popover aria-label="Main">
+    <a class="topnav__link" href="/funds/"
+       >Explore funds</a>
+    <a class="topnav__link" href="/compare/"
+       aria-current="page">Compare</a>
+    <a class="topnav__link" href="/portfolio/"
+       >Your portfolio</a>
+    <a class="topnav__link" href="/learn/"
+       >Learn</a>
+    <a class="topnav__link" href="/#categories">Categories</a>
+    <a class="topnav__link" href="/#about">About the data</a>
+  </nav>
+  
+<form class="search" action="/funds/"
+      method="get" role="search">
+  <label class="sr-only" for="q">Find a fund</label>
+  <svg class="icon search__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg>
+  <input id="q" type="search" autocomplete="off" spellcheck="false"
+         placeholder="Find a fund by name"
+         data-index="/search.json">
+  <ul class="search__suggest" hidden data-lenis-prevent></ul>
+</form>
+  <button class="icon-button" type="button" data-settings-open aria-haspopup="dialog"
+        aria-controls="settings" aria-label="Settings" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
+</header><div class="public-note">
+  <p>Descriptive, not advice. Built 03 Oct 2026 from AMFI and fund houses'
+  disclosures · <a href="/#about">About this data</a></p>
+</div>
+<main id="content" tabindex="-1" class="content content--public">
+
+<section class="plain cmp" data-compare data-root="">
+  <p class="eyebrow">Compare</p>
+  <h1>Compare funds</h1>
+  <p class="lede">
+    Up to four funds side by side: their figures, what ₹10,000 became in each, how
+    much of their portfolios is the same companies, and what they hold.
+  </p>
+  <noscript><p class="cmp__note">This page compares funds in your browser, so it needs JavaScript.</p></noscript>
+
+  <div class="card cmp__entry">
+    <label class="cmp__label" for="cmp-pick">Add a fund to compare</label>
+    <input id="cmp-pick" class="cmp__pick" list="cmp-funds" autocomplete="off"
+           placeholder="Type part of a fund's name" disabled>
+    <datalist id="cmp-funds"></datalist>
+    <p class="cmp__status" id="cmp-status" role="status"></p>
+    <div data-out="suggest"></div>
+  </div><span id="t-amc-cmp" popover class="term-pop" data-title="Fund house (AMC)"><span class="term-pop__title">Fund house (AMC)</span><span class="term-pop__text">The asset management company that invests a fund&#39;s money. In India a mutual fund is set up as a trust: a sponsor establishes it, trustees oversee it for the unitholders, the AMC manages the investments and a custodian holds the securities. The fund, its AMC and its custodian are each registered with or approved by SEBI.</span><span class="term-pop__more"><a href="/learn/glossary/#amc">More in the glossary</a> · SEBI</span></span><span id="t-sebi_categories-cmp" popover class="term-pop" data-title="SEBI fund categories"><span class="term-pop__title">SEBI fund categories</span><span class="term-pop__text">SEBI&#39;s 2017 rules sort every open-ended scheme into five groups (equity, debt, hybrid, solution-oriented and other) and into defined categories within them, such as large cap, mid cap or liquid. Each category fixes what a fund must mostly hold, and a fund house may offer one scheme per category, with a few exceptions.</span><span class="term-pop__more"><a href="/learn/glossary/#sebi_categories">More in the glossary</a> · SEBI</span></span><span id="t-aum-cmp" popover class="term-pop" data-title="Fund size (AUM)"><span class="term-pop__title">Fund size (AUM)</span><span class="term-pop__text">Assets under management: the total value of the money a fund manages. AMFI publishes each scheme&#39;s average for every quarter, and that average is the fund size this site shows. Size says how much money a fund runs, not how it has done.</span><span class="term-pop__more"><a href="/learn/glossary/#aum">More in the glossary</a> · AMFI, Zerodha Varsity</span></span><span id="t-expense_ratio-cmp" popover class="term-pop" data-title="Expense ratio (TER)"><span class="term-pop__title">Expense ratio (TER)</span><span class="term-pop__text">The total expense ratio: a fund&#39;s yearly running cost, as a share of its assets. It covers management, administration, distribution and similar costs. It is not billed separately; a small part is taken from the fund&#39;s assets each day, so the published NAV is already net of it. SEBI sets the most a fund may charge.</span><span class="term-pop__more"><a href="/learn/glossary/#expense_ratio">More in the glossary</a> · SEBI, AMFI, Zerodha Varsity</span></span><span id="t-benchmark-cmp" popover class="term-pop" data-title="Benchmark and Total Return Index"><span class="term-pop__title">Benchmark and Total Return Index</span><span class="term-pop__text">The index a fund names as its yardstick, chosen to match what it invests in. Since 2018 SEBI has required funds to measure themselves against the Total Return Index (TRI) version, which counts the dividends the index&#39;s companies pay as well as their price changes, as a fund&#39;s own return does.</span><span class="term-pop__more"><a href="/learn/glossary/#benchmark">More in the glossary</a> · SEBI, Zerodha Varsity</span></span><span id="t-annualised_return-cmp" popover class="term-pop" data-title="Annualised return"><span class="term-pop__title">Annualised return</span><span class="term-pop__text">The steady yearly rate, compounding, that would take an investment from its starting value to its ending value. ₹10,000 that became ₹15,000 in three years returned about 14.5% a year. Annualising lets periods of different lengths be set side by side.</span><span class="term-pop__more"><a href="/learn/glossary/#annualised_return">More in the glossary</a> · Zerodha Varsity</span></span><span id="t-volatility-cmp" popover class="term-pop" data-title="Volatility"><span class="term-pop__title">Volatility</span><span class="term-pop__text">How much a fund&#39;s returns swing up and down: the standard deviation of its returns, stated as a yearly percentage. A higher figure means larger swings in both directions. Two funds with the same return can differ widely in how bumpy the way there was. This site measures it from daily prices over each period it shows.</span><span class="term-pop__more"><a href="/learn/glossary/#volatility">More in the glossary</a> · Zerodha Varsity</span></span><span id="t-max_drawdown-cmp" popover class="term-pop" data-title="Deepest fall (maximum drawdown)"><span class="term-pop__title">Deepest fall (maximum drawdown)</span><span class="term-pop__text">The largest drop in a fund&#39;s NAV from a high to a later low. A NAV that rose to ₹200 and fell to ₹160 had a 20% drawdown: the worst loss a buyer at the peak would have seen. This site also shows how long the fund took to climb back, or that it has not yet.</span><span class="term-pop__more"><a href="/learn/glossary/#max_drawdown">More in the glossary</a> · Zerodha Varsity</span></span><span id="t-sharpe-cmp" popover class="term-pop" data-title="Sharpe ratio"><span class="term-pop__title">Sharpe ratio</span><span class="term-pop__text">Return per unit of risk: the fund&#39;s return above a risk-free rate, divided by its volatility. A higher figure means more return per unit of swing. It sees only the swings that happened, so it can miss rare, sudden risks such as a borrower&#39;s default in a debt fund. Its risk-free rate here is the 91-day Treasury bill yield.</span><span class="term-pop__more"><a href="/learn/glossary/#sharpe">More in the glossary</a> · Zerodha Varsity</span></span><span id="t-category_rank-cmp" popover class="term-pop" data-title="Rank in category"><span class="term-pop__title">Rank in category</span><span class="term-pop__text">Where a fund stands among the funds of its category on one measure, such as &#34;10th of 37&#34; on three-year return. Quartiles split the category into four equal groups, the first holding the top quarter. Ranks compare funds with the same mandate; a rank describes the past, not what comes next.</span><span class="term-pop__more"><a href="/learn/glossary/#category_rank">More in the glossary</a> · Zerodha Varsity, SEBI</span></span>
+  <section class="home-section" aria-labelledby="cmp-facts-h">
+    <div class="section-head"><h2 id="cmp-facts-h">Key facts and returns</h2></div>
+    <div data-out="facts"></div>
+  </section>
+  <section class="home-section" aria-labelledby="cmp-growth-h">
+    <div class="section-head"><h2 id="cmp-growth-h">What ₹10,000 became</h2></div>
+    <div data-out="growth"></div>
+  </section>
+  <section class="home-section" aria-labelledby="cmp-overlap-h">
+    <div class="section-head"><h2 id="cmp-overlap-h">How much of their portfolios is the same</h2><button type="button" class="term" popovertarget="t-overlap-cmp" data-key="overlap"
+        aria-label="What is Portfolio overlap?">?</button><span id="t-overlap-cmp" popover class="term-pop" data-title="Portfolio overlap"><span class="term-pop__title">Portfolio overlap</span><span class="term-pop__text">How much of two funds&#39; portfolios is the same companies. For each company both hold, the smaller of its two weights is counted, and the counts are added: 100% means identical portfolios, 0% nothing in common. Funds with a high overlap tend to rise and fall together.</span><span class="term-pop__more"><a href="/learn/glossary/#overlap">More in the glossary</a> · Zerodha Varsity</span></span></div>
+    <div data-out="overlap"></div>
+  </section>
+  <section class="home-section" aria-labelledby="cmp-mix-h">
+    <div class="section-head"><h2 id="cmp-mix-h">Asset mix and sectors</h2></div>
+    <div data-out="mix"></div>
+  </section>
+</section>
+
+</main>
+<footer class="colophon">
+  <p>
+    
+    Built from public sources; every figure traces to an archived source file.
+    No cookies, no tracking, and nothing loads from anywhere but this site.
+    <a class="topbar__link" href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">
+      <span>The self-hosted app, with benchmarks and your own ledger</span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 4h6v6M20 4l-9 9M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a>
+    
+  </p>
+</footer>
+
+
+<dialog id="settings" class="settings" aria-labelledby="settings-h" data-lenis-prevent>
+  <div class="settings__head">
+    <h2 id="settings-h">Settings</h2>
+    <button type="button" class="icon-button" data-settings-close
+            aria-label="Close settings"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  
+  <fieldset class="settings__group" data-setting="theme">
+    <legend>Theme</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="device">
+        
+        <span>Device</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="light">
+        
+        <span>Light</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="dark">
+        
+        <span>Dark</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="matrix">
+        
+        <span>Matrix</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="font">
+    <legend>Font</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="terminess">
+        
+        <span>Terminess</span>
+        <span class="settings__sample settings__sample--terminess" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="rubik">
+        
+        <span>Rubik</span>
+        <span class="settings__sample settings__sample--rubik" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="atkinson">
+        
+        <span>Atkinson Hyperlegible</span>
+        <span class="settings__sample settings__sample--atkinson" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="size">
+    <legend>Text size</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="small">
+        
+        <span>Small</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="standard">
+        
+        <span>Standard</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="large">
+        
+        <span>Large</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="density">
+    <legend>Density</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-density" value="comfortable">
+        
+        <span>Comfortable</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-density" value="compact">
+        
+        <span>Compact</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="motion">
+    <legend>Motion</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="device">
+        
+        <span>Device</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="on">
+        
+        <span>On</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="off">
+        
+        <span>Off</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="accent">
+    <legend>Accent</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="navy">
+        <span class="settings__swatch settings__swatch--navy" aria-hidden="true"></span>
+        <span>Navy</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="violet">
+        <span class="settings__swatch settings__swatch--violet" aria-hidden="true"></span>
+        <span>Violet</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="raspberry">
+        <span class="settings__swatch settings__swatch--raspberry" aria-hidden="true"></span>
+        <span>Raspberry</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="graphite">
+        <span class="settings__swatch settings__swatch--graphite" aria-hidden="true"></span>
+        <span>Graphite</span>
+        
+      </label>
+      
+    </div>
+    <p class="settings__hint" data-matrix-note hidden>Matrix is green by design.</p>
+  </fieldset>
+  
+  <p class="settings__note" data-settings-note hidden>This browser is not keeping site data,
+    so these settings apply to this page only; another page opens with the defaults.</p>
+  <button type="button" class="settings__reset" data-settings-reset>Reset to defaults</button>
+</dialog><script src="/static/vendor/lenis.v1.3.26.min.js" defer></script>
+<script src="/static/app.js" defer></script>
+
+<script src="/static/portfolio-math.js" defer></script>
+<script src="/static/kit.js" defer></script>
+<script src="/static/vendor/echarts.v6.1.0.min.js" defer></script>
+<script src="/static/charts.js" defer></script>
+<script src="/static/compare.js" defer></script>
+
+</body>
+</html>

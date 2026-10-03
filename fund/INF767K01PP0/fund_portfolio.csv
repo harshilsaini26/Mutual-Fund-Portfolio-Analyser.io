@@ -1,0 +1,49 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-03
+# Data as of: 31 Aug 2026 (33 days old)
+# Coverage: — of portfolio value | Unresolved: 6.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 6.0% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-03T15:34:01.754015+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,68.453526
+Units of Other Schemes,Other funds,28.204065
+HDFC Bank Ltd.,Shares,8.648813
+Hindalco Industries Ltd.,Shares,7.059610
+State Bank Of India,Shares,6.870295
+ICICI Bank Ltd.,Shares,6.137315
+Unresolved Holdings,Shares,5.952288
+Bharti Airtel  Ltd.,Shares,5.023190
+Reliance Industries Ltd,Shares,5.003133
+TATA STEEL LIMITED,Shares,4.855189
+TREPS / Repo / Reverse Repo,Cash and equivalents,3.625978
+Bharat Electronics Ltd.,Shares,3.618368
+AXIS Bank Ltd.,Shares,3.353565
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,2.813835
+Jio Financial Services Limited,Shares,2.487281
+Hindustan Unilever Ltd.,Shares,1.199029
+Punjab National Bank,Shares,0.795633
+Bank Of Baroda,Shares,0.607608
+Container Corporation Of India Ltd.,Shares,0.557111
+INDUS TOWERS LIMITED,Shares,0.404943
+JSW Steel Limited,Shares,0.370021
+Oil And Natural Gas Corporation Ltd,Shares,0.353188
+Eicher Motors Ltd.,Shares,0.333422
+Tata Power Co. Ltd,Shares,0.275831
+Larsen & Toubro Limited,Shares,0.228268
+Bharat Heavy Electricals Ltd.,Shares,0.224818
+Net Receivables / Payables,Cash and equivalents,0.181157
+Hindustan Petroleum Corporation Ltd,Shares,0.167195
+Sun Pharmaceutical Industries Ltd.,Shares,0.156811
+Crompton Greaves Consumer Electricals Limited,Shares,0.130821
+Gail (India) Ltd.,Shares,0.101607
+Max Financial Services Limited,Shares,0.081163
+ITC Ltd,Shares,0.071070
+POWER GRID CORPORATION OF INDIA LIMITED,Shares,0.064588
+Asian Paints Ltd.,Shares,0.042790
+Derivative Positions,Derivatives,-68.453525

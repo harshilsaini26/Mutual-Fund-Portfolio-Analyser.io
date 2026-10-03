@@ -1,0 +1,32 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-03
+# Data as of: 31 Aug 2026 (33 days old)
+# Coverage: — of portfolio value | Unresolved: 8.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 8.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-03T15:35:08.237730+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,26.051097
+TREPS / Repo / Reverse Repo,Cash and equivalents,21.267606
+Aurobindo Pharma Ltd.,Shares,9.729352
+Lloyds Metals and Energy Limited,Shares,9.003490
+Unresolved Holdings,Shares,8.715539
+Samvardhana Motherson International Limited,Shares,8.140700
+Adani Enterprises Ltd.,Shares,6.441402
+Adani Green Energy Limited,Shares,5.691749
+Adani Power Limited,Shares,5.156813
+Bharat Heavy Electricals Ltd.,Shares,4.591372
+Premier Energies Limited,Shares,3.586106
+Government Securities,Bonds and other debt,3.420142
+Sona BLW Precision Forgings Limited,Shares,3.130068
+Tata Communications Limited,Shares,2.928191
+Zydus Lifesciences Limited,Shares,2.295649
+JSW Infrastructure Limited,Shares,1.716931
+LIFE INSURANCE CORPORATION OF INDIA,Shares,1.185307
+3M India Ltd.,Shares,1.165614
+Procter & Gamble Hygiene & Health Care Ltd.,Shares,0.315819
+Net Receivables / Payables,Cash and equivalents,-24.532947

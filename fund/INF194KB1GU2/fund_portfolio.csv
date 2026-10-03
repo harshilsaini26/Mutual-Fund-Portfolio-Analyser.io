@@ -1,0 +1,66 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-03
+# Data as of: 31 Aug 2026 (33 days old)
+# Coverage: — of portfolio value | Unresolved: 11.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 11.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-03T15:31:38.365052+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,21.306400
+Unresolved Holdings,Shares,11.912334
+Margin / Deposits,Cash and equivalents,9.988305
+TREPS / Repo / Reverse Repo,Cash and equivalents,6.030228
+Bharti Airtel  Ltd.,Shares,5.447587
+Reliance Industries Ltd,Shares,5.076735
+ICICI Bank Ltd.,Shares,4.796603
+HDFC Bank Ltd.,Shares,4.093113
+Larsen & Toubro Limited,Shares,3.810507
+HITACHI ENERGY INDIA LIMITED,Shares,2.752714
+State Bank Of India,Shares,2.156382
+AXIS Bank Ltd.,Shares,1.929858
+Maruti Suzuki India  Ltd.,Shares,1.787620
+Info Edge(India) Ltd.,Shares,1.688543
+Infosys Ltd,Shares,1.632847
+Hindalco Industries Ltd.,Shares,1.573521
+ITC Ltd,Shares,1.404782
+Tata Consultancy Services Ltd.,Shares,1.319176
+Hero MotoCorp Limited,Shares,1.257047
+Max Financial Services Limited,Shares,1.254737
+Bajaj Finance Limited,Shares,1.162313
+Cholamandalam Investment and Finance Company Ltd,Shares,1.149722
+NHPC Limited,Shares,1.089847
+Vishnu Chemicals Limited,Shares,1.078686
+Berger Paints India Ltd,Shares,0.957836
+Coal India Limited,Shares,0.952558
+Cipla Ltd.,Shares,0.861178
+United Spirits Limited,Shares,0.819227
+CG Power and Industrial Solutions Limited,Shares,0.805812
+Star Health and Allied Insurance Company Limited,Shares,0.780410
+Lupin Ltd,Shares,0.755284
+Exide Industries Ltd.,Shares,0.726198
+Adani Ports and Special Economic Zone Ltd,Shares,0.613156
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,0.597486
+Jindal Stainless Limited,Shares,0.576703
+InterGlobe Aviation Limited,Shares,0.532113
+Colgate-Palmolive (India) Ltd.,Shares,0.521666
+Sonata Software Ltd.,Shares,0.481750
+Dabur India Ltd.,Shares,0.460857
+UNO Minda Limited,Shares,0.420940
+Varun Beverages Limited,Shares,0.403456
+Emami Ltd,Shares,0.380253
+Dhanuka Agritech Ltd.,Shares,0.373876
+Sobha Limited,Shares,0.339182
+Mankind Pharma Limited,Shares,0.320543
+Wipro  Ltd.,Shares,0.315760
+Jubilant Ingrevia Limited,Shares,0.282331
+Neogen Chemicals Limited,Shares,0.199474
+Zee Entertainment Enterprises Ltd.,Shares,0.133441
+Gail (India) Ltd.,Shares,0.084452
+Net Receivables / Payables,Cash and equivalents,0.040741
+Cash & Bank Balance,Cash and equivalents,0.002199
+Derivative Positions,Derivatives,-9.438489

@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-03
+# Data as of: 03 Oct 2026 (0 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - Benchmark comparisons are left out of this public copy: the index data is licensed for personal use. The self-hosted app shows them.
+#   - Average maturity and yield to maturity are not shown: fund houses publish them in their monthly factsheets, which this site does not load yet.
+# Generated: 2026-10-03T15:33:14.560098+00:00
+measure,1y,3y,5y,meaning
+Return a year,0.064612,0.069278,0.063588,"Annualised, with dividends reinvested."
+Benchmark a year,,,,"The benchmark over the same days, dividends included."
+Ahead of benchmark,,,,The fund's return a year less the benchmark's.
+Volatility,0.001840,0.001613,0.001594,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.000064,-0.000064,-0.000438,The largest fall from a high within the period.
+Sharpe ratio,5.288587,0.390577,18.255960,Return above cash for each unit of volatility.
+Sortino ratio,128.039474,13.404255,176.363636,Return above cash for each unit of downward swings only.
+Treynor ratio,,,,Return above cash for each unit of beta.
+Alpha a year,,,,Return beyond what its beta to the benchmark accounts for.
+Beta,,,,How far it moved for each 1% the benchmark moved.
+Tracking error,,,,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,,,,Its lead over the benchmark for each unit of tracking error.
+Up capture,,,,"Its gain on the days the benchmark rose, as a share of the benchmark's."
+Down capture,,,,"Its loss on the days the benchmark fell, as a share of the benchmark's."

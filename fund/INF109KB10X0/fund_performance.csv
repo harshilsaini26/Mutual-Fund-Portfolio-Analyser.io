@@ -1,0 +1,24 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-03
+# Data as of: 01 Oct 2026 (2 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+# Generated: 2026-10-03T15:33:04.927949+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.104781,0.041157,0.051106,"Annualised, with dividends reinvested."
+Benchmark a year,-0.105107,0.040907,0.051207,"The benchmark over the same days, dividends included."
+Ahead of benchmark,0.000326,0.000250,-0.000101,The fund's return a year less the benchmark's.
+Volatility,0.135686,0.132764,0.138442,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.160871,-0.160871,-0.162274,The largest fall from a high within the period.
+Sharpe ratio,-1.176702,-0.207067,0.120036,Return above cash for each unit of volatility.
+Sortino ratio,-1.589420,-0.293009,0.168973,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.159830,-0.027520,0.016647,Return above cash for each unit of beta.
+Alpha a year,0.000158,0.000221,-0.000072,Return beyond what its beta to the benchmark accounts for.
+Beta,0.998950,0.998938,0.998256,How far it moved for each 1% the benchmark moved.
+Tracking error,0.000326,0.000290,0.000572,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,1.000000,0.862069,-0.176573,Its lead over the benchmark for each unit of tracking error.
+Up capture,0.999326,0.998968,0.994983,"Its gain on the days the benchmark rose, as a share of the benchmark's."
+Down capture,0.999452,0.999786,0.999899,"Its loss on the days the benchmark fell, as a share of the benchmark's."

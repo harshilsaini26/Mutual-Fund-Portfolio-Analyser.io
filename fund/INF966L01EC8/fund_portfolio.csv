@@ -1,0 +1,35 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-03
+# Data as of: 31 Aug 2026 (33 days old)
+# Coverage: — of portfolio value | Unresolved: 12.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 12.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-03T15:35:06.319432+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,42.532289
+TREPS / Repo / Reverse Repo,Cash and equivalents,15.752844
+Unresolved Holdings,Shares,12.903710
+Units of Other Schemes,Other funds,9.766060
+INDUS TOWERS LIMITED,Shares,8.212460
+Gujarat Themis Biosyn Ltd.,Shares,7.065640
+Info Edge(India) Ltd.,Shares,5.323287
+Reliance Industries Ltd,Shares,4.655752
+JSW Infrastructure Limited,Shares,4.164017
+Bajaj Finance Limited,Shares,4.001003
+LIFE INSURANCE CORPORATION OF INDIA,Shares,3.682712
+Fortis Healthcare Ltd,Shares,3.310757
+Bandhan Bank Limited,Shares,3.267690
+Bharti Airtel  Ltd.,Shares,2.895735
+Kalyan Jewellers India Limited,Shares,2.866295
+REC LIMITED,Shares,2.741132
+Samvardhana Motherson International Limited,Shares,2.295660
+Infosys Ltd,Shares,1.602218
+Canara Bank,Shares,1.585059
+Glenmark Pharmaceuticals ltd,Shares,1.039322
+Net Receivables / Payables,Cash and equivalents,0.210792
+Derivative Positions,Derivatives,-39.874434

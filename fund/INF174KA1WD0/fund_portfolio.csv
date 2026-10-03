@@ -1,0 +1,23 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-03
+# Data as of: 31 Aug 2026 (33 days old)
+# Coverage: — of portfolio value | Unresolved: 10.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 10.4% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-03T15:33:58.879207+00:00
+holding,kind,weight_pct
+Tata Consultancy Services Ltd.,Shares,11.468646
+Infosys Ltd,Shares,10.817903
+ICICI Bank Ltd.,Shares,10.671271
+Unresolved Holdings,Shares,10.415171
+Reliance Industries Ltd,Shares,9.800328
+Larsen & Toubro Limited,Shares,9.751535
+Bharti Airtel  Ltd.,Shares,9.730045
+AXIS Bank Ltd.,Shares,9.466108
+HDFC Bank Ltd.,Shares,9.011043
+ITC Ltd,Shares,8.871237
+Net Receivables / Payables,Cash and equivalents,-0.003287

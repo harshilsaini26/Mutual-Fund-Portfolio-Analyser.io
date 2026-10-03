@@ -1,0 +1,812 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'">
+  <meta name="referrer" content="no-referrer">
+  
+  <title>Glossary</title>
+  <script src="/static/settings.js"></script>
+  <link rel="stylesheet" href="/static/lenis.css">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="is-public" data-root=""
+      >
+<a class="skip-link" href="#content">Skip to content</a>
+
+
+
+
+
+
+
+
+<header class="topbar topbar--public">
+  <a class="brand" href="/"><svg class="icon brand__mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="7.5"/><path d="M16 16l5 5"/><path d="M7.5 13.5v-2M10.5 13.5v-6M13.5 13.5v-4"/></svg><span>Look-through</span></a><button type="button" class="topmenu__summary" popovertarget="topnav">Menu</button>
+  <nav class="topnav" id="topnav" popover aria-label="Main">
+    <a class="topnav__link" href="/funds/"
+       >Explore funds</a>
+    <a class="topnav__link" href="/compare/"
+       >Compare</a>
+    <a class="topnav__link" href="/portfolio/"
+       >Your portfolio</a>
+    <a class="topnav__link" href="/learn/"
+       aria-current="page">Learn</a>
+    <a class="topnav__link" href="/#categories">Categories</a>
+    <a class="topnav__link" href="/#about">About the data</a>
+  </nav>
+  
+<form class="search" action="/funds/"
+      method="get" role="search">
+  <label class="sr-only" for="q">Find a fund</label>
+  <svg class="icon search__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg>
+  <input id="q" type="search" autocomplete="off" spellcheck="false"
+         placeholder="Find a fund by name"
+         data-index="/search.json">
+  <ul class="search__suggest" hidden data-lenis-prevent></ul>
+</form>
+  <button class="icon-button" type="button" data-settings-open aria-haspopup="dialog"
+        aria-controls="settings" aria-label="Settings" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
+</header><div class="public-note">
+  <p>Descriptive, not advice. Built 03 Oct 2026 from AMFI and fund houses'
+  disclosures · <a href="/#about">About this data</a></p>
+</div>
+<main id="content" tabindex="-1" class="content content--public">
+
+
+<section class="plain learn learn--glossary">
+  <p class="eyebrow"><a href="/learn/">Learn</a></p>
+  <h1>Glossary</h1>
+  <p class="lede">Every term this site uses, in a few plain sentences, with the pages
+    each was checked against.</p>
+  <p class="learn__note" role="note">This explains how things work. It is not advice about what to buy, sell or hold.</p>
+  <nav class="learn__az" aria-label="Terms">
+    <a href="#annualised_return">Annualised return</a><a href="#asset_mix">Asset mix</a><a href="#benchmark">Benchmark and Total Return Index</a><a href="#max_drawdown">Deepest fall (maximum drawdown)</a><a href="#direct_plan">Direct plan</a><a href="#expense_ratio">Expense ratio (TER)</a><a href="#amc">Fund house (AMC)</a><a href="#aum">Fund size (AUM)</a><a href="#growth_idcw">Growth and IDCW options</a><a href="#index_fund">Index fund</a><a href="#market_cap">Large, mid and small cap</a><a href="#look_through">Look-through</a><a href="#lump_sum">Lump sum</a><a href="#nav">NAV (net asset value)</a><a href="#portfolio_disclosure">Portfolio disclosure</a><a href="#overlap">Portfolio overlap</a><a href="#category_rank">Rank in category</a><a href="#regular_plan">Regular plan</a><a href="#rolling_returns">Rolling returns</a><a href="#sebi_categories">SEBI fund categories</a><a href="#sectors">Sectors</a><a href="#sharpe">Sharpe ratio</a><a href="#sip">SIP (systematic investment plan)</a><a href="#units">Units</a><a href="#volatility">Volatility</a><a href="#xirr">XIRR</a>
+  </nav>
+  <dl class="learn__terms">
+    
+    <div class="learn__term" id="annualised_return">
+      <dt>Annualised return</dt>
+      <dd>
+        <p>The steady yearly rate, compounding, that would take an investment from its starting value to its ending value. ₹10,000 that became ₹15,000 in three years returned about 14.5% a year. Annualising lets periods of different lengths be set side by side.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#xirr">XIRR</a>, <a href="#rolling_returns">Rolling returns</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/measuring-mutual-fund-returns/" rel="noopener">zerodha.com/varsity/chapter/measuring-mutual-fund-returns/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="asset_mix">
+      <dt>Asset mix</dt>
+      <dd>
+        <p>How a fund&#39;s money is split across kinds of assets: shares, bonds and other debt, cash and its equivalents, and sometimes gold or units of other funds. Shares respond mostly to company earnings, debt to interest rates and credit, so the mix shapes how a fund behaves.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#sectors">Sectors</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/asset-allocation-an-introduction/" rel="noopener">zerodha.com/varsity/chapter/asset-allocation-an-introduction/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="benchmark">
+      <dt>Benchmark and Total Return Index</dt>
+      <dd>
+        <p>The index a fund names as its yardstick, chosen to match what it invests in. Since 2018 SEBI has required funds to measure themselves against the Total Return Index (TRI) version, which counts the dividends the index&#39;s companies pay as well as their price changes, as a fund&#39;s own return does.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#index_fund">Index fund</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/attachdocs/jan-2018/1515066187290.pdf" rel="noopener">www.sebi.gov.in/sebi_data/attachdocs/jan-2018/1515066187290.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/mutual-benchmarking/" rel="noopener">zerodha.com/varsity/chapter/mutual-benchmarking/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="max_drawdown">
+      <dt>Deepest fall (maximum drawdown)</dt>
+      <dd>
+        <p>The largest drop in a fund&#39;s NAV from a high to a later low. A NAV that rose to ₹200 and fell to ₹160 had a 20% drawdown: the worst loss a buyer at the peak would have seen. This site also shows how long the fund took to climb back, or that it has not yet.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#volatility">Volatility</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/know-your-fund/" rel="noopener">zerodha.com/varsity/chapter/know-your-fund/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="direct_plan">
+      <dt>Direct plan</dt>
+      <dd>
+        <p>A plan bought from the fund house with no distributor; since 1 January 2013 SEBI has required one beside every Regular plan. It holds the same portfolio, under the same manager, but pays no distribution commission, so its expense ratio is lower and its NAV, kept separately, grows a little faster.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#regular_plan">Regular plan</a>, <a href="#expense_ratio">Expense ratio (TER)</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">AMFI</span>
+    <a href="https://www.amfiindia.com/investor/knowledge-center-info?zoneName=DirectPlan" rel="noopener">www.amfiindia.com/investor/knowledge-center-info?zoneName=DirectPlan</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="expense_ratio">
+      <dt>Expense ratio (TER)</dt>
+      <dd>
+        <p>The total expense ratio: a fund&#39;s yearly running cost, as a share of its assets. It covers management, administration, distribution and similar costs. It is not billed separately; a small part is taken from the fund&#39;s assets each day, so the published NAV is already net of it. SEBI sets the most a fund may charge.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#direct_plan">Direct plan</a>, <a href="#regular_plan">Regular plan</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">AMFI</span>
+    <a href="https://www.amfiindia.com/investor/knowledge-center-info?zoneName=expenseRatio" rel="noopener">www.amfiindia.com/investor/knowledge-center-info?zoneName=expenseRatio</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/mutual-fund-expense-ratio-direct-and-regular-plans/" rel="noopener">zerodha.com/varsity/chapter/mutual-fund-expense-ratio-direct-and-regular-plans/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="amc">
+      <dt>Fund house (AMC)</dt>
+      <dd>
+        <p>The asset management company that invests a fund&#39;s money. In India a mutual fund is set up as a trust: a sponsor establishes it, trustees oversee it for the unitholders, the AMC manages the investments and a custodian holds the securities. The fund, its AMC and its custodian are each registered with or approved by SEBI.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#units">Units</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="aum">
+      <dt>Fund size (AUM)</dt>
+      <dd>
+        <p>Assets under management: the total value of the money a fund manages. AMFI publishes each scheme&#39;s average for every quarter, and that average is the fund size this site shows. Size says how much money a fund runs, not how it has done.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#amc">Fund house (AMC)</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">AMFI</span>
+    <a href="https://www.amfiindia.com/aum-data/average-aum" rel="noopener">www.amfiindia.com/aum-data/average-aum</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/how-to-analyse-an-equity-mutual-fund/" rel="noopener">zerodha.com/varsity/chapter/how-to-analyse-an-equity-mutual-fund/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="growth_idcw">
+      <dt>Growth and IDCW options</dt>
+      <dd>
+        <p>Two ways a plan can handle what it earns. Under Growth the fund keeps it, and the gain shows as a rising NAV. Under IDCW, which SEBI renamed from &#34;dividend&#34; in April 2021, the fund pays part out, and the NAV falls by the amount paid. A payout can include some of the investor&#39;s own capital.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#nav">NAV (net asset value)</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">AMFI</span>
+    <a href="https://www.mutualfundssahihai.com/en/idcw-plans-simplifying-income-and-capital-distributions-mutual-funds" rel="noopener">www.mutualfundssahihai.com/en/idcw-plans-simplifying-income-and-capital-distributions-mutual-funds</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="index_fund">
+      <dt>Index fund</dt>
+      <dd>
+        <p>A fund that holds the shares of an index, such as the Nifty 50, in the same proportions, aiming to match the index rather than beat it. No one picks stocks, so its costs are usually lower than an active fund&#39;s. Tracking error measures how closely it follows the index. This site uses one as a stand-in benchmark.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#benchmark">Benchmark and Total Return Index</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/introduction-to-index-funds/" rel="noopener">zerodha.com/varsity/chapter/introduction-to-index-funds/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="market_cap">
+      <dt>Large, mid and small cap</dt>
+      <dd>
+        <p>Size bands for listed companies, set by SEBI: large cap is the 1st to 100th company by full market value, mid cap the 101st to 250th, and small cap the 251st onwards. AMFI publishes the list every six months, from data at the end of June and December.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#sebi_categories">SEBI fund categories</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/attachdocs/oct-2017/1509103633344.pdf" rel="noopener">www.sebi.gov.in/sebi_data/attachdocs/oct-2017/1509103633344.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/the-equity-scheme-part-1/" rel="noopener">zerodha.com/varsity/chapter/the-equity-scheme-part-1/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="look_through">
+      <dt>Look-through</dt>
+      <dd>
+        <p>Seeing past funds to the companies inside them. Each fund&#39;s holdings are weighted by the money in that fund and added up, so a company held by several funds shows its total. It describes what is owned in the end, which a list of funds alone does not.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#overlap">Portfolio overlap</a>, <a href="#portfolio_disclosure">Portfolio disclosure</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/the-mutual-fund-portfolio/" rel="noopener">zerodha.com/varsity/chapter/the-mutual-fund-portfolio/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="lump_sum">
+      <dt>Lump sum</dt>
+      <dd>
+        <p>Money put into a fund in one go, as a single purchase, rather than in instalments. The units are priced at the NAV of the day the purchase counts for. A lump sum and a SIP can both be used in either plan, Direct or Regular.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#sip">SIP (systematic investment plan)</a>, <a href="#units">Units</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="nav">
+      <dt>NAV (net asset value)</dt>
+      <dd>
+        <p>The price of one unit of a fund: the value of everything the fund holds, less what it owes, divided by the number of units in issue. It changes every business day as the prices of the holdings move, and every fund publishes it daily, on its own website and AMFI&#39;s.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#units">Units</a>, <a href="#direct_plan">Direct plan</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">AMFI</span>
+    <a href="https://www.amfiindia.com/investor/knowledge-center-info?zoneName=NetAssetValueNAV" rel="noopener">www.amfiindia.com/investor/knowledge-center-info?zoneName=NetAssetValueNAV</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="portfolio_disclosure">
+      <dt>Portfolio disclosure</dt>
+      <dd>
+        <p>The list of everything a fund holds, with each holding&#39;s quantity, value and share of the fund. Funds publish it every month, within ten days of month end, on their own website and AMFI&#39;s; debt schemes also publish every fortnight. This site reads these lists, or an aggregator&#39;s copy where marked.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#look_through">Look-through</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="overlap">
+      <dt>Portfolio overlap</dt>
+      <dd>
+        <p>How much of two funds&#39; portfolios is the same companies. For each company both hold, the smaller of its two weights is counted, and the counts are added: 100% means identical portfolios, 0% nothing in common. Funds with a high overlap tend to rise and fall together.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#look_through">Look-through</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/the-mutual-fund-portfolio/" rel="noopener">zerodha.com/varsity/chapter/the-mutual-fund-portfolio/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="category_rank">
+      <dt>Rank in category</dt>
+      <dd>
+        <p>Where a fund stands among the funds of its category on one measure, such as &#34;10th of 37&#34; on three-year return. Quartiles split the category into four equal groups, the first holding the top quarter. Ranks compare funds with the same mandate; a rank describes the past, not what comes next.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#sebi_categories">SEBI fund categories</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/know-your-fund/" rel="noopener">zerodha.com/varsity/chapter/know-your-fund/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="regular_plan">
+      <dt>Regular plan</dt>
+      <dd>
+        <p>A plan bought through a distributor, such as an agent, broker or bank. It holds the same portfolio as the scheme&#39;s Direct plan, but its expense ratio is higher because it includes the commission the fund house pays the distributor. Its NAV is kept separately and is lower than the Direct plan&#39;s.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#direct_plan">Direct plan</a>, <a href="#expense_ratio">Expense ratio (TER)</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">AMFI</span>
+    <a href="https://www.mutualfundssahihai.com/en/what-direct-plan-regular-plan" rel="noopener">www.mutualfundssahihai.com/en/what-direct-plan-regular-plan</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">AMFI</span>
+    <a href="https://www.amfiindia.com/investor/knowledge-center-info?zoneName=DirectPlan" rel="noopener">www.amfiindia.com/investor/knowledge-center-info?zoneName=DirectPlan</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="rolling_returns">
+      <dt>Rolling returns</dt>
+      <dd>
+        <p>Returns over every window of one length in a fund&#39;s history, such as every three-year stretch, each starting a little after the last (a week apart on this site). A single figure depends on the dates chosen; rolling returns show the whole range: the best, the worst and how often each kind of result happened.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#annualised_return">Annualised return</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/rolling-returns/" rel="noopener">zerodha.com/varsity/chapter/rolling-returns/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="sebi_categories">
+      <dt>SEBI fund categories</dt>
+      <dd>
+        <p>SEBI&#39;s 2017 rules sort every open-ended scheme into five groups (equity, debt, hybrid, solution-oriented and other) and into defined categories within them, such as large cap, mid cap or liquid. Each category fixes what a fund must mostly hold, and a fund house may offer one scheme per category, with a few exceptions.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#market_cap">Large, mid and small cap</a>, <a href="#category_rank">Rank in category</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/attachdocs/oct-2017/1509103633344.pdf" rel="noopener">www.sebi.gov.in/sebi_data/attachdocs/oct-2017/1509103633344.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="sectors">
+      <dt>Sectors</dt>
+      <dd>
+        <p>The industries the companies in a fund belong to, such as banking, information technology or energy, each shown as a share of the fund&#39;s shares. A sectoral fund stays within one industry; a diversified fund spreads across many, so one industry&#39;s fortunes move it less.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#asset_mix">Asset mix</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="sharpe">
+      <dt>Sharpe ratio</dt>
+      <dd>
+        <p>Return per unit of risk: the fund&#39;s return above a risk-free rate, divided by its volatility. A higher figure means more return per unit of swing. It sees only the swings that happened, so it can miss rare, sudden risks such as a borrower&#39;s default in a debt fund. Its risk-free rate here is the 91-day Treasury bill yield.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#volatility">Volatility</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/mutual-fund-risk-metrics/" rel="noopener">zerodha.com/varsity/chapter/mutual-fund-risk-metrics/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="sip">
+      <dt>SIP (systematic investment plan)</dt>
+      <dd>
+        <p>A fixed amount put into a fund at regular intervals, often each month. Each instalment buys units at that day&#39;s NAV, so the same amount buys more units when the NAV is lower and fewer when it is higher, which averages the cost of a unit over time.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#lump_sum">Lump sum</a>, <a href="#xirr">XIRR</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="units">
+      <dt>Units</dt>
+      <dd>
+        <p>What an investor owns in a mutual fund. Money put in buys units at the day&#39;s NAV, so ₹10,000 at a NAV of ₹50 buys 200 units. Every unit shares equally in the fund&#39;s gains and losses, and units are sold back to the fund at the NAV of the day the request counts for.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#nav">NAV (net asset value)</a>, <a href="#amc">Fund house (AMC)</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">SEBI</span>
+    <a href="https://www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf" rel="noopener">www.sebi.gov.in/sebi_data/faqfiles/sep-2024/1727242783639.pdf</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">AMFI</span>
+    <a href="https://www.amfiindia.com/investor/knowledge-center-info?zoneName=NetAssetValueNAV" rel="noopener">www.amfiindia.com/investor/knowledge-center-info?zoneName=NetAssetValueNAV</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="volatility">
+      <dt>Volatility</dt>
+      <dd>
+        <p>How much a fund&#39;s returns swing up and down: the standard deviation of its returns, stated as a yearly percentage. A higher figure means larger swings in both directions. Two funds with the same return can differ widely in how bumpy the way there was. This site measures it from daily prices over each period it shows.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#sharpe">Sharpe ratio</a>, <a href="#max_drawdown">Deepest fall (maximum drawdown)</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/mutual-fund-risk-metrics/" rel="noopener">zerodha.com/varsity/chapter/mutual-fund-risk-metrics/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/know-your-fund/" rel="noopener">zerodha.com/varsity/chapter/know-your-fund/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+    <div class="learn__term" id="xirr">
+      <dt>XIRR</dt>
+      <dd>
+        <p>A yearly return for money that went in on different dates and in different amounts, such as a SIP. Each amount is counted from its own date. For one purchase held more than a year it equals the annualised return; over less than a year it can look extreme, because a short gain is scaled up to a year.</p>
+        
+        <p class="learn__related">Related:
+          <a href="#annualised_return">Annualised return</a>, <a href="#sip">SIP (systematic investment plan)</a></p>
+        
+        <ul class="learn__sources">
+  
+  <li><span class="learn__source">Zerodha Varsity</span>
+    <a href="https://zerodha.com/varsity/chapter/measuring-mutual-fund-returns/" rel="noopener">zerodha.com/varsity/chapter/measuring-mutual-fund-returns/</a>
+    <span class="learn__checked">checked 02 Oct 2026</span></li>
+  
+</ul>
+      </dd>
+    </div>
+    
+  </dl>
+</section>
+
+</main>
+<footer class="colophon">
+  <p>
+    
+    Built from public sources; every figure traces to an archived source file.
+    No cookies, no tracking, and nothing loads from anywhere but this site.
+    <a class="topbar__link" href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">
+      <span>The self-hosted app, with benchmarks and your own ledger</span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 4h6v6M20 4l-9 9M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a>
+    
+  </p>
+</footer>
+
+
+<dialog id="settings" class="settings" aria-labelledby="settings-h" data-lenis-prevent>
+  <div class="settings__head">
+    <h2 id="settings-h">Settings</h2>
+    <button type="button" class="icon-button" data-settings-close
+            aria-label="Close settings"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  
+  <fieldset class="settings__group" data-setting="theme">
+    <legend>Theme</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="device">
+        
+        <span>Device</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="light">
+        
+        <span>Light</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="dark">
+        
+        <span>Dark</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="matrix">
+        
+        <span>Matrix</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="font">
+    <legend>Font</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="terminess">
+        
+        <span>Terminess</span>
+        <span class="settings__sample settings__sample--terminess" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="rubik">
+        
+        <span>Rubik</span>
+        <span class="settings__sample settings__sample--rubik" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="atkinson">
+        
+        <span>Atkinson Hyperlegible</span>
+        <span class="settings__sample settings__sample--atkinson" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="size">
+    <legend>Text size</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="small">
+        
+        <span>Small</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="standard">
+        
+        <span>Standard</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="large">
+        
+        <span>Large</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="density">
+    <legend>Density</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-density" value="comfortable">
+        
+        <span>Comfortable</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-density" value="compact">
+        
+        <span>Compact</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="motion">
+    <legend>Motion</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="device">
+        
+        <span>Device</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="on">
+        
+        <span>On</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="off">
+        
+        <span>Off</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="accent">
+    <legend>Accent</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="navy">
+        <span class="settings__swatch settings__swatch--navy" aria-hidden="true"></span>
+        <span>Navy</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="violet">
+        <span class="settings__swatch settings__swatch--violet" aria-hidden="true"></span>
+        <span>Violet</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="raspberry">
+        <span class="settings__swatch settings__swatch--raspberry" aria-hidden="true"></span>
+        <span>Raspberry</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="graphite">
+        <span class="settings__swatch settings__swatch--graphite" aria-hidden="true"></span>
+        <span>Graphite</span>
+        
+      </label>
+      
+    </div>
+    <p class="settings__hint" data-matrix-note hidden>Matrix is green by design.</p>
+  </fieldset>
+  
+  <p class="settings__note" data-settings-note hidden>This browser is not keeping site data,
+    so these settings apply to this page only; another page opens with the defaults.</p>
+  <button type="button" class="settings__reset" data-settings-reset>Reset to defaults</button>
+</dialog><script src="/static/vendor/lenis.v1.3.26.min.js" defer></script>
+<script src="/static/app.js" defer></script>
+
+</body>
+</html>

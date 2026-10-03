@@ -1,0 +1,52 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-03
+# Data as of: 31 Aug 2026 (33 days old)
+# Coverage: — of portfolio value | Unresolved: 11.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 11.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-03T15:32:52.135382+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,35.439078
+Margin / Deposits,Cash and equivalents,17.813802
+Unresolved Holdings,Bonds and other debt,11.690709
+TREPS / Repo / Reverse Repo,Cash and equivalents,9.851101
+ICICI Bank Ltd.,Shares,8.465228
+Larsen & Toubro Limited,Shares,7.794535
+Reliance Industries Ltd,Shares,5.802953
+Net Receivables / Payables,Cash and equivalents,3.023008
+HDFC Bank Ltd.,Shares,2.122030
+State Bank Of India,Shares,1.412454
+AXIS Bank Ltd.,Shares,1.154837
+Bharti Airtel  Ltd.,Shares,0.990495
+Maruti Suzuki India  Ltd.,Shares,0.925715
+Tata Consultancy Services Ltd.,Shares,0.819798
+Infosys Ltd,Shares,0.774766
+ICICI Lombard General Insurance Company Limited,Shares,0.642404
+City Union Bank Ltd,Shares,0.626482
+SBI Life Insurance Company Limited,Shares,0.594707
+Transport Corporation of India Ltd,Shares,0.593135
+POWER GRID CORPORATION OF INDIA LIMITED,Shares,0.540313
+Dr. Lal Pathlabs Limited,Shares,0.528765
+Vishal Mega Mart Limited,Shares,0.453598
+Lupin Ltd,Shares,0.448610
+ITC Ltd,Shares,0.436515
+Lumax Industries Ltd.,Shares,0.425991
+Vesuvius India Ltd.,Shares,0.417928
+Suprajit Engineering Ltd.,Shares,0.412871
+Vedant Fashions Limited,Shares,0.409865
+United Spirits Limited,Shares,0.407268
+Balkrishna Industries Ltd.,Shares,0.389365
+Alkem Laboratories Limited,Shares,0.364218
+Gujarat Pipavav Port Limited,Shares,0.343513
+Zensar Technologies Ltd.,Shares,0.314608
+Bayer CropScience Limited.,Shares,0.298481
+VOLTAMP TRANSFORMERS LIMITED,Shares,0.298139
+HUHTAMAKI INDIA LIMITED,Shares,0.269508
+TCPL Packaging Limited,Shares,0.267048
+Hindustan Petroleum Corporation Ltd,Shares,0.249964
+Derivative Positions,Derivatives,-17.813805
