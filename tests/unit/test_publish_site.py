@@ -821,3 +821,42 @@ def test_the_pair_count_is_formatted() -> None:
     assert "1,234 companies in both" in text
     one = _flat(_home(EXAMPLE, {**PAIR, "common": 1}))
     assert "1 company in both" in one
+
+
+def test_push_publishes_and_leaves_nothing_writing_into_its_repository(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """V1-90: a 400 MB commit is far past git's loose-object threshold, so `git
+    commit` started `gc --auto` detached, still writing into `.git` while the
+    temporary directory was removed ("Directory not empty: '.git'"): the push
+    had gone through and the build failed anyway. Automatic packing and
+    maintenance are off in the throwaway repository before it commits."""
+    import subprocess
+
+    remote = tmp_path / "remote.git"
+    subprocess.run(["git", "init", "-q", "--bare", str(remote)], check=True)
+    site = tmp_path / "site"
+    (site / "fund").mkdir(parents=True)
+    (site / "index.html").write_text("<!doctype html><title>x</title>", encoding="utf-8")
+    (site / "fund" / "a.json").write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("SITE_PUSH_URL", str(remote))
+
+    calls: list[tuple[str, ...]] = []
+    real = publish._git
+
+    def spy(*args: str, cwd: Path | None = None) -> str:
+        calls.append(args)
+        if args[:1] == ("config",) and args[1] in ("user.name", "user.email"):
+            return "Test"  # the runner's identity; not every machine has one set
+        return real(*args) if cwd is None else real(*args, cwd=cwd)
+
+    monkeypatch.setattr(publish, "_git", spy)
+    publish.push(site)
+
+    shown = subprocess.run(["git", "--git-dir", str(remote), "show", "--stat",
+                            "gh-pages"], capture_output=True, text=True, check=True)
+    assert "index.html" in shown.stdout and "fund/a.json" in shown.stdout
+    commit = next(i for i, a in enumerate(calls) if "commit" in a)
+    before = calls[:commit]
+    assert ("config", "gc.auto", "0") in before
+    assert ("config", "maintenance.auto", "false") in before

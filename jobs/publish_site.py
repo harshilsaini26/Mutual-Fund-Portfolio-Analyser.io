@@ -685,6 +685,12 @@ def push(out: Path) -> None:
         work = Path(tmp)
         shutil.copytree(out, work, dirs_exist_ok=True)
         _git("init", "-q", "-b", "gh-pages", cwd=work)
+        # No automatic packing (V1-90). A commit this size is far past git's
+        # loose-object threshold, so it started `gc --auto` detached, still
+        # writing into `.git` as the directory was removed: the push had gone
+        # through and the build failed on "Directory not empty".
+        _git("config", "gc.auto", "0", cwd=work)
+        _git("config", "maintenance.auto", "false", cwd=work)
         _git("add", "-A", cwd=work)
         _git(*[a for pair in author for a in ("-c", pair)], "commit", "-q", "-m",
              f"Public fund explorer, built {date.today().isoformat()}", cwd=work)
