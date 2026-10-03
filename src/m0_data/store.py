@@ -193,11 +193,20 @@ FETCHED = NAV_DIR / "fetched.csv"
 
 
 def save_fetched(conn: sqlite3.Connection, root: Path) -> int:
-    """Each mfapi URL and the last day it was fetched ('S6:<code>' in raw_file)."""
-    rows = conn.execute(
-        "SELECT source_id, url, max(CAST(fetched_at AS TEXT)) FROM raw_file"
-        " WHERE source_id LIKE 'S6:%' GROUP BY source_id ORDER BY source_id"
-    ).fetchall()
+    """Each mfapi URL and the last day it was fetched ('S6:<code>' in raw_file).
+
+    The latest is chosen by time, not by text: a restored row keeps the CSV's
+    spelling and a new one the adapter's, and the two need not sort alike."""
+    latest: dict[str, tuple[datetime, str, str]] = {}
+    for source_id, url, at in conn.execute(
+        "SELECT source_id, url, CAST(fetched_at AS TEXT) FROM raw_file"
+        " WHERE source_id LIKE 'S6:%'"
+    ):
+        when = datetime.fromisoformat(at)
+        when = when if when.tzinfo else when.replace(tzinfo=UTC)
+        if source_id not in latest or when > latest[source_id][0]:
+            latest[source_id] = (when, url, at)
+    rows = [(s, url, at) for s, (_, url, at) in sorted(latest.items())]
     (root / FETCHED).parent.mkdir(parents=True, exist_ok=True)
     with (root / FETCHED).open("w", encoding="utf-8", newline="") as fh:
         out = csv.writer(fh, lineterminator="\n")

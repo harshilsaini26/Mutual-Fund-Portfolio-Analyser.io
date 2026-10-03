@@ -1,4 +1,4 @@
-"""Build the public fund explorer: a static copy of the fund pages for GitHub Pages.
+"""Build the public fund explorer: a static copy of the fund pages, served by Vercel.
 
     python -m jobs.publish_site                  # build into site/; nothing leaves
     python -m jobs.publish_site --base ""        # a copy to preview locally
@@ -81,7 +81,9 @@ from src.m6_views.states import empty_envelope, error_envelope
 from jobs.fetch_groww import declared_benchmarks
 from jobs.landing import landing_candidate, landing_example, landing_pair
 
-#: GitHub Pages publishes at most 1 GB. The build stops well short of it.
+#: The build's own ceiling. Vercel's Hobby plan states no limit on a static
+#: deployment's output (V1-92), but every byte is pushed to gh-pages and deployed
+#: each night; past this the page profile needs lightening, not the ceiling raising.
 SITE_BUDGET_BYTES = 900 * 1024 * 1024
 #: About a year of trading days: below this a fund page is mostly empty panels.
 MIN_PRICES = 250
@@ -97,7 +99,8 @@ STATIC_FILES = (
     "fonts/atkinson-hyperlegible-latin-700-normal.woff2",
 )
 #: A file only this job writes, so a rebuild can tell its own output from a
-#: directory it must not delete.
+#: directory it must not delete. Named for GitHub Pages, which served the site
+#: until V1-92; it means nothing to Vercel and is kept only as this marker.
 MARKER = ".nojekyll"
 #: How Vercel serves the site (V1-92): it deploys the gh-pages branch as it is,
 #: with no build. Pages are linked as folders (/fund/<id>/), so a path without its
@@ -128,7 +131,7 @@ LEADERS_PER_CARD = 5
 
 
 class SiteTooLarge(RuntimeError):
-    """The site would not fit GitHub Pages; publishing it would fail there."""
+    """The site has outgrown the build's ceiling (`SITE_BUDGET_BYTES`)."""
 
 
 #: The id a proxied benchmark carries: never an index id, so nothing can take
@@ -649,8 +652,9 @@ def build_site(
 def check_budget(size: int, budget: int = SITE_BUDGET_BYTES) -> None:
     if size > budget:
         raise SiteTooLarge(
-            f"the site is {size / 1e6:,.0f} MB and GitHub Pages allows 1 GB; "
-            f"the build stops at {budget / 1e6:,.0f} MB. A lighter page profile "
+            f"the site is {size / 1e6:,.0f} MB and the build stops at"
+            f" {budget / 1e6:,.0f} MB, its own ceiling for a nightly push and"
+            f" deploy (V1-92). A lighter page profile "
             f"is the fix (DECISIONS V1-72)."
         )
 
@@ -668,12 +672,6 @@ def _git(*args: str, cwd: Path = REPO_ROOT) -> str:
             f"git {args[0]} exited {done.returncode}: {done.stderr.strip()[-600:]}"
         )
     return done.stdout.strip()
-
-
-def default_base() -> str:
-    """`/<repository name>`: where GitHub Pages serves a project site."""
-    remote = _git("remote", "get-url", "origin")
-    return "/" + remote.rstrip("/").rsplit("/", 1)[-1].removesuffix(".git")
 
 
 def push(out: Path) -> None:
@@ -714,12 +712,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--out", type=Path, default=REPO_ROOT / "site")
-    parser.add_argument("--base", help="URL prefix; default /<repository name>")
+    parser.add_argument("--base", default="",
+                        help="URL prefix; default none: Vercel serves the site from"
+                        " its address's root (V1-92)")
     parser.add_argument("--push", action="store_true",
                         help="publish to the gh-pages branch after building")
     args = parser.parse_args()
 
-    base = default_base() if args.base is None else args.base.rstrip("/")
+    base = args.base.rstrip("/")
     warehouse = connect(str(warehouse_path()))
     # The public copy reads; it never writes. SQLite enforces it from here on.
     warehouse.execute("PRAGMA query_only = ON")
@@ -729,8 +729,7 @@ def main() -> None:
     print(f"{summary['funds']:,} fund pages, {summary['bytes'] / 1e6:,.1f} MB")
     if args.push:
         push(args.out)
-        print("published to gh-pages. GitHub serves it once Pages is set to "
-              "deploy from that branch (Settings -> Pages).")
+        print("published to gh-pages, which Vercel deploys (README section 6).")
     else:
         print("not published: add --push to publish it.")
     sys.exit(0)

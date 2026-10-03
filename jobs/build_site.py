@@ -169,7 +169,9 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=REPO_ROOT / "site")
     parser.add_argument("--store", type=Path,
                         help="a previous build of the site, whose data/ to start from")
-    parser.add_argument("--base", help="URL prefix; default /<repository name>")
+    parser.add_argument("--base", default="",
+                        help="URL prefix; default none: Vercel serves the site from"
+                        " its address's root (V1-92)")
     parser.add_argument("--push", action="store_true",
                         help="publish to the gh-pages branch after building")
     parser.add_argument("--groww-pages", type=int, default=GROWW_PAGES_A_DAY,
@@ -184,7 +186,7 @@ def main() -> None:
             "MF_CONTACT_EMAIL (in GitHub: Settings -> Secrets and variables -> "
             "Actions -> Variables)."
         )
-    base = publish_site.default_base() if args.base is None else args.base.rstrip("/")
+    base = args.base.rstrip("/")
     store_root = args.store if args.store and args.store.is_dir() else None
     if args.store and store_root is None:
         print(f"no previous site at {args.store}: every fund's history is fetched")

@@ -904,3 +904,30 @@ def test_vercel_deploys_the_built_site_and_never_the_source() -> None:
     assert config["git"]["deploymentEnabled"] == {"main": False}
     workflow = (repo / ".github" / "workflows" / "site.yml").read_text(encoding="utf-8")
     assert re.search(r'python -m jobs\.build_site [^\n]*--base ""', workflow)
+
+
+def test_links_start_at_the_root_unless_asked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """V1-92: Vercel serves the site from its address's root, so a build run by
+    hand without --base must not link under /<repository> as GitHub Pages did."""
+    import sys
+
+    import jobs.build_site as build_site
+
+    seen: dict[str, str] = {}
+    monkeypatch.setattr(publish, "build_site",
+                        lambda w, out, base, **kw: seen.update(publish=base) or
+                        {"funds": 0, "bytes": 0})
+    monkeypatch.setattr(publish, "warehouse_path", lambda: tmp_path / "w.db")
+    monkeypatch.setattr(sys, "argv", ["publish_site", "--out", str(tmp_path / "o")])
+    with pytest.raises(SystemExit):
+        publish.main()
+    monkeypatch.setattr(build_site, "contact_email", lambda: "a@example.org")
+    monkeypatch.setattr(build_site, "build",
+                        lambda out, store, base, workdir, pages: seen.update(build=base)
+                        or {"funds": 0, "stored": 0, "bytes": 0})
+    monkeypatch.setattr(sys, "argv", ["build_site", "--out", str(tmp_path / "o"),
+                                      "--workdir", str(tmp_path / "w")])
+    build_site.main()
+    assert seen == {"publish": "", "build": ""}

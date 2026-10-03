@@ -38,6 +38,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+import httpx
 import yaml
 from src.common.decimals import connect
 from src.m0_data.config import REPO_ROOT, raw_root, source, warehouse_path
@@ -418,6 +419,23 @@ class Seen:
     benchmark: str = ""
 
 
+#: A page that answers these is gone; anything else that is not a parse failure
+#: (a timeout, a refusal, a throttle) is the network's, not the page's.
+_GONE = (404, 410)
+
+
+def after_failure(previous: Seen | None, exc: Exception, today: date) -> Seen | None:
+    """What the map keeps for a page whose read failed. A page that is wrong --
+    unparseable, another fund's, or gone -- is forgotten and tried again after
+    `RECHECK`, as before. A failure of the network keeps what the page said (its
+    ISIN and benchmark), so the fund stays live and is read again next night; a
+    page never read stays unread (None), to be tried as new."""
+    gone = isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code in _GONE
+    if isinstance(exc, ParseFailed) or gone:
+        return Seen("", "", today)
+    return previous
+
+
 def read_map(path: Path) -> dict[str, Seen]:
     if not path.is_file():
         return {}
@@ -500,7 +518,11 @@ def crawl(limit: int, map_path: Path, today: date | None = None) -> dict[str, in
                 # Either way nothing of it stays, and it is tried again later.
                 conn.rollback()
                 print(f"  ! {slug}: {type(exc).__name__}: {exc}")
-                seen[slug] = Seen("", "", today)
+                kept = after_failure(seen.get(slug), exc, today)
+                if kept is None:
+                    seen.pop(slug, None)
+                else:
+                    seen[slug] = kept
                 counts["failed"] += 1
     finally:
         conn.close()

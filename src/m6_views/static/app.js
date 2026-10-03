@@ -75,10 +75,21 @@
       top: Math.max(edge, top),
     };
   }
+  // The label a `?` explains: the nearest element, from `node` up, with a `.term`
+  // among its own children. Walked by hand: `:has()` throws in older browsers.
+  function termHost(node) {
+    for (var n = node; n && n.nodeType === 1; n = n.parentElement) {
+      for (var c = n.firstElementChild; c; c = c.nextElementSibling) {
+        if (c.classList.contains("term")) return n;
+      }
+    }
+    return null;
+  }
   if (typeof module === "object" && module.exports) {
     module.exports = { filterHash: filterHash, parseFilterHash: parseFilterHash,
                        isFilterHash: isFilterHash, initialFilters: initialFilters,
-                       later: later, searchTarget: searchTarget, hintPlace: hintPlace };
+                       later: later, searchTarget: searchTarget, hintPlace: hintPlace,
+                       termHost: termHost, sortKey: sortKey };
     return;
   }
 
@@ -120,9 +131,7 @@
     var popOf = function (button) {
       return document.getElementById(button.getAttribute("popovertarget"));
     };
-    var hostOf = function (node) {
-      return node && node.closest ? node.closest(":has(> .term)") : null;
-    };
+    var hostOf = termHost;
     var closeHint = function () {
       if (hinted && hinted.matches(":popover-open") &&
           hinted.classList.contains("term-pop--hint")) hinted.hidePopover();
@@ -130,7 +139,7 @@
     };
     var openHint = function (host) {
       var button = host.querySelector(":scope > .term"), pop = button && popOf(button);
-      if (!pop || (pop === hinted && pop.matches(":popover-open"))) return;
+      if (!pop || pop.matches(":popover-open")) return;   // already open, as it was
       closeHint();
       pop.classList.add("term-pop--hint");
       pop.showPopover();
@@ -264,8 +273,9 @@
       asked = query;
       var bundled = input.getAttribute("data-index");
       if (bundled) {
+        // Kept only once it has arrived: a failed fetch is tried again next time.
         var ready = index ? Promise.resolve() : fetch(bundled)
-          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
           .then(function (all) { index = all; });
         ready.then(function () { if (query === asked) show(local(query)); }).catch(close);
         return;
@@ -452,7 +462,9 @@
     if (mode === "text") return (cell.textContent || "").trim().toLowerCase();
     var raw = cell.getAttribute("data-value");
     if (raw === null || raw === "") return null;
-    return mode === "number" ? parseFloat(raw) : raw;
+    if (mode !== "number") return raw;
+    var n = parseFloat(raw);
+    return isNaN(n) ? null : n;   // not a number: missing, so it sorts last
   }
 
   document.querySelectorAll("table[data-sortable]").forEach(function (table) {

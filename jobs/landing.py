@@ -63,9 +63,12 @@ def _qualifies(c: dict[str, Any]) -> bool:
 
 def _mix(held: dict[str, Any]) -> list[dict[str, str]]:
     parts = sorted(((k, Decimal(v)) for k, v in held["mix"]), key=lambda p: (-p[1], p[0]))
+    # A negative sleeve (derivatives) lets the positive parts pass 100%: the bar is
+    # scaled to hold them end to end; the labels keep the real figures.
+    scale = max(sum((p for _, p in parts if p > 0), Decimal(0)), Decimal(100))
     out, x = [], Decimal(0)
     for kind, pct in parts:
-        width = Decimal(bar_width(pct))
+        width = Decimal(bar_width(pct * 100 / scale))
         out.append({"label": CLASS_NAMES.get(kind, kind),
                     "pct_label": format_pct(pct, precision=1),
                     "x": f"{min(x, Decimal(100)):.2f}", "width": f"{width:.2f}"})
@@ -118,7 +121,7 @@ def landing_pair(
         c for c in candidates
         if c["held"] is not None and c["row"]["family"] == "equity"
         and c["row"]["category_key"] != first["row"]["category_key"]
-        and c["row"]["size_value"]
+        and c["row"]["size_value"] and _holdings(c["held"])
     ])
     if second is None:
         return None

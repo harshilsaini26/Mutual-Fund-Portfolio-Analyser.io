@@ -548,3 +548,28 @@ class TestTheLoadPathGivesV2AWitness:
         body = inspect.getsource(job._one)
         assert "unpriced" in body
         assert "as_json(checks, unpriced=unpriced)" in body
+
+
+def test_a_failed_read_keeps_what_the_page_said_before() -> None:
+    """A timeout or a refused request on a known page must not erase its ISIN and
+    benchmark: the fund would lose its benchmark proxy and wait 90 days for a
+    re-read. Only a page that is wrong (unparseable, another fund's, gone) is
+    forgotten, as before."""
+    import httpx
+    from jobs.fetch_groww import Seen, SlugMismatch, after_failure
+    from src.m0_data.fetch.base import FetchError
+
+    known = Seen("INF000000001", "2026-08-31", date(2026, 9, 1), "Nifty 50 TRI")
+    today = date(2026, 10, 3)
+    assert after_failure(known, FetchError("timed out"), today) == known
+    assert after_failure(None, FetchError("timed out"), today) is None
+    forgotten = Seen("", "", today)
+    assert after_failure(known, SlugMismatch("another fund"), today) == forgotten
+    gone = httpx.HTTPStatusError(
+        "404", request=httpx.Request("GET", "https://x"),
+        response=httpx.Response(404, request=httpx.Request("GET", "https://x")))
+    assert after_failure(known, gone, today) == forgotten
+    busy = httpx.HTTPStatusError(
+        "429", request=httpx.Request("GET", "https://x"),
+        response=httpx.Response(429, request=httpx.Request("GET", "https://x")))
+    assert after_failure(known, busy, today) == known

@@ -218,3 +218,22 @@ def test_the_last_mfapi_fetch_is_carried_between_builds(tmp_path: Path) -> None:
                        ).fetchall() == [("S6:118955", "2026-09-25 10:00:00+00:00")]
     raw.close()
     conn.close()
+
+
+def test_the_last_fetch_is_the_latest_time_however_it_is_spelled(tmp_path: Path) -> None:
+    """A restored row keeps the CSV's spelling; a new one is the adapter's. As text,
+    'T08' sorts after ' 09', so the latest is chosen by time, not by string."""
+    db = tmp_path / "a.db"
+    migrated(db)
+    conn = connect(str(db))
+    conn.executemany(
+        "INSERT INTO raw_file (file_id, source_id, url, fetched_at, byte_size,"
+        " storage_path) VALUES (?, 'S6:118955', 'https://api.mfapi.in/mf/118955',"
+        " ?, 1, '/x')",
+        [("restored", "2026-10-03T08:00:00+00:00"), ("new", "2026-10-03 09:00:00+00:00")],
+    )
+    conn.commit()
+    assert store.save_fetched(conn, tmp_path) == 1
+    conn.close()
+    written = (tmp_path / store.FETCHED).read_text(encoding="utf-8").splitlines()
+    assert written[1].endswith(",2026-10-03 09:00:00+00:00")

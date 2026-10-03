@@ -24,3 +24,32 @@ test("it never runs off the right edge, or the left", () => {
 test("with no room above or below it keeps to the top of the screen", () => {
   assert.equal(A.hintPlace(label(100, 100), 300, 700, 1440, 760).top, 8);
 });
+
+// A tiny element: a tag, its classes and children, its parent.
+const node = (cls, ...children) => {
+  const n = { nodeType: 1, cls, children, parentElement: null,
+    classList: { contains: (c) => cls.split(" ").includes(c) } };
+  children.forEach((c, i) => {
+    c.parentElement = n;
+    c.nextElementSibling = children[i + 1] || null;
+  });
+  n.firstElementChild = children[0] || null;
+  return n;
+};
+
+test("the label of a `?` is found without :has(), which older browsers lack", () => {
+  const term = node("term"), text = node("label-text");
+  const label = node("fact__label", text, term);
+  node("card", label);
+  assert.equal(A.termHost(text), label);
+  assert.equal(A.termHost(term), label);
+  assert.equal(A.termHost(node("lonely")), null);
+  assert.equal(A.termHost(null), null);
+});
+
+test("a figure that is not a number sorts as missing, last", () => {
+  const row = (v) => ({ cells: [{ getAttribute: () => v, textContent: "" }] });
+  assert.equal(A.sortKey(row("12.5"), 0, "number"), 12.5);
+  assert.equal(A.sortKey(row("n/a"), 0, "number"), null);
+  assert.equal(A.sortKey(row(""), 0, "number"), null);
+});

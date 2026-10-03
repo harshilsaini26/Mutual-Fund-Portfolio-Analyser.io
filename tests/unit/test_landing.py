@@ -192,3 +192,31 @@ def test_a_tied_lead_goes_to_the_lower_issuer_id() -> None:
                               _cand("G", category="equity/mid_cap", holdings=other)])
     assert pair is not None and pair["lead"] is not None
     assert pair["lead"]["name"] == "One Co"
+
+
+def test_the_mix_bar_fits_when_a_sleeve_is_negative() -> None:
+    """Parag Parikh Flexi Cap's mix: the positive parts total 101.9% beside -1.9%
+    of derivatives. The bar is scaled to fit, so its parts sit end to end within
+    it; the labels keep the real figures."""
+    mix = [["equity", "84.1"], ["other", "6.2"], ["debt", "5.9"], ["cash", "5.3"],
+           ["mfunit", "0.4"], ["derivative", "-1.9"]]
+    example = landing_example([_cand("C", mix=mix)])
+    assert example is not None
+    widths = [Decimal(m["width"]) for m in example["mix"]]
+    ends = [Decimal(m["x"]) + Decimal(m["width"]) for m in example["mix"]]
+    assert abs(sum(widths, Decimal(0)) - 100) <= Decimal("0.05")
+    assert max(ends) <= Decimal("100.05")
+    assert widths[-1] == 0  # the negative sleeve draws nothing
+    assert example["mix"][0]["pct_label"] == format_pct(Decimal("84.1"), precision=1)
+
+
+def test_the_pair_partner_names_its_companies() -> None:
+    """A partner whose disclosure matched no company would make the page say the
+    two "share nothing"; it is passed over for one that names its holdings."""
+    unresolved = [["__UNRESOLVED__", "Unresolved", "other", "100"]]
+    pair = landing_pair("C", [
+        _cand("C", holdings=PAIR_C),
+        _cand("Z", category="equity/small_cap", size="9000", holdings=unresolved),
+        _cand("G", category="equity/mid_cap", size="600", holdings=PAIR_G),
+    ])
+    assert pair is not None and pair["funds"][1]["scheme_id"] == "G"

@@ -9,7 +9,7 @@
 //
 // Writes public/shots/*.png.
 import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,7 +17,6 @@ import { fileURLToPath } from "node:url";
 const BASE = (process.argv[2] ||
   "https://didmysipwork.vercel.app").replace(/\/$/, "");
 const OUT = fileURLToPath(new URL("../public/shots/", import.meta.url));
-const PORT = 9333;
 const CHROME = [
   process.env.CHROME,
   "C:/Program Files/Google/Chrome/Application/chrome.exe",
@@ -41,10 +40,13 @@ async function pickFunds() {
   return named.map((f) => f.id);
 }
 
+// Port 0: Chrome picks a free port and writes it into its own profile, so this
+// script never reaches some other Chrome already listening on a fixed one.
 async function connect() {
   for (let i = 0; i < 50; i++) {
     try {
-      const pages = await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json();
+      const port = readFileSync(join(profile, "DevToolsActivePort"), "utf8").split("\n")[0];
+      const pages = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
       const page = pages.find((p) => p.type === "page");
       if (page) return new WebSocket(page.webSocketDebuggerUrl);
     } catch { /* not up yet */ }
@@ -55,7 +57,7 @@ async function connect() {
 
 const profile = mkdtempSync(join(tmpdir(), "lt-shots-"));
 const chrome = spawn(CHROME, [
-  "--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`,
+  "--headless=new", "--remote-debugging-port=0", `--user-data-dir=${profile}`,
   "--hide-scrollbars", "--no-first-run", "--no-default-browser-check", "about:blank",
 ], { stdio: "ignore" });
 
@@ -123,6 +125,11 @@ try {
   ws.close();
 } finally {
   chrome.kill();
-  await sleep(500);
-  rmSync(profile, { recursive: true, force: true });
+  // On Windows Chrome's helpers can hold the profile a little after the parent
+  // exits; the screenshots are written by now, so a profile left behind is a warning.
+  try {
+    rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
+  } catch (e) {
+    console.warn(`  could not remove ${profile}: ${e.code || e.message}`);
+  }
 }

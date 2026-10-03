@@ -265,28 +265,59 @@ def conditional_get(
         headers["If-Modified-Since"] = last_modified
 
     getter = client or httpx
+    timeout = httpx.Timeout(timeout_read, connect=timeout_connect)
     last_error: Exception | None = None
     for attempt in range(retries + 1):
-        if limiter is not None:
-            limiter.acquire(url, sleep=sleep)
+        asked = 0.0
         try:
-            response: httpx.Response = getter.request(
-                method,
-                url,
-                headers=headers,
-                json=json_body,
-                timeout=httpx.Timeout(timeout_read, connect=timeout_connect),
-                follow_redirects=True,
-            )
+            response = _follow(getter, method, url, headers, json_body, timeout,
+                               limiter, robots, user_agent, client, sleep)
+        except FetchError:
+            raise  # a hop robots.txt refuses, or a redirect loop: not the network's
         except Exception as exc:  # network-level failure
             last_error = exc
         else:
-            if response.status_code < 500:
+            # 429 is the host asking for time, not an answer: retried like a 5xx,
+            # waiting at least what Retry-After asks (up to the backoff cap).
+            if response.status_code < 500 and response.status_code != 429:
                 return response
             last_error = FetchError(f"HTTP {response.status_code} for {url}")
+            after = str(getattr(response, "headers", {}).get("retry-after") or "")
+            asked = float(after) if after.isdigit() else 0.0
 
         if attempt < retries:
             delay = min(backoff_cap, backoff_base * (2**attempt))
-            sleep(delay * (0.5 + random.random() / 2))
+            sleep(max(delay * (0.5 + random.random() / 2), min(asked, backoff_cap)))
 
     raise FetchError(f"{url} failed after {retries + 1} attempts: {last_error}")
+
+
+#: Redirects are followed here, hop by hop, not by the client: robots.txt and the
+#: rate limit are per host, and a hop to another host gets its own check (§2.3).
+_REDIRECTS = (301, 302, 303, 307, 308)
+_MAX_HOPS = 5
+
+
+def _follow(
+    getter: Any, method: str, url: str, headers: dict[str, str], json_body: Any,
+    timeout: httpx.Timeout, limiter: DomainRateLimiter | None,
+    robots: RobotsCache | None, user_agent: str, client: Any, sleep: Any,
+) -> httpx.Response:
+    start = url
+    for _ in range(_MAX_HOPS + 1):
+        if limiter is not None:
+            limiter.acquire(url, sleep=sleep)
+        response: httpx.Response = getter.request(
+            method, url, headers=headers, json=json_body, timeout=timeout,
+            follow_redirects=False,
+        )
+        location = (getattr(response, "headers", {}).get("location")
+                    if response.status_code in _REDIRECTS else None)
+        if not location:
+            return response
+        url = str(httpx.URL(url).join(location))
+        if response.status_code == 303:
+            method, json_body = "GET", None
+        if robots is not None and not robots.allows(url, user_agent, client):
+            raise FetchError(f"robots.txt disallows {url}")
+    raise FetchError(f"more than {_MAX_HOPS} redirects from {start}")
