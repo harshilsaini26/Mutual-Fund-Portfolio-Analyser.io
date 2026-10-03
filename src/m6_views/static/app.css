@@ -1472,9 +1472,11 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
   background: var(--accent); color: var(--on-accent); font-weight: 700;
 }
 .fundmap__root span { font-weight: 400; opacity: 0.85; margin-left: 8px; }
+/* One row of families, sharing the width whatever their number: a grid of 220px
+   columns wrapped the fifth under the tallest list, joined to nothing (V1-92). */
 .fundmap__families {
   position: relative; width: 100%; list-style: none; margin: 28px 0 0; padding: 0;
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;
+  display: flex; align-items: flex-start; gap: 16px;
 }
 /* The trunk from the root, and the bar every family hangs from. */
 .fundmap__families::before {
@@ -1485,7 +1487,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
   content: ""; position: absolute; top: -14px; left: 10%; right: 10%;
   border-top: 2px solid var(--line-strong);
 }
-.fundmap__family { position: relative; min-width: 0; }
+.fundmap__family { position: relative; flex: 1 1 0; min-width: 0; }
 .fundmap__family::before {
   content: ""; position: absolute; top: -14px; left: 50%; height: 14px;
   border-left: 2px solid var(--line-strong);
@@ -1515,8 +1517,13 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 .fundmap__cat[open] { border-color: var(--accent); box-shadow: var(--shadow-lift); }
 .fundmap__cat p { margin: 8px 0 6px; color: var(--ink-soft); line-height: var(--lh-body); }
 .fundmap__cat a { font-weight: 600; text-decoration: none; }
+/* Below 1100px five families would get under 180px each and clip their names: they
+   stack, full width, and the bar they hung from has nothing to join. */
+@media (max-width: 1099px) {
+  .fundmap__families { flex-direction: column; align-items: stretch; }
+  .fundmap__families::after { display: none; }
+}
 .leader__table th button { font-size: var(--text-xs); }
-@media (max-width: 720px) { .fundmap__families::after { display: none; } }
 
 /* Motion (V1-83): one attribute, set by settings.js from the reader's choice or,
    until they choose, the device's reduced-motion setting. Off stops everything at

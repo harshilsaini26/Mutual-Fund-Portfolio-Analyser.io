@@ -517,3 +517,26 @@ def test_a_hover_explanation_is_a_light_hint() -> None:
         assert decl in hint.group(1), decl
     backdrop = re.search(r"\.term-pop--hint::backdrop\s*\{([^}]*)\}", css)
     assert backdrop and "transparent" in backdrop.group(1)
+
+
+def test_the_fund_map_keeps_its_families_in_one_row() -> None:
+    """In the landing page's 1200px section a grid of 220px columns held four of
+    the five families; the fifth wrapped under the 1,280px-tall Debt list, joined to
+    nothing. The families now share one row, whatever their number, and stack in a
+    single column on a narrow screen."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    families = re.search(r"(?m)^\.fundmap__families\s*\{([^}]*)\}", css)
+    assert families and "display: flex" in families.group(1)
+    assert "auto-fit" not in families.group(1) and "wrap" not in families.group(1)
+    family = re.search(r"(?m)^\.fundmap__family\s*\{([^}]*)\}", css)
+    assert family and "flex: 1 1 0" in family.group(1)
+    assert "min-width: 0" in family.group(1)
+    # The narrow rule must come AFTER the base rule, or the base rule's alignment
+    # wins the cascade and the stacked families keep their content widths.
+    # Five families need about 180px each: one row from 1100px (183px measured, no
+    # name clipped), stacked below it (143px at 900 clipped three category names).
+    narrow = re.search(r"@media \(max-width: 1099px\)\s*\{\s*\.fundmap__families\s*\{"
+                       r"[^}]*flex-direction: column[^}]*align-items: stretch", css)
+    assert narrow and narrow.start() > families.start()
+    assert re.search(r"\.fundmap__families::after\s*\{[^}]*display: none",
+                     css[narrow.start():])
