@@ -9,6 +9,7 @@ out, folds the smallest tiles into one counted "others" tile (§11.2), and keeps
 
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Any
 
 from src.common.types import SchemeId
@@ -195,6 +196,9 @@ class FundPortfolioBuilder:
                 "high" if stale <= STALE_DAYS and tier != "aggregator"
                 and (unresolved is None or unresolved <= UNRESOLVED_WARN_PCT)
                 else "medium",
+                # The share placed with a named holding: what "coverage" means
+                # for one fund's own portfolio (audit, 2026-10-04).
+                coverage_pct=Decimal(100) - (unresolved or Decimal(0)),
                 unresolved_pct=unresolved,
             ),
             data_as_of=disclosed,

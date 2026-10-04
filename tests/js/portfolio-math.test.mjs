@@ -34,6 +34,43 @@ for (const c of cases) {
   });
 }
 
+// --- sales (external audit, 2026-10-04: purchases only overstated anyone who sold) ---
+const SOLD = series([["2019-01-01", "100.000000"], ["2021-01-01", "200.000000"], ["2022-01-03", "200.000000"]]);
+
+test("a sale removes units at that day's price, and the return counts the money back", () => {
+  const p = M.position([{ date: "2019-01-01", paise: 1000000 }], SOLD,
+                       [{ date: "2021-01-01", paise: 500000 }]);
+  assert.equal(units(p.unitsMilli), "75.000");          // 100 bought, 25 sold at 200
+  assert.equal(rupees(p.valuePaise), "15000.00");
+  assert.equal(p.investedPaise, 1000000);
+  assert.equal(p.redeemedPaise, 500000);
+  assert.ok(p.xirr > 0.25 && p.xirr < 0.3, `xirr ${p.xirr}`);   // doubled in two years
+});
+
+test("a sale of more than was held then is left out and said so", () => {
+  const p = M.position([{ date: "2019-01-01", paise: 1000000 }], SOLD,
+                       [{ date: "2021-01-01", paise: 9000000 }]);
+  assert.equal(p.redeemedPaise, 0);
+  assert.equal(units(p.unitsMilli), "100.000");
+  assert.equal(p.sales[0].error, "more");
+});
+
+test("a sale row needs a date in the record and an amount", () => {
+  const fund = { prices_from: "2019-01-01" };
+  assert.ok(M.rowError(fund, "sale", { date: "", amount: "5000" }, "2022-01-03"));
+  assert.ok(M.rowError(fund, "sale", { date: "2021-01-01", amount: "" }, "2022-01-03"));
+  assert.equal(M.rowError(fund, "sale", { date: "2021-01-01", amount: "5000" }, "2022-01-03"), null);
+  const e = M.entriesOf({ purchases: [], sips: [], sales: [{ date: "2021-01-01", amount: "5000" }] },
+                        fund, "2022-01-03");
+  assert.deepEqual(e.sales, [{ date: "2021-01-01", paise: 500000 }]);
+});
+
+test("a saved portfolio keeps its sales", () => {
+  const got = M.parsePortfolio({ version: 1, funds: [
+    { id: "INF000T01011", purchases: [], sips: [], sales: [{ date: "2021-01-01", amount: "5000" }] }] });
+  assert.deepEqual(got.portfolio.funds[0].sales, [{ date: "2021-01-01", amount: "5000" }]);
+});
+
 test("a purchase whose NAV is not out yet says so", () => {
   const c = cases.find((x) => x.name.startsWith("a purchase whose NAV"));
   const p = M.position(M.purchasesOf({ purchases: c.purchases, sips: [] }, c.today), series(c.navs));
@@ -84,20 +121,63 @@ test("a fund with no look-through file is counted, not dropped", () => {
   assert.equal(out.coverage.unknownPaise, 50000);
 });
 
+test("equal values sort the same way whatever order the files list them in", () => {
+  // External audit, 2026-10-04 (D-312): no tie-break made the order depend on
+  // the input's, so the same portfolio could draw two ways.
+  const file = (rows) => ({ as_of: "2026-08-31", aggregator: false, holdings: rows,
+                            mix: [["equity", "50"], ["debt", "50"]], sectors: [["Banks", "50"], ["IT", "50"]], sizes: [] });
+  const one = M.lookThrough([{ id: "F", valuePaise: 1000 }],
+    { F: file([["Q", "Qco", "equity", "50"], ["P", "Pco", "equity", "50"]]) });
+  const two = M.lookThrough([{ id: "F", valuePaise: 1000 }],
+    { F: file([["P", "Pco", "equity", "50"], ["Q", "Qco", "equity", "50"]]) });
+  assert.deepEqual(one.companies.map((r) => r.id), ["P", "Q"]);
+  assert.deepEqual(two.companies.map((r) => r.id), ["P", "Q"]);
+  assert.deepEqual(one.mix.map((r) => r.key), two.mix.map((r) => r.key));
+});
+
 test("overlap is the sum of the smaller weights, synthetics left out", () => {
   assert.equal(M.overlap(LOOK.A, LOOK.B), 50);
 });
 
+const ALT = [
+  { id: "H", category: "c", name: "Held", amfi: "1", prices_from: "2015-01-01", ter: "1.0", r3: "0.10", size: "100" },
+  { id: "P", category: "c", name: "Cheap", amfi: "2", prices_from: "2015-01-01", ter: "0.2", r3: "0.12", size: "500" },
+  { id: "R", category: "c", name: "Middling", amfi: "6", prices_from: "2015-01-01", ter: "0.8", r3: "0.15", size: "60" },
+  { id: "Q", category: "c", name: "Quick", amfi: "3", prices_from: "2015-01-01", ter: "0.9", r3: "0.20", size: "50" },
+  { id: "N", category: "c", name: "New", amfi: "4", prices_from: "2024-06-01", ter: "0.1", r3: null, size: "900" },
+  { id: "Y", category: "c", name: "Younger", amfi: "7", prices_from: "2021-03-01", ter: "0.95", r3: "0.30", size: "40" },
+  { id: "O", category: "other", name: "Other", amfi: "5", prices_from: "2015-01-01", ter: "0.0", r3: "0.9", size: "9" },
+];
+
 test("alternatives: one per rule, same category, priced back to the first purchase", () => {
-  const funds = [
-    { id: "H", category: "c", name: "Held", amfi: "1", prices_from: "2015-01-01", ter: "1.0", r3: "0.10", size: "100" },
-    { id: "P", category: "c", name: "Cheap", amfi: "2", prices_from: "2015-01-01", ter: "0.2", r3: "0.12", size: "500" },
-    { id: "Q", category: "c", name: "Quick", amfi: "3", prices_from: "2015-01-01", ter: "0.9", r3: "0.20", size: "50" },
-    { id: "N", category: "c", name: "New", amfi: "4", prices_from: "2024-06-01", ter: "0.1", r3: "0.30", size: "900" },
-    { id: "O", category: "other", name: "Other", amfi: "5", prices_from: "2015-01-01", ter: "0.0", r3: "0.9", size: "9" },
-  ];
-  const out = M.alternatives(funds[0], funds, "2020-01-01");
-  assert.deepEqual(out.map((a) => [a.fund.id, a.reasons]), [["P", ["ter", "size"]], ["Q", ["r3"]]]);
+  const out = M.alternatives(ALT[0], ALT, "2020-01-01");
+  assert.deepEqual(out.map((a) => [a.fund.id, a.reasons]), [["P", ["ter", "size"]], ["R", ["r3"]]]);
+});
+
+test("the return rule picks the category's middle fund, not today's best", () => {
+  // External audit, 2026-10-04: today's highest three-year return, set against
+  // purchases made years ago, is chosen knowing the outcome.
+  const out = M.alternatives(ALT[0], ALT, "2020-01-01");
+  const middle = out.find((a) => a.reasons.includes("r3"));
+  assert.equal(middle.fund.id, "R");
+});
+
+test("a Regular plan is never suggested: suggestions compare Direct plans only", () => {
+  const regular = { id: "RG", category: "c", name: "Cheap (Regular)", amfi: "8", prices_from: "2015-01-01",
+                    ter: "0.01", plan: "regular", direct: "P" };
+  const out = M.alternatives(ALT[0], [...ALT, regular], "2020-01-01");
+  assert.ok(!out.some((a) => a.fund.id === "RG"));
+});
+
+test("with no purchase date (Compare), any fund with three years of prices is a candidate", () => {
+  // External audit: Compare cut candidates at the first fund's launch, so a
+  // younger fund with three years of prices was silently left out.
+  const out = M.alternatives(ALT[0], ALT, null);
+  const ids = out.map((a) => a.fund.id);
+  assert.ok(!ids.includes("N"), "no three-year return, no candidate");
+  const pool = ["P", "R", "Q", "Y"];
+  assert.ok(ids.every((id) => pool.includes(id)));
+  assert.equal(out.find((a) => a.reasons.includes("r3")).fund.id, "R");
 });
 
 test("parsePortfolio refuses a foreign file", () => {
@@ -141,7 +221,7 @@ test("rowError refuses a SIP day that is not a whole day of the month", () => {
 });
 
 test("rowError refuses a SIP whose first instalment is before prices begin", () => {
-  assert.match(M.rowError(FUND, "sip", SIP({ start: "2013-01", day: 5 }), "2026-10-01"), /begin on 2013-01-15/);
+  assert.match(M.rowError(FUND, "sip", SIP({ start: "2013-01", day: 5 }), "2026-10-01"), /begin on 15 Jan 2013; the first instalment, 05 Jan 2013,/);
   assert.equal(M.rowError(FUND, "sip", SIP({ start: "2013-01", day: 20 }), "2026-10-01"), null);
 });
 
@@ -180,9 +260,23 @@ test("an alternative replays only the purchases the held fund priced", () => {
 test("a category AMFI uses for mixed kinds of fund gets no suggestions", () => {
   // "Other Scheme - Index Funds" holds equity and debt index funds alike: a
   // Nifty 50 fund must not be set beside a bond index as its like.
+  // `mixed` comes from categories.yaml's `ranked: false` (funds.json).
   const funds = [
-    { id: "H", category: "index/undivided", name: "Nifty", amfi: "1", prices_from: "2015-01-01", ter: "0.2", r3: "0.1", size: "10" },
-    { id: "D", category: "index/undivided", name: "Bonds", amfi: "2", prices_from: "2015-01-01", ter: "0.1", r3: "0.07", size: "90" },
+    { id: "H", category: "index/undivided", mixed: true, name: "Nifty", amfi: "1", prices_from: "2015-01-01", ter: "0.2", r3: "0.1", size: "10" },
+    { id: "D", category: "index/undivided", mixed: true, name: "Bonds", amfi: "2", prices_from: "2015-01-01", ter: "0.1", r3: "0.07", size: "90" },
   ];
   assert.deepEqual(M.alternatives(funds[0], funds, "2020-01-01"), []);
+});
+
+test("dates read as the rest of the site writes them", () => {
+  // Design review, 2026-10-04: "Worth on 2026-09-25" beside "25 Sep 2026" elsewhere.
+  assert.equal(M.day("2026-09-25"), "25 Sep 2026");
+  assert.equal(M.day("2021-01-05"), "05 Jan 2021");
+  assert.equal(M.day(null), "—");
+});
+
+test("units are grouped like rupees, to three places", () => {
+  assert.equal(M.units(3412036n), "3,412.036");
+  assert.equal(M.units(488397n), "488.397");
+  assert.equal(M.units(123456789012n), "12,34,56,789.012");
 });

@@ -9,6 +9,7 @@ working both from the root of an address (Vercel, V1-92) and from a folder
 
 from __future__ import annotations
 
+import csv
 import json
 import re
 import sqlite3
@@ -24,7 +25,7 @@ from src.common.types import IndexId, SchemeId
 from src.m0_data.categories import category_of
 from src.m6_views.api.pages import templates
 from src.m6_views.builders.fund.common import INDEX_WITHHELD
-from src.m6_views.format import format_date
+from src.m6_views.format import DASH, format_date
 
 from tests.conftest import migrated
 
@@ -178,13 +179,100 @@ def test_no_index_level_reaches_the_public_copy(site: Path) -> None:
     growth = (site / "fund" / DIRECT / "fund_growth.csv").read_text(
         encoding="utf-8-sig"
     )
-    # The benchmark column is there and empty.
-    assert all(line.endswith(",") for line in growth.splitlines()[-3:])
+    # The benchmark column is there and empty (read by name: the NAV column
+    # follows it since the price chart joined this panel).
+    table = [r for r in csv.reader(growth.splitlines()) if r and not r[0].startswith("#")]
+    at = table[0].index("benchmark_value_inr")
+    assert all(row[at] == "" for row in table[-3:])
+
+
+def test_the_site_says_where_its_portfolios_come_from(site: Path) -> None:
+    """External audit, 2026-10-04: the banner and the hero said "fund houses'
+    disclosures" and the footer "an archived source file", while most
+    portfolios are read from an aggregator's pages and no page is kept."""
+    home = (site / "index.html").read_text(encoding="utf-8")
+    for text in (home, _page(site, DIRECT)):
+        assert "fund houses' disclosures" not in text
+        assert "fund houses'\n  disclosures" not in text
+        assert "archived source file" not in text
+        assert "an aggregator" in text
+    assert "own disclosures" not in home
+
+
+def test_a_fund_under_a_mixed_heading_is_marked_for_the_pages() -> None:
+    """External audit, 2026-10-04: the portfolio page's alternatives and the
+    fund pages' ranks follow one rule, categories.yaml's `ranked: false`."""
+    row = {"scheme_id": "X", "amfi_code": "1", "name": "X",
+           "category": "Other Scheme - Index Funds",
+           "category_key": "index/undivided", "category_short": "Index funds",
+           "ter_value": "", "size_value": "", "size_label": DASH, "house": "",
+           "rank_label": DASH}
+    assert publish.fund_record(row, None, None)["mixed"] is True
+    flexi = {**row, "category": "Equity Scheme - Flexi Cap Fund",
+             "category_key": "equity/flexi_cap"}
+    assert "mixed" not in publish.fund_record(flexi, None, None)
+
+
+def test_without_a_benchmark_the_page_does_not_promise_one(site: Path) -> None:
+    """V1-94: neither question asks about a benchmark the public copy cannot
+    show (test_m6_fund_page has the rows left out)."""
+    page = _page(site, DIRECT)
+    assert "How has it done for the risk taken?" in page
+    assert "How much has it returned?" in page
+    assert "against its benchmark" not in page
+
+
+def test_compare_lines_each_funds_column_up_on_one_edge() -> None:
+    """Design review, 2026-10-04: a fund's column held left-aligned text and
+    rank under right-aligned figures. Every value and the heading align right."""
+    static = Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
+    script = (static / "compare.js").read_text(encoding="utf-8")
+    body = script[script.index("function facts("):]
+    body = body[:body.index("\n  }\n")]
+    assert 'el("td", { "class": "num" }' in body
+    css = (static / "app.css").read_text(encoding="utf-8")
+    assert re.search(r"\.cmp__table thead th \+ th\s*\{[^}]*text-align:\s*right", css)
+
+
+def test_the_confidence_tag_says_what_it_means(site: Path) -> None:
+    """External audit, 2026-10-04: "Confidence: medium" without saying what
+    drives it. Each tag links to the guide's paragraph on it (V1-94)."""
+    anchor = "dates-sources-confidence-and-gaps"
+    page = _page(site, DIRECT)
+    assert f'href="{BASE}/learn/reading-a-fund-page/#{anchor}" class="badge' in page
+    guide = (site / "learn" / "reading-a-fund-page" / "index.html").read_text(
+        encoding="utf-8")
+    assert f'id="{anchor}"' in guide
+    assert "High means" in guide and "Low means" in guide
+
+
+def test_your_portfolio_can_hold_a_regular_plan(site: Path) -> None:
+    """External audit, 2026-10-04: most money sits in Regular plans, and entering
+    one as its Direct twin read about 1% a year too high. funds.json lists each
+    published fund's Regular plan for Your portfolio, marked so Explore and
+    Compare leave it out, with its own prices; holdings and the fund page are
+    its Direct plan's (one portfolio, two share classes)."""
+    funds = json.loads((site / "funds.json").read_text(encoding="utf-8"))
+    regular = next(f for f in funds if f["id"] == REGULAR)
+    assert regular["plan"] == "regular" and regular["direct"] == DIRECT
+    assert regular["amfi"] == "900002" and regular["name"].endswith("(Regular)")
+    assert regular["prices_from"] == (TODAY - timedelta(days=300)).isoformat()
+    assert (site / "data" / "nav" / "900002.csv.gz").exists()
+    assert not (site / "fund" / REGULAR).exists()
+
+
+def test_your_portfolio_says_what_it_can_hold(site: Path) -> None:
+    """Regular plans and sales are entered as such now (audit, 2026-10-04); the
+    note says so, and what is still not modelled."""
+    page = _flat((site / "portfolio" / "index.html").read_text(encoding="utf-8"))
+    assert "Direct and Regular plans are listed" in page
+    assert "Enter a sale as the amount you received" in page
+    assert "Direct version" not in page
 
 
 def test_funds_json_lists_every_published_fund_for_the_portfolio_page(site: Path) -> None:
     funds = json.loads((site / "funds.json").read_text(encoding="utf-8"))
-    assert {f["id"] for f in funds} == {DIRECT, AGGREGATED}
+    assert {f["id"] for f in funds if f.get("plan") != "regular"} == {DIRECT, AGGREGATED}
     one = next(f for f in funds if f["id"] == DIRECT)
     assert set(one) == {"id", "amfi", "name", "category", "category_name",
                         "prices_from", "ter", "size", "r1", "r3", "r5",
@@ -287,6 +375,32 @@ def test_an_index_funds_price_stands_in_for_the_benchmark_it_declares(
                                TODAY - timedelta(days=9), TODAY) == []
 
 
+def test_an_index_fund_whose_page_is_not_read_yet_names_its_index_itself(
+    warehouse: sqlite3.Connection,
+) -> None:
+    """External audit, 2026-10-04: an index fund showed benchmark "—" until the
+    aggregator crawl reached its page (100 a night). Its own name says which
+    index it tracks; only an exact match with an index another fund declares
+    counts, the longest first, so "Test 50 Equal Weight" never borrows "Test 50"."""
+    tracker, unread, weighted = "INF000T01052", "INF000T01078", "INF000T01086"
+    for sid, name in ((tracker, "Acme Test 50 Index Fund"),
+                      (unread, "Other House Test 50 Index Fund"),
+                      (weighted, "Third Test 50 Equal Weight Index Fund")):
+        warehouse.execute(
+            "INSERT INTO scheme (scheme_id, scheme_name, fund_name, plan, option,"
+            " amc_id, scheme_family, sebi_category, status, last_seen) VALUES"
+            " (?,?,?,'direct','growth','amc1',?,'Index Funds - Equity Funds',"
+            " 'active',?)", (sid, name, name, name, TODAY))
+        _prices(warehouse, sid, 400)
+    market = publish.PublicMarket(warehouse, {tracker: "TEST 50 TRI"})
+    assert market.benchmark_for(SchemeId(unread)) == f"proxy:{tracker}"
+    facts = market.scheme_facts(SchemeId(unread))
+    assert facts is not None
+    assert facts.benchmark_name == "TEST 50 (via Acme Test 50 Index Fund)"
+    assert market.benchmark_for(SchemeId(weighted)) is None
+    assert market.benchmark_for(SchemeId(AGGREGATED)) is None  # not an index fund
+
+
 def test_an_aggregators_holdings_are_published_and_say_whose_they_are(
     site: Path,
 ) -> None:
@@ -381,7 +495,14 @@ def test_the_front_page_is_a_way_in_not_a_list(site: Path) -> None:
     by its door; the fund map is kept as "Understand funds"."""
     index = (site / "index.html").read_text(encoding="utf-8")
     assert len(re.findall(r"<h1[\s>]", index)) == 1
-    assert re.search(r"<h1[^>]*>\s*See what every fund owns, and how it has done", index)
+    # External audit, 2026-10-04: the address asks "Did my SIP work?", so the page
+    # leads with it, and its first door is Your portfolio.
+    assert re.search(r"<h1[^>]*>\s*Did my SIP work\?", index)
+    first = index[index.index('class="lp-door"'):]
+    first = first[:first.index("</li>")]
+    assert "Did my SIP work?" in first and 'href="/Repo/portfolio/"' in first
+    # The doors once, not again at the foot of the page (design review).
+    assert 'class="lp-end"' not in index
     assert re.search(r'<a[^>]*href="#privacy"[^>]*>[^<]*Nothing you enter leaves your'
                      r' browser', index)
     hero = index[index.index('class="lp-hero"'):index.index('id="lookup"')]
@@ -470,13 +591,18 @@ def test_the_example_and_pair_render() -> None:
     page = _home(EXAMPLE, PAIR)
     text = _flat(page)
     assert f'href="{BASE}/fund/{DIRECT}/"' in page and 'class="lp-fund"' in page
-    assert "An example: the largest flexi cap fund by size." in text
+    # Not always the largest now: a mostly identified portfolio comes first (audit).
+    assert ("An example: the largest flexi cap fund whose portfolio we could"
+            " identify.") in text
     assert "Fund One Flexi Cap within its category, Flexi cap" in text
     for n in range(1, 6):
         assert f"Company {n}" in text
     for period in ("1 year", "3 years", "5 years"):
         assert period in text
-    assert "2 companies in both" in text and "7.0%" in text
+    assert "2 companies in both" in text
+    # Audit, 2026-10-04: "with ₹1 in each, Company 1 is 7.0% of what you own"
+    # took a second read.
+    assert "put ₹1 in each fund and Company 1 is 7.0% of your ₹2" in text
     assert "of the two portfolios is the same" in text
     assert 'width="57.89"' in page  # the fill runs to the fund's position
     none = _flat(_home(EXAMPLE, {**PAIR, "common": 0, "lead": None}))
@@ -767,7 +893,8 @@ def test_row_errors_are_tied_to_their_fields() -> None:
     assert ".remove()" not in body
     card = script[script.index("function holdingCard"):]
     card = card[:card.index("\n  }\n") + 4]
-    assert card.count("errorSlot()") == 2 and 'err && el("p"' not in card
+    # Purchases, SIPs and (since the audit of 2026-10-04) sales: one slot each.
+    assert card.count("errorSlot()") == 3 and 'err && el("p"' not in card
     css = (Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
            / "app.css").read_text(encoding="utf-8")
     # Empty, it leaves the row's flex flow (a flex line's gap would remain) but

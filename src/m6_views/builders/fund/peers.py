@@ -36,7 +36,10 @@ QUARTERS = {1: "first quarter", 2: "second quarter", 3: "third quarter",
             4: "fourth quarter"}
 RANK_ORDER = (
     "Rank 1 is the highest return, the lowest volatility, the smallest fall, the "
-    "highest return for the risk and the lowest expense ratio."
+    "highest return for the risk and the lowest expense ratio. Each counts only the "
+    "category's funds with that figure -- a year of prices for one-year figures, "
+    "three or five years for those, an expense ratio on record for the cost -- so "
+    "the totals differ."
 )
 #: How the headline names a period, and the history that period needs.
 PERIOD_WORDS = {"1y": ("one-year", "a year of prices"),

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 from bisect import bisect_right
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
@@ -171,6 +171,29 @@ def risk_free_on(when: date, path: Path = RISK_FREE_YAML) -> Decimal | None:
     rates = risk_free_rates(path)
     i = bisect_right([d for d, _ in rates], when) - 1
     return rates[i][1] if i >= 0 else None
+
+
+def risk_free_over(start: date, end: date, path: Path = RISK_FREE_YAML) -> Decimal | None:
+    """The rate in force on each day from `start` to `end`, averaged: what a
+    window's Sharpe, Sortino and Treynor are judged against (MODULE_2.md §8.1).
+
+    Not the rate on the first day, as until 2026-10-04: a five-year window that
+    began at the 2021 trough was set against 3.45% while the five years averaged
+    about 5.5%. None when `start` is before the first observation, as for
+    `risk_free_on`; the rate on `start` itself for a window of no length.
+    """
+    first = risk_free_on(start, path)
+    if first is None or end <= start:
+        return first
+    rates = risk_free_rates(path)
+    days = [d for d, _ in rates]
+    total, at, rate = Decimal(0), start, first
+    last = end - timedelta(days=1)
+    for i in range(bisect_right(days, start), bisect_right(days, last)):
+        total += rate * (days[i] - at).days
+        at, rate = days[i], rates[i][1]
+    total += rate * (end - at).days
+    return (total / (end - start).days).quantize(Decimal("0.0001"))
 
 
 def state_isin_codes(path: Path = STATE_CODES_YAML) -> dict[str, str]:

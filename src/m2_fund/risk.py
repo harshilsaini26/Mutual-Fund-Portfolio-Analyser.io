@@ -197,6 +197,21 @@ def returns_of(
     return fund, bench
 
 
+def monthly_returns(
+    common: list[tuple[date, Decimal, Decimal]],
+) -> tuple[list[Decimal], list[Decimal]]:
+    """Fund and benchmark returns month by month, for the capture ratios (§8.4).
+
+    From the window's first price to the last price of each calendar month it
+    covers, so the first and last months are as long as the window lets them be.
+    """
+    ends: dict[tuple[int, int], tuple[Decimal, Decimal]] = {}
+    for day, fund, bench in common[1:]:
+        ends[(day.year, day.month)] = (fund, bench)
+    points = [(common[0][1], common[0][2]), *(ends[k] for k in sorted(ends))]
+    return returns_of([(date.min, f, b) for f, b in points])
+
+
 def aligned(
     navs: list[NavPoint], levels: list[tuple[date, Decimal]]
 ) -> list[tuple[date, Decimal, Decimal]]:
@@ -284,11 +299,14 @@ def information_ratio(
 
 
 def capture(fund: list[Decimal], bench: list[Decimal], *, rising: bool) -> Decimal | None:
-    """Share of the benchmark's move the fund captured, up or down. §8.1.
+    """Share of the benchmark's move the fund captured, up or down. §8.4.
 
-    Compounded over the days the benchmark rose (or fell), not averaged: a
-    ratio of arithmetic means describes a portfolio nobody holds. Above 1 on
-    the up side and below 1 on the down side is the shape every fund claims.
+    Over MONTHLY returns (`monthly_returns`), at least `MIN_CAPTURE_MONTHS` of
+    them each way, as the ratio of the two annualised geometric means over the
+    months the benchmark rose (or fell): the usual definition. Compounding
+    every daily move instead, as this did until 2026-10-04, drifts with the
+    window's length -- the up side towards 0 and the down side towards 1 -- so
+    a fund catching three-quarters of rallies read as catching a quarter.
 
     Mismatched lengths give None, as they do for `beta` and `tracking_error`:
     three siblings taking the same pair must agree on what a malformed one
@@ -299,17 +317,23 @@ def capture(fund: list[Decimal], bench: list[Decimal], *, rising: bool) -> Decim
     picked = [
         (f, b) for f, b in zip(fund, bench, strict=True) if (b > 0) is rising and b != 0
     ]
-    if not picked:
+    if len(picked) < MIN_CAPTURE_MONTHS:
         return None
     grow_f, grow_b = Decimal(1), Decimal(1)
     for f, b in picked:
         grow_f *= 1 + f
         grow_b *= 1 + b
-    # Reachable, though by no real price series. A falling-day return below
-    # -100% makes its factor negative, and two such factors multiply back to
-    # exactly 1: (1 - 2) * (1 - 2). That is a zero denominator. `_against`
-    # rejects non-positive levels before any of this runs, so it fires only
-    # when this is called directly with data no market produces.
-    if grow_b == 1:
+    # A month below -100% (no real price series has one) leaves no geometric
+    # mean to take.
+    if grow_f <= 0 or grow_b <= 0:
         return None
-    return ((grow_f - 1) / (grow_b - 1)).quantize(RATE_Q)
+    per_year = Decimal(12) / len(picked)
+    ann_f = (grow_f.ln() * per_year).exp() - 1
+    ann_b = (grow_b.ln() * per_year).exp() - 1
+    if ann_b == 0:
+        return None
+    return (ann_f / ann_b).quantize(RATE_Q)
+
+
+#: §8.4: below this many up (or down) months a capture ratio means nothing.
+MIN_CAPTURE_MONTHS = 6

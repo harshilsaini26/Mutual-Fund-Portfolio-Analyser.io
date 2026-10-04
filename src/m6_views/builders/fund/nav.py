@@ -31,6 +31,41 @@ def _nav(v: Decimal | None) -> str:
     return format_inr(v, precision=4, compact=False)
 
 
+#: The fund page draws it in "What ₹10,000 became", behind a switch (design
+#: review, 2026-10-04: the two charts drew the same line).
+PRICE_TITLE = "Price per unit (NAV)"
+
+
+def price_chart(
+    market: Any, scheme: SchemeId, as_of: date, start: date = date.min,
+    title: str = PRICE_TITLE,
+) -> tuple[dict[str, Any], str, dict[date, Decimal]] | None:
+    """The published NAV from `start`: drawn (downsampled), said in a sentence,
+    and every price by date. None with fewer than two prices."""
+    navs = market.nav_series(scheme, start, as_of, adjusted=False)
+    if len(navs) < 2:
+        return None
+    first, last = navs[0], navs[-1]
+    high = max(navs, key=lambda p: p.nav)
+    low = min(navs, key=lambda p: p.nav)
+    said = (
+        f"Its NAV was {_nav(first.nav)} on {format_date(first.nav_date)} and "
+        f"{_nav(last.nav)} on {format_date(last.nav_date)}. The highest was "
+        f"{_nav(high.nav)} on {format_date(high.nav_date)}, the lowest "
+        f"{_nav(low.nav)} on {format_date(low.nav_date)}."
+    )
+    kept = [navs[i] for i in lttb_indices([p.nav for p in navs])]
+    facts = market.scheme_facts(scheme)
+    chart = {
+        "kind": "line", "title": title, "y": "inr",
+        "series": [{
+            "name": facts.name if facts else str(scheme), "role": "fund",
+            "points": points([(p.nav_date, p.nav) for p in kept], _nav),
+        }],
+    }
+    return chart, said, {p.nav_date: p.nav for p in navs}
+
+
 @register
 class FundNavBuilder:
     view_id = VIEW_ID
@@ -44,36 +79,23 @@ class FundNavBuilder:
             return empty_envelope(VIEW_ID, question, scope, NO_FUND)
         scheme = SchemeId(scope.scope_id)
         navs = self.market.nav_series(scheme, date.min, scope.as_of, adjusted=False)
-        if len(navs) < 2:
+        found = price_chart(self.market, scheme, scope.as_of, title=question)
+        if found is None:
             return empty_envelope(
                 VIEW_ID, question, scope,
                 f"Fewer than two prices are on record for {scheme}. "
                 f"python -m jobs.backfill_scheme_nav --scheme {scheme} loads them.",
             )
+        chart, headline, _ = found
         first, last = navs[0], navs[-1]
-        high = max(navs, key=lambda p: p.nav)
-        low = min(navs, key=lambda p: p.nav)
-        headline = (
-            f"Its NAV was {_nav(first.nav)} on {format_date(first.nav_date)} and "
-            f"{_nav(last.nav)} on {format_date(last.nav_date)}. The highest was "
-            f"{_nav(high.nav)} on {format_date(high.nav_date)}, the lowest "
-            f"{_nav(low.nav)} on {format_date(low.nav_date)}."
-        )
         kept = [navs[i] for i in lttb_indices([p.nav for p in navs])]
-        facts = self.market.scheme_facts(scheme)
         rows = [{"date": p.nav_date, "nav": p.nav} for p in kept]
         return ok_envelope(
             view_id=VIEW_ID,
             scope=scope,
             payload={
                 "headline": headline,
-                "charts": [{
-                    "kind": "line", "title": question, "y": "inr",
-                    "series": [{
-                        "name": facts.name if facts else str(scheme), "role": "fund",
-                        "points": points([(p.nav_date, p.nav) for p in kept], _nav),
-                    }],
-                }],
+                "charts": [chart],
                 "columns": [
                     {"key": "date", "label": "Date", "kind": "date"},
                     {"key": "nav", "label": "NAV", "kind": "nav"},
@@ -91,4 +113,4 @@ class FundNavBuilder:
         )
 
 
-__all__ = ["FundNavBuilder"]
+__all__ = ["PRICE_TITLE", "FundNavBuilder", "price_chart"]

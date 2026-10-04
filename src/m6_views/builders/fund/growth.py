@@ -8,6 +8,7 @@ Rs 10,000 on the same day. The period tabs refetch this panel alone.
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 from typing import Any
 
 from src.common.types import SchemeId
@@ -27,6 +28,7 @@ from src.m6_views.builders.fund.common import (
     window_of,
     withholds_index,
 )
+from src.m6_views.builders.fund.nav import price_chart
 from src.m6_views.compose import ok_envelope
 from src.m6_views.deps import Deps
 from src.m6_views.envelope import ViewEnvelope
@@ -35,6 +37,8 @@ from src.m6_views.registry import VIEW_DEFS, register
 from src.m6_views.states import empty_envelope
 
 VIEW_ID = "fund_growth"
+#: The switch's two faces: the growth chart and the price chart.
+SWITCH = ["What ₹10,000 became", "Price per unit"]
 
 
 @register
@@ -112,8 +116,18 @@ class FundGrowthBuilder:
                 {"name": f"{bench} (with dividends)", "role": "benchmark",
                  "points": points([(d, b) for d, _, b in kept], rupees)}
             )
+        # The published price per unit beside it, behind a switch: the page's
+        # "Price history" drew the same line again (design review, 2026-10-04).
+        price = price_chart(self.market, scheme, scope.as_of, path.start)
+        charts = [{"kind": "line", "title": question, "y": "inr", "series": series}]
+        prices: dict[date, Decimal] = {}
+        if price is not None:
+            chart, said, prices = price
+            charts.append(chart)
+            headline += " " + said
         rows = [
-            {"date": d, "fund_value_inr": f, "benchmark_value_inr": b}
+            {"date": d, "fund_value_inr": f, "benchmark_value_inr": b,
+             "nav": prices.get(d)}
             for d, f, b in kept
         ]
         return ok_envelope(
@@ -122,13 +136,13 @@ class FundGrowthBuilder:
             payload={
                 "headline": headline,
                 "tabs": tabs(VIEW_ID, str(scheme), key),
-                "charts": [
-                    {"kind": "line", "title": question, "y": "inr", "series": series}
-                ],
+                "charts": charts,
+                "switch": SWITCH if price is not None else None,
                 "columns": [
                     {"key": "date", "label": "Date", "kind": "date"},
                     {"key": "fund_value_inr", "label": name, "kind": "inr"},
                     {"key": "benchmark_value_inr", "label": "Benchmark", "kind": "inr"},
+                    {"key": "nav", "label": "NAV", "kind": "nav"},
                 ],
                 "rows": rows,
             },

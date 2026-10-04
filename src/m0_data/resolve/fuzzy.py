@@ -118,13 +118,16 @@ def best_matches(
     reviews it sees what was considered, and an empty candidate list tells them
     nothing about whether the matcher looked.
 
-    Ties break on `issuer_id` so the ordering is deterministic — `CLAUDE.md`
-    invariant 10 requires a rebuild to reproduce byte-identical output, and an
-    arbitrary tie order would break that on any dict reordering.
+    Ties break first on the closer token set, then on `issuer_id`. A name
+    containing the needle ties with the needle's own company at 100 (`mahindra
+    mahindra` and `tech mahindra` for `tech mahindra`); breaking that on the
+    id alone put the wrong one first, and `tech mahindra` went unresolved with
+    its company in the master (external audit, 2026-10-04). The id keeps the
+    order deterministic, as invariant 10 requires.
     """
     scored = [
         (name, issuer_id, token_set_ratio(needle, name))
         for name, issuer_id in candidates.items()
     ]
-    scored.sort(key=lambda row: (-row[2], row[1]))
+    scored.sort(key=lambda row: (-row[2], -token_jaccard(needle, row[0]), row[1]))
     return scored[:limit]

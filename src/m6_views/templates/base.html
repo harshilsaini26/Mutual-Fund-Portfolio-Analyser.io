@@ -131,8 +131,8 @@
 </header>
 {#- One sentence (V1-88), wrapping on a phone so its link stays in reach. -#}
 <div class="public-note">
-  <p>Descriptive, not advice. Built {{ built | fmt_date }} from AMFI and fund houses'
-  disclosures · <a href="{{ root }}/#about">About this data</a></p>
+  <p>Descriptive, not advice. Built {{ built | fmt_date }} from AMFI's data and fund
+  portfolios, most read from an aggregator · <a href="{{ root }}/#about">About this data</a></p>
 </div>
 {% else %}
 <div class="shell">
@@ -197,7 +197,7 @@
 <footer class="colophon">
   <p>
     {% if static %}
-    Built from public sources; every figure traces to an archived source file.
+    Built from public sources; every figure names its source and date.
     No cookies, no tracking, and nothing loads from anywhere but this site.
     <a class="topbar__link" href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">
       <span>The self-hosted app, with benchmarks and your own ledger</span>{{ icon.i("external") }}</a>

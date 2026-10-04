@@ -33,6 +33,9 @@ from src.m0_data.categories import Category, category_of
 
 #: Below this many ranked funds a rank says more about the gaps than the fund.
 MIN_PEERS = 5
+#: Why a fund in a `ranked: false` category (categories.yaml) has no ranks.
+MIXED = ("not ranked: this heading holds funds that do different jobs, so a rank "
+         "against them would mean little")
 SURVIVORSHIP_CAVEAT = (
     "Ranks compare the funds open today; funds that closed or merged are not "
     "included, which tends to flatter the category's middle."
@@ -135,7 +138,9 @@ def peer_context(market: Any, scheme_id: str) -> PeerContext | None:
             and stat.spans and getattr(stat, metric.field) is not None
         }
         own = values.get(scheme_id)
-        if own is None:
+        if not category.ranked:
+            ranks.append(Rank(metric, own, None, len(values), None, MIXED))
+        elif own is None:
             ranks.append(Rank(metric, None, None, len(values), None,
                               "no expense ratio on record" if metric.field == "ter"
                               else "too little price history for the period"))

@@ -14,7 +14,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
-from src.common.types import IssuerId, SchemeId
+from src.common.types import UNRESOLVED, IssuerId, SchemeId
 from src.m3_lookthrough.engine import IssuerWeight, is_synthetic
 from src.m3_lookthrough.overlap import pairwise_overlap
 from src.m6_views.builders.fund.common import CLASS_NAMES
@@ -41,8 +41,22 @@ def _size(candidate: dict[str, Any]) -> Decimal:
     return Decimal(candidate["row"]["size_value"])
 
 
+#: A worked example at most this much unidentified is preferred over a larger
+#: fund; past it, the least unidentified (external audit, 2026-10-04).
+EXAMPLE_UNRESOLVED_MAX = Decimal(5)
+
+
+def _unresolved(candidate: dict[str, Any]) -> Decimal:
+    held = candidate["held"] or {"holdings": []}
+    return sum((Decimal(w) for i, _, _, w in held["holdings"] if str(i) == UNRESOLVED),
+               Decimal(0))
+
+
 def _largest(candidates: list[dict[str, Any]]) -> dict[str, Any] | None:
-    ranked = sorted(candidates, key=lambda c: (-_size(c), c["row"]["scheme_id"]))
+    """The largest fund that is mostly identified, else the least unidentified."""
+    ranked = sorted(candidates, key=lambda c: (
+        max(_unresolved(c) - EXAMPLE_UNRESOLVED_MAX, Decimal(0)), -_size(c),
+        c["row"]["scheme_id"]))
     return ranked[0] if ranked else None
 
 

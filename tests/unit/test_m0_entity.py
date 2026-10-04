@@ -636,6 +636,27 @@ def test_tech_mahindra_does_not_resolve_to_mahindra_and_mahindra(
     assert result.needs_review
 
 
+def test_the_exact_name_wins_when_a_longer_one_ties_with_it(
+    conn: sqlite3.Connection,
+) -> None:
+    """External audit, 2026-10-04: with BOTH companies in the master, "Tech
+    Mahindra Ltd" still went unresolved. M&M and Tech Mahindra tie at 100, the
+    tie broke on issuer id, and only the first candidate was tried -- M&M, which
+    the guard rightly refused. Tech Mahindra, NTPC, Titan and Kotak Mahindra
+    Bank sat in `__UNRESOLVED__` that way, ~15% of a typical portfolio.
+    The closest token set breaks the tie; the guard is unchanged."""
+    index = {"mahindra mahindra": "MM", "tech mahindra": "TECHM",
+             "ntpc green energy": "NGE", "ntpc": "NTPC"}
+    tech = resolve(conn, "Tech Mahindra Ltd", None, "equity", issuer_index=index)
+    assert (tech.issuer_id, tech.method) == ("TECHM", "fuzzy")
+    ntpc = resolve(conn, "NTPC Ltd", None, "equity", issuer_index=index)
+    assert ntpc.issuer_id == "NTPC"
+    # Only the longer name on record: still refused, as before.
+    alone = resolve(conn, "Tech Mahindra Ltd", None, "equity",
+                    issuer_index={"mahindra mahindra": "MM"})
+    assert alone.method == "unresolved"
+
+
 # --- §2.2 S4 the market-cap list --------------------------------------------
 
 

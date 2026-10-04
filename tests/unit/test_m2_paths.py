@@ -76,6 +76,22 @@ def test_rolling_counts_periods_ahead_only_where_the_index_priced() -> None:
     assert path.worst <= path.median <= path.best
 
 
+def test_rolling_says_how_many_stretches_the_benchmark_could_be_set_against() -> None:
+    """External audit, 2026-10-04: "ahead in 100% of three-year stretches" was
+    200 of 201, over the stretches since the benchmark's prices began -- not
+    all 510. The counts and the first such stretch are kept, so the page can
+    say exactly that."""
+    navs = _navs([str(100 + i) for i in range(40)], step=10)
+    # The index starts late: only windows from its first price on can be compared.
+    levels = {p.nav_date: Decimal(100 + i // 2) for i, p in enumerate(navs) if i >= 15}
+    path = rolling_path(navs, levels, horizon_days=60, step_days=10)
+    assert path is not None
+    paired = [d for d, _, b in path.points if b is not None]
+    assert path.paired == len(paired) < len(path.points)
+    assert path.ahead == path.paired
+    assert path.paired_from == paired[0]
+
+
 def test_too_few_windows_is_no_answer_rather_than_a_thin_one() -> None:
     short = _navs(["100", "101", "102"], step=30)
     assert rolling_path(short, {}, horizon_days=60) is None

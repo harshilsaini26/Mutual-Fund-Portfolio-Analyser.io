@@ -171,13 +171,16 @@
   window.addEventListener("hashchange", function () { say(""); read(); render(); });
 
   // --- suggestions ------------------------------------------------------------------
-  var REASON = { ter: "lowest expense ratio", r3: "highest three-year return", size: "largest fund" };
+  var REASON = { ter: "lowest expense ratio", r3: "middle three-year return in its category",
+                 size: "largest fund today" };
 
   function suggest(funds) {
     var box = out("suggest");
     var first = funds[0];
-    var picks = first && first.prices_from && funds.length < MAX
-      ? M.alternatives(first, Array.from(FUNDS.values()), first.prices_from)
+    // No purchase date here: any fund with three years of prices is a
+    // candidate, not only those as old as the first fund (audit, 2026-10-04).
+    var picks = first && funds.length < MAX
+      ? M.alternatives(first, Array.from(FUNDS.values()), null)
           .filter(function (s) { return ids.indexOf(s.fund.id) < 0; })
       : [];
     if (!picks.length) { fill(box); return; }
@@ -235,7 +238,8 @@
       var tr = el("tr", null, el("th", { scope: "row" }, row[0], row[3] && K.termButton(row[3], "cmp")));
       funds.forEach(function (f, i) {
         var text = row[1](f);
-        tr.appendChild(el("td", { "class": row[2] ? "num" : null }, text == null ? "—" : text,
+        // Every value on the column's right edge, text and rank too (design review).
+        tr.appendChild(el("td", { "class": "num" }, text == null ? "—" : text,
           tags[i] && el("span", { "class": "cmp-tag" }, tags[i] + " here")));
       });
       body.appendChild(tr);
@@ -425,6 +429,7 @@
   }).then(function (list) {
     var options = document.getElementById("cmp-funds");
     list.forEach(function (f) {
+      if (f.plan === "regular") return;   // Your portfolio's only; Compare is Direct plans
       FUNDS.set(f.id, f);
       BY_NAME.set(f.name, f);
       options.appendChild(el("option", { value: f.name }, f.category_name));

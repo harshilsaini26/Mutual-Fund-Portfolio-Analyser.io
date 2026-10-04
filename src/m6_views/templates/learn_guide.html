@@ -14,7 +14,7 @@
   <p class="lede">{{ guide.summary }}</p>
   {{ vc.learn_note() }}
   {% for section in guide.sections %}
-  <h2>{{ section.heading }}</h2>
+  <h2 id="{{ section.heading | lower | replace(',', '') | replace(' ', '-') }}">{{ section.heading }}</h2>
   {% for paragraph in section.paragraphs %}<p>{{ paragraph | link_terms }}</p>{% endfor %}
   {% endfor %}
   <h2>Sources</h2>

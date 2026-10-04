@@ -161,7 +161,7 @@ def test_sharpe_appears_once_a_rate_is(monkeypatch: pytest.MonkeyPatch) -> None:
     the ratio must be finite and signed the obvious way."""
     import src.m2_fund.windows as mod
 
-    monkeypatch.setattr(mod, "risk_free_on", lambda _d: Decimal("6"))
+    monkeypatch.setattr(mod, "risk_free_over", lambda _a, _b: Decimal("6"))
     w = compute_return_window(series([str(100 + i) for i in range(400)]), "1y")
     assert w is not None
     assert w.risk_free_pct == Decimal("6")
@@ -180,7 +180,7 @@ def test_sortino_needs_something_to_have_fallen(
     fell less is scored better than Sharpe alone would say."""
     import src.m2_fund.windows as mod
 
-    monkeypatch.setattr(mod, "risk_free_on", lambda _d: Decimal("6"))
+    monkeypatch.setattr(mod, "risk_free_over", lambda _a, _b: Decimal("6"))
     jagged = [str(100 + i + (5 if i % 3 else 0)) for i in range(400)]
     w = compute_return_window(series(jagged), "1y")
     assert w is not None
@@ -195,7 +195,7 @@ def test_a_rate_with_no_volatility_to_divide_gives_no_sharpe(
     would assert an infinitely good one."""
     import src.m2_fund.windows as mod
 
-    monkeypatch.setattr(mod, "risk_free_on", lambda _d: Decimal("6"))
+    monkeypatch.setattr(mod, "risk_free_over", lambda _a, _b: Decimal("6"))
     w = compute_return_window(series(["100", "100", "100.000001"]), "1y")
     assert w is not None
     assert w.volatility_ann == Decimal(0)

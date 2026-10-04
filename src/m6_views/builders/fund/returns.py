@@ -24,6 +24,7 @@ from src.m6_views.states import empty_envelope
 VIEW_ID = "fund_returns"
 YEAR = 365
 PERIODS = {"1y": "1 year", "3y": "3 years", "5y": "5 years"}
+NO_BENCHMARK_QUESTION = "How much has it returned?"
 
 
 def _figures(w: ReturnWindow) -> tuple[Any, Any, str, bool]:
@@ -86,6 +87,8 @@ class FundReturnsBuilder:
         if bench and any(v[0] is not None for v in bench_values):
             series.append({"name": f"{bench} (with dividends)", "role": "benchmark",
                            "values": bench_values})
+        else:
+            question = NO_BENCHMARK_QUESTION   # V1-94: no promise the page cannot keep
 
         lead = next(
             (
@@ -130,6 +133,7 @@ class FundReturnsBuilder:
             source_modules=["m2", "m0"],
             row_count=len(rows),
             params=params,
+            question=question,
         )
 
 

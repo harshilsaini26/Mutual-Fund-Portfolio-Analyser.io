@@ -114,6 +114,21 @@ def test_too_few_peers_gives_no_rank_and_says_why() -> None:
     assert one.rank is None and one.reason and "only 3" in one.reason
 
 
+def test_a_heading_that_mixes_unlike_funds_ranks_none_of_them() -> None:
+    """External audit, 2026-10-04: AMFI's older "Index Funds" heading put gilt
+    target-maturity funds beside equity trackers ("63rd of 141"), and the old
+    "Sectoral/ Thematic" one put banking beside digital. A rank there means
+    nothing, and the page says why instead (`ranked: false` in categories.yaml)."""
+    funds = [_fund(f"F{i}", "Other Scheme - Index Funds") for i in range(8)]
+    stats = [_stat(f.scheme_id, w, f"0.{10 + i}")
+             for i, f in enumerate(funds) for w in ("1y", "3y")]
+    found = peer_context(_Market(funds, stats), "F0")
+    assert found is not None and found.in_category == 8
+    for rank in found.ranks:
+        assert rank.rank is None and rank.quartile is None, rank.metric.key
+        assert rank.reason and "do different jobs" in rank.reason
+
+
 def test_a_fund_that_is_not_live_has_no_peer_group() -> None:
     assert peer_context(_Market([_fund("F0", FLEXI_NEW)], []), "GONE") is None
 

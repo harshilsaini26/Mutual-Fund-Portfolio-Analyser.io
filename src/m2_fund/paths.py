@@ -138,6 +138,9 @@ class RollingPath:
 
     `pct_ahead` counts only windows where the benchmark priced at both ends,
     and is None when there are none: "ahead in 0% of periods" would be a claim.
+    `ahead` of `paired`, from the stretch ending `paired_from`, is what a
+    sentence about it states: a benchmark younger than the fund compares only
+    its later stretches, and 200 of 201 is not "100%".
     """
 
     horizon_days: int
@@ -146,6 +149,9 @@ class RollingPath:
     median: Decimal
     best: Decimal
     pct_ahead: Decimal | None
+    ahead: int = 0
+    paired: int = 0
+    paired_from: date | None = None
 
 
 def rolling_path(
@@ -170,15 +176,20 @@ def rolling_path(
     if len(points) < MIN_ROLLING_WINDOWS:
         return None
     returns = [f for _, f, _ in points]
-    paired = [(f, b) for _, f, b in points if b is not None]
-    ahead = Decimal(sum(1 for f, b in paired if f > b))
+    paired = [(d, f, b) for d, f, b in points if b is not None]
+    ahead = sum(1 for _, f, b in paired if f > b)
     return RollingPath(
         horizon_days=horizon_days,
         points=points,
         worst=min(returns),
         median=median(returns),
         best=max(returns),
-        pct_ahead=(ahead * 100 / len(paired)).quantize(RATE_Q) if paired else None,
+        pct_ahead=(
+            (Decimal(ahead) * 100 / len(paired)).quantize(RATE_Q) if paired else None
+        ),
+        ahead=ahead,
+        paired=len(paired),
+        paired_from=paired[0][0] if paired else None,
     )
 
 

@@ -53,7 +53,7 @@ from src.m0_data.store import (
     save_fetched,
     save_holdings,
 )
-from src.m0_data.universe import live_funds
+from src.m0_data.universe import live_funds, regular_twins
 from src.m2_fund.stats import rebuild_fund_stats
 
 from jobs import publish_site
@@ -96,21 +96,37 @@ def run_step(job: Sequence[str], env: dict[str, str]) -> int:
                            cwd=REPO_ROOT, env=env)
 
 
-def build(out: Path, store_root: Path | None, base: str, workdir: Path,
-          groww_pages: int = GROWW_PAGES_A_DAY) -> dict[str, int]:
-    env = workspace_env(workdir)
+def fetch(env: dict[str, str]) -> list[str]:
+    """Run `FETCH_STEPS`; a required one that fails stops the build. Returns
+    what did not finish. On GitHub Actions that is a warning on the run's
+    summary page, not a line in the log: Kotak's and ICICI's files had been
+    missing from the public site unnoticed (external audit, 2026-10-04)."""
+    missed: list[str] = []
     for what, job, required in FETCH_STEPS:
         print(f"\n== {what}", flush=True)
         if run_step(job, env) != 0:
             if required:
                 raise SystemExit(f"the build needs {what}, and that step failed")
+            missed.append(what)
             print(f"  ! {what} did not finish; the build carries on without it")
+            if os.environ.get("GITHUB_ACTIONS"):
+                print(f"::warning title=Nightly build::{what} did not finish; "
+                      "the site was built without it", flush=True)
+    return missed
+
+
+def build(out: Path, store_root: Path | None, base: str, workdir: Path,
+          groww_pages: int = GROWW_PAGES_A_DAY) -> dict[str, int]:
+    env = workspace_env(workdir)
+    fetch(env)
 
     db = workdir / "warehouse" / "canonical.db"
     conn = connect(str(db))
     try:
         funds = live_funds(conn)
-        print(f"\n== the store: {len(funds):,} live funds", flush=True)
+        # Their Regular plans' prices are kept too, for Your portfolio (audit).
+        funds += list(regular_twins(conn, funds).values())
+        print(f"\n== the store: {len(funds):,} live funds and Regular plans", flush=True)
         if store_root is not None:
             done = restore(conn, store_root, funds)
             print(f"  {done.funds:,} funds, {done.rows:,} prices restored;"

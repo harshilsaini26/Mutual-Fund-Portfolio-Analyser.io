@@ -70,6 +70,22 @@
 
   function pad(n) { return String(n).padStart(2, "0"); }
 
+  // "25 Sep 2026", as format.py's `format_date` writes every date on the site.
+  // The months are spelled here: en-GB formatting gives "Sept" in some browsers.
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function day(iso) {
+    if (!iso) return "—";
+    var p = String(iso).split("-");
+    return p[2] + " " + MONTHS[Number(p[1]) - 1] + " " + p[0];
+  }
+
+  // Units held, from thousandths, grouped as rupees are: 12,34,567.890.
+  var GROUPED = new Intl.NumberFormat("en-IN");
+  function units(milli) {
+    return GROUPED.format(milli / 1000n) + "." + String(milli % 1000n).padStart(3, "0");
+  }
+
+
   function sipDates(sip, todayIso) {
     var a = sip.start.split("-").map(Number);
     var b = (sip.stop || todayIso.slice(0, 7)).split("-").map(Number);
@@ -102,7 +118,7 @@
   }
 
   function blank(kind, row) {
-    return kind === "purchase" ? !row.date && !row.amount : !row.amount;
+    return kind === "sip" ? !row.amount : !row.date && !row.amount;
   }
 
   // What is wrong with one entry, in words, or null. The page shows this beside
@@ -110,11 +126,14 @@
   // page says and what it counts are the same thing.
   function rowError(fund, kind, row, todayIso) {
     var from = fund && fund.prices_from;
-    if (kind === "purchase") {
-      if (!ISO.test(row.date || "")) return "Enter the date of the purchase.";
+    if (kind === "purchase" || kind === "sale") {
+      if (!ISO.test(row.date || "")) return "Enter the date of the " + kind + ".";
       if (row.date > todayIso) return "The date is after today.";
-      if (from && row.date < from) return "Prices on record begin on " + from + "; enter a date from then on.";
-      if (!toPaise(row.amount)) return "Enter an amount in rupees, above zero.";
+      if (from && row.date < from) return "Prices on record begin on " + day(from) + "; enter a date from then on.";
+      if (!toPaise(row.amount)) {
+        return kind === "sale" ? "Enter the amount you received, in rupees, above zero."
+          : "Enter an amount in rupees, above zero.";
+      }
       return null;
     }
     if (!toPaise(row.amount)) return "Enter a monthly amount in rupees, above zero.";
@@ -123,7 +142,7 @@
     if (row.start > todayIso.slice(0, 7)) return "The SIP starts after this month.";
     if (row.stop && row.stop < row.start) return "The SIP stops before it starts.";
     var first = sipDates({ day: row.day, start: row.start, stop: row.start }, "9999-12-31")[0];
-    if (from && first < from) return "Prices on record begin on " + from + "; the first instalment, " + first + ", is before that.";
+    if (from && first < from) return "Prices on record begin on " + day(from) + "; the first instalment, " + day(first) + ", is before that.";
     return null;
   }
 
@@ -140,8 +159,19 @@
       var paise = toPaise(s.amount);
       sipDates(s, todayIso).forEach(function (d) { buys.push({ date: d, paise: paise }); });
     });
-    buys.sort(function (x, y) { return x.date < y.date ? -1 : x.date > y.date ? 1 : 0; });
-    return { buys: buys, excluded: excluded };
+    buys.sort(byDate);
+    var sales = [];
+    (holding.sales || []).forEach(function (p) {
+      if (rowError(fund, "sale", p, todayIso)) { if (!blank("sale", p)) excluded += 1; return; }
+      sales.push({ date: p.date, paise: toPaise(p.amount) });
+    });
+    sales.sort(byDate);
+    return { buys: buys, sales: sales, excluded: excluded };
+  }
+
+  function byDate(x, y) {
+    var a = x.date || x[0], b = y.date || y[0];
+    return a < b ? -1 : a > b ? 1 : 0;
   }
 
   // M1's `returns.xirr`, step for step.
@@ -185,20 +215,50 @@
     return (lo + hi) / 2;
   }
 
-  function position(buys, series) {
+  // A sale: the units the amount buys back at that day's NAV, without stamp
+  // duty (it is charged on purchases), or why it cannot be priced.
+  function redeem(amountPaise, iso, series) {
+    if (!series.dates.length || iso < series.dates[0]) return { error: "before" };
+    var i = onOrAfter(series.dates, iso);
+    if (i < 0) return { error: "pending" };
+    return { navDate: series.dates[i], navMicro: series.navs[i],
+             unitsMilli: roundDiv(BigInt(amountPaise) * 10000000n, series.navs[i]) };
+  }
+
+  // `sales` are the money received from selling units (external audit,
+  // 2026-10-04: purchases alone overstated anyone who had sold). Each removes
+  // its units on its date; one larger than what was held then is left out
+  // ("more"), and the return counts the money back as it came.
+  function position(buys, series, sales) {
     var lots = buys.map(function (b) {
       return Object.assign({ date: b.date, paise: b.paise }, allot(b.paise, b.date, series));
     });
     var priced = lots.filter(function (l) { return !l.error; });
-    var units = priced.reduce(function (s, l) { return s + l.unitsMilli; }, 0n);
+    var bought = function (iso) {
+      return priced.reduce(function (s, l) { return l.date <= iso ? s + l.unitsMilli : s; }, 0n);
+    };
+    var soldUnits = 0n;
+    var out = (sales || []).slice().sort(byDate).map(function (s) {
+      var sale = Object.assign({ date: s.date, paise: s.paise }, redeem(s.paise, s.date, series));
+      if (sale.error) return sale;
+      if (sale.unitsMilli > bought(s.date) - soldUnits) return Object.assign(sale, { error: "more" });
+      soldUnits += sale.unitsMilli;
+      return sale;
+    });
+    var taken = out.filter(function (s) { return !s.error; });
+    var units = bought("9999-12-31") - soldUnits;
     var last = series.dates.length - 1;
     var valuePaise = Number(roundDiv(units * series.navs[last], 10000000n));
     var flows = priced.map(function (l) { return [l.date, -l.paise / 100]; })
+      .concat(taken.map(function (s) { return [s.date, s.paise / 100]; }))
+      .sort(byDate)
       .concat([[series.dates[last], valuePaise / 100]]);
     return {
       lots: lots,
+      sales: out,
       unitsMilli: units,
       investedPaise: priced.reduce(function (s, l) { return s + l.paise; }, 0),
+      redeemedPaise: taken.reduce(function (s, x) { return s + x.paise; }, 0),
       valuePaise: valuePaise,
       valueDate: series.dates[last],
       firstDate: priced.length ? priced[0].date : null,
@@ -217,14 +277,14 @@
   function shares(map, of) {
     return Array.from(map, function (kv) {
       return { key: kv[0], paise: kv[1], pct: of ? kv[1] * 100 / of : 0 };
-    }).sort(function (x, y) { return y.paise - x.paise; });
+    }).sort(function (x, y) { return y.paise - x.paise || (x.key < y.key ? -1 : x.key > y.key ? 1 : 0); });
   }
 
   function rows(map, total) {
     return Array.from(map.values(), function (r) {
       return { id: r.id, name: r.name, klass: r.klass, paise: r.paise,
                funds: r.funds.size, pct: total ? r.paise * 100 / total : 0 };
-    }).sort(function (x, y) { return y.paise - x.paise; });
+    }).sort(function (x, y) { return y.paise - x.paise || (x.id < y.id ? -1 : x.id > y.id ? 1 : 0); });   // a tie-break: one order (D-312)
   }
 
   function lookThrough(positions, files) {
@@ -277,29 +337,35 @@
     return s;
   }
 
+  // [field, order, which]: the first after sorting, or the middle one. Not
+  // today's highest three-year return: set against purchases made years ago,
+  // that fund is chosen knowing the outcome (external audit, 2026-10-04).
   var RULES = [
-    ["ter", function (x, y) { return x - y; }],     // lowest expense ratio
-    ["r3", function (x, y) { return y - x; }],      // highest three-year return
-    ["size", function (x, y) { return y - x; }],    // largest fund
+    ["ter", function (x, y) { return x - y; }, "first"],     // lowest expense ratio
+    ["r3", function (x, y) { return x - y; }, "middle"],     // the category's middle return
+    ["size", function (x, y) { return y - x; }, "first"],    // largest fund today
   ];
 
-  // AMFI's older "Index Funds" and "ETFs" headings hold equity, debt and gold
-  // funds alike (config/categories.yaml, `*/undivided`): nothing in them is
-  // like-for-like, so none is suggested. The person can still choose one.
-  function mixed(category) { return /\/undivided$/.test(category || ""); }
-
+  // A heading that holds unlike funds -- AMFI's older "Index Funds", catch-alls,
+  // funds of funds -- has nothing like-for-like to suggest (`mixed` in
+  // funds.json: categories.yaml's `ranked: false`). The person can still choose.
+  //
+  // `firstIso` is the first purchase: a candidate needs prices back to it. With
+  // none (Compare), it needs three years of prices, as its return rule does.
   function alternatives(held, funds, firstIso) {
-    if (mixed(held.category)) return [];
+    if (held.mixed) return [];
     var pool = funds.filter(function (f) {
-      return f.category === held.category && f.id !== held.id && f.amfi &&
-        f.prices_from && f.prices_from <= firstIso;
+      return f.category === held.category && f.id !== held.id && f.amfi && f.prices_from &&
+        f.plan !== "regular" &&   // Direct plans only (MODULE_2 §11.2)
+        (firstIso ? f.prices_from <= firstIso : f.r3 != null);
     });
     var out = [];
     RULES.forEach(function (rule) {
       var key = rule[0];
-      var pick = pool.filter(function (f) { return f[key] != null; }).sort(function (x, y) {
+      var ranked = pool.filter(function (f) { return f[key] != null; }).sort(function (x, y) {
         return rule[1](Number(x[key]), Number(y[key])) || (x.name < y.name ? -1 : 1);
-      })[0];
+      });
+      var pick = ranked[rule[2] === "middle" ? Math.floor((ranked.length - 1) / 2) : 0];
       if (!pick) return;
       var seen = out.filter(function (o) { return o.fund.id === pick.id; })[0];
       if (seen) seen.reasons.push(key); else out.push({ fund: pick, reasons: [key] });
@@ -330,6 +396,11 @@
       .map(function (l) { return { date: l.date, paise: l.paise }; });
   }
 
+  function pricedSales(pos) {
+    return (pos.sales || []).filter(function (s) { return !s.error; })
+      .map(function (s) { return { date: s.date, paise: s.paise }; });
+  }
+
   function text(v, max) {
     return (typeof v === "string" || typeof v === "number") && String(v).length <= max ? String(v) : null;
   }
@@ -344,13 +415,18 @@
       if (!f || typeof f.id !== "string" || !ISIN.test(f.id)) {
         return { error: "A fund in the file has no valid ISIN." };
       }
-      var into = byId.get(f.id) || { id: f.id, purchases: [], sips: [], alts: [null, null, null] };
+      var into = byId.get(f.id) || { id: f.id, purchases: [], sips: [], sales: [], alts: [null, null, null] };
       // Rows are kept whenever their fields have the right shape, filled in or
       // not: whether an entry is complete is `rowError`'s question, asked on the
       // page. Only rows that are not shaped like entries are dropped, counted.
       (f.purchases || []).forEach(function (p) {
         var d = p && text(p.date, 10), a = p && text(p.amount, 20);
         if (d != null && a != null) into.purchases.push({ date: d, amount: a });
+        else dropped += 1;
+      });
+      (f.sales || []).forEach(function (p) {
+        var d = p && text(p.date, 10), a = p && text(p.amount, 20);
+        if (d != null && a != null) into.sales.push({ date: d, amount: a });
         else dropped += 1;
       });
       (f.sips || []).forEach(function (s) {
@@ -391,7 +467,7 @@
     showsXirr: showsXirr, isSynthetic: isSynthetic, lookThrough: lookThrough,
     overlap: overlap, alternatives: alternatives, parsePortfolio: parsePortfolio,
     localDay: localDay, rowError: rowError, entriesOf: entriesOf, altSlots: altSlots,
-    pricedBuys: pricedBuys, gzipText: gzipText,
+    pricedBuys: pricedBuys, pricedSales: pricedSales, gzipText: gzipText, day: day, units: units,
   };
   if (typeof module === "object" && module.exports) module.exports = api;
   else globalThis.PortfolioMath = api;

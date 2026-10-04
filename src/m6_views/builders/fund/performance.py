@@ -62,10 +62,18 @@ MEASURES = (
     ("information_ratio", "Information ratio", "ratio",
      "Its lead over the benchmark for each unit of tracking error."),
     ("up_capture", "Up capture", "fraction",
-     "Its gain on the days the benchmark rose, as a share of the benchmark's."),
+     "Its yearly gain over the months the benchmark rose, as a share of the "
+     "benchmark's."),
     ("down_capture", "Down capture", "fraction",
-     "Its loss on the days the benchmark fell, as a share of the benchmark's."),
+     "Its yearly loss over the months the benchmark fell, as a share of the "
+     "benchmark's."),
 )
+
+NO_BENCHMARK_QUESTION = "How has it done for the risk taken?"
+#: The measures that need a benchmark: left out when the fund has none.
+BENCHMARK_MEASURES = {"bench_return_ann", "lead", "treynor", "alpha_ann", "beta",
+                      "tracking_error", "information_ratio", "up_capture",
+                      "down_capture"}
 
 NO_YIELD = (
     "Average maturity and yield to maturity are not shown: fund houses publish "
@@ -98,6 +106,8 @@ class FundPerformanceBuilder:
             fw = fund_windows(self.market, scheme, scope.as_of)
         except NothingToCompute as e:
             return empty_envelope(VIEW_ID, question, scope, str(e))
+        if fw.benchmark_id is None:
+            question = NO_BENCHMARK_QUESTION
 
         # A fixed window only when the prices span it, as in `fund_returns`.
         shown = {k: w for k, w in fw.windows.items()
@@ -108,10 +118,15 @@ class FundPerformanceBuilder:
                 f"Prices for {scheme} begin on {format_date(fw.navs[0].nav_date)}: "
                 f"less than a year, so no yearly measure is shown yet.",
             )
+        # Without a benchmark its rows are left out rather than drawn as dashes;
+        # the note below says why (V1-94). With one, every row stays: a blank
+        # there has its own reason (a capture ratio's six months, say).
+        benchmarked = any(w.bench_return_ann is not None for w in shown.values())
         rows = [
             {"measure": label, "kind": kind, "meaning": meaning,
              **{k: _value(w, key) for k, w in shown.items()}}
             for key, label, kind, meaning in MEASURES
+            if benchmarked or key not in BENCHMARK_MEASURES
         ]
 
         facts = self.market.scheme_facts(scheme)
@@ -137,11 +152,25 @@ class FundPerformanceBuilder:
         elif fw.benchmark_id is None:
             caveats.append(
                 "No benchmark index is on record for this fund, so the rows "
-                "that compare it with one are empty."
+                "that compare it with one are left out."
             )
         category = category_of(facts.category) if facts and facts.category else None
         if category and "debt" in (category.family, category.key.split("/")[-1]):
             caveats.append(NO_YIELD)
+        # Capture is monthly (§8.4): a short window has few months to rest on,
+        # and under six either way there is no ratio at all.
+        caveats.extend(
+            (f"Over {PERIODS[k]} the capture ratios rest on {cw.up_months} rising "
+             f"and {cw.down_months} falling months of the benchmark; that few "
+             f"makes them rough.")
+            if cw.up_capture is not None and cw.down_capture is not None
+            else (f"Over {PERIODS[k]} the benchmark had {cw.up_months} rising and "
+                  f"{cw.down_months} falling months; a capture ratio needs six "
+                  f"each way, so a blank one is left blank.")
+            for k, cw in shown.items()
+            if cw.up_months is not None and cw.down_months is not None
+            and min(cw.up_months, cw.down_months) < 12
+        )
 
         rf = w.risk_free_pct
         return ok_envelope(
@@ -150,9 +179,9 @@ class FundPerformanceBuilder:
             payload={
                 "headline": headline,
                 "definition": (
-                    "Cash is the risk-free rate in force when each period began"
-                    + (f" ({rf}% a year for {PERIODS[lead_key]})." if rf is not None
-                       else ".")
+                    "Cash is the 91-day Treasury bill rate, averaged over each period"
+                    + (f" ({rf:.2f}% a year over {PERIODS[lead_key]})."
+                       if rf is not None else ".")
                 ),
                 "columns": [
                     {"key": "measure", "label": "Measure", "kind": "text"},
@@ -167,6 +196,7 @@ class FundPerformanceBuilder:
             row_count=len(rows),
             params=params,
             extra_caveats=caveats,
+            question=question if benchmarked else NO_BENCHMARK_QUESTION,
         )
 
 

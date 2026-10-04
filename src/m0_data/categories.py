@@ -54,6 +54,9 @@ class Category:
     note: str | None = None
     #: What SEBI's rules say it holds, in a line (the front page's map, V1-81).
     about: str | None = None
+    #: False for a heading that mixes funds doing different jobs: its funds are
+    #: never ranked against each other (categories.yaml, `ranked: false`).
+    ranked: bool = True
 
 
 def normalise(name: str) -> str:
@@ -72,6 +75,7 @@ def _table(path: Path = CATEGORIES_YAML) -> dict[str, Category]:
             family=str(entry["family"]),
             note=" ".join(str(entry["note"]).split()) if entry.get("note") else None,
             about=entry.get("about"),
+            ranked=entry.get("ranked", True) is not False,
         )
         for amfi_name in entry["merges"]:
             table[normalise(str(amfi_name))] = category

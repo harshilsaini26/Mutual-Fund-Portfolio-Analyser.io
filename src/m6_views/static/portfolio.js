@@ -33,6 +33,8 @@
   }
 
   function out(name) { return page.querySelector('[data-out="' + name + '"]'); }
+  // A Regular plan shares its Direct plan's portfolio and page (funds.json `direct`).
+  function fundPage(fund) { return BASE + "/fund/" + (fund.direct || fund.id) + "/"; }
   function say(text) { document.getElementById("pf-status").textContent = text; }
   function entries(n) { return n + (n === 1 ? " entry" : " entries"); }
 
@@ -99,7 +101,7 @@
     var fund = FUNDS.get(h.id);
     var gone = leaving.get(h.id);
     var title = fund
-      ? el("a", { href: BASE + "/fund/" + h.id + "/" }, fund.name)
+      ? el("a", { href: fundPage(fund) }, fund.name)
       : el("span", null, h.id + " (no longer published here, so it is not valued)");
     var card = el("article", { "class": "pf__holding" + (gone ? " pf__holding--leaving" : ""), "data-fund": i },
       el("header", { "class": "pf__holding-head" },
@@ -124,11 +126,21 @@
         errorSlot()));
       showRowError(row, rowError(fund, "sip", s));
     });
+    (h.sales || []).forEach(function (p, r) {
+      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "sale", "data-row": r, inert: !!gone },
+        field("Sold on", { type: "date", value: p.date, max: TODAY, min: fund ? fund.prices_from : null, "data-field": "date" }),
+        field("Received", { type: "text", inputmode: "decimal", value: p.amount, "data-field": "amount" }, "₹"),
+        iconButton("remove-row", "Remove this sale", "close"),
+        errorSlot()));
+      showRowError(row, rowError(fund, "sale", p));
+    });
     card.appendChild(el("p", { "class": "pf__add", inert: !!gone },
       el("button", { type: "button", "class": "button button--tinted", "data-action": "add-lump" },
         K.icon("plus"), "Add a lump sum"),
       el("button", { type: "button", "class": "button button--tinted", "data-action": "add-sip" },
-        K.icon("plus"), "Add a SIP")));
+        K.icon("plus"), "Add a SIP"),
+      el("button", { type: "button", "class": "button button--tinted", "data-action": "add-sale" },
+        K.icon("plus"), "Add a sale")));
     return card;
   }
 
@@ -205,6 +217,10 @@
 
   function changed() { save(); entry(); results(); }
 
+  function listOf(h, kind) {
+    return kind === "sip" ? h.sips : kind === "sale" ? (h.sales = h.sales || []) : h.purchases;
+  }
+
   function stopReplacing() {
     replacing = null;
     document.getElementById("pf-pick-label").textContent = "Add a fund";
@@ -228,7 +244,7 @@
       return;
     }
     if (state.funds.some(function (h) { return h.id === fund.id; })) { say(fund.name + " is already in your portfolio."); return; }
-    state.funds.push({ id: fund.id, purchases: [{ date: "", amount: "" }], sips: [], alts: [null, null, null] });
+    state.funds.push({ id: fund.id, purchases: [{ date: "", amount: "" }], sips: [], sales: [], alts: [null, null, null] });
     say("");
     changed();
   }
@@ -240,8 +256,7 @@
     var row = t.closest("[data-row]"), card = t.closest("[data-fund]");
     if (!row || !card || !t.dataset.field) return;
     var h = state.funds[Number(card.dataset.fund)];
-    var list = row.dataset.kind === "sip" ? h.sips : h.purchases;
-    var item = list[Number(row.dataset.row)];
+    var item = listOf(h, row.dataset.kind)[Number(row.dataset.row)];
     item[t.dataset.field] = t.dataset.field === "day" ? (t.value === "" ? null : Number(t.value))
       : t.dataset.field === "stop" ? (t.value || null) : t.value;
     showRowError(row, rowError(FUNDS.get(h.id), row.dataset.kind, item));
@@ -258,7 +273,8 @@
     switch (b.dataset.action) {
       case "add-lump": h.purchases.push({ date: "", amount: "" }); break;
       case "add-sip": h.sips.push({ amount: "", day: 1, start: TODAY.slice(0, 7), stop: null }); break;
-      case "remove-row": (row.dataset.kind === "sip" ? h.sips : h.purchases).splice(Number(row.dataset.row), 1); break;
+      case "add-sale": (h.sales = h.sales || []).push({ date: "", amount: "" }); break;
+      case "remove-row": listOf(h, row.dataset.kind).splice(Number(row.dataset.row), 1); break;
       case "remove-fund": arm(h.id); return;
       case "undo-remove": undo(h.id); return;
       case "replace":
@@ -320,7 +336,7 @@
   function returnText(pos) {
     if (!pos.firstDate) return "—";
     if (M.showsXirr(pos.firstDate, pos.valueDate)) return pos.xirr == null ? "—" : signedPct(pos.xirr) + " a year";
-    var gain = pos.investedPaise ? (pos.valuePaise - pos.investedPaise) / pos.investedPaise : 0;
+    var gain = pos.investedPaise ? (pos.valuePaise + pos.redeemedPaise - pos.investedPaise) / pos.investedPaise : 0;
     return signedPct(gain) + " in total (under a year)";
   }
 
@@ -331,7 +347,7 @@
       if (!fund.amfi) return { h: h, fund: fund, pos: null, error: "its prices are not published" };
       var e = M.entriesOf(h, fund, TODAY);
       return K.navSeries(BASE, fund).then(function (s) {
-        return { h: h, fund: fund, pos: M.position(e.buys, s), excluded: e.excluded, error: null };
+        return { h: h, fund: fund, pos: M.position(e.buys, s, e.sales), excluded: e.excluded, error: null };
       }, function (err) { return { h: h, fund: fund, pos: null, excluded: e.excluded, error: err.message }; });
     }));
   }
@@ -347,9 +363,11 @@
     }
     var invested = ok.reduce(function (s, x) { return s + x.pos.investedPaise; }, 0);
     var value = ok.reduce(function (s, x) { return s + x.pos.valuePaise; }, 0);
+    var redeemed = ok.reduce(function (s, x) { return s + x.pos.redeemedPaise; }, 0);
     var flows = [];
     ok.forEach(function (x) {
       x.pos.lots.forEach(function (l) { if (!l.error) flows.push([l.date, -l.paise / 100]); });
+      x.pos.sales.forEach(function (v) { if (!v.error) flows.push([v.date, v.paise / 100]); });
     });
     flows.sort(function (a, b) { return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0; });
     var asOf = ok.map(function (x) { return x.pos.valueDate; }).sort().pop();
@@ -358,15 +376,20 @@
     var pending = list.reduce(function (s, x) {
       return s + (x.pos ? x.pos.lots.filter(function (l) { return l.error === "pending"; }).length : 0);
     }, 0);
+    var oversold = list.reduce(function (s, x) {
+      return s + (x.pos ? x.pos.sales.filter(function (v) { return v.error === "more"; }).length : 0);
+    }, 0);
     var unvalued = list.filter(function (x) { return !x.pos; }).length;
     var excluded = list.reduce(function (s, x) { return s + (x.excluded || 0); }, 0);
     fill(box,
       el("dl", { "class": "pf__tiles" },
         el("div", { "class": "pf__tile" }, el("dt", null, "Put in"), el("dd", null, rupees(invested))),
-        el("div", { "class": "pf__tile" }, el("dt", null, "Worth on " + asOf), el("dd", null, rupees(value))),
-        el("div", { "class": "pf__tile" }, el("dt", null, "Gain"), el("dd", null, rupees(value - invested))),
+        redeemed ? el("div", { "class": "pf__tile" }, el("dt", null, "Taken out"), el("dd", null, rupees(redeemed))) : null,
+        el("div", { "class": "pf__tile" }, el("dt", null, "Worth on " + M.day(asOf)), el("dd", null, rupees(value))),
+        el("div", { "class": "pf__tile" }, el("dt", null, "Gain"), el("dd", null, rupees(value + redeemed - invested))),
         el("div", { "class": "pf__tile" }, el("dt", null, "Return", K.termButton("xirr", "pf")), el("dd", null, returnText(whole)))),
       pending ? el("p", { "class": "pf__note" }, pending + " purchase" + (pending === 1 ? " is" : "s are") + " awaiting a published NAV and left out until it appears.") : null,
+      oversold ? el("p", { "class": "pf__note" }, oversold + " sale" + (oversold === 1 ? " is" : "s are") + " larger than the units held on " + (oversold === 1 ? "its date" : "their dates") + " and left out; check the amount and the purchases before it.") : null,
       unvalued ? el("p", { "class": "pf__note" }, unvalued + " fund" + (unvalued === 1 ? " is" : "s are") + " not valued and left out of these totals; the funds table says why.") : null,
       excluded ? el("p", { "class": "pf__note" }, entries(excluded) + " with an error " + (excluded === 1 ? "is" : "are") + " left out until corrected; each says what is wrong.") : null,
       el("p", { "class": "pf__estimate" }, ESTIMATE));
@@ -375,15 +398,15 @@
   function fundsTable(list) {
     var total = list.reduce(function (s, x) { return s + (x.pos ? x.pos.valuePaise : 0); }, 0);
     var rows = list.map(function (x) {
-      var name = x.fund ? el("a", { href: BASE + "/fund/" + x.fund.id + "/" }, x.fund.name) : x.h.id;
+      var name = x.fund ? el("a", { href: fundPage(x.fund) }, x.fund.name) : x.h.id;
       if (!x.pos) return [name, "—", "—", "—", "—", "—", "Not valued: " + x.error];
       var p = x.pos;
       if (!p.firstDate) {
         var waiting = p.lots.some(function (l) { return l.error === "pending"; });
         return [name, "—", "—", "—", "—", "—", waiting ? "Awaiting a published NAV" : "No purchases entered yet"];
       }
-      return [name, rupees(p.investedPaise), (Number(p.unitsMilli) / 1000).toFixed(3), rupees(p.valuePaise),
-              rupees(p.valuePaise - p.investedPaise), returnText(p),
+      return [name, rupees(p.investedPaise), M.units(p.unitsMilli), rupees(p.valuePaise),
+              rupees(p.valuePaise + p.redeemedPaise - p.investedPaise), returnText(p),
               total ? pct(p.valuePaise * 100 / total) : "—"];
     });
     out("funds").replaceChildren(rows.length
@@ -403,7 +426,7 @@
     var held = list.filter(function (x) { return x.pos && x.pos.valuePaise > 0; });
     var box = out("look");
     if (!held.length) { box.replaceChildren(el("p", { "class": "pf__note" }, "Shown once a fund is valued.")); return Promise.resolve(); }
-    return Promise.all(held.map(function (x) { return K.lookFile(BASE, x.fund.id); })).then(function (files) {
+    return Promise.all(held.map(function (x) { return K.lookFile(BASE, x.fund.direct || x.fund.id); })).then(function (files) {
       if (!live()) return;
       var byId = {};
       held.forEach(function (x, i) { byId[x.fund.id] = files[i]; });
@@ -438,12 +461,15 @@
 
       fill(box,
         el("h3", null, "Companies"),
-        table(["Company", "Your money in it", "Share of portfolio", "Held by"], companyRows, [0, 1, 1, 1]),
+        // No disclosure loaded for any fund: one sentence, not a table of headers.
+        companyRows.length
+          ? table(["Company", "Your money in it", "Share of portfolio", "Held by"], companyRows, [0, 1, 1, 1])
+          : el("p", { "class": "pf__note" }, "No company is named yet: none of these funds has a disclosure loaded here."),
         grid && el("h3", null, "How much of each pair of funds is the same", K.termButton("overlap", "pf")),
         grid && el("p", { "class": "pf__note" }, "The share of two funds' portfolios in the same companies: 100% would be identical funds, 0% nothing in common."),
         grid,
         el("div", { "class": "pf__grid" },
-          bars("Asset mix", lt.mix, CLASS),
+          lt.mix.length ? bars("Asset mix", lt.mix, CLASS) : null,
           lt.sectors.length ? bars("Shares by sector", lt.sectors, {}) : null,
           lt.sizes.length ? bars("Shares by company size", lt.sizes, SIZE) : null),
         noteList(notes));
@@ -458,8 +484,8 @@
 
   var REASON = {
     ter: "lowest expense ratio",
-    r3: "highest three-year return",
-    size: "largest fund",
+    r3: "middle three-year return in its category",
+    size: "largest fund today",
   };
 
   function figure(v, kind) {
@@ -479,27 +505,30 @@
     return Promise.all(cards.map(function (x) {
       var suggested = M.alternatives(x.fund, all, x.pos.firstDate);
       var slots = M.altSlots(x.h.alts, suggested, function (id) { return FUNDS.get(id); });
-      var buys = M.pricedBuys(x.pos);
+      var buys = M.pricedBuys(x.pos), sold = M.pricedSales(x.pos);
       return Promise.all(slots.map(function (s) {
         if (!s.fund) return Promise.resolve({ s: s, pos: null, error: null });
         return K.navSeries(BASE, s.fund).then(function (series) {
-          return { s: s, pos: M.position(buys, series), error: null };
+          return { s: s, pos: M.position(buys, series, sold), error: null };
         }, function (e) { return { s: s, pos: null, error: e.message }; });
       })).then(function (valued) {
-        var label = "the same " + rupees(x.pos.investedPaise) + " on the same dates";
+        var label = "the same " + rupees(x.pos.investedPaise) + (sold.length ? ", and the same sales," : "") + " on the same dates";
         var rows = [[el("strong", null, x.fund.name), "yours", rupees(x.pos.valuePaise), returnText(x.pos),
                      figure(x.fund.r3), figure(x.fund.vol3, "fall"), figure(x.fund.fall3, "fall"), figure(x.fund.ter, "ter"), ""]];
         valued.forEach(function (v) {
           var f = v.s.fund;
           var button = el("button", { type: "button", "class": "button button--quiet", "data-action": "replace",
-                                      "data-held": x.h.id, "data-slot": v.s.slot }, f ? "Replace" : "Choose a fund");
+                                      "data-held": x.h.id, "data-slot": v.s.slot },
+                                    f ? "Compare a different fund" : "Choose a fund");
           if (!f) { rows.push(["—", "", "", "", "", "", "", "", button]); return; }
           var why = v.s.reasons.map(function (r) { return r === "chosen" ? "your choice" : REASON[r]; }).join(", ");
           // Valued only on exactly the money the held fund priced: a lot this
           // fund cannot price yet would make it a different sum.
-          var gap = v.pos && v.pos.lots.filter(function (l) { return l.error; })[0];
+          var gap = v.pos && (v.pos.lots.filter(function (l) { return l.error; })[0] ||
+                              v.pos.sales.filter(function (x) { return x.error; })[0]);
           var reason = v.error || (gap && (gap.error === "before"
             ? "its prices begin after " + gap.date
+            : gap.error === "more" ? "it would not have held enough to sell the same on " + gap.date
             : "its NAV for " + gap.date + " is not out yet"));
           rows.push([el("a", { href: BASE + "/fund/" + f.id + "/" }, f.name), why,
             reason ? "—" : rupees(v.pos.valuePaise),
@@ -510,9 +539,11 @@
         return el("article", { "class": "pf__alt card" },
           el("h3", null, x.fund.name + " — " + (x.fund.category_name || "")),
           el("p", { "class": "pf__note" }, "What " + label + " would be worth today in each fund. " +
-            (/\/undivided$/.test(x.fund.category)
-              ? "AMFI files this fund under a heading that mixes share, bond and gold funds, so none is suggested; choose any fund to compare."
-              : "Funds of the same category whose prices go back to " + x.pos.firstDate + ", picked by the rule named beside each." +
+            (x.fund.mixed
+              ? "AMFI files this fund under a heading that mixes funds doing different jobs, so none is suggested; choose any fund to compare."
+              : "Funds of the same category whose prices go back to " + M.day(x.pos.firstDate) + ", picked by the rule named beside each." +
+                " The largest is today's largest, which leans towards funds that have done well." +
+                (x.fund.plan === "regular" ? " These are Direct plans; part of any gap is the Regular plan's higher cost." : "") +
                 (count === 0 ? " No other fund of this category has prices back that far; choose any fund to compare."
                   : count < 3 ? " Only " + count + " of this category " + (count === 1 ? "qualifies" : "qualify") + ", so the rest are empty; choose any fund to compare." : ""))),
           table(["Fund", "Why it is here", "Worth today", "Return", "3 years a year", "Volatility", "Deepest fall", "Expense ratio", ""],

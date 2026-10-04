@@ -67,3 +67,4 @@ test("with no clock given, a fuse calls the page's timers as browsers require", 
     globalThis.setTimeout = real;
   }
 });
+

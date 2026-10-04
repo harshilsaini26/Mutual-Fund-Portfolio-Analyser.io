@@ -53,7 +53,7 @@ from src.m0_data.config import REPO_ROOT, warehouse_path
 from src.m0_data.normalise.index_id import index_key
 from src.m0_data.providers.warehouse import SchemeFacts, WarehouseMarketDataProvider
 from src.m0_data.store import save as save_navs
-from src.m0_data.universe import ISIN, live_funds
+from src.m0_data.universe import ISIN, Fund, live_funds, regular_twins
 from src.m1_ledger.db import apply_ledger_schema, connect_ledger
 from src.m1_ledger.providers.position import SqlitePositionProvider
 from src.m2_fund.windows import spans
@@ -154,6 +154,40 @@ def trackers(warehouse: Any, declared: dict[str, str]) -> dict[str, list[str]]:
     return out
 
 
+#: Words a fund's name adds after the index it tracks ("... Nifty 50 Index Fund").
+_FUND_TAIL = {"INDEX", "FUND", "FUNDS", "ETF", "FOF", "OF", "EXCHANGE", "TRADED",
+              "DIRECT", "PLAN", "GROWTH", "OPTION"}
+
+
+def named_index(name: str, keys: set[str]) -> str | None:
+    """The index an index fund's own name says it tracks, as an `index_key`: the
+    longest tail of the name, fund words dropped, that is exactly an index some
+    fund declares. Exact, so "Nifty 50 Equal Weight" never borrows "Nifty 50"."""
+    words = re.sub(r"[^A-Z0-9]+", " ", name.upper()).split()
+    while words and words[-1] in _FUND_TAIL:
+        words.pop()
+    tails = (index_key(" ".join(words[i:])) for i in range(len(words)))
+    return next((key for key in tails if key in keys), None)
+
+
+def named_benchmarks(
+    warehouse: Any, declared: dict[str, str], tracked: dict[str, list[str]]
+) -> dict[str, str]:
+    """Each index fund or ETF the crawl has not read yet, and the index its name
+    names (external audit, 2026-10-04: until then it showed no benchmark)."""
+    keys = set(tracked)
+    found: dict[str, str] = {}
+    for fund in live_funds(warehouse):
+        if fund.scheme_id in declared:
+            continue
+        if not category_of(fund.category).key.startswith(("index/", "etf/")):
+            continue
+        key = named_index(fund.name, keys)
+        if key is not None:
+            found[fund.scheme_id] = key
+    return found
+
+
 class PublicMarket(WarehouseMarketDataProvider):
     """The warehouse's market data with every index level withheld (V1-72), and
     an index fund's price in place of each benchmark one tracks (V1-81).
@@ -169,11 +203,15 @@ class PublicMarket(WarehouseMarketDataProvider):
         super().__init__(conn)
         self.declared = declared or {}
         self.trackers = trackers(conn, self.declared) if self.declared else {}
+        self.named = (named_benchmarks(conn, self.declared, self.trackers)
+                      if self.trackers else {})
 
     def proxy(self, scheme_id: str) -> str | None:
-        """The index fund standing in for this fund's benchmark: never itself."""
+        """The index fund standing in for this fund's benchmark: never itself.
+        The benchmark is the one the fund declares, else the one its name names."""
         name = self.declared.get(scheme_id)
-        found = self.trackers.get(index_key(name), []) if name else []
+        key = index_key(name) if name else self.named.get(scheme_id)
+        found = self.trackers.get(key, []) if key else []
         return next((s for s in found if s != scheme_id), None)
 
     def benchmark_for(self, scheme_id: SchemeId) -> IndexId | None:
@@ -198,7 +236,8 @@ class PublicMarket(WarehouseMarketDataProvider):
         tracker = super().scheme_facts(SchemeId(proxy)) if proxy else None
         if facts is None or tracker is None:
             return facts
-        index = _TRI.sub("", self.declared[str(scheme_id)])
+        named = self.declared.get(str(scheme_id)) or self.declared[str(proxy)]
+        index = _TRI.sub("", named)
         return replace(facts, benchmark_id=PROXY + str(proxy),
                        benchmark_name=f"{index} (via {tracker.name})")
 
@@ -367,6 +406,29 @@ def fund_record(
         "prices_from": None if prices_from is None
         else format_date(date.fromisoformat(prices_from)),
     }
+    # A heading of unlike funds (categories.yaml `ranked: false`): no ranks on
+    # its pages, and no suggestions beside it on the portfolio page.
+    if not category_of(row.get("category")).ranked:
+        record["mixed"] = True
+    return record
+
+
+def regular_record(
+    direct: dict[str, Any], twin: Fund, prices_from: str, ter: Any = None
+) -> dict[str, Any]:
+    """A Regular plan for Your portfolio's picker (external audit, 2026-10-04):
+    its own prices and cost; its Direct plan's category, holdings and page,
+    since the two share one portfolio. `plan` keeps it out of Explore, Compare
+    and the suggestions, which compare Direct plans only (MODULE_2 §11.2)."""
+    record: dict[str, Any] = {
+        "id": twin.scheme_id, "amfi": twin.amfi_code,
+        "name": f"{direct['name']} (Regular)",
+        "plan": "regular", "direct": direct["id"], "category": direct["category"],
+        "category_name": direct["category_name"], "prices_from": prices_from,
+        "ter": None if ter is None else str(ter.total),
+    }
+    if direct.get("mixed"):
+        record["mixed"] = True
     return record
 
 
@@ -633,9 +695,18 @@ def build_site(
         ),
         encoding="utf-8",
     )
+    live = live_funds(warehouse)
+    twins = regular_twins(warehouse, live)
+    published = {r["id"]: r for r in records}
+    records.extend(
+        regular_record(published[direct], twin, firsts[twin.scheme_id],
+                       deps.market.ters([twin.scheme_id], today).get(twin.scheme_id))
+        for direct, twin in twins.items()
+        if direct in published and twin.scheme_id in firsts
+    )
     (out / "funds.json").write_text(
         json.dumps(records, ensure_ascii=False), encoding="utf-8")
-    nav_files = save_navs(warehouse, out, live_funds(warehouse))
+    nav_files = save_navs(warehouse, out, [*live, *twins.values()])
     for name in STATIC_FILES:
         target = out / "static" / name
         target.parent.mkdir(parents=True, exist_ok=True)

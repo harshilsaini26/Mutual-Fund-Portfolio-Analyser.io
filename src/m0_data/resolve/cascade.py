@@ -55,7 +55,8 @@ from src.m0_data.resolve.synthetic import match_synthetic
 #:
 #: Rows written before the ISIN issuer segment existed carry `'0'` from the
 #: migration default, which is what makes the first run after an upgrade rewrite.
-RESOLVER_VERSION = "9"  # 9: state development loans resolve to their state (V1-71)
+#: 10: a tie at the top no longer hides the exact name (audit, 2026-10-04).
+RESOLVER_VERSION = "10"  # 9: state development loans resolve to their state (V1-71)
 
 #: How many leading characters of an Indian ISIN identify the ISSUER rather
 #: than the security. `IN` is the country, the next five are the entity, and
@@ -159,9 +160,10 @@ def resolve(
 
     # 4. FUZZY, with the guard §8.2 lacks.
     index = issuer_index if issuer_index is not None else load_issuer_index(conn)
+    #    The first candidate that passes both conditions, not only the first
+    #    candidate: one that merely contains this name can outscore it.
     candidates = tuple(best_matches(norm, index))
-    if candidates:
-        name, issuer_id, score = candidates[0]
+    for name, issuer_id, score in candidates:
         if is_auto_acceptable(score, token_jaccard(norm, name)):
             return Resolution(
                 IssuerId(issuer_id), "fuzzy",

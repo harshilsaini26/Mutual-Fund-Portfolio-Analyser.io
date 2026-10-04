@@ -81,7 +81,10 @@
         {% for key, name in category_options %}<option value="{{ key }}">{{ name }}</option>{% endfor %}
       </select>
       <label class="sr-only" for="filter-text">Narrow by name</label>
-      <input id="filter-text" type="search" autocomplete="off" placeholder="Narrow by name" data-filter-text>
+      <span class="table-card__search">
+        {{ icon.i("search", "icon field-search__icon") }}
+        <input id="filter-text" type="search" autocomplete="off" placeholder="Narrow by name" data-filter-text>
+      </span>
       <span class="table-card__count" data-filter-count>{{ count }} funds</span>
     </div>
     <div class="table-wrap">

@@ -54,7 +54,7 @@ from src.m0_data.parse.nav.mfapi import (
     parse_mfapi,
 )
 from src.m0_data.schema.apply import apply_migrations
-from src.m0_data.universe import live_funds
+from src.m0_data.universe import live_funds, regular_twins
 
 SOURCE_ID = "S6"
 
@@ -313,6 +313,14 @@ def _archived(conn: sqlite3.Connection, file_id: str) -> bool:
     return bool(row) and Path(row[0]).exists()
 
 
+def universe_ids(conn: sqlite3.Connection) -> list[str]:
+    """Every live fund's Direct plan and, for Your portfolio, its Regular plan
+    (`regular_twins`, external audit 2026-10-04), sorted."""
+    funds = live_funds(conn)
+    twins = regular_twins(conn, funds)
+    return sorted({f.scheme_id for f in funds} | {t.scheme_id for t in twins.values()})
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scheme", nargs="+", help="scheme_id (ISIN) to backfill")
@@ -337,7 +345,7 @@ def main() -> None:
         if args.held:
             scheme_ids = sorted(set(scheme_ids) | set(disclosed_scheme_ids(conn)))
         if args.universe:
-            scheme_ids = sorted(set(scheme_ids) | {f.scheme_id for f in live_funds(conn)})
+            scheme_ids = sorted(set(scheme_ids) | set(universe_ids(conn)))
         asked = len(scheme_ids)
         if args.missing:
             scheme_ids = missing(conn, scheme_ids)

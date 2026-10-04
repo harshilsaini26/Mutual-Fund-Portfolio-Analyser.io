@@ -61,6 +61,7 @@ def ok_envelope(
     truncated: bool = False,
     extra_caveats: list[str] | None = None,
     basis: str | None = None,
+    question: str | None = None,
 ) -> ViewEnvelope:
     """§3.1. Everything needed to judge the numbers, beside the numbers.
 
@@ -68,11 +69,14 @@ def ok_envelope(
     and `confidence` comes from upstream unchanged — M6 does not grade data, it
     renders the grade. §14.1 rule 3 makes confidence the weakest link rather than
     an average, and that reduction happened in M3.
+
+    `question` replaces the registry's when the view cannot answer all of it:
+    a fund with no benchmark is not asked how it did against one (V1-94).
     """
     view = VIEW_DEFS[view_id]
     return ViewEnvelope(
         view_id=view_id,
-        question=view.question,
+        question=question or view.question,
         as_of=scope.as_of,
         data_as_of=data_as_of,
         staleness_days=quality.worst_staleness_days or 0,

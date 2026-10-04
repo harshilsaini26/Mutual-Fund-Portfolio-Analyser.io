@@ -33,12 +33,12 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 from statistics import median
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 from src.common.contracts.market import NavPoint
 from src.common.decimals import RATE_Q, annualise
 from src.common.types import IndexId, SchemeId
-from src.m0_data.config import risk_free_on
+from src.m0_data.config import risk_free_over
 from src.m0_data.providers.market_data import MarketDataProvider
 from src.m2_fund.paths import SPAN_SLACK_DAYS, price_history, rolling_windows
 from src.m2_fund.risk import (
@@ -53,6 +53,7 @@ from src.m2_fund.risk import (
     downside_deviation,
     information_ratio,
     max_drawdown,
+    monthly_returns,
     returns_of,
     sharpe,
     sortino,
@@ -164,6 +165,10 @@ class ReturnWindow:
     treynor: Decimal | None = None
     up_capture: Decimal | None = None
     down_capture: Decimal | None = None
+    #: The months the benchmark rose and fell in this window: what the capture
+    #: ratios rest on (§8.4).
+    up_months: int | None = None
+    down_months: int | None = None
 
 
 #: Below this many paired observations a beta is noise dressed as a number.
@@ -188,7 +193,7 @@ def _against(
     fund_ann: Decimal,
     rf: Decimal | None,
     benchmark_id: str | None = None,
-) -> dict[str, Decimal | None]:
+) -> dict[str, Any]:
     """The benchmark-relative half of a window, or `{}` when there is none.
 
     Empty rather than a dict of `None`s so the caller can tell "no benchmark"
@@ -224,6 +229,7 @@ def _against(
             )
 
     fund_rets, bench_rets = returns_of(common)
+    fund_months, bench_months = monthly_returns(common)
     span = (common[-1][0] - common[0][0]).days
     if span <= 0:
         return {}
@@ -248,8 +254,12 @@ def _against(
         "treynor": (
             treynor(fund_ann, b, rf) if b is not None and rf is not None else None
         ),
-        "up_capture": capture(fund_rets, bench_rets, rising=True),
-        "down_capture": capture(fund_rets, bench_rets, rising=False),
+        # Monthly (§8.4), with the months each figure rests on: a year has
+        # about six of each, which is the floor, not a comfortable sample.
+        "up_capture": capture(fund_months, bench_months, rising=True),
+        "down_capture": capture(fund_months, bench_months, rising=False),
+        "up_months": sum(1 for r in bench_months if r > 0),
+        "down_months": sum(1 for r in bench_months if r < 0),
     }
 
 def window_start(as_of: date, key: str) -> date:
@@ -300,10 +310,10 @@ def compute_return_window(
     vol = annualised_vol(rets)
     ann = annualise(growth, obs_days).quantize(RATE_Q)
 
-    # The rate in force when the window STARTED, not today's: a Sharpe over
-    # 2019-2022 judged against a 2026 yield is comparing a return to money
-    # that cost something different at the time.
-    rf = risk_free_on(first.nav_date)
+    # The rate in force across the window, averaged -- not today's, and not
+    # the first day's: a five-year window from the 2021 trough was judged
+    # against 3.45% when its five years averaged about 5.5% (audit, 2026-10-04).
+    rf = risk_free_over(first.nav_date, last.nav_date)
 
     bench = _against(navs, benchmark, ann, rf, benchmark_id)
 

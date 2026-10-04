@@ -506,6 +506,10 @@ def test_every_view_is_reachable(client: TestClient) -> None:
     for view_id, view in VIEW_DEFS.items():
         if view.default_scope == "portfolio":
             assert f"/view/{view_id}" in nav, view_id
+        elif view_id == "fund_nav":
+            # Drawn inside "What ₹10,000 became", behind its switch (design
+            # review, 2026-10-04); the view itself stays, for the API.
+            assert 'data-switch="What ₹10,000 became|Price per unit"' in fund
         else:
             assert f'data-view-id="{view_id}"' in fund, view_id
 

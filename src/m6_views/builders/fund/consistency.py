@@ -18,7 +18,7 @@ from src.m6_views.builders.fund.common import NO_FUND, FundQuality, points, thin
 from src.m6_views.compose import ok_envelope
 from src.m6_views.deps import Deps
 from src.m6_views.envelope import ViewEnvelope
-from src.m6_views.format import format_date, format_pct, format_return
+from src.m6_views.format import format_date, format_return
 from src.m6_views.registry import VIEW_DEFS, register
 from src.m6_views.states import empty_envelope
 
@@ -67,10 +67,16 @@ class FundConsistencyBuilder:
             f"{format_return(rp.worst, False)} and {format_return(rp.best, False)} "
             f"a year; the middle value was {format_return(rp.median, False)}."
         )
-        if rp.pct_ahead is not None:
+        if rp.paired:
+            # Counts, not a rounded share (200 of 201 is not "100%"), and over
+            # the stretches the benchmark covers, which may start later.
             headline += (
-                f" It was ahead of its benchmark in "
-                f"{format_pct(rp.pct_ahead, precision=0)} of those stretches."
+                f" It was ahead of its benchmark in {rp.ahead} of the {rp.paired} "
+                f"stretches"
+                + (f" ending from {format_date(rp.paired_from)}, the first with "
+                   f"benchmark prices at both ends"
+                   if rp.paired < len(rp.points) and rp.paired_from else "")
+                + "."
             )
 
         kept = thin(rp.points)

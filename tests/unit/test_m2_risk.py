@@ -190,6 +190,23 @@ def test_the_rate_in_force_is_the_latest_on_or_before(tmp_path: Path) -> None:
     assert risk_free_on(date(2024, 6, 1), cfg) == Decimal("7.0")
 
 
+def test_a_window_is_judged_against_the_average_rate_across_it(tmp_path: Path) -> None:
+    """External audit, 2026-10-04: the rate on a window's first day overstated
+    every 5-year Sharpe that began at the 2021 trough, and made the three
+    windows incomparable. The rate in force each day, averaged over the window,
+    is the standard."""
+    from src.m0_data.config import risk_free_over
+
+    cfg = tmp_path / "rf.yaml"
+    cfg.write_text(
+        "observations:\n  2020-01-01: 5.0\n  2022-01-01: 4.0\n  2024-01-01: 7.0\n",
+        encoding="utf-8",
+    )
+    assert risk_free_over(date(2021, 1, 1), date(2023, 1, 1), cfg) == Decimal("4.5")
+    assert risk_free_over(date(2024, 2, 1), date(2024, 3, 1), cfg) == Decimal("7.0")
+    assert risk_free_over(date(2019, 12, 1), date(2021, 1, 1), cfg) is None
+
+
 def test_no_file_and_no_observations_are_both_just_empty(tmp_path: Path) -> None:
     """Not an error: every M2 figure but Sharpe and Sortino is unaffected."""
     from src.m0_data.config import risk_free_on, risk_free_rates
@@ -287,7 +304,14 @@ def test_sharpe_and_sortino_come_out_of_a_real_window() -> None:
 
     w = compute_return_window(navs, "3y")
     assert w is not None
-    assert w.risk_free_pct == Decimal("3.657")   # the auction of 2021-12-29
+    # The average across the window (audit, 2026-10-04), not the auction of
+    # 2021-12-29 (3.657%) it began with: bills rose through 2022.
+    from src.m0_data.config import risk_free_over
+
+    rf = w.risk_free_pct
+    assert rf is not None and rf == risk_free_over(navs[0].nav_date, navs[-1].nav_date)
+    assert Decimal("5") < rf < Decimal("7")
+    assert rf == rf.quantize(Decimal("0.0001"))
     assert w.sharpe is not None
     assert w.sortino is not None
     # It beat a 3.69% bill comfortably, and punishing only the falls flatters it.
@@ -393,16 +417,67 @@ def test_an_index_funds_alpha_is_about_minus_its_fee() -> None:
 
 
 def test_capture_compounds_rather_than_averaging() -> None:
-    """A ratio of arithmetic means describes a portfolio nobody holds."""
+    """A ratio of arithmetic means describes a portfolio nobody holds; this is
+    the ratio of the two annualised geometric means, over monthly returns."""
     from src.m2_fund.risk import capture
 
-    bench = [Decimal("0.02"), Decimal("-0.01"), Decimal("0.03"), Decimal("-0.02")]
+    bench = [Decimal("0.02"), Decimal("-0.01"), Decimal("0.03"), Decimal("-0.02")] * 3
     half = [b / 2 for b in bench]
     up = capture(half, bench, rising=True)
     down = capture(half, bench, rising=False)
     assert up is not None and down is not None
     assert Decimal("0.45") < up < Decimal("0.55")
     assert Decimal("0.45") < down < Decimal("0.55")
+
+
+def test_capture_needs_six_months_each_way() -> None:
+    """§8.4: below six up (or down) months a capture ratio means nothing."""
+    from src.m2_fund.risk import capture
+
+    bench = [Decimal("0.02"), Decimal("-0.01")] * 5
+    assert capture(bench, bench, rising=True) is None
+    assert capture(bench, bench, rising=False) is None
+
+
+def _beta_pair(
+    years: int, beta: Decimal
+) -> tuple[list[NavPoint], list[tuple[date, Decimal]]]:
+    """A benchmark that rises one month and falls the next, and a fund that
+    moves `beta` times as far every day."""
+    navs, index = [], []
+    fund, level = Decimal(100), Decimal(1000)
+    for i in range(years * 365 + 1):
+        day = START + timedelta(days=i)
+        move = Decimal("0.001") if day.month % 2 else Decimal("-0.0008")
+        if i:
+            fund *= 1 + beta * move
+            level *= 1 + move
+        navs.append(NavPoint(scheme_id=SCHEME, nav_date=day, nav=fund,
+                             is_interpolated=False))
+        index.append((day, level))
+    return navs, index
+
+
+def test_capture_reads_a_steady_beta_whatever_the_window() -> None:
+    """External audit, 2026-10-04: compounding every daily move made the ratio
+    drift with the window's length, towards 0 on the way up and 1 on the way
+    down, so a low-beta fund read as catching a quarter of rallies and nearly
+    every fall. Monthly, annualised geometric means: a fund moving 0.67 times
+    its benchmark reads about 0.67 both ways, over one year or five."""
+    from src.m2_fund.windows import compute_return_window
+
+    navs, index = _beta_pair(5, Decimal("0.67"))
+    one = compute_return_window(navs[-366:], "1y", index, "NSE:X_TRI")
+    five = compute_return_window(navs, "5y", index, "NSE:X_TRI")
+    for w in (one, five):
+        assert w is not None and w.up_capture is not None and w.down_capture is not None
+        assert Decimal("0.6") < w.up_capture < Decimal("0.72"), w.window_key
+        assert Decimal("0.6") < w.down_capture < Decimal("0.72"), w.window_key
+    assert one is not None and five is not None
+    assert one.up_capture is not None and five.up_capture is not None
+    assert abs(one.up_capture - five.up_capture) < Decimal("0.03")
+    assert one.up_months == 6 and one.down_months == 6
+    assert five.up_months is not None and five.up_months >= 29
 
 
 def test_a_flat_benchmark_has_no_beta_rather_than_an_infinite_one() -> None:

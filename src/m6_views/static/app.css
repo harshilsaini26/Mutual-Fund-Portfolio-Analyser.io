@@ -511,14 +511,20 @@ main.content.content--bleed { max-width: none; padding: 0; }
 .view--low { border-style: dashed; }
 .view--low .view__chart { opacity: 0.86; }
 
+/* Present but unobtrusive (§7.2): the words in the soft ink, the grade in a dot
+   beside them, and a link to what the grades mean (V1-94). */
 .badge {
+  display: inline-flex; align-items: center; gap: 6px;
   font-size: var(--text-xs); font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase;
-  padding: 3px 9px; border-radius: 999px; border: 1px solid currentColor;
-  white-space: nowrap;
+  padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line-strong);
+  color: var(--ink-soft); text-decoration: none; white-space: nowrap;
 }
-.badge--high { color: var(--good); }
-.badge--medium { color: var(--fair); }
-.badge--low { color: var(--weak); border-style: dashed; }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+a.badge:hover { color: var(--ink); border-color: var(--ink-faint); }
+.badge--high::before { background: var(--good); }
+.badge--medium::before { background: var(--fair); }
+.badge--low { border-style: dashed; }
+.badge--low::before { background: var(--weak); }
 
 /* The fund page's header card names the fund itself; its question is for a
    screen reader, and only the badge shows, on its own line at the right. In the
@@ -725,6 +731,12 @@ p.chart-table { font-size: var(--text-sm); color: var(--ink-faint); }
 }
 .view[aria-busy="true"] .echarts { opacity: 0.5; }
 .echarts--several { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 28px; }
+/* One at a time behind a switch (charts.js `switcher`): full width, the buttons
+   saying what each is, so no captions. */
+.echarts--switched { display: block; }
+.echarts--switched figcaption { display: none; }
+.echarts--switched .echart[hidden] { display: none; }
+.zoom.chart-switch { justify-content: flex-start; margin-bottom: 10px; }
 .echarts--several .echart--treemap { grid-column: 1 / -1; }
 .echart { margin: 0; min-width: 0; }
 .echart figcaption {
@@ -916,16 +928,20 @@ p.chart-table { font-size: var(--text-sm); color: var(--ink-faint); }
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   padding: 14px 16px; border-bottom: 1px solid var(--line);
 }
+/* The entry fields' shape (V1-93), 40px to sit in a toolbar (design review). */
 .table-card__tools select, .table-card__tools input {
+  box-sizing: border-box; height: 40px; padding: 0 12px;
   font: inherit; font-size: var(--text-sm); color: var(--ink);
-  background: var(--surface-2); border: 1px solid var(--field-line); border-radius: 8px;
-  padding: 7px 10px;
+  background: var(--surface); border: 1px solid var(--field-line); border-radius: 12px;
 }
-.table-card__tools input { flex: 1 1 220px; max-width: 320px; }
-.table-card__tools select:focus, .table-card__tools input:focus {
-  outline: 2px solid var(--accent); outline-offset: 1px;
-  border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+.table-card__tools select:hover, .table-card__tools input:hover { border-color: var(--ink-faint); }
+.table-card__tools select:focus-visible, .table-card__tools input:focus-visible {
+  border-color: var(--accent);
+  outline: 3px solid color-mix(in srgb, var(--accent) 30%, transparent); outline-offset: 0;
 }
+.table-card__search { position: relative; flex: 1 1 220px; max-width: 320px; }
+.table-card__search .field-search__icon { left: 13px; width: 16px; height: 16px; }
+.table-card__search input { width: 100%; padding-left: 36px; border-radius: 999px; }
 .table-card__count { margin-left: auto; font-size: var(--text-sm); color: var(--ink-faint); }
 /* The table grows with the page (V1-88): one scroll, not a box inside it. Where every
    column fits, even in the widest font and text size, the wrapper stops scrolling
@@ -1081,7 +1097,10 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
   display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   grid-template-areas: "text fund" "doors doors"; gap: 36px 40px; align-items: center;
 }
-.lp-hero__grid--alone { grid-template-columns: minmax(0, 1fr); grid-template-areas: "text" "doors"; }
+/* No example tonight: the doors beside the words, one above another, rather than
+   an empty half (design review, 2026-10-04). */
+.lp-hero__grid--alone { grid-template-areas: "text doors"; }
+.lp-hero__grid--alone > .lp-doors { grid-template-columns: minmax(0, 1fr); }
 .lp-hero__text { grid-area: text; }
 .lp-hero__grid > .lp-doors { grid-area: doors; margin: 0; }
 .lp-fund { grid-area: fund; }
@@ -1144,8 +1163,6 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 .lp-door__title { margin: 0; font-size: var(--text-base); font-weight: 700; color: var(--accent); }
 .lp-door .search--hero { width: 100%; max-width: none; }
 .lp-door__more { font-size: var(--text-sm); }
-.lp-end { max-width: 1200px; margin: 96px auto 24px; }
-.lp-end .lp-doors { margin: 0; }
 
 /* One section per door: words on one side, its picture on the other. */
 .lp-section {
@@ -1253,10 +1270,10 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
   .lp-pic { padding: 16px; }
   .lp-door a, .lp-links a, .lp-pair__card h3 a { display: inline-flex; align-items: center; min-height: 40px; }
   .leaders-fold > summary { display: flex; align-items: center; min-height: 40px; }
-  /* The search door spans the row; the other two share one, so all three fit the
-     first screen (375x812). */
-  .lp-doors { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lp-door:first-child { grid-column: 1 / -1; }
+  /* One above another, the search box at full width; the portfolio door's longer
+     line left out, so the doors stay near the first screen (375x812). */
+  .lp-doors { grid-template-columns: minmax(0, 1fr); }
+  .lp-door:first-child .lp-door__more { display: none; }
   .lp-hero__lede { font-size: var(--text-base); }
   .lp-pair { grid-template-columns: minmax(0, 1fr); }
   .lp-flow { grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr); gap: 8px; }
@@ -1548,7 +1565,10 @@ body, .topbar, .card, .view, .settings {
 
 /* Your portfolio (V1-82) */
 .pf__toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
-.pf__status, .cmp__status { min-height: 1.4em; color: var(--ink-soft); font-size: var(--text-sm); }
+.pf__status, .cmp__status { min-height: 1.4em; margin: 0; color: var(--ink-soft); font-size: var(--text-sm); }
+/* Empty, out of the flow but still announced when filled, as `.pf__error` is:
+   it left a blank band under Compare's search box (design review). */
+.pf__status:empty, .cmp__status:empty { position: absolute; }
 .pf__note, .pf__hint, .pf__estimate, .cmp__note { color: var(--ink-soft); font-size: var(--text-sm); max-width: 72ch; }
 .pf__entry, .cmp__entry { display: grid; gap: 10px; margin-bottom: 28px; }
 .pf__label, .cmp__label { font-weight: 650; }
@@ -1640,6 +1660,9 @@ body, .topbar, .card, .view, .settings {
   font-size: var(--text-sm); color: var(--ink); min-width: 11em;
 }
 .cmp__table thead th:first-child { min-width: 0; }
+/* A fund's heading on the same right edge as its values (design review). */
+.cmp__table thead th + th { text-align: right; }
+.cmp__table thead th + th .cmp__fund { justify-content: flex-end; }
 .cmp__table tbody th { font-weight: 500; color: var(--ink-soft); white-space: nowrap; }
 .cmp__fund { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
 .cmp__remove {
@@ -1807,6 +1830,8 @@ details.tuck > summary { cursor: pointer; color: var(--accent); font-size: var(-
   .fundcard__chips { gap: 6px; margin-top: 8px; }
   .fundcard__chips .chip { padding: 2px 8px; font-size: var(--text-xs); }
 }
+/* A phone: two to a row, so a label like "Return, 1 year" stays on one line. */
+@media (max-width: 480px) { .fundcard .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 360px) { .fundcard .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* Learn (V1-87): guides in a reading column, cards by group, the glossary A to Z. */
 .learn__note {
@@ -1880,11 +1905,18 @@ th .term::after, .term::after { content: none; }   /* not a sort button (th butt
 .term-pop__more { display: block; margin-top: 8px; color: var(--ink-faint); font-size: var(--text-sm); }
 
 /* Running prose in the prose face (V1-88): Atkinson Hyperlegible while the reader's
-   font is Terminess; their own choice otherwise. Headings, figures, tables and
-   controls keep --font. */
+   font is Terminess; their own choice otherwise. Headings, labels, figures and
+   controls keep --font. Since the design review of 2026-10-04 that covers every
+   sentence -- a panel's headline and definition, notes, Learn's cards -- and the
+   fund names in tables and search, which read slowly in the pixel face. */
 .learn--guide p, .learn__term dd p, .lede, .public-note, .term-pop__text,
 .placeholder__reason, .pf__note, .cmp__note,
-.lp-hero__lede, .lp-text p, .lp-how li, .lp-pic__note, .lp-none { font-family: var(--font-prose); }
+.lp-hero__lede, .lp-text p, .lp-how li, .lp-pic__note, .lp-none,
+.headline, .definition, .caveats li, .page-head__lede, .table-note, .measure-notes dd,
+.learn__note, .learn__card p, .pf__hint, .pf__estimate, .pf__leaving, .cmp__lead,
+.leaders-fold__note, .facts-list__note, .kpi__absent-note, .colophon p,
+.fund-name, .search__name, .search-results__name, .cmp__fund a,
+.pf__holding-head h3 { font-family: var(--font-prose); }
 
 /* Skip link (V1-88): the keyboard's first stop, out of sight until focused. */
 .skip-link {

@@ -73,6 +73,22 @@ def test_the_example_is_the_largest_complete_flexi_cap_fund() -> None:
     assert example is not None and example["scheme_id"] == "C"
 
 
+def test_the_example_is_not_a_fund_we_mostly_could_not_identify() -> None:
+    """External audit, 2026-10-04: the front page's worked example was PPFAS at
+    23% unidentified, the worst of the funds checked closely. A fund at most 5%
+    unidentified is preferred over a larger one; failing that, the least."""
+    murky = [["__UNRESOLVED__", "Unresolved", "equity", "23"], *HELD]
+    clear = [["__UNRESOLVED__", "Unresolved", "equity", "1"], *HELD]
+    big = _cand("BIG", size="900", holdings=murky)
+    small = _cand("SMALL", size="100", holdings=clear)
+    example = landing_example([big, small])
+    assert example is not None and example["scheme_id"] == "SMALL"
+    worse = _cand("WORSE", size="500",
+                  holdings=[["__UNRESOLVED__", "U", "equity", "40"], *HELD])
+    example = landing_example([big, worse])
+    assert example is not None and example["scheme_id"] == "BIG"
+
+
 def test_equal_sizes_go_to_the_lower_scheme_id() -> None:
     example = landing_example([_cand("D", size="700"), _cand("C", size="700")])
     assert example is not None and example["scheme_id"] == "C"

@@ -15,6 +15,11 @@
 #            old category the rename split in two ("Sectoral/ Thematic", the
 #            undivided "Index Funds"). Each carries a `note` saying so.
 #
+# `ranked: false` marks a heading that holds funds doing different jobs: AMFI's
+# older undivided ones, "other" catch-alls and funds of funds, where gold sits
+# beside equity. Their funds are listed and charted together but never ranked
+# or given a quartile against each other (external audit, 2026-10-04).
+#
 # Matching ignores repeated spaces ("Other  ETFs"). A name not listed here is
 # shown as AMFI writes it, in a group of its own, and flagged as unmapped.
 #
@@ -90,6 +95,7 @@ categories:
     family: equity
     merges: ["Equity Schemes - Thematic Fund"]
   - key: equity/sectoral_thematic
+    ranked: false
     name: Sectoral or thematic (earlier AMFI heading)
     about: "Sectoral and thematic funds, under a heading AMFI has since split in two."
     family: equity
@@ -271,11 +277,13 @@ categories:
     family: debt
     merges: ["Income/Debt Oriented Schemes - Sectoral Fund"]
   - key: debt/other
+    ranked: false
     name: Other debt
     about: "Debt funds outside SEBI's named debt categories."
     family: debt
     merges: ["Income/Debt Oriented Schemes - Other Debt Scheme"]
   - key: debt/income_legacy
+    ranked: false
     name: Income (earlier AMFI heading)
     about: "Bond funds under a heading AMFI has since replaced with SEBI's debt categories."
     family: debt
@@ -301,6 +309,7 @@ categories:
     family: other
     merges: ["Index Funds - Hybrid Fund"]
   - key: index/undivided
+    ranked: false
     name: Index funds (earlier AMFI heading)
     about: "Index funds, under a heading AMFI has since split by asset."
     family: other
@@ -329,11 +338,13 @@ categories:
     family: other
     merges: ["Exchange Traded Funds (ETFs) - Silver ETF"]
   - key: etf/other
+    ranked: false
     name: ETFs, other
     about: "Exchange-traded funds of other kinds."
     family: other
     merges: ["Exchange Traded Funds (ETFs) - Other ETF"]
   - key: etf/undivided
+    ranked: false
     name: ETFs (earlier AMFI heading)
     about: "Exchange-traded funds, under a heading AMFI has since split by kind."
     family: other
@@ -342,6 +353,7 @@ categories:
       AMFI's older heading does not say what an ETF tracks, so these funds are
       compared only with each other.
   - key: fof/domestic
+    ranked: false
     name: Funds of funds, domestic
     about: "Invest in other Indian mutual funds or ETFs rather than directly."
     family: other
@@ -349,6 +361,7 @@ categories:
       - "Other Scheme - FoF Domestic"
       - "Fund of Funds Scheme (Domestic) - Fund of Funds Scheme (Domestic)"
   - key: fof/overseas
+    ranked: false
     name: Funds of funds, overseas
     about: "Invest in funds abroad, for exposure to foreign markets."
     family: other

@@ -170,10 +170,10 @@ terms:
     title: Sharpe ratio
     short: >-
       Return per unit of risk: the fund's return above a risk-free rate, divided
-      by its volatility. A higher figure means more return per unit of swing. It sees
-      only the swings that happened, so it can miss rare, sudden risks such as a
-      borrower's default in a debt fund. Its risk-free rate here is the 91-day Treasury
-      bill yield.
+      by its volatility. Higher means more return per unit of swing. It sees only
+      the swings that happened, so it can miss rare, sudden risks such as a
+      borrower's default in a debt fund. The risk-free rate is the 91-day Treasury
+      bill yield, averaged over the period.
     sources: [*v_risk]
     related: [volatility]
   rolling_returns:
@@ -739,10 +739,18 @@ guides:
             from the fund's latest [[portfolio_disclosure]], or from an aggregator's
             page where marked. Every figure lists all the computed measures for every
             period in one table.
-      - heading: Dates, sources and gaps
+      - heading: Dates, sources, confidence and gaps
         paragraphs:
           - >-
             Each section says how old its data is and where it came from. A figure that
             could not be computed shows a dash with the reason, never a zero, because a
             zero would be a claim. Every figure describes the past.
+          - >-
+            Each section also carries a confidence tag, graded by its weakest input.
+            High means its data is current, complete and resolved: prices up to date
+            and, for holdings, a fund house's own recent file with nearly every holding
+            identified. Medium means it is usable with the notes shown beside it, such
+            as older data, holdings read from an aggregator's page, or a share not
+            identified. Low means its weakest input is weak, so read its notes first.
+            The tag is never hidden, and a weak figure is shown rather than dropped.
     sources: [*sebi_faq, *v_analyse]

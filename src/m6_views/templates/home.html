@@ -14,18 +14,23 @@
   needs a style attribute (the public CSP).
 
   The example fund is picked by a stated rule -- the largest flexi cap fund by size
-  with a complete page -- and the page says so, so it reads as an example and not
-  a pick. V1-74's line holds: no "best", no "top performers".
+  with a complete page, preferring one at most 5% unidentified (landing.py) -- and
+  the page says so, so it reads as an example and not a pick. V1-74's line holds:
+  no "best", no "top performers".
 #}
 {% block main_class %} content--bleed{% endblock %}
 
-{% macro doors(compact=False) -%}
-<ul class="lp-doors{% if compact %} lp-doors--compact{% endif %}">
+{#- Your portfolio first: the address asks "Did my SIP work?" (external audit,
+    2026-10-04). Shown once, in the hero (design review). -#}
+{% macro doors() -%}
+<ul class="lp-doors">
+  <li class="lp-door">
+    <p class="lp-door__title">Did my SIP work?</p>
+    <a class="button" href="{{ root }}/portfolio/">Add your SIPs and lump sums</a>
+    <span class="lp-door__more">What they are worth, what they earned a year and what they own, worked out in your browser</span>
+  </li>
   <li class="lp-door">
     <p class="lp-door__title">Look up a fund</p>
-    {% if compact %}
-    <a href="{{ root }}/funds/">Explore all {{ count | fmt_count }} fund{{ '' if count == 1 else 's' }}</a>
-    {% else %}
     <form class="search search--hero" action="{{ root }}/funds/" method="get" role="search">
       <label class="sr-only" for="q-hero">Find a fund by name</label>
       {{ icon.i("search", "icon search__icon") }}
@@ -35,15 +40,10 @@
       <ul class="search__suggest" hidden data-lenis-prevent></ul>
     </form>
     <a class="lp-door__more" href="{{ root }}/funds/">or explore all {{ count | fmt_count }}</a>
-    {% endif %}
   </li>
   <li class="lp-door">
     <p class="lp-door__title">Understand funds</p>
     <a href="{{ root }}/learn/">How funds are organised, in plain words</a>
-  </li>
-  <li class="lp-door">
-    <p class="lp-door__title">See your portfolio</p>
-    <a href="{{ root }}/portfolio/">What your funds add up to, kept in your browser</a>
   </li>
 </ul>
 {%- endmacro %}
@@ -53,10 +53,12 @@
   <div class="lp-hero__grid{% if not example %} lp-hero__grid--alone{% endif %}">
     <div class="lp-hero__text">
       <p class="eyebrow">Indian mutual funds, looked through</p>
-      <h1 id="lp-title" class="lp-hero__title">See what every fund owns, and how it has done</h1>
-      <p class="lp-hero__lede">{{ count | fmt_count }} fund{{ '' if count == 1 else 's' }}, each set
-        against the funds that do the same job, from AMFI's prices and the fund houses' own
-        disclosures. Free, rebuilt every night.</p>
+      <h1 id="lp-title" class="lp-hero__title">Did my SIP work?</h1>
+      <p class="lp-hero__lede">Enter your SIPs and lump sums to see what they are worth, what
+        they earned a year and what they own, company by company. Or look up any of
+        {{ count | fmt_count }} fund{{ '' if count == 1 else 's' }}, each set against the funds that do the
+        same job, from AMFI's prices and each fund's published portfolio, most read from an
+        aggregator's pages. Free, rebuilt every night.</p>
       <a class="lp-pill" href="#privacy">Nothing you enter leaves your browser</a>
     </div>
     {{ doors() }}
@@ -80,7 +82,7 @@
         </li>
         {% endfor %}
       </ol>
-      <figcaption>An example: the largest flexi cap fund by size. Holdings as disclosed
+      <figcaption>An example: the largest flexi cap fund whose portfolio we could identify. Holdings as disclosed
         {{ example.as_of_label }}{% if example.aggregator %}, from an aggregator's page{% endif %}.</figcaption>
     </figure>
     {% endif %}
@@ -190,7 +192,7 @@
     </div>
     <p class="lp-pair__total">
       {%- if pair.common %}{{ pair.common | fmt_count }} compan{{ 'y' if pair.common == 1 else 'ies' }} in both
-      {%- if pair.lead %} · with ₹1 in each, {{ pair.lead.name }} is {{ pair.lead.share_label }} of what you own{% endif %}
+      {%- if pair.lead %} · put ₹1 in each fund and {{ pair.lead.name }} is {{ pair.lead.share_label }} of your ₹2{% endif %}
       · {{ pair.overlap_label }} of the two portfolios is the same
       {%- else %}No companies in both: these two portfolios share nothing{% endif %}</p>
     <p class="lp-pic__note">An example pair: the fund above and the largest fund, with holdings, from another equity category.</p>
@@ -245,13 +247,10 @@
   </div>
   <ul class="lp-pic lp-sources">
     <li class="lp-source"><strong>AMFI</strong>Daily prices, monthly expense ratios</li>
-    <li class="lp-source"><strong>The fund houses</strong>Monthly holdings disclosures</li>
+    <li class="lp-source"><strong>Fund portfolios</strong>Monthly; most from an aggregator's pages, Kotak's and ICICI's from their own files</li>
     <li class="lp-source"><strong>SEBI</strong>Fund categories and their rules</li>
   </ul>
 </section>
 
-<nav class="lp-end" aria-label="Where to next">
-  {{ doors(compact=True) }}
-</nav>
 </div>
 {% endblock %}

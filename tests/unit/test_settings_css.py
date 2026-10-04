@@ -213,6 +213,40 @@ def test_an_invalid_field_shows_it_on_its_border() -> None:
             assert _ratio(t["loss"], t[bg]) >= 3.0, (theme, bg)
 
 
+def test_sentences_and_fund_names_are_set_in_the_reading_face() -> None:
+    """Design review, 2026-10-04: long sentences and dense tables in the pixel
+    face (Terminess) read slowly; it stays for headings, labels and figures.
+    `--font-prose` follows the reader's Font setting (V1-83)."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    prose = {s.strip() for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+             if "font-family: var(--font-prose)" in body for s in sel.split(",")}
+    for sel in (".lede", ".headline", ".definition", ".placeholder__reason",
+                ".caveats li", ".term-pop__text", ".pf__note", ".cmp__note",
+                ".learn__card p", ".learn--guide p", ".fund-name",
+                ".search__name", ".colophon p"):
+        assert sel in prose, sel
+
+
+def test_a_phone_has_the_fund_figures_two_to_a_row() -> None:
+    """Design review, 2026-10-04: at 390px three tiles a row broke "RETURN, 1
+    YEAR" over two lines. Two a row on a phone, after (so over) the three."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    three = css.rfind(".fundcard .tiles { grid-template-columns: repeat(3")
+    two = re.search(r"@media \(max-width: 480px\)\s*\{\s*\.fundcard \.tiles\s*\{\s*"
+                    r"grid-template-columns:\s*repeat\(2", css)
+    assert two and two.start() > three
+
+
+def test_explores_filters_share_the_entry_fields_shape() -> None:
+    """Design review, 2026-10-04: Explore's filters kept the old plain look
+    beside the new fields (V1-93)."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    tools = [body for s, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+             if ".table-card__tools select" in s]
+    assert any("border-radius: 12px" in b and "height: 40px" in b for b in tools)
+    assert re.search(r"\.table-card__search input\s*\{[^}]*border-radius:\s*999px", css)
+
+
 def test_entry_fields_are_44px_tall() -> None:
     """Apple's comfortable touch target, with room for the figures (V1-93)."""
     css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)

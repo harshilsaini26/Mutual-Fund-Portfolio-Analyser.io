@@ -28,11 +28,13 @@
     The title text is the redundant channel §10.3 requires, so the badge does not
     depend on colour alone.
   #}
-  <span class="badge badge--{{ confidence }}"
+  {#- A link to what the grades mean (external audit, 2026-10-04): the tag said
+      "medium" without saying what drives it. -#}
+  <a href="{{ root }}/learn/reading-a-fund-page/#dates-sources-confidence-and-gaps" class="badge badge--{{ confidence }}"
         title="{{ {'high': 'Current, complete, and resolved',
                    'medium': 'Usable with the notes above',
-                   'low': 'Weakest contributing input is weak'}[confidence] }}"
-  >Confidence: {{ confidence }}</span>
+                   'low': 'Weakest contributing input is weak'}[confidence] }}. What this means"
+  >Confidence: {{ confidence }}</a>
 {%- endmacro %}
 
 

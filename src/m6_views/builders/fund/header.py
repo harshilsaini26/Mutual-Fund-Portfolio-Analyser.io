@@ -145,10 +145,14 @@ def _tiles(fw: FundWindows | None, facts: Any,
     tiles.append(_rank_tile(peers))
 
     longest = fw.windows.get("since_first_nav") if fw else None
-    if longest is not None and longest.obs_days >= YEAR and longest.drawdown.depth < 0:
+    if (fw is not None and longest is not None and longest.obs_days >= YEAR
+            and longest.drawdown.depth < 0):
         dd = longest.drawdown
         tiles.append(_tile(
-            "worst_fall", "Worst fall", dd.depth, "fraction",
+            # Named with its start: beside a 3- or 5-year deepest fall, "Worst
+            # fall" alone reads as the same measure (V1-94).
+            "worst_fall", f"Worst fall since {fw.navs[0].nav_date.year}", dd.depth,
+            "fraction",
             f"{format_date(dd.peak)} to {format_date(dd.trough)}; "
             + (f"back at its high {dd.recovery_days:,} days after the low"
                if dd.recovery_days is not None else "not yet back at that high"),
@@ -208,12 +212,14 @@ class FundHeaderBuilder:
             # now; a finding repeating a tile's figure would say it twice.
             navs, levels, _ = price_history(self.market, scheme, scope.as_of)
             rp = rolling_path(navs, levels, THREE_YEARS)
-            if rp is not None and rp.pct_ahead is not None:
+            if rp is not None and rp.paired:
+                since = (f" since {rp.paired_from.strftime('%b %Y')}"
+                         if rp.paired < len(rp.points) and rp.paired_from else "")
                 findings.append(_finding(
                     "How steady",
-                    f"Ahead of its benchmark in {format_pct(rp.pct_ahead, precision=0)} "
-                    f"of all three-year stretches",
-                    "ahead" if rp.pct_ahead >= 50 else "behind",
+                    f"Ahead of its benchmark in {rp.ahead} of {rp.paired} "
+                    f"three-year stretches{since}",
+                    "ahead" if rp.ahead * 2 >= rp.paired else "behind",
                 ))
 
         plan = " · ".join(p.title() for p in (facts.plan, facts.option) if p)

@@ -21,7 +21,7 @@ from decimal import Decimal
 from src.common.contracts.entity import MergerLink, SchemeRef
 from src.common.contracts.market import IdcwEvent, IndexPoint, NavPoint
 from src.common.types import Confidence, IndexId, Isin, Plan, SchemeId
-from src.m0_data.universe import Fund, live_funds
+from src.m0_data.universe import Fund, display_name, live_funds
 
 #: §11.3 resolution confidence, by the field that matched.
 _CONFIDENCE = {
@@ -229,7 +229,8 @@ class WarehouseMarketDataProvider:
 
     def fund_sizes(self, scheme_ids: list[str]) -> dict[str, Decimal]:
         """Each fund's newest size on record, in rupees (`scheme_aum`), for the
-        peers' bubble chart. Funds with none are absent, not zero."""
+        peers' bubble chart. Funds with none are absent, not zero -- and so are
+        funds whose newest size AMFI lists as 0, which is "not reported"."""
         found: dict[str, Decimal] = {}
         for start in range(0, len(scheme_ids), 500):
             chunk = scheme_ids[start:start + 500]
@@ -240,7 +241,11 @@ class WarehouseMarketDataProvider:
                 " ORDER BY scheme_id, as_of_date",
                 chunk,
             ):
-                found[str(sid)] = Decimal(str(aum))  # the newest date wins
+                size = _reported(aum)   # the newest date wins, zero or not
+                if size is None:
+                    found.pop(str(sid), None)
+                else:
+                    found[str(sid)] = size
         return found
 
     def ters(self, scheme_ids: list[str], on: date) -> dict[str, Ter]:
@@ -260,8 +265,12 @@ class WarehouseMarketDataProvider:
             except sqlite3.OperationalError:
                 return {}
             for sid, day, total, base in rows:  # the last row per fund wins
+                cost = _reported(total)          # 0.0000 is "not reported"
+                if cost is None:
+                    found.pop(str(sid), None)
+                    continue
                 found[str(sid)] = Ter(
-                    str(sid), _as_date(day), Decimal(str(total)),
+                    str(sid), _as_date(day), cost,
                     None if base is None else Decimal(str(base)),
                 )
         return found
@@ -366,11 +375,13 @@ class WarehouseMarketDataProvider:
             " ORDER BY as_of_date DESC LIMIT 1",
             (str(scheme_id),),
         ).fetchone()
+        if aum is not None and _reported(aum["aum_inr"]) is None:
+            aum = None   # AMFI's 0: not reported, shown as "—" (audit, 2026-10-04)
         # The newest on record, as for the size.
         ter = self.ters([str(scheme_id)], date.max).get(str(scheme_id))
         return SchemeFacts(
             scheme_id=SchemeId(str(row["scheme_id"])),
-            name=str(row["fund_name"] or row["scheme_name"]),
+            name=display_name(str(row["fund_name"] or row["scheme_name"])),
             scheme_name=str(row["scheme_name"]),
             amc_name=row["amc_name"],
             category=row["sebi_category"],
@@ -563,6 +574,14 @@ class SchemeHit:
 def _preference(row: sqlite3.Row) -> tuple[bool, bool, str]:
     """Direct before Regular, Growth before IDCW, then a stable id."""
     return (row["plan"] != "direct", row["option"] != "growth", str(row["scheme_id"]))
+
+
+def _reported(value: object) -> Decimal | None:
+    """A size or cost as AMFI lists it, or None for its 0, which no fund that
+    is priced daily has: AMFI's way of not reporting one (funds of funds' sizes,
+    some ETFs' costs). D-613: None renders as "—", never as 0."""
+    figure = Decimal(str(value))
+    return figure if figure > 0 else None
 
 
 def _as_date(value: object) -> date:

@@ -177,6 +177,100 @@ def test_performance_sets_each_measure_beside_its_benchmark(
     assert "What it says" in html and "Return above cash for each unit of beta." in html
 
 
+def test_a_capture_ratio_says_how_few_months_it_rests_on(
+    client: TestClient,  # noqa: F811
+) -> None:
+    """External audit, 2026-10-04: a one-year capture ratio rests on about six
+    rising and six falling months, and the page should say so."""
+    env = client.get(f"/api/views/fund_performance{QS}&scope_id=S1").json()
+    rows = {r["measure"]: r for r in env["payload"]["rows"]}
+    assert rows["Up capture"]["1y"] is not None
+    caveats = env["quality"]["caveats"]
+    note = next((c for c in caveats if "capture" in c), "")
+    assert re.search(r"Over 1 year .* \d+ rising and \d+ falling months", note), caveats
+
+
+def test_the_steadiness_claim_counts_only_the_stretches_it_compared(
+    client: TestClient,  # noqa: F811
+) -> None:
+    """External audit, 2026-10-04: say "N of the M stretches", never a rounded
+    share -- 200 of 201 read as "100%" -- and say from when, when the benchmark
+    covers fewer stretches than the fund."""
+    env = client.get(f"/api/views/fund_consistency{QS}&scope_id=S1").json()
+    head = env["payload"]["headline"]
+    claim = re.search(r"ahead of its benchmark in (\d+) of the (\d+) stretches", head)
+    assert claim, head
+    assert "%" not in head[claim.start():]
+    html = client.get(f"/fund/S1{QS}").text
+    assert re.search(r"Ahead of its benchmark in \d+ of \d+ three-year stretches", html)
+
+
+def test_a_funds_holdings_report_their_coverage(client: TestClient) -> None:  # noqa: F811
+    """External audit, 2026-10-04: every envelope showed Coverage "—", the
+    holdings one too, where it means something: the share placed."""
+    env = client.get(f"/api/views/fund_portfolio{QS}&scope_id=S1").json()
+    quality = env["quality"]
+    assert quality["coverage_pct"] is not None
+    unresolved = Decimal(quality["unresolved_pct"] or 0)
+    assert Decimal(quality["coverage_pct"]) == 100 - unresolved
+
+
+def test_the_ranks_say_what_each_one_counts(client: TestClient) -> None:  # noqa: F811
+    """External audit, 2026-10-04: one fund ranked of 40, 36, 27 and 46 on one
+    page, unexplained. Each rank counts the funds with that figure."""
+    env = client.get(f"/api/views/fund_peers{QS}&scope_id=S1").json()
+    assert any("Each counts only the category's funds with that figure" in c
+               for c in env["quality"]["caveats"]), env["quality"]["caveats"]
+
+
+def test_without_a_benchmark_its_rows_are_left_out(
+    client: TestClient, tmp_path: Path,  # noqa: F811
+) -> None:
+    """V1-94: a measure with no figure in any period is not drawn as a row of
+    dashes (the note says why), and neither question promises a benchmark."""
+    from src.common.decimals import connect
+
+    warehouse = connect(str(tmp_path / "warehouse.db"))
+    warehouse.execute("UPDATE scheme SET benchmark_id = NULL WHERE scheme_id = 'S1'")
+    warehouse.commit()
+    warehouse.close()
+    env = client.get(f"/api/views/fund_performance{QS}&scope_id=S1").json()
+    measures = {r["measure"] for r in env["payload"]["rows"]}
+    assert {"Return a year", "Volatility", "Sharpe ratio"} <= measures
+    assert not measures & {"Benchmark a year", "Ahead of benchmark", "Beta", "Up capture"}
+    assert env["question"] == "How has it done for the risk taken?"
+    caveats = env["quality"]["caveats"]
+    assert any("left out" in c for c in caveats), caveats
+    returns = client.get(f"/api/views/fund_returns{QS}&scope_id=S1").json()
+    assert returns["question"] == "How much has it returned?"
+
+
+def test_the_worst_fall_names_its_period(client: TestClient) -> None:  # noqa: F811
+    """Beside a 3- or 5-year deepest fall, "Worst fall" alone reads as the same
+    measure; it is the deepest since the first price, and says so (V1-94)."""
+    html = client.get(f"/fund/S1{QS}").text
+    assert re.search(r"Worst fall since (19|20)\d\d<", html)
+
+
+def test_growth_and_price_are_one_chart_with_a_switch(
+    client: TestClient,  # noqa: F811
+) -> None:
+    """Design review, 2026-10-04: "What ₹10,000 became" and "Price history" drew
+    the same line twice. One panel holds both, with a switch; its file carries
+    the NAV beside the ₹10,000 figure, so nothing the Price section gave is lost."""
+    env = client.get(f"/api/views/fund_growth{QS}&scope_id=S1").json()
+    payload = env["payload"]
+    assert [c["title"] for c in payload["charts"]][1] == "Price per unit (NAV)"
+    assert payload["switch"] == ["What ₹10,000 became", "Price per unit"]
+    assert "nav" in {c["key"] for c in payload["columns"]}
+    assert any(r["nav"] is not None for r in payload["rows"])
+    assert "Its NAV was ₹" in payload["headline"]
+    html = client.get(f"/fund/S1{QS}").text
+    assert 'data-view-id="fund_nav"' not in html
+    assert 'data-switch="What ₹10,000 became|Price per unit"' in html
+    assert SECTION_LABELS["fund_growth"] == "Growth and price"
+
+
 def test_the_price_history_is_the_published_nav_from_its_first_day(
     client: TestClient,  # noqa: F811
 ) -> None:

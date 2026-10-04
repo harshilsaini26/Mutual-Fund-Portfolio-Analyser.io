@@ -60,7 +60,7 @@
 </div>
 {% endif %}
 <div class="echarts{% if env.payload.charts | length > 1 %} echarts--several{% endif %}"
-     data-chart="echart">
+     data-chart="echart"{% if env.payload.switch %} data-switch="{{ env.payload.switch | join('|') }}"{% endif %}>
   {% for chart in env.payload.charts %}
   <figure class="echart echart--{{ chart.kind }}">
     {% if env.payload.charts | length > 1 %}<figcaption>{{ chart.title }}</figcaption>{% endif %}

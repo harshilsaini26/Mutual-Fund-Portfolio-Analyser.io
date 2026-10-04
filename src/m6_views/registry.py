@@ -248,11 +248,12 @@ VIEW_DEFS: dict[str, ViewDef] = {
 }
 
 #: The fund page, top to bottom. `fund_xray_header` is its detail, collapsed.
+#: `fund_nav` is drawn inside `fund_growth`, behind a switch (design review,
+#: 2026-10-04): the two drew the same line. Its view stays, for the API.
 FUND_PAGE = (
     "fund_header",
     "fund_performance",
     "fund_growth",
-    "fund_nav",
     "fund_returns",
     "fund_peers",
     "fund_drawdown",
@@ -265,8 +266,7 @@ FUND_PAGE = (
 SECTION_LABELS = {
     "fund_header": "Overview",
     "fund_performance": "Performance",
-    "fund_growth": "Growth",
-    "fund_nav": "Price",
+    "fund_growth": "Growth and price",
     "fund_returns": "Returns",
     "fund_peers": "Peers",
     "fund_drawdown": "Falls",

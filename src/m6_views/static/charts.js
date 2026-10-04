@@ -147,12 +147,15 @@
       // which would cover one another.
       var many = c.series.filter(function (s) { return s.role === "fund"; }).length > 1;
       // Fund names run to 80 characters: one scrolling row, each name cut to fit
-      // and whole on hover, so the legend never lies over the lines.
+      // and whole on hover, so the legend never lies over the lines (a wrapping
+      // one covered the chart, V1-85). A wide gap between names: at 18px a cut
+      // name ran into the next one's mark (design review, 2026-10-04).
       if (many) {
         o.legend.type = "scroll";
         o.legend.right = 0;
+        o.legend.itemGap = 32;
         o.legend.pageTextStyle = { color: p.faint };
-        o.legend.textStyle = { color: p.ink, width: 150, overflow: "truncate" };
+        o.legend.textStyle = { color: p.ink, width: 180, overflow: "truncate" };
         o.legend.tooltip = { show: true };
       }
       o.series = c.series.map(function (s, i) {
@@ -354,6 +357,11 @@
       }
       o.grid.bottom = 28;
       o.grid.right = 28;
+      // The legend's marks at one size: drawn at a bubble's, they ran into the
+      // next item's words (design review).
+      o.legend.itemWidth = 14;
+      o.legend.itemHeight = 14;
+      o.legend.itemGap = 24;
       o.tooltip.trigger = "item";
       o.tooltip.formatter = function (d) { return d.data.name + "\n" + d.data.caption; };
       function axis(kind, name, where) {
@@ -490,7 +498,38 @@
         var spec = payload.charts[Number(el.getAttribute("data-index"))];
         if (spec && KINDS[spec.kind]) draw(el, spec);
       });
+      if (box.hasAttribute("data-switch")) switcher(box);
     });
+  }
+
+  // Several charts shown one at a time (`data-switch`: what ₹10,000 became, and
+  // the price per unit -- design review, 2026-10-04). Without scripts both show,
+  // captioned; here a pair of buttons picks one, and the ResizeObserver below
+  // redraws a chart as it appears. Drawn first, hidden after, so none is
+  // measured at zero size.
+  function switcher(box) {
+    var figures = box.querySelectorAll("figure.echart");
+    var labels = box.getAttribute("data-switch").split("|");
+    var group = document.createElement("div");
+    group.className = "zoom chart-switch";
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-label", "Show");
+    function show(k) {
+      figures.forEach(function (f, i) { f.hidden = i !== k; });
+      group.querySelectorAll("button").forEach(function (b, i) {
+        b.setAttribute("aria-pressed", String(i === k));
+      });
+    }
+    labels.forEach(function (text, k) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = text;
+      b.addEventListener("click", function () { show(k); });
+      group.appendChild(b);
+    });
+    box.classList.add("echarts--switched");
+    box.insertBefore(group, box.firstChild);
+    show(0);
   }
 
   function redrawAll() {
