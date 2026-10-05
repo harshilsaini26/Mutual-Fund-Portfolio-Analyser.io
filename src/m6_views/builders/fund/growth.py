@@ -60,6 +60,16 @@ class FundGrowthBuilder:
             else window_start(navs[-1].nav_date, key)
         )
         path = growth_path(navs, levels, start)
+        # Over the whole record a benchmark younger than the fund is dropped (the
+        # two lines start on one day, or the fund is drawn alone), so a reader of
+        # "All" never saw it. Start where the benchmark does instead; the price per
+        # unit beside it keeps the whole record (UI/UX critique F-06).
+        late = False
+        if key == "max" and path is not None and levels and all(
+                b is None for _, _, b in path.points):
+            later = growth_path(navs, levels, min(levels))
+            if later is not None and any(b is not None for _, _, b in later.points):
+                path, late = later, True
         if path is None:
             return empty_envelope(
                 VIEW_ID, question, scope,
@@ -84,6 +94,12 @@ class FundGrowthBuilder:
         )
 
         caveats: list[str] = []
+        if late:
+            caveats.append(
+                f"Drawn from {format_date(path.start)}, the first day its benchmark "
+                f"has prices; the price per unit goes back to "
+                f"{format_date(navs[0].nav_date)}."
+            )
         if key != "max" and path.start > start:
             caveats.append(
                 f"Prices on record begin on {format_date(path.start)}, after "
@@ -118,8 +134,12 @@ class FundGrowthBuilder:
             )
         # The published price per unit beside it, behind a switch: the page's
         # "Price history" drew the same line again (design review, 2026-10-04).
-        price = price_chart(self.market, scheme, scope.as_of, path.start)
-        charts = [{"kind": "line", "title": question, "y": "inr", "series": series}]
+        price = price_chart(self.market, scheme, scope.as_of,
+                            navs[0].nav_date if late else path.start)
+        # `log`: a log-scale switch beside the periods, so a long record's early
+        # years are not flattened under its later ones (F-06).
+        charts = [{"kind": "line", "title": question, "y": "inr", "series": series,
+                   "log": True}]
         prices: dict[date, Decimal] = {}
         if price is not None:
             chart, said, prices = price

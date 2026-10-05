@@ -38,7 +38,8 @@ def _cand(
     holdings: list[list[str]] | None = None, has_holdings: bool = True,
     mix: list[list[str]] | None = None,
 ) -> dict[str, Any]:
-    returns = [{"value": "0.1"}, {"value": "0.1"}, {"value": five_year}]
+    returns = [{"value": "0.1", "label": "+10.0%"}, {"value": "0.13", "label": "+13.0%"},
+               {"value": five_year, "label": "+12.0%"}]
     row = {
         "scheme_id": sid, "name": f"Fund {sid}",
         "detail": "Equity Scheme - Flexi Cap Fund · Direct · Growth",
@@ -138,17 +139,24 @@ PAIR_G = [["I1", "One Co", "equity", "6"], ["I2", "Two Co", "equity", "8"],
           ["I7", "Seven Co", "equity", "86"]]
 
 
-def test_the_pair_is_the_largest_fund_from_another_equity_category() -> None:
+def test_the_pair_is_the_fund_of_another_equity_category_sharing_the_most() -> None:
+    """UI/UX critique H-04: the largest fund of another category shared 0.4% with the
+    example, which showed nothing. The partner is the equity fund of another
+    category whose portfolio overlaps the example's most; on a tie, the larger."""
+    near = [["I1", "One Co", "equity", "10"], ["I9", "Nine Co", "equity", "80"],
+            ["I7", "Seven Co", "equity", "10"]]
     candidates = [
         _cand("C", holdings=PAIR_C),
-        _cand("F", category="equity/large_cap", size="500", holdings=PAIR_G),
-        _cand("G", category="equity/mid_cap", size="600", holdings=PAIR_G),
-        _cand("H", category="debt/liquid", size="2000", holdings=PAIR_G),
+        _cand("F", category="equity/large_cap", size="500", holdings=near),
+        _cand("G", category="equity/mid_cap", size="9000", holdings=PAIR_G),
+        _cand("E", category="equity/large_cap", size="400", holdings=near),
+        _cand("H", category="debt/liquid", size="2000", holdings=PAIR_C),
+        _cand("D", size="800", holdings=PAIR_C),   # the example's own category
         _cand("K", category="equity/small_cap", size="9000", has_holdings=False),
     ]
     pair = landing_pair("C", candidates)
     assert pair is not None
-    assert [f["scheme_id"] for f in pair["funds"]] == ["C", "G"]
+    assert [f["scheme_id"] for f in pair["funds"]] == ["C", "F"]
 
 
 def test_the_pair_overlap_is_pairwise_overlap() -> None:
@@ -182,6 +190,14 @@ def test_a_pair_with_nothing_in_common_says_so() -> None:
 
 def test_no_second_fund_no_pair() -> None:
     assert landing_pair("C", [_cand("C"), _cand("D")]) is None
+
+
+def test_the_example_says_how_the_fund_has_done() -> None:
+    """UI/UX critique H-01: the example showed what a fund owns but not how it had
+    done. Its three- and five-year returns, as its row writes them."""
+    example = landing_example([_cand("C")])
+    assert example is not None
+    assert example["returns"] == [("3 years", "+13.0%"), ("5 years", "+12.0%")]
 
 
 def test_the_card_names_the_category_as_the_site_does() -> None:

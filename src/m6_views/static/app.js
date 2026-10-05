@@ -85,11 +85,47 @@
     }
     return null;
   }
+  // Explore funds (UI/UX critique E-01 to E-03): the funds a view shows, from every
+  // fund's row in funds/rows.json, filtered by family, category and the words of a
+  // name, then sorted on a column -- by default the largest fund first. A fund with
+  // no figure sorts last either way: an absent return is not the lowest return.
+  function exploreRows(rows, state) {
+    var typed = words(state.q || "");
+    var key = state.sort || "size", down = state.dir !== "asc";
+    var value = function (r) {
+      if (key === "name") return r.name.toLowerCase();
+      if (key === "cat") return r.cat_name.toLowerCase();
+      var cell = r.c[key];
+      return cell && cell[0] !== "" ? Number(cell[0]) : null;
+    };
+    return rows.filter(function (r) {
+      var name = words(r.name).join(" ");
+      return (!state.family || r.family === state.family) &&
+        (!state.category || r.cat === state.category) &&
+        typed.every(function (w) { return name.indexOf(w) !== -1; });
+    }).map(function (r, i) { return [r, value(r), i]; }).sort(function (a, b) {
+      if (a[1] === null || b[1] === null) return (a[1] === null) - (b[1] === null) || a[2] - b[2];
+      var d = a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0;
+      return (down ? -d : d) || a[2] - b[2];
+    }).map(function (x) { return x[0]; });
+  }
+  // How many funds each family holds, and each category within the family chosen:
+  // the filters' options say so, and offer only categories of that family (E-03).
+  function exploreCounts(rows, family) {
+    var families = {}, categories = {};
+    rows.forEach(function (r) {
+      families[r.family] = (families[r.family] || 0) + 1;
+      if (!family || r.family === family) categories[r.cat] = (categories[r.cat] || 0) + 1;
+    });
+    return { families: families, categories: categories };
+  }
+
   if (typeof module === "object" && module.exports) {
     module.exports = { filterHash: filterHash, parseFilterHash: parseFilterHash,
                        isFilterHash: isFilterHash, initialFilters: initialFilters,
                        later: later, searchTarget: searchTarget, hintPlace: hintPlace,
-                       termHost: termHost, sortKey: sortKey };
+                       termHost: termHost, sortKey: sortKey,
+                       exploreRows: exploreRows, exploreCounts: exploreCounts };
     return;
   }
 
@@ -382,6 +418,12 @@
       S.reset();
       check();
     });
+    // The recently viewed funds, which the privacy text names (UI/UX critique G-21).
+    var forget = panel.querySelector("[data-recent-clear]");
+    if (forget) forget.addEventListener("click", function () {
+      try { window.localStorage.removeItem(RECENT); } catch (e) { /* nothing kept */ }
+      forget.textContent = "Recently viewed cleared";
+    });
     new MutationObserver(matrix).observe(html, { attributes: true, attributeFilter: ["data-theme"] });
   }
 
@@ -449,6 +491,42 @@
     });
   }
 
+  // --- tables wider than their box (UI/UX critique G-17) -------------------------
+  //
+  // A table region that scrolls sideways is a tab stop, so a keyboard can scroll
+  // it; one that fits is not, so a page of tables is not a page of extra stops.
+  // While more of it lies to the right, its right edge fades (the scroll hint).
+  // Both the region and its table are watched: either may change size (the window,
+  // the text size, a `<details>` opening), and the page scripts draw new ones.
+  function moreRight(wrap) {
+    wrap.classList.toggle("table-wrap--more", wrap.scrollWidth - wrap.clientWidth - wrap.scrollLeft > 1);
+  }
+  var scrollers = new ResizeObserver(function (entries) {
+    entries.forEach(function (e) {
+      var wrap = e.target.closest(".table-wrap");
+      if (wrap.scrollWidth > wrap.clientWidth + 1) wrap.setAttribute("tabindex", "0");
+      else wrap.removeAttribute("tabindex");
+      moreRight(wrap);
+    });
+  });
+  document.addEventListener("scroll", function (e) {
+    if (e.target.classList && e.target.classList.contains("table-wrap")) moreRight(e.target);
+  }, { capture: true, passive: true });
+  function eachTable(node, act) {
+    if (node.nodeType !== 1) return;
+    (node.matches(".table-wrap") ? [node] : node.querySelectorAll(".table-wrap")).forEach(function (wrap) {
+      act.call(scrollers, wrap);
+      if (wrap.firstElementChild) act.call(scrollers, wrap.firstElementChild);
+    });
+  }
+  eachTable(document.body, scrollers.observe);
+  new MutationObserver(function (records) {
+    records.forEach(function (r) {
+      r.removedNodes.forEach(function (n) { eachTable(n, scrollers.unobserve); });
+      r.addedNodes.forEach(function (n) { eachTable(n, scrollers.observe); });
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+
   // --- sortable tables ----------------------------------------------------------
   //
   // A header button sorts on the server's `data-value` (a number) or on the
@@ -498,15 +576,88 @@
     });
   });
 
-  // --- filtering the public copy's fund table -------------------------------------
+  // --- Explore funds (UI/UX critique E-01 to E-07) -----------------------------------
+  //
+  // The page draws the 50 largest funds; every fund's row, its cells formatted by
+  // the build, is in funds/rows.json. Here the filters, the sort and "Show 50 more"
+  // draw rows from that data, in the page's own markup (explorer.html's `cell`).
+  // Until it has loaded, the 50 stay as drawn.
 
-  var table = document.querySelector("table[data-filterable]");
+  var table = document.querySelector("table[data-rows]");
   if (table) {
     var family = document.querySelector("select[data-filter-family]");
     var category = document.querySelector("select[data-filter-category]");
     var text = document.querySelector("input[data-filter-text]");
     var count = document.querySelector("[data-filter-count]");
-    var all = table.tBodies[0].rows;
+    var sortBy = document.querySelector("select[data-sort-select]");
+    var empty = document.querySelector("[data-empty]");
+    var more = document.querySelector("[data-more]");
+    var chooser = document.querySelector("[data-columns]");
+    var body = table.tBodies[0];
+    var heads = Array.prototype.slice.call(table.tHead.rows[0].cells);
+    var STEP = 50, COLUMNS = "lookthrough.columns.v1";
+    var PHONE_HIDE = "ter r1 r5 rank vol3 fall3 sharpe3";   // a phone's row: category, size, 3 years
+    var data = null, shown = STEP, sort = { key: "size", dir: "desc" };
+
+    // The page's markup for one cell (explorer.html's `cell` macro).
+    var cell = function (r, th) {
+      var key = th.getAttribute("data-col"), td = document.createElement("td");
+      td.setAttribute("data-col", key);
+      if (key === "name") {
+        var link = document.createElement("a");
+        link.className = "fund-name";
+        link.href = ROOT + "/fund/" + r.id + "/";
+        link.textContent = r.name;
+        var house = document.createElement("span");
+        house.className = "cell-sub";
+        house.textContent = r.house;
+        td.append(link, " ", house);
+        return td;
+      }
+      if (key === "cat") { td.textContent = r.cat_name; return td; }
+      var c = r.c[key], tone = /^r\d$/.test(key) ? c[2] : "";
+      td.className = "num" + (tone ? " ret--" + tone : "");
+      td.setAttribute("data-label", th.getAttribute("data-short"));
+      if (c[0] !== "") td.setAttribute("data-value", c[0]);
+      if (tone && c[3]) {
+        var symbol = document.createElement("span");
+        symbol.className = "ret__symbol";
+        symbol.setAttribute("aria-hidden", "true");
+        symbol.textContent = c[3];
+        td.appendChild(symbol);
+      }
+      td.appendChild(document.createTextNode(c[1]));
+      if (key === "rank" && c[2]) {
+        var quarter = document.createElement("span");
+        quarter.className = "cell-sub";
+        quarter.textContent = c[2];
+        td.appendChild(quarter);
+      }
+      return td;
+    };
+
+    // Each family and category option says how many funds it holds; the categories
+    // are only the chosen family's (E-03).
+    var options = function () {
+      var counts = exploreCounts(data, family.value);
+      Array.prototype.forEach.call(family.options, function (o) {
+        if (!o.hasAttribute("data-name")) o.setAttribute("data-name", o.textContent);
+        var n = o.value ? counts.families[o.value] || 0 : data.length;
+        o.textContent = o.getAttribute("data-name") + " (" + n.toLocaleString("en-IN") + ")";
+      });
+      var names = {};
+      data.forEach(function (r) { names[r.cat] = r.cat_name; });
+      var keys = Object.keys(counts.categories).sort(function (a, b) {
+        return names[a].toLowerCase() < names[b].toLowerCase() ? -1 : 1;
+      });
+      var kept = category.value, total = 0;
+      keys.forEach(function (k) { total += counts.categories[k]; });
+      category.replaceChildren(new Option("All categories (" + total.toLocaleString("en-IN") + ")", ""));
+      keys.forEach(function (k) {
+        category.appendChild(new Option(names[k] + " (" + counts.categories[k].toLocaleString("en-IN") + ")", k));
+      });
+      category.value = keys.indexOf(kept) >= 0 ? kept : "";
+    };
 
     // The view is the address: replaced, not pushed, so Back still leaves; written
     // once typing pauses, since Safari refuses a burst of replaceState calls. The
@@ -514,62 +665,128 @@
     var writeAddress = later(function (hash) {
       history.replaceState(null, "", location.pathname + hash);
     }, 250);
-    var apply = function () {
-      var wanted = family ? family.value : "";
-      var kind = category ? category.value : "";
-      var typed = text ? words(text.value) : [];
-      var shown = 0;
-      Array.prototype.forEach.call(all, function (row) {
-        var name = words(row.cells[0].textContent || "").join(" ");
-        var match = (!wanted || row.getAttribute("data-family") === wanted) &&
-          (!kind || row.getAttribute("data-category") === kind) &&
-          typed.every(function (w) { return name.indexOf(w) !== -1; });
-        row.hidden = !match;
-        if (match) shown += 1;
+    var draw = function () {
+      var hits = exploreRows(data, { family: family.value, category: category.value,
+                                     q: text.value, sort: sort.key, dir: sort.dir });
+      var rows = document.createDocumentFragment();
+      hits.slice(0, shown).forEach(function (r) {
+        var tr = document.createElement("tr");
+        tr.setAttribute("data-family", r.family);
+        tr.setAttribute("data-category", r.cat);
+        heads.forEach(function (th) { tr.appendChild(cell(r, th)); });
+        rows.appendChild(tr);
       });
-      if (count) {
-        count.textContent = shown === all.length
-          ? all.length + " funds"
-          : shown + " of " + all.length + " funds";
-      }
-      writeAddress(filterHash({ category: category ? category.value : "",
-                                family: family ? family.value : "",
-                                q: text ? text.value.trim() : "" }));
+      body.replaceChildren(rows);
+      count.textContent = hits.length === data.length
+        ? data.length.toLocaleString("en-IN") + " funds"
+        : hits.length.toLocaleString("en-IN") + " of " + data.length.toLocaleString("en-IN") + " funds";
+      empty.hidden = hits.length > 0;
+      more.parentNode.hidden = hits.length <= shown;
+      more.textContent = "Show " + Math.min(STEP, hits.length - shown) + " more";
+      heads.forEach(function (th) {
+        if (th.getAttribute("data-col") === sort.key) {
+          th.setAttribute("aria-sort", sort.dir === "asc" ? "ascending" : "descending");
+        } else th.removeAttribute("aria-sort");
+      });
+      var asked = sort.key + ":" + sort.dir;
+      sortBy.value = Array.prototype.some.call(sortBy.options, function (o) { return o.value === asked; })
+        ? asked : "";
+      writeAddress(filterHash({ category: category.value, family: family.value, q: text.value.trim() }));
     };
-    if (family) family.addEventListener("change", apply);
-    if (category) category.addEventListener("change", apply);
-    if (text) text.addEventListener("input", apply);
+    var refilter = function () { shown = STEP; if (data) draw(); };
+
+    family.addEventListener("change", function () { if (data) options(); refilter(); });
+    category.addEventListener("change", refilter);
+    text.addEventListener("input", refilter);
+    more.addEventListener("click", function () { shown += STEP; draw(); });
+    document.querySelector("[data-filter-clear]").addEventListener("click", function () {
+      family.value = "";
+      category.value = "";
+      text.value = "";
+      options();
+      refilter();
+      family.focus();
+    });
+    // A heading sorts by its column: figures largest first, names A to Z, then
+    // the other way. A phone has the list of sorts instead (E-07).
+    heads.forEach(function (th) {
+      var button = th.querySelector("button[data-sort]");
+      var key = th.getAttribute("data-col");
+      button.addEventListener("click", function () {
+        if (!data) return;
+        var named = key === "name" || key === "cat";
+        sort = { key: key, dir: sort.key === key ? (sort.dir === "asc" ? "desc" : "asc") : (named ? "asc" : "desc") };
+        refilter();
+      });
+    });
+    sortBy.addEventListener("change", function () {
+      if (!data || !sortBy.value) return;
+      var parts = sortBy.value.split(":");
+      sort = { key: parts[0], dir: parts[1] };
+      refilter();
+    });
+
+    // The columns shown (E-05): the reader's choice, kept in this browser; else
+    // the page's, or on a phone the three a two-line row holds.
+    var hide = function (list) {
+      table.setAttribute("data-hide", list);
+      chooser.querySelectorAll("input[type=checkbox]").forEach(function (box) {
+        box.checked = list.split(" ").indexOf(box.value) < 0;
+      });
+    };
+    var kept = store(COLUMNS);   // "" is a choice too: every column shown
+    hide(kept !== null ? kept
+      : window.matchMedia("(max-width: 720px)").matches ? PHONE_HIDE : table.getAttribute("data-hide"));
+    chooser.hidden = false;
+    chooser.addEventListener("change", function () {
+      var off = Array.prototype.filter.call(chooser.querySelectorAll("input[type=checkbox]"), function (box) {
+        return !box.checked;
+      }).map(function (box) { return box.value; }).join(" ");
+      hide(off);
+      store(COLUMNS, off);
+    });
 
     // "#category=…&family=…&q=…": the front page's category cards, a shared or
     // bookmarked view, or Back and Forward; "?q=hdfc": the search box's plain form.
     // A value the page has no option for is ignored.
     var choose = function (select, value) {
-      if (!select) return;
       var known = Array.prototype.some.call(select.options, function (o) { return o.value === value; });
       select.value = known ? value : "";
     };
     var follow = function (asked) {
       choose(family, asked.family);
+      options();
       choose(category, asked.category);
-      if (text) text.value = asked.q;
-      apply();
+      text.value = asked.q;
+      refilter();
     };
-    if (isFilterHash(location.hash) || /[?&]q=/.test(location.search)) {
-      follow(initialFilters(location.search, location.hash));
-    }
+
+    fetch(table.getAttribute("data-rows")).then(function (r) {
+      if (!r.ok) throw new Error(String(r.status));
+      return r.json();
+    }).then(function (rows) {
+      data = rows;
+      options();
+      if (isFilterHash(location.hash) || /[?&]q=/.test(location.search)) {
+        follow(initialFilters(location.search, location.hash));
+      } else draw();
+    }).catch(function () {
+      count.textContent = "The full list did not load; reload the page to try again.";
+    });
     // An emptied hash resets the view; "#content" and other anchors leave it be.
     window.addEventListener("hashchange", function () {
-      if (!location.hash || isFilterHash(location.hash)) follow(parseFilterHash(location.hash));
+      if (data && (!location.hash || isFilterHash(location.hash))) follow(parseFilterHash(location.hash));
     });
 
     // A category tile narrows the table rather than jumping to the plain lists
     // below it, which are the way through with scripts off.
     document.querySelectorAll("a[data-family]").forEach(function (tile) {
       tile.addEventListener("click", function (e) {
-        if (!family) return;
+        if (!data) return;
         e.preventDefault();
         family.value = tile.getAttribute("data-family");
-        apply();
+        options();
+        refilter();
         table.closest("section").scrollIntoView({ block: "start" });
       });
     });

@@ -373,6 +373,43 @@
     return out;
   }
 
+  // What a holding is set beside in "Did it work?" (UI/UX critique P-01): the same
+  // purchases and sales in the longest-running index fund on its benchmark (the
+  // build's `tracker`, the one standing in for the benchmark on its page), else in
+  // its category's middle three-year return. Either must have been there to buy on
+  // the first purchase; never the holding itself or its own Direct plan.
+  function reference(held, funds, firstIso) {
+    var tracker = held.tracker && funds.filter(function (f) { return f.id === held.tracker; })[0];
+    if (tracker && tracker.plan !== "regular" && tracker.prices_from && tracker.prices_from <= firstIso) {
+      return { fund: tracker, why: "index" };
+    }
+    var others = funds.filter(function (f) { return f.id !== held.direct; });
+    var middle = alternatives(held, others, firstIso).filter(function (s) {
+      return s.reasons.indexOf("r3") >= 0;
+    })[0];
+    return middle ? { fund: middle.fund, why: "middle" } : null;
+  }
+
+  // An amount as typed, in Indian grouping (P-03): "100000" reads "1,00,000", so a
+  // lakh is not taken for ten. Text that is not an amount is left as it was.
+  function grouped(text) {
+    var s = String(text == null ? "" : text).replace(/[₹,\s]/g, "");
+    var m = /^(\d+)(\.\d*)?$/.exec(s);
+    if (!m) return String(text == null ? "" : text);
+    var whole = m[1].replace(/^0+(?=\d)/, "");
+    var head = whole.slice(0, -3), tail = whole.slice(-3);
+    return (head ? head.replace(/\B(?=(\d{2})+$)/g, ",") + "," : "") + tail + (m[2] || "");
+  }
+
+  // The same in words, beside the field: "₹2.5 lakh". Under a thousand, nothing.
+  function inWords(text) {
+    var paise = toPaise(text);
+    if (!paise || paise < 100000) return "";
+    var rupees = paise / 100;
+    var unit = rupees >= 1e7 ? [1e7, "crore"] : rupees >= 1e5 ? [1e5, "lakh"] : [1e3, "thousand"];
+    return "₹" + String(Math.round(rupees / unit[0] * 100) / 100) + " " + unit[1];
+  }
+
   // Each of the three comparison slots, at its own index: the person's choice
   // there, else the suggestion of the same rank unless it was chosen elsewhere,
   // else empty. "Replace" writes the slot it is drawn in.
@@ -468,6 +505,7 @@
     overlap: overlap, alternatives: alternatives, parsePortfolio: parsePortfolio,
     localDay: localDay, rowError: rowError, entriesOf: entriesOf, altSlots: altSlots,
     pricedBuys: pricedBuys, pricedSales: pricedSales, gzipText: gzipText, day: day, units: units,
+    reference: reference, grouped: grouped, inWords: inWords,
   };
   if (typeof module === "object" && module.exports) module.exports = api;
   else globalThis.PortfolioMath = api;

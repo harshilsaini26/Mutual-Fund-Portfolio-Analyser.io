@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% import "macros.html" as vc %}
 {% block title %}{{ title }}{% endblock %}
+{% block description %}{{ title }}: its returns beside the funds that do the same job, its costs, its falls and what it owns. Descriptive, not advice.{% endblock %}
+{% block share_image %}/fund/{{ fund_id }}/share.png{% endblock %}
 {% block body_attrs %}data-fund-id="{{ fund_id }}" data-fund-name="{{ title }}"{% endblock %}
 
 {#

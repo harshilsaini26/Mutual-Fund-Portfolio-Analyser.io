@@ -72,5 +72,7 @@ def test_every_accent_reads_on_its_surface() -> None:
 
 
 def test_each_font_choice_sets_the_stacks() -> None:
-    assert '"Atkinson Hyperlegible"' in _block(':root[data-font="atkinson"]')
+    # Atkinson Hyperlegible is the bare :root's since the UI/UX critique (G-01);
+    # Terminess, once the default, is the opt-in "Terminal".
+    assert '"Terminess Nerd Font"' in _block(':root[data-font="terminess"]')
     assert '"Rubik"' in _block(':root[data-font="rubik"]')

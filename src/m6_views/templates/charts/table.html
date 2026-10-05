@@ -23,14 +23,22 @@
 {% if env.payload.definition %}
 <p class="definition">{{ env.payload.definition }}</p>
 {% endif %}
-<div class="table-wrap" data-chart="table">
-<table data-sortable>
+{#- A region named by its caption, a tab stop when it scrolls (app.js; G-17). Rows of
+    unlike measures (Performance) are not sorted: `sortable: false` (G-18). -#}
+{% set sortable = env.payload.sortable is not sameas false %}
+<div class="table-wrap" data-chart="table" role="region" aria-labelledby="tbl-{{ env.view_id }}">
+<table{% if sortable %} data-sortable{% endif %}>
+  <caption class="sr-only" id="tbl-{{ env.view_id }}">{{ view_names.get(env.view_id, env.view_id) }}</caption>
   <thead>
     <tr>
       {% for column in env.payload.columns %}
+      {% if sortable %}
       <th scope="col" class="col--{{ column.kind }}"><button type="button"
           data-sort="{{ 'text' if column.kind == 'text' else ('value' if column.kind == 'date' else 'number') }}"
           >{{ column.label }}</button></th>
+      {% else %}
+      <th scope="col" class="col--{{ column.kind }}">{{ column.label }}</th>
+      {% endif %}
       {% endfor %}
     </tr>
   </thead>

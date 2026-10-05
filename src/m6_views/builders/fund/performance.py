@@ -85,8 +85,7 @@ def _value(w: ReturnWindow, key: str) -> Any:
     if key == "max_dd":
         return w.drawdown.depth
     if key == "lead":
-        bench = w.bench_return_ann
-        return w.return_ann - bench if bench is not None else None
+        return w.lead_ann   # computed in M2, beside the two returns (§2.1)
     return getattr(w, key)
 
 
@@ -178,6 +177,9 @@ class FundPerformanceBuilder:
             scope=scope,
             payload={
                 "headline": headline,
+                # Each row a different measure: an order by one column means
+                # nothing, so the table is not sortable (UI/UX critique G-18).
+                "sortable": False,
                 "definition": (
                     "Cash is the 91-day Treasury bill rate, averaged over each period"
                     + (f" ({rf:.2f}% a year over {PERIODS[lead_key]})."

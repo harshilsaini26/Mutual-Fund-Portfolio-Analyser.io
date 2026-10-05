@@ -19,14 +19,16 @@
   no "best", no "top performers".
 #}
 {% block main_class %} content--bleed{% endblock %}
+{% block topbar_search %}{% endblock %}
 
 {#- Your portfolio first: the address asks "Did my SIP work?" (external audit,
     2026-10-04). Shown once, in the hero (design review). -#}
 {% macro doors() -%}
+{#- A card with one destination is a link across its face (UI/UX critique H-02). -#}
 <ul class="lp-doors">
-  <li class="lp-door">
+  <li class="lp-door lp-door--link">
     <p class="lp-door__title">Did my SIP work?</p>
-    <a class="button" href="{{ root }}/portfolio/">Add your SIPs and lump sums</a>
+    <a class="button lp-door__link" href="{{ root }}/portfolio/">Add your SIPs and lump sums</a>
     <span class="lp-door__more">What they are worth, what they earned a year and what they own, worked out in your browser</span>
   </li>
   <li class="lp-door">
@@ -41,11 +43,19 @@
     </form>
     <a class="lp-door__more" href="{{ root }}/funds/">or explore all {{ count | fmt_count }}</a>
   </li>
-  <li class="lp-door">
+  <li class="lp-door lp-door--link">
     <p class="lp-door__title">Understand funds</p>
-    <a href="{{ root }}/learn/">How funds are organised, in plain words</a>
+    <a class="lp-door__link" href="{{ root }}/learn/">How funds are organised, in plain words</a>
   </li>
 </ul>
+{%- endmacro %}
+
+{% macro map_category(c) -%}
+<li><details class="fundmap__cat">
+  <summary>{{ c.name }} <span>{{ c.count }}</span></summary>
+  {% if c.about %}<p>{{ c.about }}</p>{% endif %}
+  <a href="{{ root }}/funds/#category={{ c.key }}">See its {{ c.count }} fund{{ '' if c.count == 1 else 's' }}</a>
+</details></li>
 {%- endmacro %}
 
 {% block content %}
@@ -66,6 +76,9 @@
     <figure class="lp-fund">
       <a class="lp-fund__name" href="{{ root }}/fund/{{ example.scheme_id }}/">{{ example.name }}</a>
       <p class="lp-fund__detail">{{ example.detail }}</p>
+      <dl class="lp-fund__returns">
+        {% for period, label in example.returns %}<div><dt>Return a year, {{ period }}</dt><dd>{{ label }}</dd></div>{% endfor %}
+      </dl>
       <svg class="lp-mix" viewBox="0 0 100 8" preserveAspectRatio="none" role="img"
            aria-label="What it holds: {% for m in example.mix %}{{ m.label }} {{ m.pct_label }}{{ ', ' if not loop.last }}{% endfor %}">
         {% for m in example.mix %}<rect class="lp-mix__part lp-mix__part--{{ loop.index }}" x="{{ m.x }}" y="0" width="{{ m.width }}" height="8"/>{% endfor %}
@@ -150,13 +163,16 @@
         <p class="fundmap__node"><strong>{{ family.name }}</strong>
           <span>{{ family.count | fmt_count }} fund{{ '' if family.count == 1 else 's' }} · {{ family.hint }}</span></p>
         <ul class="fundmap__cats">
-          {% for c in family.categories %}
-          <li><details class="fundmap__cat">
-            <summary>{{ c.name }} <span>{{ c.count }}</span></summary>
-            {% if c.about %}<p>{{ c.about }}</p>{% endif %}
-            <a href="{{ root }}/funds/#category={{ c.key }}">See its {{ c.count }} fund{{ '' if c.count == 1 else 's' }}</a>
+          {% for c in family.categories %}{{ map_category(c) }}{% endfor %}
+          {#- Headings that mix funds doing different jobs, last and folded (H-03). -#}
+          {% if family.mixed %}
+          <li><details class="fundmap__mixed">
+            <summary>Mixed headings <span>{{ family.mixed | sum(attribute="count") }}</span></summary>
+            <p>AMFI headings that hold funds doing different jobs, so never ranked
+              against each other.</p>
+            <ul class="fundmap__cats">{% for c in family.mixed %}{{ map_category(c) }}{% endfor %}</ul>
           </details></li>
-          {% endfor %}
+          {% endif %}
         </ul>
       </li>
       {% endfor %}
@@ -195,7 +211,7 @@
       {%- if pair.lead %} · put ₹1 in each fund and {{ pair.lead.name }} is {{ pair.lead.share_label }} of your ₹2{% endif %}
       · {{ pair.overlap_label }} of the two portfolios is the same
       {%- else %}No companies in both: these two portfolios share nothing{% endif %}</p>
-    <p class="lp-pic__note">An example pair: the fund above and the largest fund, with holdings, from another equity category.</p>
+    <p class="lp-pic__note">An example pair: the fund above and the equity fund of another category whose portfolio is most like it.</p>
     {% elif not example %}
     <p class="lp-none">No example tonight: there is no example fund above to pair with.</p>
     {% else %}
@@ -208,9 +224,10 @@
   <div class="lp-text">
     <p class="eyebrow">Your data stays yours</p>
     <h2 id="privacy-h">Nothing you enter leaves your browser</h2>
-    <p>Your portfolio and your settings are kept in this browser's own storage, on this
-      device. Nothing you enter is sent anywhere or kept on any server. You can clear
-      them at any time: Clear on Your portfolio, Reset to defaults in Settings.</p>
+    <p>Your portfolio, your settings and the funds you viewed lately are kept in this
+      browser's own storage, on this device. Nothing you enter is sent anywhere or kept
+      on any server. You can clear them at any time: More, then Remove everything, on Your portfolio; Reset to
+      defaults and Clear recently viewed in Settings.</p>
     <details class="lp-how">
       <summary>How this works</summary>
       <ul>
@@ -224,16 +241,15 @@
   </div>
   <div class="lp-pic lp-flow">
     <div class="lp-flow__box"><strong>This site</strong>Fund prices, holdings, categories (public)</div>
-    <svg class="lp-flow__arrows" viewBox="0 0 120 80" role="img"
-         aria-label="Public data goes from this site to your browser; nothing you enter goes back">
+    {#- One way only (UI/UX critique H-05): a crossed-out arrow back still drew data
+        going back. -#}
+    <svg class="lp-flow__arrows" viewBox="0 0 120 52" role="img"
+         aria-label="Public data goes from this site to your browser">
       <path class="lp-flow__out" d="M8 26 H104" pathLength="1"/>
       <path class="lp-flow__head lp-flow__head--out" d="M98 20 L108 26 L98 32"/>
-      <path class="lp-flow__back" d="M112 56 H16"/>
-      <path class="lp-flow__head lp-flow__head--back" d="M22 50 L12 56 L22 62"/>
-      <g class="lp-flow__cross"><path d="M54 46 L66 66"/><path d="M66 46 L54 66"/></g>
     </svg>
-    <div class="lp-flow__box"><strong>Your browser</strong>Your funds, your settings</div>
-    <p class="lp-flow__labels"><span>public data →</span><span>← your entries: never sent</span></p>
+    <div class="lp-flow__box"><strong>Your browser</strong>Your funds, your settings: kept here</div>
+    <p class="lp-flow__labels"><span>public data →</span></p>
   </div>
 </section>
 
@@ -241,13 +257,16 @@
   <div class="lp-text">
     <p class="eyebrow">About the data</p>
     <h2 id="about-h">Where every figure comes from</h2>
-    <p>Rebuilt every night; each figure is dated. Descriptive, not advice. Benchmark
-      comparisons and your own ledger are in the
+    <p>Rebuilt every night; each figure is dated. Descriptive, not advice. The
+      indices' own levels (here an index fund stands in for each benchmark) and your
+      own ledger are in the
       <a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">self-hosted app</a>.</p>
   </div>
   <ul class="lp-pic lp-sources">
     <li class="lp-source"><strong>AMFI</strong>Daily prices, monthly expense ratios</li>
-    <li class="lp-source"><strong>Fund portfolios</strong>Monthly; most from an aggregator's pages, Kotak's and ICICI's from their own files</li>
+    <li class="lp-source"><strong>Fund portfolios</strong>Monthly;
+      {%- if stats.holdings_as_of %} most disclosed for {{ stats.holdings_as_of | fmt_date }}, each fund's date on its page;{% endif %}
+      most from an aggregator's pages, Kotak's and ICICI's from their own files</li>
     <li class="lp-source"><strong>SEBI</strong>Fund categories and their rules</li>
   </ul>
 </section>

@@ -36,7 +36,8 @@
 {%- elif name == "moon" -%}
 <path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>
 {%- elif name == "settings" -%}
-<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>
+{#- Sliders, not a sun: it opens six settings, not a light/dark switch (G-06). -#}
+<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>
 {%- elif name == "close" -%}
 <path d="M6 6l12 12M18 6L6 18"/>
 {%- elif name == "external" -%}

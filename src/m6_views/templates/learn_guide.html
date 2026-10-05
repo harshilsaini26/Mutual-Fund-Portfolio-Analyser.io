@@ -5,20 +5,53 @@
 {#
   One guide (DECISIONS V1-87). Paragraphs pass through `link_terms`, which escapes
   the text and turns [[key]] into a glossary link; every other string is
-  autoescaped.
+  autoescaped. Since the UI/UX critique (L-03, L-04): its sections as links at the
+  top, a screenshot where a section has one, the glossary terms it uses and the
+  guides before and after it at the end.
 #}
 {% block content %}
+{%- macro anchor(heading) %}{{ heading | lower | replace(',', '') | replace(' ', '-') }}{% endmacro -%}
+{%- set ns = namespace(at=0) -%}
+{%- for g in learn.guides %}{% if g.slug == guide.slug %}{% set ns.at = loop.index0 %}{% endif %}{% endfor -%}
 <article class="plain learn learn--guide">
   <p class="eyebrow"><a href="{{ root }}/learn/">Learn</a> · {{ guide.group }}</p>
   <h1>{{ guide.title }}</h1>
   <p class="lede">{{ guide.summary }}</p>
   {{ vc.learn_note() }}
+  <nav class="learn__toc" aria-labelledby="toc-h">
+    <h2 id="toc-h" class="learn__toc-title">On this page</h2>
+    <ol>
+      {% for section in guide.sections %}<li><a href="#{{ anchor(section.heading) }}">{{ section.heading }}</a></li>{% endfor %}
+    </ol>
+  </nav>
   {% for section in guide.sections %}
-  <h2 id="{{ section.heading | lower | replace(',', '') | replace(' ', '-') }}">{{ section.heading }}</h2>
+  <h2 id="{{ anchor(section.heading) }}">{{ section.heading }}</h2>
   {% for paragraph in section.paragraphs %}<p>{{ paragraph | link_terms }}</p>{% endfor %}
+  {% if section.figure %}
+  <figure class="learn__shot">
+    <img src="{{ root }}/static/{{ section.figure.src }}" alt="{{ section.figure.alt }}" width="{{ section.figure.width }}" height="{{ section.figure.height }}" loading="lazy">
+    <figcaption><ol class="learn__callouts">
+      {% for callout in section.figure.callouts %}<li>{{ callout }}</li>{% endfor %}
+    </ol></figcaption>
+  </figure>
+  {% endif %}
   {% endfor %}
   <h2>Sources</h2>
   {{ vc.learn_sources(guide.sources) }}
+  {% if guide.terms %}
+  <h2>Terms in this guide</h2>
+  <ul class="learn__related">
+    {% for key in guide.terms %}<li><a href="{{ root }}/learn/glossary/#{{ key }}">{{ learn.term(key).title }}</a></li>{% endfor %}
+  </ul>
+  {% endif %}
+  <nav class="learn__pager" aria-label="More guides">
+    {% if ns.at > 0 %}{% set before = learn.guides[ns.at - 1] %}
+    <a class="learn__step" href="{{ root }}/learn/{{ before.slug }}/"><span class="learn__step-label">Previous</span>{{ before.title }}</a>
+    {% endif %}
+    {% if ns.at < learn.guides | length - 1 %}{% set after = learn.guides[ns.at + 1] %}
+    <a class="learn__step learn__step--next" href="{{ root }}/learn/{{ after.slug }}/"><span class="learn__step-label">Next</span>{{ after.title }}</a>
+    {% endif %}
+  </nav>
   <p class="learn__more"><a href="{{ root }}/learn/">All guides</a> ·
     <a href="{{ root }}/learn/glossary/">Glossary</a></p>
 </article>

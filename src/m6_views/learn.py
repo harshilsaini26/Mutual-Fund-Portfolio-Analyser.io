@@ -11,7 +11,9 @@ the build and the app rather than reaching a reader:
   a paragraph 120) and a guide outside 4 to 6 sections;
 - a `[[key]]` link or a related term that names no term;
 - any percentage in the tax guide: rates change with each Budget and are not
-  this site's to print (invariant 8).
+  this site's to print (invariant 8);
+- a figure that is not a PNG in static/learn/, or has no alt text or no numbered
+  callouts (a screenshot of the page a guide describes, UI/UX critique L-03).
 
 What the checks cannot prove is that an explanation is true. Only reading it
 against its source does, which is why the content is reviewed before release.
@@ -21,6 +23,7 @@ from __future__ import annotations
 
 import functools
 import re
+import struct
 from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
@@ -31,6 +34,7 @@ import yaml
 from markupsafe import Markup, escape
 
 LEARN_YAML = Path(__file__).with_name("learn.yaml")
+STATIC = Path(__file__).with_name("static")
 GROUPS = ("Basics", "Costs", "Risk and return", "Your portfolio", "Using this site")
 TAX_GUIDE = "how-gains-are-taxed"
 LIMITS = {"short": 60, "summary": 25, "paragraph": 120}
@@ -83,9 +87,23 @@ class Term:
 
 
 @dataclass(frozen=True)
+class Figure:
+    """A screenshot in a guide (UI/UX critique L-03): the page it describes, with
+    numbered marks, and what each number points at. `src` is under static/; the
+    size is read from the file, so the page reserves its room."""
+
+    src: str
+    alt: str
+    width: int
+    height: int
+    callouts: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class Section:
     heading: str
     paragraphs: tuple[str, ...]
+    figure: Figure | None = None
 
 
 @dataclass(frozen=True)
@@ -96,6 +114,13 @@ class Guide:
     summary: str
     sections: tuple[Section, ...]
     sources: tuple[SourceRef, ...]
+
+    @property
+    def terms(self) -> tuple[str, ...]:
+        """The glossary terms it links to, in the order first linked, each once:
+        listed at its end (UI/UX critique L-04)."""
+        text = " ".join(p for s in self.sections for p in s.paragraphs)
+        return tuple(dict.fromkeys(m.group(1) for m in LINK.finditer(text)))
 
 
 @dataclass(frozen=True)
@@ -155,6 +180,21 @@ def _length(text: str, kind: str, who: str) -> str:
     return text
 
 
+def _figure(raw: Any, slug: str) -> Figure | None:
+    if raw is None:
+        return None
+    src = str(raw.get("src", ""))
+    path = STATIC / src
+    if not (src.startswith("learn/") and src.endswith(".png") and path.is_file()):
+        raise LearnError(f"{slug}: {src!r} is not a PNG in static/learn/")
+    callouts = tuple(_length(c, "short", slug) for c in raw.get("callouts") or ())
+    if not raw.get("alt") or not 1 <= len(callouts) <= 8:
+        raise LearnError(f"{slug}: a figure needs alt text and 1 to 8 callouts")
+    # A PNG's width and height: the IHDR chunk's first eight bytes.
+    width, height = struct.unpack(">II", path.read_bytes()[16:24])
+    return Figure(src, str(raw["alt"]), width, height, callouts)
+
+
 def load(path: Path = LEARN_YAML, today: date | None = None) -> Learn:
     """The content, checked. Cached for the real file at today's date."""
     if path == LEARN_YAML and today is None:
@@ -187,7 +227,8 @@ def _load(path: Path, today: date) -> Learn:
             raise LearnError(f"{slug}: a guide has 4 to 6 sections")
         sections = tuple(
             Section(s["heading"],
-                    tuple(_length(p, "paragraph", slug) for p in s["paragraphs"]))
+                    tuple(_length(p, "paragraph", slug) for p in s["paragraphs"]),
+                    _figure(s.get("figure"), slug))
             for s in raw["sections"]
         )
         guides.append(Guide(slug, raw["title"], raw["group"],

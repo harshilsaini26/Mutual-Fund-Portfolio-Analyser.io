@@ -98,7 +98,23 @@
     return idsAfter.length ? idsAfter[Math.min(index, idsAfter.length - 1)] : null;
   }
 
+  // Comparisons to start from on an empty page (UI/UX critique C-02): each listed
+  // category's largest funds, by size today -- a stated rule, not a pick -- where it
+  // has at least two with a size.
+  var STARTERS = [["equity/flexi_cap", "flexi cap"], ["equity/large_cap", "large cap"],
+                  ["equity/mid_cap", "mid cap"]];
+  var COUNTS = { 2: "two", 3: "three" };
+  function starters(funds) {
+    return STARTERS.map(function (s) {
+      var ids = funds.filter(function (f) { return f.category === s[0] && f.size != null; })
+        .sort(function (a, b) { return Number(b.size) - Number(a.size) || (a.id < b.id ? -1 : 1); })
+        .slice(0, 3).map(function (f) { return f.id; });
+      return { label: "The " + COUNTS[ids.length] + " largest " + s[1] + " funds", ids: ids };
+    }).filter(function (s) { return s.ids.length >= 2; });
+  }
+
   var api = {
+    starters: starters,
     parseHash: parseHash, writeHash: writeHash, sharedStart: sharedStart,
     growthSeries: growthSeries, highLow: highLow, commonHoldings: commonHoldings,
     shownFigure: shownFigure, nextFocus: nextFocus, MAX: MAX,
@@ -115,7 +131,6 @@
 
   var BASE = page.getAttribute("data-root") || "";
   var FUNDS = new Map();
-  var BY_NAME = new Map();
   var ids = [];                 // the funds on show, in the address's order
   var generation = 0;           // the newest render; older ones do not draw
 
@@ -149,13 +164,9 @@
     if (document.activeElement === document.body) stay.focus();
   }
 
-  page.addEventListener("change", function (e) {
-    if (e.target.id !== "cmp-pick") return;
-    var fund = BY_NAME.get(e.target.value);
-    if (!fund) { say("No published fund has exactly that name; choose one from the list."); return; }
-    e.target.value = "";
-    add(fund.id);
-  });
+  K.picker(document.getElementById("cmp-pick"),
+           function () { return Array.from(FUNDS.values()); },
+           function (fund) { add(fund.id); });
   page.addEventListener("click", function (e) {
     var b = e.target.closest("[data-add], [data-remove]");
     if (!b) return;
@@ -220,31 +231,33 @@
   ];
 
   function heading(f) {
-    return el("th", { scope: "col" },
-      el("span", { "class": "cmp__fund" },
-        el("a", { href: BASE + "/fund/" + f.id + "/" }, f.name),
-        el("button", { type: "button", "class": "cmp__remove", "data-remove": f.id,
-                       "aria-label": "Remove " + f.name }, "×")));
+    return el("span", { "class": "cmp__fund" }, el("a", { href: BASE + "/fund/" + f.id + "/" }, f.name));
+  }
+
+  // The funds on show, as chips under the search (UI/UX critique C-03): each in its
+  // line's colour on the chart, so they are its legend, and each with its remove.
+  function chosen(funds) {
+    fill(out("chosen"), funds.length && el.apply(null, ["ul", { "class": "cmp__chosen" }].concat(
+      funds.map(function (f, i) {
+        return el("li", { "class": "cmp__picked" },
+          el("span", { "class": "cmp__swatch cmp__swatch--" + (i + 1), "aria-hidden": "true" }),
+          el("a", { href: BASE + "/fund/" + f.id + "/" }, f.name),
+          el("button", { type: "button", "class": "cmp__remove", "data-remove": f.id,
+                         "aria-label": "Remove " + f.name }, "×"));
+      }))));
   }
 
   function facts(funds) {
     var box = out("facts");
-    if (!funds.length) { fill(box, note("Add a fund to compare, with the box above.")); return; }
-    var head = el("tr", null, el("th", { scope: "col" }, ""));
-    funds.forEach(function (f) { head.appendChild(heading(f)); });
-    var body = el("tbody");
-    ROWS.forEach(function (row) {
+    var rows = ROWS.map(function (row) {
       var tags = row[2] ? highLow(funds.map(row[2])) : [];
-      var tr = el("tr", null, el("th", { scope: "row" }, row[0], row[3] && K.termButton(row[3], "cmp")));
-      funds.forEach(function (f, i) {
+      // Every value on the column's right edge, text and rank too (design review).
+      return [[row[0], row[3] && K.termButton(row[3], "cmp")]].concat(funds.map(function (f, i) {
         var text = row[1](f);
-        // Every value on the column's right edge, text and rank too (design review).
-        tr.appendChild(el("td", { "class": "num" }, text == null ? "—" : text,
-          tags[i] && el("span", { "class": "cmp-tag" }, tags[i] + " here")));
-      });
-      body.appendChild(tr);
+        return [text == null ? "—" : text, tags[i] && el("span", { "class": "cmp-tag" }, tags[i] + " here")];
+      }));
     });
-    fill(box, el("div", { "class": "table-wrap" }, el("table", { "class": "cmp__table" }, el("thead", null, head), body)),
+    fill(box, table("Key facts and returns", [""].concat(funds.map(heading)), rows),
       funds.length === 1 && note("Add another fund to compare."));
   }
 
@@ -257,23 +270,17 @@
     return list.length < 2 ? list.join("") : list.slice(0, -1).join(", ") + " and " + list[list.length - 1];
   }
 
-  // A table with a row heading first and the funds' cells after it.
-  function table(head, rows) {
-    var tr = el("tr");
-    head.forEach(function (h) { tr.appendChild(el("th", { scope: "col" }, h)); });
-    var body = el("tbody");
-    rows.forEach(function (cells) {
-      var row = el("tr", null, el("th", { scope: "row" }, cells[0]));
-      cells.slice(1).forEach(function (c) { row.appendChild(el("td", { "class": "num" }, c)); });
-      body.appendChild(row);
-    });
-    return el("div", { "class": "table-wrap" }, el("table", { "class": "cmp__table" }, el("thead", null, tr), body));
+  // A table with a row heading first and the funds' cells after it (Kit.table).
+  function table(caption, head, rows) {
+    return K.table(caption, head, rows, { rowHead: true, cls: "cmp__table",
+      numeric: head.map(function (h, i) { return i > 0; }) });
   }
   // The first `shown` rows, and the rest behind "N more".
-  function tucked(head, rows, shown) {
+  function tucked(caption, head, rows, shown) {
     var more = rows.slice(shown);
-    return [table(head, rows.slice(0, shown)),
-      more.length && el("details", { "class": "tuck" }, el("summary", null, more.length + " more"), table(head, more))];
+    return [table(caption, head, rows.slice(0, shown)),
+      more.length && el("details", { "class": "tuck" }, el("summary", null, more.length + " more"),
+                        table(caption + ", the rest", head, more))];
   }
 
   // --- 2. what Rs 10,000 became ----------------------------------------------------------
@@ -310,8 +317,10 @@
       var headline = "₹10,000 put in on " + day(lines[0].pts[0][0]) + " became " + names(lines.map(function (l, i) {
         return INR.format(ends[i][1]) + " in " + l.f.name + (sameEnd ? "" : " by " + day(ends[i][0]));
       })) + (sameEnd ? " by " + day(ends[0][0]) : "") + ".";
-      var spec = { charts: [{ kind: "line", y: "inr", title: "What ₹10,000 became", series: lines.map(function (l) {
-        return { name: l.f.name, role: "fund", points: l.pts.map(function (pt) {
+      // The chips under the search are the legend: the same colours, whole names.
+      var spec = { charts: [{ kind: "line", y: "inr", title: "What ₹10,000 became", legend: false,
+                              series: lines.map(function (l) {
+        return { name: l.f.name, role: "fund", hue: funds.indexOf(l.f), points: l.pts.map(function (pt) {
           return [pt[0], String(Math.round(pt[1])), INR.format(pt[1])];
         }) };
       }) }] };
@@ -351,9 +360,12 @@
     var shared = have.length === 2
       ? el("p", { "class": "cmp__lead" }, have[0].name + " and " + have[1].name + " have " +
           pct(M.overlap(fileOf(have[0]), fileOf(have[1]))) + " of their portfolios in the same companies.")
-      : table([""].concat(have.map(function (f) { return f.name; })), have.map(function (a) {
+      : table("How much of each pair's portfolios is the same",
+              [""].concat(have.map(function (f) { return f.name; })), have.map(function (a) {
           return [a.name].concat(have.map(function (b) {
-            return a === b ? "—" : pct(M.overlap(fileOf(a), fileOf(b)));
+            if (a === b) return el("span", { "class": "heat heat--self" }, "—");
+            var v = M.overlap(fileOf(a), fileOf(b));
+            return K.heat(v, pct(v));
           }));
         }));
     var byId = {};
@@ -366,7 +378,8 @@
       el("h3", null, "Companies held by two or more of them")]
       .concat(common.length
         ? [note("Each figure is the company's share of that fund.")]
-          .concat(tucked(["Company"].concat(funds.map(function (f) { return f.name; })), common, 15))
+          .concat(tucked("Companies held by two or more of them",
+                         ["Company"].concat(funds.map(function (f) { return f.name; })), common, 15))
         : [note("No company is held by two of these funds.")])
       .concat([disclosures(funds, files)]));
   }
@@ -393,11 +406,27 @@
     }
     var sectors = rows(function (f) { return f.sectors; });
     fill.apply(null, [box, el("h3", null, "Asset mix"), note("Each figure is a share of the fund."),
-      table(head, rows(function (f) { return f.mix; }))]
+      table("Asset mix", head, rows(function (f) { return f.mix; }))]
       .concat(sectors.length
         ? [el("h3", null, "Shares by sector"), note("Each figure is a share of the fund's shares.")]
-          .concat(tucked(head, sectors, 8))
+          .concat(tucked("Shares by sector", head, sectors, 8))
         : []));
+  }
+
+  // With no fund chosen: one panel of comparisons to start from, not four sections
+  // saying they are empty (UI/UX critique C-02).
+  function start(funds) {
+    var box = out("start");
+    box.hidden = funds.length > 0;
+    page.querySelectorAll("[data-cmp-section]").forEach(function (s) { s.hidden = !funds.length; });
+    if (funds.length) return;
+    var list = el("ul", { "class": "cmp__starters" });
+    starters(Array.from(FUNDS.values())).forEach(function (s) {
+      list.appendChild(el("li", null, el("a", { href: "#f=" + s.ids.join(",") }, s.label),
+        el("span", { "class": "cmp__why" }, s.ids.map(function (id) { return FUNDS.get(id).name; }).join(", "))));
+    });
+    fill(box, el("h2", { "class": "cmp__start-title" }, "Nothing to compare yet"),
+      note("Add two to four funds with the box above, or start from one of these:"), list);
   }
 
   // --- drawing -----------------------------------------------------------------------
@@ -405,11 +434,14 @@
     var funds = ids.map(function (id) { return FUNDS.get(id); });
     var mine = ++generation;
     var live = function () { return mine === generation; };
+    chosen(funds);
     suggest(funds);
+    start(funds);
+    if (!funds.length) return;
     facts(funds);
     if (funds.length < 2) {
       ["growth", "overlap", "mix"].forEach(function (name) {
-        fill(out(name), note(funds.length ? "Add another fund to compare." : "Shown once two funds are chosen."));
+        fill(out(name), note("Add another fund to compare."));
       });
       return;
     }
@@ -427,12 +459,8 @@
     if (!r.ok) throw new Error(r.status);
     return r.json();
   }).then(function (list) {
-    var options = document.getElementById("cmp-funds");
     list.forEach(function (f) {
-      if (f.plan === "regular") return;   // Your portfolio's only; Compare is Direct plans
-      FUNDS.set(f.id, f);
-      BY_NAME.set(f.name, f);
-      options.appendChild(el("option", { value: f.name }, f.category_name));
+      if (f.plan !== "regular") FUNDS.set(f.id, f);   // Your portfolio's only; Compare is Direct plans
     });
     document.getElementById("cmp-pick").disabled = false;
     read();

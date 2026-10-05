@@ -15,13 +15,14 @@
   var ESTIMATE = "Worked out in your browser from published NAVs: an estimate of your holding, " +
     "not a statement. Fund houses round units differently, by up to 0.001 of a unit.";
   var FUNDS = new Map();
-  var BY_NAME = new Map();
   var replacing = null;         // {id: held fund's ISIN, slot: 0..2} while "Replace" is picking
   var generation = 0;           // the newest results() run; older runs do not draw
   var state = { version: 1, funds: [] };
   var FUSE_MS = 4000;           // how long Undo is on offer after "Remove"
   var leaving = new Map();      // fund id -> its fuse (Kit.fuse) while Undo is on offer
   var ticking = null;           // the countdown's interval while any fund is leaving
+  var dirty = false;            // changed since the last Save or Load to a file (P-10)
+  var editFold = page.querySelector(".pf__edit");
 
   var K = window.Kit;
   var el = K.el, fill = K.fill, bar = K.bar, CLASS = K.CLASS, INR = K.INR;
@@ -84,11 +85,26 @@
   }
 
   // A labelled field (V1-93); `prefix` sits inside it, before the figure (₹).
-  function field(label, attrs, prefix) {
+  function field(label, attrs, prefix, words) {
     var id = "pf-" + Math.random().toString(36).slice(2, 9);
     var input = el("input", Object.assign({ id: id }, attrs));
-    return el("label", { "class": "pf__field", "for": id }, label,
+    // The words share the label's line, so every row's boxes stay level.
+    return el("label", { "class": "pf__field", "for": id },
+      words == null ? label : el("span", null, label,
+        el("span", { "class": "pf__words", "data-words": true, "aria-hidden": "true" }, words)),
       prefix ? el("span", { "class": "pf__affix" }, el("span", { "class": "pf__prefix" }, prefix), input) : input);
+  }
+
+  // An amount (UI/UX critique P-03): in Indian grouping once typed, and in words
+  // beneath as it is typed, so ₹1,00,000 is not read as ₹10,000.
+  function amountField(label, value) {
+    return field(label, { type: "text", inputmode: "decimal", value: M.grouped(value), "data-field": "amount" },
+                 "₹", M.inWords(value));
+  }
+
+  // Each kind of entry under its own name (P-05), when there is one.
+  function group(legend, rows) {
+    return rows.length ? el.apply(null, ["fieldset", { "class": "pf__group" }, el("legend", null, legend)].concat(rows)) : null;
   }
 
   // A button that shows only an icon: its name is read out, and shown on hover.
@@ -108,32 +124,36 @@
         el("h3", null, title),
         gone ? undoButton(gone) : iconButton("remove-fund", "Remove " + nameOf(h.id), "bin")),
       gone && el("p", { "class": "pf__leaving", "data-leaving": h.id }, leftText(gone)));
-    h.purchases.forEach(function (p, r) {
-      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "purchase", "data-row": r, inert: !!gone },
+    function row(kind, item, r, fields) {
+      var node = el.apply(null, ["div", { "class": "pf__row", "data-kind": kind, "data-row": r, inert: !!gone }]
+        .concat(fields, [errorSlot()]));
+      showRowError(node, rowError(fund, kind, item));
+      return node;
+    }
+    K.present([group("Lump sums", h.purchases.map(function (p, r) {
+      return row("purchase", p, r, [
         field("Date", { type: "date", value: p.date, max: TODAY, min: fund ? fund.prices_from : null, "data-field": "date" }),
-        field("Amount", { type: "text", inputmode: "decimal", value: p.amount, "data-field": "amount" }, "₹"),
-        iconButton("remove-row", "Remove this lump sum", "close"),
-        errorSlot()));
-      showRowError(row, rowError(fund, "purchase", p));
-    });
-    h.sips.forEach(function (s, r) {
-      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "sip", "data-row": r, inert: !!gone },
-        field("SIP a month", { type: "text", inputmode: "decimal", value: s.amount, "data-field": "amount" }, "₹"),
+        amountField("Amount", p.amount),
+        iconButton("remove-row", "Remove this lump sum", "close")]);
+    })),
+    // A running SIP has no end month to fill in: "Still running" stands for it, and
+    // clearing the box brings the month (P-04; the empty one read "---------, ----").
+    group("SIPs", h.sips.map(function (s, r) {
+      return row("sip", s, r, [
+        amountField("SIP a month", s.amount),
         field("Day", { type: "number", min: 1, max: 31, value: s.day, "data-field": "day" }),
         field("From", { type: "month", value: s.start, "data-field": "start" }),
-        field("Until (blank if running)", { type: "month", value: s.stop || "", "data-field": "stop" }),
-        iconButton("remove-row", "Remove this SIP", "close"),
-        errorSlot()));
-      showRowError(row, rowError(fund, "sip", s));
-    });
-    (h.sales || []).forEach(function (p, r) {
-      var row = card.appendChild(el("div", { "class": "pf__row", "data-kind": "sale", "data-row": r, inert: !!gone },
+        s.stop === null ? null : field("Until", { type: "month", value: s.stop, "data-field": "stop" }),
+        el("label", { "class": "pf__check" },
+          el("input", { type: "checkbox", "data-field": "running", checked: s.stop === null }), "Still running"),
+        iconButton("remove-row", "Remove this SIP", "close")]);
+    })),
+    group("Sales", (h.sales || []).map(function (p, r) {
+      return row("sale", p, r, [
         field("Sold on", { type: "date", value: p.date, max: TODAY, min: fund ? fund.prices_from : null, "data-field": "date" }),
-        field("Received", { type: "text", inputmode: "decimal", value: p.amount, "data-field": "amount" }, "₹"),
-        iconButton("remove-row", "Remove this sale", "close"),
-        errorSlot()));
-      showRowError(row, rowError(fund, "sale", p));
-    });
+        amountField("Received", p.amount),
+        iconButton("remove-row", "Remove this sale", "close")]);
+    }))]).forEach(function (g) { card.appendChild(g); });
     card.appendChild(el("p", { "class": "pf__add", inert: !!gone },
       el("button", { type: "button", "class": "button button--tinted", "data-action": "add-lump" },
         K.icon("plus"), "Add a lump sum"),
@@ -215,7 +235,20 @@
     box.replaceChildren.apply(box, state.funds.map(holdingCard));
   }
 
-  function changed() { save(); entry(); results(); }
+  function changed() { save(); entry(); results(); unsaved(true); folded(); }
+
+  // Save is the main button while there are changes no file holds (P-10).
+  function unsaved(yes) {
+    dirty = yes;
+    page.querySelector('[data-action="save"]').classList.toggle("button--quiet", !dirty);
+  }
+  // The form's fold says how many funds it holds, and is open while there are none.
+  function folded() {
+    var n = state.funds.length;
+    page.querySelector("[data-edit-label]").textContent = "Your funds and what you put in" +
+      (n ? " (" + n + (n === 1 ? " fund)" : " funds)") : "");
+    if (!n) editFold.open = true;
+  }
 
   function listOf(h, kind) {
     return kind === "sip" ? h.sips : kind === "sale" ? (h.sales = h.sales || []) : h.purchases;
@@ -226,15 +259,14 @@
     document.getElementById("pf-pick-label").textContent = "Add a fund";
   }
 
+  // The picker first: its Esc closes its list before this one cancels a replacing.
+  K.picker(document.getElementById("pf-pick"),
+           function () { return Array.from(FUNDS.values()); }, pick);
   document.getElementById("pf-pick").addEventListener("keydown", function (e) {
     if (e.key === "Escape" && replacing) { stopReplacing(); say(""); }
   });
 
-  function pick(name) {
-    var fund = BY_NAME.get(name);
-    var input = document.getElementById("pf-pick");
-    if (!fund) { say("No published fund has exactly that name; choose one from the list."); return; }
-    input.value = "";
+  function pick(fund) {
     if (replacing) {
       var held = state.funds.filter(function (h) { return h.id === replacing.id; })[0];
       var slot = replacing.slot;
@@ -251,17 +283,39 @@
 
   page.addEventListener("change", function (e) {
     var t = e.target;
-    if (t.id === "pf-pick") { pick(t.value); return; }
     if (t.id === "pf-file") { loadFile(t.files[0]); t.value = ""; return; }
     var row = t.closest("[data-row]"), card = t.closest("[data-fund]");
     if (!row || !card || !t.dataset.field) return;
     var h = state.funds[Number(card.dataset.fund)];
     var item = listOf(h, row.dataset.kind)[Number(row.dataset.row)];
-    item[t.dataset.field] = t.dataset.field === "day" ? (t.value === "" ? null : Number(t.value))
-      : t.dataset.field === "stop" ? (t.value || null) : t.value;
+    if (t.dataset.field === "running") {
+      // "" until a month is chosen: running still, with the month's field drawn.
+      item.stop = t.checked ? null : "";
+      changed();
+      var at = '[data-fund="' + card.dataset.fund + '"] [data-kind="sip"][data-row="' + row.dataset.row + '"] ';
+      var next = out("holdings").querySelector(at + (t.checked ? '[data-field="running"]' : '[data-field="stop"]'));
+      if (next) next.focus();
+      return;
+    }
+    if (t.dataset.field === "amount") {
+      item.amount = t.value.replace(/[₹,\s]/g, "");
+      t.value = M.grouped(item.amount);
+    } else {
+      item[t.dataset.field] = t.dataset.field === "day" ? (t.value === "" ? null : Number(t.value))
+        : t.dataset.field === "stop" ? (t.value || null) : t.value;
+    }
     showRowError(row, rowError(FUNDS.get(h.id), row.dataset.kind, item));
     save();
+    unsaved(true);
     results();
+  });
+
+  // The amount in words, as it is typed.
+  page.addEventListener("input", function (e) {
+    var t = e.target;
+    if (!t.dataset || t.dataset.field !== "amount") return;
+    var words = t.closest(".pf__field").querySelector("[data-words]");
+    if (words) words.textContent = M.inWords(t.value);
   });
 
   page.addEventListener("click", function (e) {
@@ -279,17 +333,18 @@
       case "undo-remove": undo(h.id); return;
       case "replace":
         replacing = { id: b.dataset.held, slot: Number(b.dataset.slot) };
+        editFold.open = true;
         document.getElementById("pf-pick-label").textContent = "Pick a fund to compare in this place (Esc to cancel)";
         document.getElementById("pf-pick").focus();
         return;
       case "save": saveFile(); return;
       case "load": document.getElementById("pf-file").click(); return;
-      case "clear":
-        if (window.confirm("Remove every fund and purchase from this page and this browser?")) {
-          state = { version: 1, funds: [] };
-          stopReplacing();
-          defuse();
-        } else { return; }
+      case "clear":   // the second step: More said what this removes (P-10)
+        state = { version: 1, funds: [] };
+        stopReplacing();
+        defuse();
+        b.closest("details").open = false;
+        say("Every fund and entry was removed from this page and this browser.");
         break;
       default: return;
     }
@@ -304,6 +359,7 @@
     a.remove();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 0);
     say("Saved to a file in your downloads.");
+    unsaved(false);
   }
 
   function loadFile(file) {
@@ -317,20 +373,93 @@
       defuse();
       say("Loaded " + file.name + (got.dropped ? "; " + entries(got.dropped) + " could not be read and were left out." : "."));
       changed();
+      unsaved(false);
     });
   }
 
   // --- results ------------------------------------------------------------------
-  function table(head, rows, numeric) {
-    var thead = el("tr");
-    head.forEach(function (h, i) { thead.appendChild(el("th", { scope: "col", "class": numeric[i] ? "num" : null }, h)); });
-    var body = el("tbody");
-    rows.forEach(function (cells) {
-      var tr = el("tr");
-      cells.forEach(function (c, i) { tr.appendChild(el("td", { "class": numeric[i] ? "num" : null }, c)); });
-      body.appendChild(tr);
+  // Kit.table: a named region, and on a phone a card per row (G-17, P-08).
+  function table(caption, head, rows, numeric, opts) {
+    var o = opts || {};
+    o.numeric = numeric;
+    return K.table(caption, head, rows, o);
+  }
+
+  // Positions summed: put in, taken out, worth, and the return a year on all their
+  // dated money (XIRR) to the latest date any of them is valued on.
+  function whole(positions) {
+    var invested = 0, value = 0, redeemed = 0, flows = [];
+    positions.forEach(function (p) {
+      invested += p.investedPaise; value += p.valuePaise; redeemed += p.redeemedPaise;
+      p.lots.forEach(function (l) { if (!l.error) flows.push([l.date, -l.paise / 100]); });
+      p.sales.forEach(function (v) { if (!v.error) flows.push([v.date, v.paise / 100]); });
     });
-    return el("div", { "class": "table-wrap" }, el("table", null, el("thead", null, thead), body));
+    flows.sort(function (a, b) { return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0; });
+    var asOf = positions.map(function (p) { return p.valueDate; }).sort().pop();
+    flows.push([asOf, value / 100]);
+    return { firstDate: flows[0][0], valueDate: asOf, xirr: M.xirr(flows),
+             investedPaise: invested, valuePaise: value, redeemedPaise: redeemed };
+  }
+
+  // The return with its period on a smaller line (P-09): "+15.2%", "a year".
+  function returnParts(pos) {
+    var text = returnText(pos), cut = text.indexOf(" ");
+    return cut < 0 ? [text] : [text.slice(0, cut), el("span", { "class": "pf__per" }, text.slice(cut + 1))];
+  }
+
+  // Why a fund cannot take exactly the money a holding priced, or null if it can.
+  function gapReason(pos) {
+    var gap = pos.lots.filter(function (l) { return l.error; })[0] ||
+              pos.sales.filter(function (x) { return x.error; })[0];
+    return !gap ? null : gap.error === "before" ? "its prices begin after " + gap.date
+      : gap.error === "more" ? "it would not have held enough to sell the same on " + gap.date
+      : "its NAV for " + gap.date + " is not out yet";
+  }
+
+  // "Did it work?" in a sentence (UI/UX critique P-01): what the money became, then
+  // the same purchases and sales in each holding's reference (M.reference: the
+  // index fund on its benchmark, else its category's middle three-year return),
+  // each named. Two sums side by side and no verdict on them (ADR-0002).
+  function verdict(list, live) {
+    var box = out("verdict");
+    var ok = list.filter(function (x) { return x.pos && x.pos.firstDate; });
+    if (!ok.length) { fill(box); return Promise.resolve(); }
+    var all = Array.from(FUNDS.values());
+    return Promise.all(ok.map(function (x) {
+      var ref = M.reference(x.fund, all, x.pos.firstDate);
+      if (!ref) return { x: x, ref: null, pos: null };
+      return K.navSeries(BASE, ref.fund).then(function (series) {
+        var pos = M.position(M.pricedBuys(x.pos), series, M.pricedSales(x.pos));
+        var gap = gapReason(pos);
+        return { x: x, ref: ref, pos: gap ? null : pos, why: gap };
+      }, function () { return { x: x, ref: ref, pos: null, why: "its prices did not load" }; });
+    })).then(function (got) {
+      if (!live()) return;
+      var refs = el.apply(null, ["ul", { "class": "pf__refs" }].concat(got.map(function (g) {
+        var name = g.x.fund.name;
+        if (!g.ref) return el("li", null, name + ": no index fund on its benchmark and no category to draw a fund from, so it is left out.");
+        return el("li", null, name + " beside ", el("a", { href: fundPage(g.ref.fund) }, g.ref.fund.name),
+          g.ref.why === "index" ? ", the longest-running index fund on its benchmark" : ", the middle three-year return of its category",
+          g.pos ? "." : "; " + g.why + ", so it is left out.");
+      })));
+      var priced = got.filter(function (g) { return g.pos; });
+      if (!priced.length) {
+        fill(box, el("p", { "class": "pf__verdict" }, "None of your funds has a reference that could take the same money:"), refs);
+        return;
+      }
+      var mine = whole(priced.map(function (g) { return g.x.pos; }));
+      var theirs = whole(priced.map(function (g) { return g.pos; }));
+      var sold = mine.redeemedPaise ? ", with " + rupees(mine.redeemedPaise) + " taken out," : ",";
+      var regular = priced.some(function (g) { return g.x.fund.plan === "regular"; });
+      fill(box,
+        el("p", { "class": "pf__verdict" },
+          (priced.length < ok.length ? "For the " + priced.length + " of your " + ok.length + " funds with a reference, what" : "What") +
+          " you put in, " + rupees(mine.investedPaise) + sold + " is worth " + rupees(mine.valuePaise) + ": " +
+          returnText(mine) + ". The same money on the same dates in each fund's reference would be worth " +
+          rupees(theirs.valuePaise) + ": " + returnText(theirs) + "."),
+        refs,
+        regular && el("p", { "class": "pf__note" }, "The references are Direct plans: part of any gap is a Regular plan's higher cost."));
+    });
   }
 
   function returnText(pos) {
@@ -361,18 +490,8 @@
         : "Add a fund and a purchase to see what it is worth."));
       return;
     }
-    var invested = ok.reduce(function (s, x) { return s + x.pos.investedPaise; }, 0);
-    var value = ok.reduce(function (s, x) { return s + x.pos.valuePaise; }, 0);
-    var redeemed = ok.reduce(function (s, x) { return s + x.pos.redeemedPaise; }, 0);
-    var flows = [];
-    ok.forEach(function (x) {
-      x.pos.lots.forEach(function (l) { if (!l.error) flows.push([l.date, -l.paise / 100]); });
-      x.pos.sales.forEach(function (v) { if (!v.error) flows.push([v.date, v.paise / 100]); });
-    });
-    flows.sort(function (a, b) { return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0; });
-    var asOf = ok.map(function (x) { return x.pos.valueDate; }).sort().pop();
-    flows.push([asOf, value / 100]);
-    var whole = { firstDate: flows[0][0], valueDate: asOf, xirr: M.xirr(flows), investedPaise: invested, valuePaise: value };
+    var all = whole(ok.map(function (x) { return x.pos; }));
+    var invested = all.investedPaise, value = all.valuePaise, redeemed = all.redeemedPaise, asOf = all.valueDate;
     var pending = list.reduce(function (s, x) {
       return s + (x.pos ? x.pos.lots.filter(function (l) { return l.error === "pending"; }).length : 0);
     }, 0);
@@ -387,7 +506,8 @@
         redeemed ? el("div", { "class": "pf__tile" }, el("dt", null, "Taken out"), el("dd", null, rupees(redeemed))) : null,
         el("div", { "class": "pf__tile" }, el("dt", null, "Worth on " + M.day(asOf)), el("dd", null, rupees(value))),
         el("div", { "class": "pf__tile" }, el("dt", null, "Gain"), el("dd", null, rupees(value + redeemed - invested))),
-        el("div", { "class": "pf__tile" }, el("dt", null, "Return", K.termButton("xirr", "pf")), el("dd", null, returnText(whole)))),
+        el("div", { "class": "pf__tile" }, el("dt", null, "Return", K.termButton("xirr", "pf")),
+          el.apply(null, ["dd", null].concat(returnParts(all))))),
       pending ? el("p", { "class": "pf__note" }, pending + " purchase" + (pending === 1 ? " is" : "s are") + " awaiting a published NAV and left out until it appears.") : null,
       oversold ? el("p", { "class": "pf__note" }, oversold + " sale" + (oversold === 1 ? " is" : "s are") + " larger than the units held on " + (oversold === 1 ? "its date" : "their dates") + " and left out; check the amount and the purchases before it.") : null,
       unvalued ? el("p", { "class": "pf__note" }, unvalued + " fund" + (unvalued === 1 ? " is" : "s are") + " not valued and left out of these totals; the funds table says why.") : null,
@@ -410,7 +530,8 @@
               total ? pct(p.valuePaise * 100 / total) : "—"];
     });
     out("funds").replaceChildren(rows.length
-      ? table(["Fund", "Put in", "Units", "Worth", "Gain", "Return", "Share"], rows, [0, 1, 1, 1, 1, 1, 1])
+      ? table("Your funds", ["Fund", "Put in", "Units", "Worth", "Gain", "Return", "Share"], rows,
+              [0, 1, 1, 1, 1, 1, 1], { cls: "pf__funds" })
       : el("p", { "class": "pf__note" }, "No funds yet."));
   }
 
@@ -419,7 +540,8 @@
 
   function bars(title, rowsIn, names) {
     return el("div", null, el("h3", null, title),
-      table(["", "Share"], rowsIn.map(function (r) { return [names[r.key] || r.key, bar(r.pct)]; }), [0, 1]));
+      table(title, ["", "Share"], rowsIn.map(function (r) { return [names[r.key] || r.key, bar(r.pct)]; }),
+            [0, 1], { stack: false }));
   }
 
   function look(list, live) {
@@ -434,19 +556,24 @@
       var top = lt.companies.slice(0, 20);
       var rest = lt.companies.slice(20);
       var restPaise = rest.reduce(function (s, r) { return s + r.paise; }, 0);
+      // Each share drawn as a bar (P-06); what is not a company -- cash, and holdings
+      // not matched to one -- in a grey bar, as on a fund's page.
       var companyRows = top.map(function (r) {
-        return [r.name, rupees(r.paise), pct(r.pct), r.funds + " of " + held.length];
+        return [r.name, rupees(r.paise), bar(r.pct), r.funds + " of " + held.length];
       });
-      if (rest.length) companyRows.push([rest.length + " other companies", rupees(restPaise), pct(lt.total ? restPaise * 100 / lt.total : 0), ""]);
-      lt.synthetic.forEach(function (r) { companyRows.push([r.name, rupees(r.paise), pct(r.pct), r.funds + " of " + held.length]); });
+      if (rest.length) companyRows.push([rest.length + " other companies", rupees(restPaise), bar(lt.total ? restPaise * 100 / lt.total : 0), ""]);
+      lt.synthetic.forEach(function (r) { companyRows.push([r.name, rupees(r.paise), greyBar(r.pct), r.funds + " of " + held.length]); });
 
       var withFiles = held.filter(function (x) { return byId[x.fund.id]; });
       var grid = null;
       if (withFiles.length > 1) {
-        grid = table([""].concat(withFiles.map(function (x) { return x.fund.name; })),
+        grid = table("How much of each pair of funds is the same",
+          [""].concat(withFiles.map(function (x) { return x.fund.name; })),
           withFiles.map(function (a) {
             return [a.fund.name].concat(withFiles.map(function (b) {
-              return a === b ? "—" : pct(M.overlap(byId[a.fund.id], byId[b.fund.id]));
+              if (a === b) return el("span", { "class": "heat heat--self" }, "—");
+              var v = M.overlap(byId[a.fund.id], byId[b.fund.id]);
+              return K.heat(v, pct(v));
             }));
           }), [0].concat(withFiles.map(function () { return 1; })));
       }
@@ -463,7 +590,7 @@
         el("h3", null, "Companies"),
         // No disclosure loaded for any fund: one sentence, not a table of headers.
         companyRows.length
-          ? table(["Company", "Your money in it", "Share of portfolio", "Held by"], companyRows, [0, 1, 1, 1])
+          ? table("Companies", ["Company", "Your money in it", "Share of portfolio", "Held by"], companyRows, [0, 1, 1, 1])
           : el("p", { "class": "pf__note" }, "No company is named yet: none of these funds has a disclosure loaded here."),
         grid && el("h3", null, "How much of each pair of funds is the same", K.termButton("overlap", "pf")),
         grid && el("p", { "class": "pf__note" }, "The share of two funds' portfolios in the same companies: 100% would be identical funds, 0% nothing in common."),
@@ -474,6 +601,12 @@
           lt.sizes.length ? bars("Shares by company size", lt.sizes, SIZE) : null),
         noteList(notes));
     });
+  }
+
+  function greyBar(value) {
+    var b = bar(value);
+    b.firstChild.setAttribute("class", "bar bar--neutral");
+    return b;
   }
 
   function noteList(notes) {
@@ -524,12 +657,7 @@
           var why = v.s.reasons.map(function (r) { return r === "chosen" ? "your choice" : REASON[r]; }).join(", ");
           // Valued only on exactly the money the held fund priced: a lot this
           // fund cannot price yet would make it a different sum.
-          var gap = v.pos && (v.pos.lots.filter(function (l) { return l.error; })[0] ||
-                              v.pos.sales.filter(function (x) { return x.error; })[0]);
-          var reason = v.error || (gap && (gap.error === "before"
-            ? "its prices begin after " + gap.date
-            : gap.error === "more" ? "it would not have held enough to sell the same on " + gap.date
-            : "its NAV for " + gap.date + " is not out yet"));
+          var reason = v.error || (v.pos && gapReason(v.pos));
           rows.push([el("a", { href: BASE + "/fund/" + f.id + "/" }, f.name), why,
             reason ? "—" : rupees(v.pos.valuePaise),
             reason || returnText(v.pos),
@@ -546,7 +674,10 @@
                 (x.fund.plan === "regular" ? " These are Direct plans; part of any gap is the Regular plan's higher cost." : "") +
                 (count === 0 ? " No other fund of this category has prices back that far; choose any fund to compare."
                   : count < 3 ? " Only " + count + " of this category " + (count === 1 ? "qualifies" : "qualify") + ", so the rest are empty; choose any fund to compare." : ""))),
-          table(["Fund", "Why it is here", "Worth today", "Return", "3 years a year", "Volatility", "Deepest fall", "Expense ratio", ""],
+          // "Return a year, 3 years", as Compare says it: "3 years a year" read garbled (P-08).
+          table("In hindsight: " + x.fund.name,
+                ["Fund", "Why it is here", "Worth today", "Return", "Return a year, 3 years", "Volatility",
+                 "Deepest fall", "Expense ratio", ""],
                 rows, [0, 0, 1, 1, 1, 1, 1, 1, 0]));
       });
     })).then(function (articles) {
@@ -564,22 +695,19 @@
       if (!live()) return;
       summary(list);
       fundsTable(list);
-      return Promise.all([look(list, live), alts(list, live)]);
+      return Promise.all([verdict(list, live), look(list, live), alts(list, live)]);
     });
   }
 
   // --- start -------------------------------------------------------------------
   restore();
+  editFold.open = !state.funds.length;   // the answer first (P-02)
+  folded();
   fetch(BASE + "/funds.json").then(function (r) {
     if (!r.ok) throw new Error(r.status);
     return r.json();
   }).then(function (list) {
-    var options = document.getElementById("pf-funds");
-    list.forEach(function (f) {
-      FUNDS.set(f.id, f);
-      BY_NAME.set(f.name, f);
-      options.appendChild(el("option", { value: f.name }, f.category_name));
-    });
+    list.forEach(function (f) { FUNDS.set(f.id, f); });
     document.getElementById("pf-pick").disabled = false;
     entry();
     results();

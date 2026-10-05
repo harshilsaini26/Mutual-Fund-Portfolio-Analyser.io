@@ -706,19 +706,44 @@ guides:
       - heading: The header
         paragraphs:
           - >-
-            The top of the page names the fund, its fund house, [[sebi_categories|category]]
-            and plan, with the latest [[nav]] and its change on the day. Below come the
-            facts: fund house, category, plan, launch date, [[aum|fund size]] and the
-            span of prices on record. Then tiles: the [[annualised_return]] over one,
-            three and five years, the [[category_rank]], the deepest fall, volatility,
-            size and [[expense_ratio]].
+            The top of the page names the fund, its plan, its option and its ISIN, with
+            the latest [[nav]] and its change on the day. Then tiles of how it has done:
+            the [[annualised_return]] over one, three and five years, each with how far
+            it was ahead of or behind its [[benchmark]] and the benchmark's own return;
+            the [[category_rank]]; its worst fall; volatility; [[aum|fund size]]; and
+            [[expense_ratio]]. Below them are the facts: fund house,
+            [[sebi_categories|category]], plan, launch date and the span of prices on
+            record. The riskometer, fund manager, exit load and minimum SIP are listed
+            too, as not in the data this site loads, since no source it reads carries them.
+        figure:
+          src: learn/fund-header.png
+          alt: >-
+            The top of a fund page, numbered: 1 the fund's name, 2 its latest NAV,
+            3 the tiles of how it has done, 4 the facts.
+          callouts:
+            - The fund's name, its plan and option, and its ISIN.
+            - The latest NAV, its date and the change on the day.
+            - How it has done, returns first, each beside its benchmark where it has one, then its rank, falls, volatility, size and cost.
+            - The facts, and the ones no source this site loads carries.
       - heading: Performance, growth and price
         paragraphs:
           - >-
             Performance sets the fund's return, volatility, deepest fall, Sharpe ratio
             and other measures beside its [[benchmark]] over one, three and five years.
-            Growth shows what ₹10,000 became over the fund's whole record, and Price
-            shows the NAV itself, with buttons to narrow the period.
+            Growth shows what ₹10,000 became from the first day both the fund and its
+            benchmark have prices, and Price shows the NAV itself over the fund's whole
+            record. Buttons narrow the period, and a log scale keeps a long record's
+            early years from lying flat.
+        figure:
+          src: learn/fund-growth.png
+          alt: >-
+            The growth chart of a fund page, numbered: 1 the switch to the price, 2 the
+            period buttons, 3 the log scale, 4 the chart.
+          callouts:
+            - Switch between what ₹10,000 became and the price per unit.
+            - Choose the period shown.
+            - Read it on a log scale.
+            - The fund and its benchmark, with dividends, from the same day.
       - heading: Returns and peers
         paragraphs:
           - >-
@@ -735,10 +760,21 @@ guides:
       - heading: Holdings and every figure
         paragraphs:
           - >-
-            Holdings shows the [[asset_mix]], the largest holdings and the [[sectors]],
-            from the fund's latest [[portfolio_disclosure]], or from an aggregator's
-            page where marked. Every figure lists all the computed measures for every
-            period in one table.
+            Holdings shows the [[asset_mix]], the largest holdings as tiles and as a
+            table, and the [[sectors]], from the fund's latest [[portfolio_disclosure]],
+            or from an aggregator's page where marked. The share not matched to a
+            company is a grey bar of its own, above the tiles. Every figure lists all
+            the computed measures for every period in one table.
+        figure:
+          src: learn/fund-holdings.png
+          alt: >-
+            The holdings of a fund page, numbered: 1 the share not matched to a
+            company, 2 the largest holdings as tiles, 3 the sectors, 4 the table.
+          callouts:
+            - The share not matched to a company, in grey, outside the tiles.
+            - The largest holdings, each tile sized by its share of the fund.
+            - Shares by the sector the fund house names.
+            - The ten largest holdings as a table; the published file has every one.
       - heading: Dates, sources, confidence and gaps
         paragraphs:
           - >-

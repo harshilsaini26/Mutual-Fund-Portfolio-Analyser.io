@@ -38,7 +38,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import replace
 from datetime import date
 from decimal import Decimal
@@ -56,7 +56,7 @@ from src.m0_data.store import save as save_navs
 from src.m0_data.universe import ISIN, Fund, live_funds, regular_twins
 from src.m1_ledger.db import apply_ledger_schema, connect_ledger
 from src.m1_ledger.providers.position import SqlitePositionProvider
-from src.m2_fund.windows import spans
+from src.m2_fund.windows import spans, window_start
 from src.m3_lookthrough.providers.sqlite import SqliteLookThroughProvider
 from src.m6_views.api.pages import STATIC, fund_context, templates
 from src.m6_views.builder import Scope
@@ -80,6 +80,7 @@ from src.m6_views.states import empty_envelope, error_envelope
 
 from jobs.fetch_groww import declared_benchmarks
 from jobs.landing import landing_candidate, landing_example, landing_pair
+from jobs.share_image import fund_card, icon_png, site_card
 
 #: The build's own ceiling. Vercel's Hobby plan states no limit on a static
 #: deployment's output (V1-92), but every byte is pushed to gh-pages and deployed
@@ -97,7 +98,15 @@ STATIC_FILES = (
     "portfolio-math.js", "kit.js", "portfolio.js", "compare.js",
     "fonts/atkinson-hyperlegible-latin-400-normal.woff2",
     "fonts/atkinson-hyperlegible-latin-700-normal.woff2",
+    "favicon.svg",
+    # The Learn guides' screenshots (UI/UX critique L-03).
+    *sorted(f"learn/{png.name}" for png in (STATIC / "learn").glob("*.png")),
 )
+#: Where the site is served: a shared link's preview needs a whole address
+#: (Open Graph), not a path (UI/UX critique G-11; V1-92).
+SITE_URL = "https://didmysipwork.vercel.app"
+#: The web manifest's icons, drawn at build time (`share_image.icon_png`).
+ICONS = (("icon-192.png", 192), ("icon-512.png", 512), ("apple-touch-icon.png", 180))
 #: A file only this job writes, so a rebuild can tell its own output from a
 #: directory it must not delete. Named for GitHub Pages, which served the site
 #: until V1-92; it means nothing to Vercel and is kept only as this marker.
@@ -274,9 +283,11 @@ def funds_to_publish(warehouse: Any) -> list[dict[str, str]]:
             "name": fund.name,
             "category": fund.category,
             "amfi_code": fund.amfi_code or "",
+            # The site's own category name, not AMFI's heading ("Solution
+            # Oriented Schemes ** - Retirement Fund"; UI/UX critique G-05).
             "detail": " · ".join(
                 str(x).title() if x in (fund.plan, fund.option) else str(x)
-                for x in (fund.category, fund.plan, fund.option)
+                for x in (category_of(fund.category).name, fund.plan, fund.option)
                 if x and x != "unknown"
             ),
         }
@@ -348,12 +359,65 @@ def explorer_row(
     }
 
 
+#: Explore funds draws this many rows; app.js draws the rest from funds/rows.json
+#: (UI/UX critique E-01: all 1,662 at once were 1.88 MB and 31,170 nodes).
+EXPLORE_FIRST = 50
+#: Its columns: key, heading, the term its `?` explains, figure (right-aligned),
+#: and the name a phone's two-line row gives the figure (E-07). The three
+#: measures of risk start hidden; the column chooser shows them (E-05).
+EXPLORE_COLUMNS = (
+    ("name", "Fund", None, False, ""),
+    ("cat", "Category", None, False, ""),
+    ("size", "Fund size", "aum", True, "Size"),
+    ("ter", "Expense ratio", "expense_ratio", True, "Expense ratio"),
+    ("r1", "1 year", "annualised_return", True, "1-year return"),
+    ("r3", "3 years", "annualised_return", True, "3-year return"),
+    ("r5", "5 years", "annualised_return", True, "5-year return"),
+    ("rank", "Rank in category, 3 years", "category_rank", True, "Rank"),
+    ("vol3", "Volatility, 3 years", "volatility", True, "Volatility"),
+    ("fall3", "Deepest fall, 3 years", "max_drawdown", True, "Deepest fall"),
+    ("sharpe3", "Sharpe ratio, 3 years", "sharpe", True, "Sharpe"),
+)
+EXPLORE_HIDDEN = "vol3 fall3 sharpe3"
+
+
+def explore_row(row: dict[str, Any], record: dict[str, Any]) -> dict[str, Any]:
+    """One fund in Explore funds' data: its table row's cells as [value, label,
+    ...], the value what a column sorts on ("" for none), the label formatted here
+    (§16.4). The page draws the first rows from these and app.js the rest, so the
+    two are one markup."""
+    returns = dict(zip(("r1", "r3", "r5"), row["returns"], strict=True))
+    labels = record["labels"]
+    return {
+        "id": row["scheme_id"], "name": row["name"], "house": row["house"],
+        "family": row["family"], "cat": row["category_key"],
+        "cat_name": row["category_short"],
+        "c": {
+            "size": [row["size_value"], row["size_label"]],
+            "ter": [row["ter_value"], row["ter_label"]],
+            **{key: [r["value"], r["label"], r["tone"] or "", r["symbol"] or ""]
+               for key, r in returns.items()},
+            "rank": [row["rank_value"], row["rank_label"], row["rank_quarter"]],
+            **{key: [record[key] or "", labels[key] or DASH]
+               for key in ("vol3", "fall3", "sharpe3")},
+        },
+    }
+
+
+def largest_first(explore: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Explore funds' first view (E-02): the largest fund first, a fund with no
+    size last; compared as Decimals here, never as text in SQL."""
+    return sorted(explore, key=lambda r: (r["c"]["size"][0] == "",
+                                          -Decimal(r["c"]["size"][0] or 0)))
+
+
 def fund_record(
     row: dict[str, Any], detail: ViewEnvelope | None, prices_from: str | None,
-    benchmark: str | None = None,
+    benchmark: str | None = None, tracker: str | None = None,
 ) -> dict[str, Any]:
     """One fund for the portfolio page's picker and alternatives (V1-82) and the
-    compare page (V1-85).
+    compare page (V1-85). `tracker` is the index fund standing in for its
+    benchmark (`PublicMarket.proxy`): Your portfolio's reference (UI/UX critique P-01).
 
     The same figures the `/funds/` table shows, as text: the pages compare and
     sort on them, and never re-derive them. `labels` are those figures as a
@@ -391,6 +455,7 @@ def fund_record(
         "fall3": text(three.get("max_dd")),
         "house": row["house"] or None,
         "benchmark": benchmark,
+        "tracker": tracker,
         "sharpe3": text(three.get("sharpe")),
         "rank3": None if row["rank_label"] in (None, "", DASH) else row["rank_label"],
     }
@@ -424,12 +489,43 @@ def regular_record(
         "id": twin.scheme_id, "amfi": twin.amfi_code,
         "name": f"{direct['name']} (Regular)",
         "plan": "regular", "direct": direct["id"], "category": direct["category"],
-        "category_name": direct["category_name"], "prices_from": prices_from,
+        "category_name": direct["category_name"], "house": direct.get("house"),
+        "tracker": direct.get("tracker"), "prices_from": prices_from,
         "ter": None if ter is None else str(ter.total),
     }
     if direct.get("mixed"):
         record["mixed"] = True
     return record
+
+
+def share_card(out: Path, record: dict[str, Any], detail: str, market: Any, scheme: str,
+               today: date) -> None:
+    """The fund's preview for a shared link (UI/UX critique G-11): its three-year
+    return (else its one-year), its rank, and three years of its price."""
+    figure = None
+    for key, words in (("r3", "a year over 3 years"), ("r1", "over 1 year")):
+        if record.get(key):
+            figure = f"{format_return(Decimal(record[key]), False)} {words}"
+            break
+    rank = (f"{record['rank3']} in its category over 3 years"
+            if record.get("rank3") else None)
+    navs = market.nav_series(SchemeId(scheme), window_start(today, "3y"), today,
+                             adjusted=True)
+    step = max(1, len(navs) // 160)
+    fund_card(out, record["name"], detail, figure, rank, [p.nav for p in navs[::step]])
+
+
+def manifest(out: Path, base: str) -> None:
+    """The web manifest and its icons: a name and a mark for a home screen."""
+    for name, size in ICONS:
+        icon_png(out / "static" / name, size)
+    (out / "static" / "site.webmanifest").write_text(json.dumps({
+        "name": "Look-through: Did my SIP work?", "short_name": "Look-through",
+        "start_url": f"{base}/", "display": "browser",
+        "theme_color": "#134585", "background_color": "#f5f7fb",
+        "icons": [{"src": name, "sizes": f"{size}x{size}", "type": "image/png"}
+                  for name, size in ICONS if name.startswith("icon-")],
+    }, indent=2) + "\n", encoding="utf-8")
 
 
 def lookthrough_file(lookthrough: Any, scheme: str, today: date) -> dict[str, Any] | None:
@@ -480,8 +576,11 @@ def category_leaders(
 
 
 def fund_map(funds: list[dict[str, str]]) -> list[dict[str, Any]]:
-    """The front page's map (V1-81): each family, then its categories with what
-    SEBI's rules say they hold and how many funds they have here. Largest first."""
+    """The front page's map (V1-81): each family, in SEBI's order, then its
+    categories with what SEBI's rules say they hold and how many funds they have
+    here, largest first. Headings that mix funds doing different jobs (never
+    ranked: AMFI's older catch-alls among them) come last, in `mixed`, which the
+    page folds away (UI/UX critique H-03)."""
     counts: dict[str, int] = defaultdict(int)
     found = {}
     for fund in funds:
@@ -493,11 +592,14 @@ def fund_map(funds: list[dict[str, str]]) -> list[dict[str, Any]]:
         members = sorted((c for c in found.values() if c.family == key),
                          key=lambda c: (-counts[c.key], c.name))
         if members:
+            def entry(c: Any) -> dict[str, Any]:
+                return {"key": c.key, "name": c.name, "about": c.about,
+                        "count": counts[c.key]}
             families.append({
                 "key": key, "name": name, "hint": hint,
                 "count": sum(counts[c.key] for c in members),
-                "categories": [{"key": c.key, "name": c.name, "about": c.about,
-                                "count": counts[c.key]} for c in members],
+                "categories": [entry(c) for c in members if c.ranked],
+                "mixed": [entry(c) for c in members if not c.ranked],
             })
     return families
 
@@ -540,7 +642,7 @@ def _adapter(folder: Path, url: str, scope: Scope) -> Any:
 
 def build_site(
     warehouse: Any, out: Path, base: str, today: date | None = None,
-    declared: dict[str, str] | None = None,
+    declared: dict[str, str] | None = None, site_url: str = SITE_URL,
 ) -> dict[str, int]:
     """Render every public fund page, the index and the search list into `out`.
     `declared` is each fund's benchmark by ISIN, from the Groww crawl's map."""
@@ -554,7 +656,10 @@ def build_site(
     out.mkdir(parents=True)
 
     deps = public_deps(warehouse, declared)
+    market = deps.market
+    assert isinstance(market, PublicMarket)
     engine = templates(root=base, static=True)
+    engine.env.globals["site_url"] = site_url   # for a shared link's preview (G-11)
     shell = {"catalogue": [], "health": {}, "qs": "", "active": "", "built": today}
     funds = funds_to_publish(warehouse)
     firsts = {
@@ -567,6 +672,7 @@ def build_site(
     candidates: list[dict[str, Any]] = []  # the landing page's example (V1-89)
     houses: set[str] = set()
     with_holdings = 0
+    disclosed: Counter[date] = Counter()   # the dates portfolios were disclosed for
     prices_to: date | None = None
     for n, fund in enumerate(funds, start=1):
         sid = fund["scheme_id"]
@@ -587,7 +693,10 @@ def build_site(
         rows.append(explorer_row(fund, facts, context["detail"]["env"],
                                  panels.get("fund_peers")))
         records.append(fund_record(rows[-1], context["detail"]["env"], firsts.get(sid),
-                                   facts.benchmark_name if facts else None))
+                                   facts.benchmark_name if facts else None,
+                                   market.proxy(sid)))
+        share_card(folder / "share.png", records[-1], rows[-1]["detail"], deps.market,
+                   sid, today)
         held = lookthrough_file(deps.lookthrough, sid, today)
         if rows[-1]["family"] == "equity":
             peers = panels.get("fund_peers")
@@ -605,6 +714,7 @@ def build_site(
                 continue
             if env.view_id == "fund_portfolio":
                 with_holdings += 1
+                disclosed[env.data_as_of] += 1
             if env.view_id == "fund_header":
                 prices_to = max(prices_to or env.data_as_of, env.data_as_of)
         if n % 50 == 0:
@@ -612,7 +722,7 @@ def build_site(
 
     by_category: dict[str, list[dict[str, str]]] = defaultdict(list)
     for fund in funds:
-        by_category[fund["category"]].append(fund)
+        by_category[category_of(fund["category"]).name].append(fund)
     counted: defaultdict[str, int] = defaultdict(int)
     for row in rows:
         counted[row["family"]] += 1
@@ -624,6 +734,9 @@ def build_site(
     stats = {
         "houses": len(houses),
         "holdings": with_holdings,
+        # The date most portfolios were disclosed for (UI/UX critique H-07); ties
+        # go to the later.
+        "holdings_as_of": max(disclosed, key=lambda d: (disclosed[d], d), default=None),
         "prices_to": prices_to,
         "categories": len({r["category_key"] for r in rows}),
     }
@@ -637,6 +750,10 @@ def build_site(
         encoding="utf-8",
     )
     (out / "funds").mkdir(exist_ok=True)
+    explore = largest_first([explore_row(r, rec) for r, rec in zip(rows, records,
+                                                                   strict=True)])
+    (out / "funds" / "rows.json").write_text(
+        json.dumps(explore, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (out / "funds" / "index.html").write_text(
         engine.get_template("explorer.html").render({
             **shell,
@@ -647,7 +764,10 @@ def build_site(
                 key=lambda kv: kv[1].lower(),
             ),
             "count": len(funds),
-            "funds": rows,
+            "explore": explore[:EXPLORE_FIRST],
+            "columns": EXPLORE_COLUMNS,
+            "hidden": EXPLORE_HIDDEN,
+            "first": EXPLORE_FIRST,
             "families": families,
             "stats": stats,
             "leaders": category_leaders(rows),
@@ -711,6 +831,8 @@ def build_site(
         target = out / "static" / name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(STATIC / name, target)
+    site_card(out / "static" / "share.png", len(funds))
+    manifest(out, base)
     (out / MARKER).write_text("", encoding="utf-8")
     (out / "vercel.json").write_text(json.dumps(VERCEL_CONFIG, indent=2) + "\n",
                                      encoding="utf-8")

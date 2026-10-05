@@ -115,6 +115,10 @@ def landing_example(candidates: list[dict[str, Any]]) -> dict[str, Any] | None:
                  "width": bar_width(w * 100 / largest if largest > 0 else 0)}
                 for _, n, w in top],
         "ranges": chosen["ranges"],
+        # How it has done, beside what it owns (UI/UX critique H-01): its row's own
+        # labels, annualised. A five-year return is required, a three-year implied.
+        "returns": [(period, row["returns"][at]["label"]) for period, at
+                    in (("3 years", FIVE_YEAR - 1), ("5 years", FIVE_YEAR))],
     }
 
 
@@ -126,25 +130,33 @@ def _weights(held: dict[str, Any]) -> list[IssuerWeight]:
 def landing_pair(
     example_id: str, candidates: list[dict[str, Any]]
 ) -> dict[str, Any] | None:
-    """The example fund and the largest fund, with holdings, from another equity
-    category: what they hold in common, with ₹1 in each."""
+    """The example fund and the equity fund of another category, with holdings,
+    whose portfolio overlaps it most (on a tie, the larger; then the lower id):
+    what they hold in common, with ₹1 in each. UI/UX critique H-04: the largest
+    fund of another category shared 0.4% with it, which showed nothing."""
     first = next((c for c in candidates if c["row"]["scheme_id"] == example_id), None)
     if first is None or first["held"] is None:
         return None
-    second = _largest([
-        c for c in candidates
-        if c["held"] is not None and c["row"]["family"] == "equity"
-        and c["row"]["category_key"] != first["row"]["category_key"]
-        and c["row"]["size_value"] and _holdings(c["held"])
-    ])
-    if second is None:
-        return None
-    a, b = first["held"], second["held"]
-    found = pairwise_overlap(
-        SchemeId(example_id), SchemeId(second["row"]["scheme_id"]),
-        date.fromisoformat(a["as_of"]), date.fromisoformat(b["as_of"]),
-        _weights(a), _weights(b),
+    a = first["held"]
+
+    def overlap(c: dict[str, Any]) -> Any:
+        return pairwise_overlap(
+            SchemeId(example_id), SchemeId(c["row"]["scheme_id"]),
+            date.fromisoformat(a["as_of"]), date.fromisoformat(c["held"]["as_of"]),
+            _weights(a), _weights(c["held"]),
+        )
+
+    scored = sorted(
+        ((overlap(c), c) for c in candidates
+         if c["held"] is not None and c["row"]["family"] == "equity"
+         and c["row"]["category_key"] != first["row"]["category_key"]
+         and c["row"]["size_value"] and _holdings(c["held"])),
+        key=lambda fc: (-fc[0].overlap_pct, -_size(fc[1]), fc[1]["row"]["scheme_id"]),
     )
+    if not scored:
+        return None
+    found, second = scored[0]
+    b = second["held"]
     wa = {i: w for i, _, w in _holdings(a)}
     wb = {i: w for i, _, w in _holdings(b)}
     names = {i: n for i, n, _ in _holdings(a) + _holdings(b)}

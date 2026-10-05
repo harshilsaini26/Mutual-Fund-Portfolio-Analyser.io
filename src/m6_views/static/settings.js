@@ -13,12 +13,12 @@
 
   var KEY = "settings";
   var DEFAULTS = {
-    theme: "device", font: "terminess", size: "standard",
+    theme: "device", font: "atkinson", size: "standard",
     density: "comfortable", motion: "device", accent: "navy",
   };
   var CHOICES = {
     theme: ["device", "light", "dark", "matrix"],
-    font: ["terminess", "rubik", "atkinson"],
+    font: ["atkinson", "rubik", "terminess"],
     size: ["small", "standard", "large"],
     density: ["comfortable", "compact"],
     motion: ["device", "on", "off"],
@@ -79,7 +79,7 @@
     Object.keys(attrs).forEach(function (k) { root.setAttribute("data-" + k, attrs[k]); });
   }
 
-  function preloadFor(font) { return FONTS[font] || FONTS.terminess; }
+  function preloadFor(font) { return FONTS[font] || FONTS.atkinson; }
 
   function onStorage(event, applyNow) { if (event && event.key === KEY) applyNow(); }
 

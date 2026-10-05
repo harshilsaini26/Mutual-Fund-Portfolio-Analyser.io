@@ -53,8 +53,9 @@
 
 <details class="chart-table">
   <summary>The same pairs as a table ({{ env.payload.cells | length }} rows)</summary>
-  <div class="table-wrap">
+  <div class="table-wrap" role="region" aria-labelledby="tbl-{{ env.view_id }}-pairs">
   <table>
+    <caption class="sr-only" id="tbl-{{ env.view_id }}-pairs">{{ view_names.get(env.view_id, env.view_id) }}: each pair of funds</caption>
     <thead><tr>
       <th scope="col">Fund A</th><th scope="col">Fund B</th>
       <th scope="col">Overlap</th><th scope="col">In rupees</th>

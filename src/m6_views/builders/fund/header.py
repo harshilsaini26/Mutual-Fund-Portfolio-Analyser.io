@@ -35,8 +35,8 @@ from src.m6_views.deps import Deps
 from src.m6_views.envelope import ViewEnvelope
 from src.m6_views.format import (
     format_date,
-    format_inr,
     format_pct,
+    format_points,
     format_return,
 )
 from src.m6_views.registry import VIEW_DEFS, register
@@ -50,6 +50,8 @@ PERIODS = {"5y": "five years", "3y": "three years", "1y": "one year"}
 
 #: Points in a tile's sparkline: a shape, not a chart. LTTB keeps the trough.
 SPARK_POINTS = 48
+#: What the page says of a fact no source this site loads carries (F-13).
+NOT_LOADED = "Not in the data this site loads"
 RETURN_TILES = (("1y", "1 year"), ("3y", "3 years"), ("5y", "5 years"))
 
 
@@ -119,9 +121,11 @@ def _tiles(fw: FundWindows | None, facts: Any,
     five years, the category rank, the worst fall, volatility, size and the
     expense ratio (V1-78).
 
-    Beside each return goes the benchmark's own figure, never a difference
-    between the two: that would be a number the page derived, and §2.1 keeps
-    figures where they were computed.
+    Beside each return goes its distance from the benchmark in points a year and
+    the benchmark's own figure: "3.9 points a year behind its benchmark, which
+    returned +11.5% a year" (UI/UX critique F-02; "Behind its benchmark, +11.5%"
+    read as the fund's own figure). M2 computes the distance (`lead_ann`), so the
+    page derives nothing (§2.1).
     """
     tiles: list[dict[str, Any]] = []
     for key, label in RETURN_TILES:
@@ -131,11 +135,13 @@ def _tiles(fw: FundWindows | None, facts: Any,
                                f"Less than {label} of prices on record"))
             continue
         context, tone = None, None
-        if w.bench_return_ann is not None:
-            tone = "ahead" if w.return_ann > w.bench_return_ann else "behind"
+        if w.bench_return_ann is not None and w.lead_ann is not None:
+            tone = "ahead" if w.lead_ann > 0 else "behind" if w.lead_ann < 0 else None
+            where = {"ahead": "ahead of", "behind": "behind"}.get(tone or "")
             context = (
-                f"{'Ahead of' if tone == 'ahead' else 'Behind'} its benchmark, "
-                f"{format_return(w.bench_return_ann, True)}"
+                (f"{format_points(w.lead_ann)} a year {where} its benchmark"
+                 if where else "Level with its benchmark")
+                + f", which returned {format_return(w.bench_return_ann, False)} a year"
             )
         tile = _tile(f"return_{key}", f"Return, {label}", w.return_ann, "return_ann",
                      context, tone)
@@ -223,13 +229,7 @@ class FundHeaderBuilder:
                 ))
 
         plan = " · ".join(p.title() for p in (facts.plan, facts.option) if p)
-        size = (
-            f"{format_inr(facts.aum_inr, precision=0)}, the average for the "
-            f"quarter to {format_date(facts.aum_as_of)}"
-            if facts.aum_inr is not None
-            else None
-        )
-        rows = [
+        rows: list[dict[str, Any]] = [
             {"label": label, "value": value}
             for label, value in (
                 ("Fund house", facts.amc_name),
@@ -239,7 +239,7 @@ class FundHeaderBuilder:
                  category_of(facts.category).name if facts.category else None),
                 ("Plan", plan or None),
                 ("Launched", format_date(facts.inception) if facts.inception else None),
-                ("Fund size", size),
+                # Fund size is a tile, with its date (UI/UX critique F-04).
                 # The public build has no index data at all (NSE's licence),
                 # so "none on record" there would be a claim about the fund.
                 ("Benchmark", f"{facts.benchmark_name}, with dividends"
@@ -250,6 +250,10 @@ class FundHeaderBuilder:
             )
             if value
         ]
+        # What a reader looks for first and no source this site loads carries:
+        # said, not left out (F-13). Never filled in from anywhere else.
+        rows += [{"label": label, "value": NOT_LOADED, "absent": True}
+                 for label in ("Riskometer", "Fund manager", "Exit load", "Minimum SIP")]
         return ok_envelope(
             view_id=VIEW_ID,
             scope=scope,

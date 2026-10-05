@@ -8,11 +8,27 @@
   own page since V1-80, so the front page need not carry 1,661 rows).
 
   Every figure in the table was formatted by `jobs/publish_site.py` from the same
-  fund pages it links to; the browser only sorts it (on the `data-value` beside
-  each figure) and filters it, by family, by category (`#category=<key>`, which
-  the front page's cards link to) and by name. With scripts off the table is the
-  whole list, and the grouped lists at the end are the way through by category.
+  fund pages it links to. The page draws the 50 largest funds (UI/UX critique
+  E-01, E-02); app.js draws the rest from funds/rows.json, the same cells, as the
+  reader filters by family, by category (`#category=<key>`, which the front page's
+  cards link to) or by name, sorts, or asks for 50 more. With scripts off, the
+  grouped lists at the end are the way through every fund (E-04: only then).
 #}
+{#- One fund's cell, from its row in funds/rows.json; app.js builds the same. -#}
+{% macro cell(f, key, short) -%}
+{%- if key == "name" -%}
+<td data-col="name"><a class="fund-name" href="{{ root }}/fund/{{ f.id }}/">{{ f.name }}</a>
+            <span class="cell-sub">{{ f.house }}</span></td>
+{%- elif key == "cat" -%}
+<td data-col="cat">{{ f.cat_name }}</td>
+{%- else -%}
+{%- set c = f.c[key] -%}
+{%- set tone = c[2] if key in ("r1", "r3", "r5") else "" -%}
+<td class="num{% if tone %} ret--{{ tone }}{% endif %}" data-col="{{ key }}" data-label="{{ short }}"{% if c[0] %} data-value="{{ c[0] }}"{% endif %}>
+            {%- if tone and c[3] %}<span class="ret__symbol" aria-hidden="true">{{ c[3] }}</span>{% endif %}{{ c[1] -}}
+            {%- if key == "rank" and c[2] %}<span class="cell-sub">{{ c[2] }}</span>{% endif %}</td>
+{%- endif -%}
+{%- endmacro %}
 {% block content %}
 <header class="page-head">
   <p class="eyebrow">Explore funds</p>
@@ -85,45 +101,56 @@
         {{ icon.i("search", "icon field-search__icon") }}
         <input id="filter-text" type="search" autocomplete="off" placeholder="Narrow by name" data-filter-text>
       </span>
-      <span class="table-card__count" data-filter-count>{{ count }} funds</span>
+      {#- A phone has no column headings to sort by: a list of the sorts (E-07). -#}
+      <label class="sr-only" for="filter-sort">Sort by</label>
+      <select id="filter-sort" class="table-card__sort" data-sort-select>
+        <option value="size:desc">Largest first</option>
+        <option value="r3:desc">3-year return, highest first</option>
+        <option value="r1:desc">1-year return, highest first</option>
+        <option value="r5:desc">5-year return, highest first</option>
+        <option value="ter:asc">Expense ratio, lowest first</option>
+        <option value="name:asc">Name, A to Z</option>
+      </select>
+      {#- Which columns show (E-05): the measures of risk too, on request. -#}
+      <details class="columns" data-columns hidden>
+        <summary class="button button--quiet">Columns</summary>
+        <fieldset class="columns__menu"><legend>Columns shown</legend>
+          {% for key, heading, term, numeric, short in columns if key != "name" %}
+          <label><input type="checkbox" value="{{ key }}"{% if key not in hidden.split() %} checked{% endif %}> {{ heading }}</label>
+          {% endfor %}
+        </fieldset>
+      </details>
+      <span class="table-card__count" data-filter-count aria-live="polite">{% if count > first %}The {{ first }} largest of {{ count | fmt_count }} funds{% else %}{{ count }} funds{% endif %}</span>
     </div>
-    <div class="table-wrap">
-    <table data-sortable data-filterable>
+    <div class="table-wrap" role="region" aria-labelledby="tbl-funds">
+    <table data-filterable data-rows="{{ root }}/funds/rows.json" data-hide="{{ hidden }}">
+      <caption class="sr-only" id="tbl-funds">Every fund on this site</caption>
       <thead><tr>
-        <th scope="col"><button type="button" data-sort="text">Fund</button></th>
-        <th scope="col"><button type="button" data-sort="text">Category</button></th>
-        <th scope="col" class="num"><button type="button" data-sort="number">Fund size</button>{{ vc.term("aum", "col-0") }}</th>
-        <th scope="col" class="num"><button type="button" data-sort="number">Expense ratio</button>{{ vc.term("expense_ratio", "col-1") }}</th>
-        <th scope="col" class="num"><button type="button" data-sort="number">1 year</button>{{ vc.term("annualised_return", "col-2") }}</th>
-        <th scope="col" class="num"><button type="button" data-sort="number">3 years</button>{{ vc.term("annualised_return", "col-3y") }}</th>
-        <th scope="col" class="num"><button type="button" data-sort="number">5 years</button>{{ vc.term("annualised_return", "col-5y") }}</th>
-        <th scope="col" class="num"><button type="button" data-sort="number">Rank in category, 3 years</button>{{ vc.term("category_rank", "col-3") }}</th>
+        {% for key, heading, term, numeric, short in columns %}
+        <th scope="col" data-col="{{ key }}" data-short="{{ short }}"{% if numeric %} class="num"{% endif %}{% if key == "size" %} aria-sort="descending"{% endif %}><button type="button" data-sort="{{ key }}">{{ heading }}</button>{% if term %}{{ vc.term(term, "col-" ~ key) }}{% endif %}</th>
+        {% endfor %}
       </tr></thead>
       <tbody>
-        {% for fund in funds %}
-        <tr data-family="{{ fund.family }}" data-category="{{ fund.category_key }}">
-          <td><a class="fund-name" href="{{ root }}/fund/{{ fund.scheme_id }}/">{{ fund.name }}</a>
-            <span class="cell-sub">{{ fund.house }}</span></td>
-          <td>{{ fund.category_short }}</td>
-          <td class="num"{% if fund.size_value %} data-value="{{ fund.size_value }}"{% endif %}>{{ fund.size_label }}</td>
-          <td class="num"{% if fund.ter_value %} data-value="{{ fund.ter_value }}"{% endif %}>{{ fund.ter_label }}</td>
-          {% for r in fund.returns %}
-          <td class="num{% if r.tone %} ret--{{ r.tone }}{% endif %}"{% if r.value %} data-value="{{ r.value }}"{% endif %}>
-            {%- if r.symbol %}<span class="ret__symbol" aria-hidden="true">{{ r.symbol }}</span>{% endif %}{{ r.label -}}
-          </td>
-          {% endfor %}
-          <td class="num"{% if fund.rank_value %} data-value="{{ fund.rank_value }}"{% endif %}>{{ fund.rank_label }}
-            {%- if fund.rank_quarter %}<span class="cell-sub">{{ fund.rank_quarter }}</span>{% endif %}</td>
+        {% for f in explore %}
+        <tr data-family="{{ f.family }}" data-category="{{ f.cat }}">
+          {% for key, heading, term, numeric, short in columns %}{{ cell(f, key, short) }}{% endfor %}
         </tr>
         {% endfor %}
       </tbody>
     </table>
     </div>
+    <div class="table-empty" data-empty hidden>
+      <p>No funds match these filters.</p>
+      <button type="button" class="button button--quiet" data-filter-clear>Clear filters</button>
+    </div>
+    <p class="table-more" hidden><button type="button" class="button button--quiet" data-more>Show 50 more</button></p>
   </div>
-  <p class="table-note">Returns are annualised; a dash means too little price history
-    for the period. Ranks compare a fund with the open funds of its own category.</p>
+  <p class="table-note">Largest funds first; a column's heading sorts by it. Returns are
+    annualised; a dash means too little price history for the period. Ranks compare a
+    fund with the open funds of its own category.</p>
 </section>
 
+<noscript>
 <div class="section-head">
   <h2>Every fund, by category</h2>
   <p>The same funds, grouped, for reading without scripts.</p>
@@ -142,4 +169,5 @@
   </details>
   {% endfor %}
 </div>
+</noscript>
 {% endblock %}

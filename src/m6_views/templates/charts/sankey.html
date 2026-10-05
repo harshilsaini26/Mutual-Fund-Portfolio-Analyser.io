@@ -38,8 +38,9 @@
 #}
 <details class="chart-table">
   <summary>The same flows as a table ({{ env.payload.links | length }} rows)</summary>
-  <div class="table-wrap">
+  <div class="table-wrap" role="region" aria-labelledby="tbl-{{ env.view_id }}-flows">
   <table>
+    <caption class="sr-only" id="tbl-{{ env.view_id }}-flows">{{ view_names.get(env.view_id, env.view_id) }}: each fund's money in each company</caption>
     <thead><tr><th scope="col">Fund</th><th scope="col">Company</th><th scope="col">Exposure</th></tr></thead>
     <tbody>
       {% for link in env.payload.links %}

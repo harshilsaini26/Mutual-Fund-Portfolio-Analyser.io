@@ -67,3 +67,18 @@ test("nextFocus goes to the column that took the removed one's place, else the l
   assert.equal(C.nextFocus(["A", "B"], 2), "B");   // C removed: the new last
   assert.equal(C.nextFocus([], 0), null);          // nothing left: the picker
 });
+
+// UI/UX critique C-02: an empty page offers comparisons to start from.
+test("starting points: each listed category's three largest funds, largest first", () => {
+  const f = (id, category, size, name = id) => ({ id, category, size, name });
+  const funds = [
+    f("A", "equity/flexi_cap", "900"), f("B", "equity/flexi_cap", "300"),
+    f("C", "equity/flexi_cap", "500"), f("D", "equity/flexi_cap", null),
+    f("E", "equity/flexi_cap", "100"), f("L1", "equity/large_cap", "50"),
+    f("L2", "equity/large_cap", "70"), f("M1", "equity/mid_cap", "10"),
+  ];
+  assert.deepEqual(C.starters(funds), [
+    { label: "The three largest flexi cap funds", ids: ["A", "C", "B"] },
+    { label: "The two largest large cap funds", ids: ["L2", "L1"] },
+  ]);
+});

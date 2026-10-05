@@ -125,6 +125,15 @@ def format_fraction(v: Decimal | None, precision: int = 1) -> str:
     return f"{abs(v) * 100:.{precision}f}%"
 
 
+def format_points(v: Decimal | None) -> str:
+    """The distance between two returns, from a fraction: -0.0391 renders "3.9
+    points" (UI/UX critique F-02). Unsigned: the words beside it say which way,
+    and a gap is not itself a return, so it carries no "%"."""
+    if v is None:
+        return DASH
+    return f"{abs(v) * 100:.1f} points"
+
+
 def format_ordinal(n: int) -> str:
     """1st, 2nd, 3rd, 4th ... 11th, 12th, 13th ... 21st: a rank as it is said."""
     if 10 <= n % 100 <= 20:

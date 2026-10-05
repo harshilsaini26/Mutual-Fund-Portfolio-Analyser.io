@@ -97,6 +97,9 @@ class FundConsistencyBuilder:
                 "charts": [{
                     "kind": "line", "title": question, "y": "fraction",
                     "zero_line": True, "series": series,
+                    # Its period buttons pick the stretches shown, not their
+                    # length (UI/UX critique F-07).
+                    "zoom_label": "Stretches ending in the last",
                 }],
                 "columns": [
                     {"key": "stretch_ending", "label": "Stretch ending", "kind": "date"},

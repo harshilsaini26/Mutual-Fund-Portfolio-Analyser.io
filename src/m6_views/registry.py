@@ -157,7 +157,7 @@ VIEW_DEFS: dict[str, ViewDef] = {
     ),
     "fund_growth": ViewDef(
         view_id="fund_growth",
-        view_name="Growth of Rs 10,000",
+        view_name="Growth of ₹10,000",
         module_source="m2",
         question="What would ₹10,000 have become?",
         chart_type="echart",

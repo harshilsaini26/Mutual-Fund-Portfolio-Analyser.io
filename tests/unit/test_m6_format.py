@@ -148,3 +148,13 @@ def test_staleness_reads_as_english() -> None:
     assert format_staleness(0) == "today"
     assert format_staleness(1) == "1 day old"
     assert format_staleness(43) == "43 days old"
+
+
+def test_a_gap_between_two_returns_is_in_points() -> None:
+    """UI/UX critique F-02: the distance between two returns is not itself a
+    return: "3.9 points", unsigned, the direction in the words beside it."""
+    from src.m6_views.format import format_points
+
+    assert format_points(Decimal("-0.0391")) == "3.9 points"
+    assert format_points(Decimal("0.012")) == "1.2 points"
+    assert format_points(None) == "—"

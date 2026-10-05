@@ -14,8 +14,8 @@ const memory = (init = {}) => { const m = new Map(Object.entries(init)); return 
 const throwing = { getItem() { throw new Error("blocked"); }, setItem() { throw new Error("blocked"); }, removeItem() { throw new Error("blocked"); } };
 
 test("defaults follow the device", () => {
-  assert.deepEqual(S.resolve(null, LIGHT), { theme: "light", font: "terminess", size: "standard", density: "comfortable", motion: "on", accent: "navy" });
-  assert.deepEqual(S.resolve(null, DARK_CALM), { theme: "dark", font: "terminess", size: "standard", density: "comfortable", motion: "off", accent: "navy" });
+  assert.deepEqual(S.resolve(null, LIGHT), { theme: "light", font: "atkinson", size: "standard", density: "comfortable", motion: "on", accent: "navy" });
+  assert.deepEqual(S.resolve(null, DARK_CALM), { theme: "dark", font: "atkinson", size: "standard", density: "comfortable", motion: "off", accent: "navy" });
 });
 test("each stored value is honoured", () => {
   assert.deepEqual(S.resolve({ v: 1, theme: "matrix", font: "atkinson", size: "large", density: "compact", motion: "on", accent: "violet" }, DARK_CALM),
@@ -23,7 +23,7 @@ test("each stored value is honoured", () => {
 });
 test("unknown values fall back one by one", () => {
   const r = S.resolve({ v: 1, font: "comic", size: "large", accent: 7 }, LIGHT);
-  assert.equal(r.font, "terminess"); assert.equal(r.size, "large"); assert.equal(r.accent, "navy");
+  assert.equal(r.font, "atkinson"); assert.equal(r.size, "large"); assert.equal(r.accent, "navy");
 });
 test("device changes are followed only while the choice is device", () => {
   assert.equal(S.resolve({ v: 1, theme: "device" }, DARK_CALM).theme, "dark");
@@ -53,5 +53,5 @@ test("onStorage re-applies when another tab writes", () => {
 });
 test("each font has a preload file", () => {
   assert.equal(S.preloadFor("atkinson"), "fonts/atkinson-hyperlegible-latin-400-normal.woff2");
-  assert.equal(S.preloadFor("nope"), S.preloadFor("terminess"));
+  assert.equal(S.preloadFor("nope"), S.preloadFor("atkinson"));
 });

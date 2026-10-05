@@ -33,6 +33,21 @@
   <meta name="referrer" content="no-referrer">
   {% endif %}
   <title>{% block title %}Look-through{% endblock %}</title>
+  {#- What a search result and a shared link show (UI/UX critique G-11). -#}
+  <meta name="description" content="{% block description %}What Indian mutual funds own and how each has done beside the funds that do the same job, and what your own SIPs add up to. Descriptive, not advice; nothing you enter leaves your browser.{% endblock %}">
+  <link rel="icon" href="{{ root }}/static/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#134585" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+  {% if static %}
+  <link rel="manifest" href="{{ root }}/static/site.webmanifest">
+  <link rel="apple-touch-icon" href="{{ root }}/static/apple-touch-icon.png">
+  <meta property="og:site_name" content="Look-through">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="{{ self.description() }}">
+  <meta property="og:image" content="{{ site_url }}{{ root }}{% block share_image %}/static/share.png{% endblock %}">
+  <meta name="twitter:card" content="summary_large_image">
+  {% endif %}
   <script src="{{ root }}/static/settings.js"></script>
   <link rel="stylesheet" href="{{ root }}/static/lenis.css">
   <link rel="stylesheet" href="{{ root }}/static/app.css">
@@ -53,7 +68,7 @@
   <label class="sr-only" for="q">Find a fund</label>
   {{ icon.i("search", "icon search__icon") }}
   <input id="q" {% if not static %}name="q" {% endif %}type="search" autocomplete="off" spellcheck="false"
-         placeholder="Find a fund by name"
+         placeholder="Search funds"
          {% if static %}data-index="{{ root }}/search.json"{% else %}data-suggest="/api/search"{% endif %}>
   <ul class="search__suggest" hidden data-lenis-prevent></ul>
 </form>
@@ -61,8 +76,8 @@
 
 {% macro settings_button() -%}
 {#- Hidden until app.js shows it: without scripts the panel cannot open. -#}
-<button class="icon-button" type="button" data-settings-open aria-haspopup="dialog"
-        aria-controls="settings" aria-label="Settings" hidden>{{ icon.i("settings") }}</button>
+<button class="icon-button icon-button--labelled" type="button" data-settings-open aria-haspopup="dialog"
+        aria-controls="settings" aria-label="Display settings" hidden>{{ icon.i("settings") }}<span class="icon-button__label">Display</span></button>
 {%- endmacro %}
 
 {% macro settings_panel() -%}
@@ -74,7 +89,7 @@
 #}
 {%- set rows = [
   ("theme", "Theme", [("device", "Device"), ("light", "Light"), ("dark", "Dark"), ("matrix", "Matrix")]),
-  ("font", "Font", [("terminess", "Terminess"), ("rubik", "Rubik"), ("atkinson", "Atkinson Hyperlegible")]),
+  ("font", "Font", [("atkinson", "Atkinson Hyperlegible"), ("rubik", "Rubik"), ("terminess", "Terminal (Terminess)")]),
   ("size", "Text size", [("small", "Small"), ("standard", "Standard"), ("large", "Large")]),
   ("density", "Density", [("comfortable", "Comfortable"), ("compact", "Compact")]),
   ("motion", "Motion", [("device", "Device"), ("on", "On"), ("off", "Off")]),
@@ -105,6 +120,8 @@
   <p class="settings__note" data-settings-note hidden>This browser is not keeping site data,
     so these settings apply to this page only; another page opens with the defaults.</p>
   <button type="button" class="settings__reset" data-settings-reset>Reset to defaults</button>
+  {#- The funds a reader viewed, kept in this browser (app.js RECENT; G-21). -#}
+  <button type="button" class="settings__reset" data-recent-clear>Clear recently viewed</button>
 </dialog>
 {%- endmacro %}
 
@@ -126,7 +143,8 @@
     <a class="topnav__link" href="{{ root }}/#categories">Categories</a>
     <a class="topnav__link" href="{{ root }}/#about">About the data</a>
   </nav>
-  {{ search_box() }}
+  {#- The home page's own search is its hero's: one box on its first screen (G-08). -#}
+  {% block topbar_search %}{{ search_box() }}{% endblock %}
   {{ settings_button() }}
 </header>
 {#- One sentence (V1-88), wrapping on a phone so its link stays in reach. -#}
@@ -195,12 +213,42 @@
 {% block content %}{% endblock %}
 </main>
 <footer class="colophon">
+  {% if static %}
+  {#- Three ways around and what this is (UI/UX critique G-10, 2026-10-04). -#}
+  <div class="colophon__columns">
+    <nav aria-labelledby="foot-product">
+      <h2 id="foot-product">Product</h2>
+      <ul>
+        <li><a href="{{ root }}/funds/">Explore funds</a></li>
+        <li><a href="{{ root }}/compare/">Compare</a></li>
+        <li><a href="{{ root }}/portfolio/">Your portfolio</a></li>
+        <li><a href="{{ root }}/learn/">Learn</a></li>
+      </ul>
+    </nav>
+    <nav aria-labelledby="foot-data">
+      <h2 id="foot-data">Data</h2>
+      <ul>
+        <li><a href="{{ root }}/#about">Where every figure comes from</a></li>
+        <li><a href="{{ root }}/learn/reading-a-fund-page/">How a fund page is made</a></li>
+        <li>Built {{ built | fmt_date }}, every night</li>
+        <li><a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">The code, and the self-hosted app with your own ledger</a></li>
+      </ul>
+    </nav>
+    <nav aria-labelledby="foot-about">
+      <h2 id="foot-about">About</h2>
+      <ul>
+        <li><a href="{{ root }}/#privacy">Your data stays yours</a></li>
+        <li><a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io/issues">Report a problem</a></li>
+        <li><a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io/blob/main/LICENSE">Licence</a></li>
+        <li>Descriptive, not advice</li>
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
   <p>
     {% if static %}
     Built from public sources; every figure names its source and date.
     No cookies, no tracking, and nothing loads from anywhere but this site.
-    <a class="topbar__link" href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">
-      <span>The self-hosted app, with benchmarks and your own ledger</span>{{ icon.i("external") }}</a>
     {% else %}
     Self-hosted. Every figure traces to an archived source file. Descriptive, not advice.
     {% endif %}

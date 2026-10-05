@@ -16,7 +16,93 @@ def test_no_text_size_is_fixed_in_pixels() -> None:
 
 def test_standard_text_is_todays_text() -> None:
     css = CSS.read_text(encoding="utf-8")
-    assert "font: 0.875rem/1.55 var(--font)" in css  # the body, 14px today
+    # 16px since the UI/UX critique (G-03, 2026-10-04); 14px before.
+    assert "font: 1rem/1.55 var(--font)" in css
+
+
+def test_the_default_face_is_proportional_and_terminess_a_choice() -> None:
+    """UI/UX critique G-01/G-02 (2026-10-04): the pixel monospace set nearly every
+    word and had no ₹. Atkinson Hyperlegible is the default; Terminess is the
+    "Terminal" choice; a ₹-only face takes the system's own sans for the sign."""
+    css = CSS.read_text(encoding="utf-8")
+    root = css[css.index("\n:root {"):]
+    root = root[:root.index("\n}")]
+    assert '--font: "Atkinson Hyperlegible", "Rupee"' in root
+    assert "Terminess" not in root.split("--font:")[1].split(";")[0]
+    assert re.search(r':root\[data-font="terminess"\]\s*\{[^}]*--font:\s*"Terminess', css)
+    rupee = re.search(r'@font-face\s*\{[^}]*font-family:\s*"Rupee"[^}]*\}', css)
+    assert rupee and "unicode-range: U+20B9" in rupee.group(0)
+    assert "local(" in rupee.group(0)
+    assert re.search(r"body\s*\{[^}]*font-variant-numeric:\s*tabular-nums", css)
+
+
+def test_a_data_mark_never_waits_on_a_scroll_animation() -> None:
+    """UI/UX critique G-15 (2026-10-04): the peer-range bar and its marker were
+    drawn from nothing as their section scrolled in; where the timeline does not
+    run (a hidden tab, some extensions) they stayed invisible. Decoration may
+    move; a figure's mark is simply there."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    for mark in (".lp-range__fill", ".lp-range__marker"):
+        rules = [body for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+                 if mark in sel]
+        assert not any("animation" in body for body in rules), mark
+
+
+def test_public_pages_share_one_width() -> None:
+    """UI/UX critique G-09/L-01 (2026-10-04): the home page centred at 1200px
+    while other pages ran to 1600px, so their narrower blocks hugged the left;
+    Learn's grid laid out five columns for three cards."""
+    css = CSS.read_text(encoding="utf-8")
+    # 1200px of content and its padding.
+    assert re.search(r"\.content--public\s*\{[^}]*max-width:\s*1256px", css)
+    assert re.search(r"\.learn__cards\s*\{[^}]*repeat\(3, minmax\(0, 1fr\)\)", css)
+
+
+def test_every_question_mark_is_a_24px_target() -> None:
+    """UI/UX critique G-16 (2026-10-04): the "?" was 16px outside phones (WCAG
+    2.5.8 asks 24), and on a phone it fell onto its own line under a heading."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    # Unindented: a top-level rule, not one inside a media query.
+    assert re.search(r"\n\.term::before\s*\{[^}]*inset:\s*-([4-9]|1\d)px", css)
+    assert re.search(
+        r"\.section-head > h2\s*\{[^}]*max-width:\s*calc\(100% - \d+px\)", css)
+
+
+def test_in_matrix_a_loss_is_not_green() -> None:
+    """UI/UX critique G-13 (2026-10-04): Matrix sets all text green, so a tile's
+    falling figure read as a gain beside its small red ▼. There the figure itself
+    takes the gain or loss colour (the sign and arrow stay, so colour is never
+    the only carrier)."""
+    css = CSS.read_text(encoding="utf-8")
+    assert re.search(r':root\[data-theme="matrix"\] \.kpi__tile--behind \.kpi__value'
+                     r'[^{]*\{[^}]*color:\s*var\(--loss\)', css)
+
+
+def test_series_colours_are_not_gain_loss_or_benchmark_colours() -> None:
+    """UI/UX critique G-14 (2026-10-04): Compare drew its third fund in the loss
+    orange, so it read as "the losing one". The four series a comparison uses
+    keep 25 degrees of hue away from gain, loss and the benchmark."""
+    import colorsys
+
+    def hue(hex_: str) -> float:
+        r, g, b = (int(hex_[i:i + 2], 16) / 255 for i in (1, 3, 5))
+        return colorsys.rgb_to_hsv(r, g, b)[0] * 360
+
+    for theme in ("light", "dark"):
+        t = _tokens(theme)
+        meaning = [hue(t[k]) for k in ("gain", "loss", "bench")]
+        for n in range(1, 5):
+            h = hue(t[f"cat-{n}"])
+            for m in meaning:
+                gap = min(abs(h - m), 360 - abs(h - m))
+                assert gap >= 25, (theme, f"cat-{n}", round(gap))
+
+
+def test_headings_stand_above_the_text() -> None:
+    """G-03: a panel's question was the size of the text under it."""
+    css = CSS.read_text(encoding="utf-8")
+    assert "--text-base: 1rem;" in css and "--text-sm: 0.875rem;" in css
+    assert re.search(r"\.view__header h2 \{[^}]*font-size: var\(--text-h3\)", css)
 
 
 def test_the_root_size_carries_the_choice() -> None:
@@ -37,6 +123,16 @@ def test_motion_off_stops_every_transition_and_animation() -> None:
     rule = re.search(r'\[data-motion="off"\][^{]*\{([^}]*)\}', css)
     assert rule and "transition: none !important" in rule.group(1)
     assert "animation: none !important" in rule.group(1)
+
+
+def test_the_settings_drawer_never_crosses_the_window_edge() -> None:
+    """UI/UX critique G-12: the drawer, pinned to the right edge, slid in from 24px
+    further right, so for its first frames (and for good in a paused background tab)
+    it stood past the window. It fades in where it rests."""
+    css = CSS.read_text(encoding="utf-8")
+    frames = re.search(r"@keyframes settings-in\s*\{(.*?)\}\s*\}", css, re.S)
+    assert frames and "opacity: 0" in frames.group(1)
+    assert "translate" not in frames.group(1)
 
 
 def test_everything_that_moves_asks_one_attribute() -> None:
@@ -112,18 +208,16 @@ def test_charts_can_be_drawn_after_the_page_loads() -> None:
     assert re.search(r"window\.Charts\s*=\s*\{\s*draw:", charts)
 
 
-def test_compare_tables_keep_the_measure_in_view_on_phones() -> None:
-    css = CSS.read_text(encoding="utf-8")
-    pinned = r"\.cmp table (th|td):first-child[^{]*\{[^}]*position:\s*sticky"
-    assert re.search(pinned, css)
-
-
-def test_a_chart_of_several_funds_keeps_its_legend_to_one_row() -> None:
-    """Long fund names in a wrapping legend covered the compare chart (V1-85):
-    several funds get a scrolling, truncated legend with the full name on hover."""
+def test_a_chart_of_several_funds_is_named_by_the_pages_chips() -> None:
+    """Long fund names in a legend covered or cut the compare chart (V1-85). The
+    chips under Compare's search name the lines (C-03), in the lines' colours: the
+    chart takes each fund's colour from its place among the chips."""
     charts = (CSS.parent / "charts.js").read_text(encoding="utf-8")
-    many = charts[charts.index("var many ="):charts.index("o.series = c.series.map")]
-    assert re.search(r'type\s*[:=]\s*"scroll"', many) and '"truncate"' in many
+    assert re.search(r"if \(c\.legend === false\) \{ o\.legend\.show = false;", charts)
+    assert "p.cats[(s.hue != null ? s.hue : i) % p.cats.length]" in charts
+    compare = (CSS.parent / "compare.js").read_text(encoding="utf-8")
+    assert "legend: false" in compare and "hue: funds.indexOf(l.f)" in compare
+    assert '"cmp__swatch cmp__swatch--" + (i + 1)' in compare
 
 
 def test_an_explanation_stays_hidden_where_popovers_are_not_supported() -> None:
@@ -268,9 +362,10 @@ def test_fields_have_a_focus_ring() -> None:
 
 # --- type scale and prose face (V1-88) ------------------------------------------
 
+# 13/14/15.5px became 14/15/16px with the UI/UX critique (G-03, 2026-10-04).
 SCALE = {
-    "text-xs": "0.75rem", "text-sm": "0.8125rem", "text-md": "0.875rem",
-    "text-base": "0.96875rem", "text-lead": "1.125rem", "text-h3": "1.375rem",
+    "text-xs": "0.75rem", "text-sm": "0.875rem", "text-md": "0.9375rem",
+    "text-base": "1rem", "text-lead": "1.125rem", "text-h3": "1.375rem",
     "text-h2": "1.75rem", "text-display": "clamp(2.125rem, 5.4vw, 3.75rem)",
 }
 
@@ -291,19 +386,20 @@ def test_every_font_size_is_a_token() -> None:
                 continue
             if value.endswith("%") and re.search(r"html|:root\[data-size", sel):
                 continue  # the text-size setting itself
-            if value == "0.75em" and ".term" in sel:
-                continue  # the "?" sizes to the label it sits beside
+            if value == "max(0.75em, var(--text-xs))" and ".term" in sel:
+                continue  # the "?" sizes to its label, never under the smallest token
             stray.append(f"{sel.strip()[:50]}: {value}")
     assert not stray, stray
 
 
 def test_prose_uses_the_prose_face() -> None:
-    """Running text reads in Atkinson Hyperlegible while the reader's font is
-    Terminess, the default; headings, figures and controls keep Terminess."""
+    """Running text reads in the reader's face; under Terminess, the opt-in
+    "Terminal" (the default until the UI/UX critique, G-01), in Atkinson
+    Hyperlegible, while headings, figures and controls keep Terminess."""
     css = CSS.read_text(encoding="utf-8")
-    assert re.search(r'--font-prose:\s*"Atkinson Hyperlegible"', _block(css, ":root"))
-    for font in ("rubik", "atkinson"):
-        assert "--font-prose: var(--font)" in _block(css, f':root[data-font="{font}"]')
+    assert "--font-prose: var(--font)" in _block(css, ":root")
+    assert re.search(r'--font-prose:\s*"Atkinson Hyperlegible"',
+                     _block(css, ':root[data-font="terminess"]'))
     for sel in (".learn--guide p", ".learn__term dd p", ".lede", ".public-note",
                 ".term-pop__text", ".placeholder__reason", ".pf__note", ".cmp__note"):
         rules = re.findall(r"(?m)^([^{}]*" + re.escape(sel) + r"[^{}]*)\{([^{}]*)\}", css)
@@ -352,7 +448,7 @@ def test_phone_targets_are_40px() -> None:
     phone = " ".join(_block(css[m.start():], "@media (max-width: 720px)")
                      for m in re.finditer(r"(?m)^@media \(max-width: 720px\)", css))
     targets = ("th button", ".leader__all", ".cmp__pick", ".pf__pick",
-               ".topmenu__summary", ".colophon .topbar__link")
+               ".topmenu__summary", ".colophon__columns a")
     for sel in targets:
         rules = [body for s, body in re.findall(r"([^{}]+)\{([^{}]*)\}", phone)
                  if sel in s.split(",") or sel in [x.strip() for x in s.split(",")]]
@@ -596,3 +692,171 @@ def test_the_fund_map_keeps_its_families_in_one_row() -> None:
     assert narrow and narrow.start() > families.start()
     assert re.search(r"\.fundmap__families::after\s*\{[^}]*display: none",
                      css[narrow.start():])
+
+
+def _phone(css: str) -> str:
+    return " ".join(_block(css[m.start():], "@media (max-width: 720px)")
+                    for m in re.finditer(r"(?m)^@media \(max-width: 720px\)", css))
+
+
+def test_a_table_wider_than_its_box_shows_it() -> None:
+    """UI/UX critique G-17: while there is more to the right, the table's right edge
+    fades out (app.js sets `table-wrap--more`). A mask, not a painted fade: tables
+    sit on cards and on the page's ground alike."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    more = re.search(r"\.table-wrap--more\s*\{([^}]*)\}", css)
+    assert more and "mask-image: linear-gradient(to left, transparent" in more.group(1)
+    script = (CSS.parent / "app.js").read_text(encoding="utf-8")
+    assert 'classList.toggle("table-wrap--more"' in script
+
+
+def test_a_tables_first_column_stays_while_the_rest_scroll() -> None:
+    """C-04: the measure or the fund's name stays in view beside its figures -- only
+    while the table scrolls (app.js's tab stop), in the colour behind the table: a
+    card's, or the page's where a section sits on it (Compare, Your portfolio)."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    sticky = r":where\(\.table-wrap\[tabindex\] tbody > tr\) > :first-child"
+    first = re.search(sticky + r"\s*\{([^}]*)\}", css)
+    assert first
+    for decl in ("position: sticky", "left: 0", "background: var(--table-ground)"):
+        assert decl in first.group(1), decl
+    assert re.search(r"(?m)^\.table-wrap \{[^}]*--table-ground: var\(--surface\)", css)
+    assert re.search(r"\.home-section \.table-wrap \{ --table-ground: var\(--bg\)", css)
+    card = r"\.home-section \.card \.table-wrap \{ --table-ground: var\(--surface\)"
+    assert re.search(card, css)
+    corner = re.search(
+        r":where\(\.table-wrap\[tabindex\] thead tr\) > :first-child\s*\{([^}]*)\}", css)
+    assert corner and "left: 0" in corner.group(1) and "z-index: 2" in corner.group(1)
+
+
+def test_on_a_phone_a_tables_rows_are_cards() -> None:
+    """P-08, C-04: each row a card, each figure under its column's name, so nothing
+    scrolls sideways and no figure is read without its label."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    phone = _phone(css)
+    assert re.search(r"\.table--stack thead\s*\{[^}]*clip: rect\(0, 0, 0, 0\)", phone)
+    assert re.search(r"\.table--stack tr\s*\{[^}]*display: grid", phone)
+    label = re.search(r"\.table--stack td\[data-label\]::before\s*\{([^}]*)\}", phone)
+    assert label and "content: attr(data-label)" in label.group(1)
+    # The card's heading is its own label: "Fund" over a fund's name says nothing.
+    heading = r"\.table--stack tbody > tr > :first-child::before\s*\{\s*content: none"
+    assert re.search(heading, phone)
+    # Your funds: what it is worth, the gain and the return come first (P-08).
+    assert re.search(r"\.pf__funds td:nth-child\(4\)[^{]*\{[^}]*order: -1", phone)
+
+
+def test_the_chosen_funds_wear_their_lines_colours() -> None:
+    """C-03: the chips under Compare's search are the chart's legend."""
+    css = CSS.read_text(encoding="utf-8")
+    for n in range(1, 5):
+        swatch = rf"\.cmp__swatch--{n}\s*\{{[^}}]*background: var\(--cat-{n}\)"
+        assert re.search(swatch, css), n
+
+
+def test_a_question_mark_in_a_heading_stays_a_circle_on_a_phone() -> None:
+    """A phone's 40px sort buttons (`th button`) stretched the `?` in a heading into
+    a tall oval; its tap area is the 40px `::before` around a 16px circle."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    term = re.search(r"(?m)^\.term \{([^}]*)\}", css)
+    assert term and "min-height: 0" in term.group(1)
+
+
+def test_your_portfolios_new_parts_are_drawn() -> None:
+    """UI/UX critique P-02 to P-10: the form's fold, the More menu and its red
+    button, named groups, the "Still running" box (a 40px target), the return's
+    period on its own line, the reference sentence and the grey bar."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    for selector in (r"\.pf__edit > summary", r"\.pf__more-menu", r"\.button--danger",
+                     r"\.pf__group", r"\.pf__group > legend", r"\.pf__words",
+                     r"\.pf__per", r"\.pf__verdict", r"\.pf__refs",
+                     r"\.bar--neutral rect\.bar__fill"):
+        assert re.search(selector + r"\s*\{", css), selector
+    check = re.search(r"\.pf__check\s*\{([^}]*)\}", css)
+    assert check and "min-height: 40px" in check.group(1)
+    assert re.search(r"\.pf__per\s*\{[^}]*display: block", css)
+
+
+def test_a_long_growth_chart_offers_a_log_scale() -> None:
+    """UI/UX critique F-06: on a linear axis a fund's early years lie flat under its
+    later ones. A chart the server marks `log` gets a "Log scale" switch beside its
+    periods; a period button never presses or releases it."""
+    charts = (CSS.parent / "charts.js").read_text(encoding="utf-8")
+    assert "if (spec.log)" in charts and '"Log scale"' in charts
+    assert 'type: on ? "log" : "value"' in charts
+    assert 'querySelectorAll("button:not(.zoom__scale)")' in charts
+
+
+def test_a_charts_period_buttons_say_what_they_choose() -> None:
+    """UI/UX critique F-07: beside a chart of rolling three-year returns, "1Y 3Y 5Y"
+    read as the length of the stretch. Each row of period buttons is labelled; the
+    rolling chart's says they choose which stretches are shown."""
+    charts = (CSS.parent / "charts.js").read_text(encoding="utf-8")
+    assert 'label.className = "zoom__label"' in charts
+    assert 'spec.zoom_label || "Period"' in charts
+    builder = (CSS.parents[1] / "builders" / "fund" / "consistency.py").read_text(
+        encoding="utf-8")
+    assert '"zoom_label": "Stretches ending in the last"' in builder
+
+
+def test_a_horizontal_bars_figure_fits_beside_the_longest_bar() -> None:
+    """A bar that fills the chart wrote its figure past the edge: "98." of 98.5%
+    (seen in the Learn guide's screenshots). The grid leaves room on the right."""
+    charts = (CSS.parent / "charts.js").read_text(encoding="utf-8")
+    hbar = charts[charts.index("hbar: function"):]
+    hbar = hbar[:hbar.index("return o;")]
+    assert "o.grid.right = 56;" in hbar
+
+
+def test_a_bar_charts_labels_never_overlap() -> None:
+    """UI/UX critique F-09: small bars side by side wrote their figures over one
+    another. A label that would overlap is left off; the tooltip and the table
+    still carry every figure."""
+    charts = (CSS.parent / "charts.js").read_text(encoding="utf-8")
+    bar = charts[charts.index("bar: function"):charts.index("donut: function")]
+    assert "labelLayout: { hideOverlap: true }" in bar
+
+
+def test_explore_hides_columns_and_reads_in_two_lines_on_a_phone() -> None:
+    """UI/UX critique E-05: a column the reader turns off is hidden by the table's
+    `data-hide`. E-06: the filters fill a phone's width. E-07: a phone's row is the
+    fund's name, then its figures on a line beneath, each under its short name."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    for key in ("cat", "size", "ter", "r1", "r3", "r5", "rank",
+                "vol3", "fall3", "sharpe3"):
+        assert f'table[data-hide~="{key}"] [data-col="{key}"]' in css, key
+    phone = _phone(css)
+    for rule in (r"\.table-card__tools select[^{]*\{[^}]*width: 100%[^}]*min-width: 0",
+                 r"table\[data-rows\] tr\s*\{[^}]*display: flex[^}]*flex-wrap: wrap",
+                 r'table\[data-rows\] td\[data-col="name"\]\s*\{[^}]*flex-basis: 100%',
+                 r"table\[data-rows\] td\[data-label\]::before\s*\{"
+                 r"[^}]*attr\(data-label\)"):
+        assert re.search(rule, phone), rule
+    assert re.search(r"@media \(min-width: 721px\)\s*\{\s*\.table-card__sort\s*\{"
+                     r"\s*display: none",
+                     css)
+
+
+def test_a_guides_contents_pictures_and_neighbours_are_drawn() -> None:
+    """UI/UX critique L-03, L-04: the contents box, a screenshot that never outgrows
+    its column, the numbered list under it, the terms and the previous/next pair."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    shot = re.search(r"\.learn__shot img\s*\{([^}]*)\}", css)
+    assert shot and "width: 100%" in shot.group(1) and "height: auto" in shot.group(1)
+    for selector in (r"\.learn__toc", r"\.learn__callouts", r"\.learn__related a",
+                     r"\.learn__pager", r"\.learn__step--next"):
+        assert re.search(selector + r"\s*\{", css), selector
+
+
+def test_the_audits_last_findings_stay_fixed() -> None:
+    """Found by the audit probe over every page after the UI/UX critique's batches:
+    the chips' cross sat on the browser's own button face (2.46:1 in dark), the More
+    menu ran off a phone's right edge, two kinds of link were under 24px tall, and a
+    `?` in a small label drew at 9px."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    remove = re.search(r"\.cmp__picked \.cmp__remove\s*\{([^}]*)\}", css)
+    assert remove and "background: transparent" in remove.group(1)
+    menu = re.search(r"\.pf__more-menu\s*\{([^}]*)\}", css)
+    assert menu and "right: 0" in menu.group(1) and "left: 0" not in menu.group(1)
+    for link in (r"\.pf__holding-head h3 a", r"\.measure-notes dt a"):
+        assert re.search(link + r"\s*\{[^}]*min-height: 24px", css), link
+    assert re.search(r"\.term \{[^}]*font-size: max\(0\.75em, var\(--text-xs\)\)", css)

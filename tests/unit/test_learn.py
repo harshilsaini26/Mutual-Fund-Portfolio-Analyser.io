@@ -237,3 +237,30 @@ def test_the_reviewed_statements_say_what_their_sources_say() -> None:
     assert "hold only government securities" not in _text("equity-debt-and-hybrid")
     index = _text("index-and-active-funds")
     assert "is often called alpha" not in index and "beyond what its beta" in index
+
+
+def _with_figure(figure: dict[str, Any]) -> dict[str, Any]:
+    sections = _guide()["sections"]
+    return _guide(sections=[{**sections[0], "figure": figure}, *sections[1:]])
+
+
+def test_a_guide_figure_is_a_png_with_its_numbers_said(tmp_path: Path) -> None:
+    """UI/UX critique L-03: a guide may show the page it describes, as a screenshot
+    in static/learn/ with numbered marks, each number's meaning in words; its size
+    is read from the file, so the page reserves its room."""
+    figure = {"src": "learn/fund-header.png", "alt": "A fund page's header, numbered.",
+              "callouts": ["The fund's name.", "Its latest NAV."]}
+    learn = load(_write(tmp_path, guides=[_with_figure(figure)]), today=TODAY)
+    shot = learn.guides[0].sections[0].figure
+    assert shot is not None and shot.callouts == ("The fund's name.", "Its latest NAV.")
+    assert shot.width > 0 and shot.height > 0
+    for bad in ({**figure, "src": "fonts/rubik.png"}, {**figure, "src": "learn/none.png"},
+                {**figure, "alt": ""}, {**figure, "callouts": []}):
+        _refused(_write(tmp_path, guides=[_with_figure(bad)]), "what-a-mutual-fund-is")
+
+
+def test_a_guide_names_the_terms_it_links_to_once_each() -> None:
+    """L-04: the guide's glossary terms, listed at its end, in the order first linked."""
+    guide = load().guide("reading-a-fund-page")
+    assert guide.terms[:3] == ("nav", "annualised_return", "benchmark")
+    assert len(guide.terms) == len(set(guide.terms))

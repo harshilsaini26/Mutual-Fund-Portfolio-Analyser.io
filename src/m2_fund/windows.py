@@ -158,6 +158,9 @@ class ReturnWindow:
     #: because unavailable" case the module docstring describes.
     benchmark_id: str | None = None
     bench_return_ann: Decimal | None = None
+    #: The fund's annualised return less the benchmark's, over the same dates: the
+    #: page's "3.9 points a year behind its benchmark" (UI/UX critique F-02).
+    lead_ann: Decimal | None = None
     beta: Decimal | None = None
     tracking_error: Decimal | None = None
     alpha_ann: Decimal | None = None
@@ -239,6 +242,7 @@ def _against(
     te = tracking_error(fund_rets, bench_rets)
     return {
         "bench_return_ann": bench_ann,
+        "lead_ann": (fund_ann - bench_ann).quantize(RATE_Q),
         "beta": b,
         "tracking_error": te,
         # Jensen's alpha needs both a beta and a risk-free rate. Without either

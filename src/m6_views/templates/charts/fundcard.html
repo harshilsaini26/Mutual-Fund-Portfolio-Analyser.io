@@ -40,11 +40,8 @@
     </div>
     {% endif %}
   </div>
-  <dl class="facts facts--grid">
-    {% for fact in env.payload.facts %}
-    <div><dt>{{ fact.label }}{% if term_for.fact.get(fact.label) %}{{ vc.term(term_for.fact[fact.label], 'fact-' ~ loop.index) }}{% endif %}</dt><dd>{{ fact.value }}</dd></div>
-    {% endfor %}
-  </dl>
+  {#- How it has done before what it is (UI/UX critique F-01): the figures, then the
+      facts, the ones no source here carries muted but said (F-13). -#}
   {% if env.payload.tiles %}
   <dl class="tiles">
     {% for tile in env.payload.tiles %}
@@ -52,6 +49,12 @@
     {% endfor %}
   </dl>
   {% endif %}
+  <dl class="facts facts--grid">
+    {% for fact in env.payload.facts %}
+    <div><dt>{{ fact.label }}{% if term_for.fact.get(fact.label) %}{{ vc.term(term_for.fact[fact.label], 'fact-' ~ loop.index) }}{% endif %}</dt>
+      <dd{% if fact.absent %} class="facts__absent"{% endif %}>{{ fact.value }}</dd></div>
+    {% endfor %}
+  </dl>
   {% if env.payload.findings %}
   <ul class="findings">
     {% for f in env.payload.findings %}

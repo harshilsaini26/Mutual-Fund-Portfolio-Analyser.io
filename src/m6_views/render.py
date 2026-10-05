@@ -117,13 +117,17 @@ def _fmt_value(tile: dict[str, Any], compact: bool) -> str:
         return format_pct(Decimal(str(value)) * 100, signed=True) + " p.a."
     if kind == "ter":  # percent a year, to AMFI's two places (V1-78)
         return format_pct(Decimal(str(value)), precision=2)
-    if kind == "fraction":  # M2's figures are fractions: 0.0842 -> 8.42%
-        return format_pct(Decimal(str(value)) * 100, precision=2)
+    # M2's figures are fractions, 0.0842 -> 8.4%: one place, as every tile and list
+    # gives a return, fall or swing (UI/UX critique G-20); a cost keeps two (ter).
+    if kind == "fraction":
+        return format_pct(Decimal(str(value)) * 100, precision=1)
     if kind == "ratio":
         return f"{Decimal(str(value)):.2f}"
     if kind == "metric":
         return fmt_metric(Decimal(str(value)))
-    if kind in ("units", "nav"):
+    if kind == "units":  # to the thousandth a statement shows (G-20)
+        return f"{Decimal(str(value)):,.3f}"
+    if kind == "nav":  # AMFI's four places
         return f"{Decimal(str(value)):,.4f}".rstrip("0").rstrip(".")
     if kind == "date":
         return fmt_date(value)

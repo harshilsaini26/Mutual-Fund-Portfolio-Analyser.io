@@ -252,6 +252,59 @@ def test_the_worst_fall_names_its_period(client: TestClient) -> None:  # noqa: F
     assert re.search(r"Worst fall since (19|20)\d\d<", html)
 
 
+def test_a_return_reads_to_one_place_everywhere(client: TestClient) -> None:  # noqa: F811
+    """UI/UX critique G-20 (2026-10-04): the Performance table gave returns to two
+    places (15.42%) beside tiles and lists at one (15.4%). One place for returns,
+    falls and swings; two for a cost (AMFI's own); three for units."""
+    html = client.get(f"/fund/S1{QS}").text
+    panel = html[html.index('data-view-id="fund_performance"'):]
+    # The table, not the bill rate in the sentence above it.
+    panel = panel[panel.index("<table"):panel.index("</table>")]
+    assert re.search(r">\s*-?\d+\.\d%\s*<", panel)
+    assert not re.search(r"\d\.\d\d%", panel)
+
+
+def test_a_table_of_unlike_measures_offers_no_sorting(
+    client: TestClient,  # noqa: F811
+) -> None:
+    """UI/UX critique G-18 (2026-10-04): the Performance table showed sort arrows,
+    but its rows are different measures -- a return beside a Sharpe ratio -- so
+    an order by one column means nothing."""
+    html = client.get(f"/fund/S1{QS}").text
+    panel = html[html.index('data-view-id="fund_performance"'):]
+    panel = panel[:panel.index("</section>")]
+    assert "<table" in panel and "data-sortable" not in panel
+
+
+def assert_tables_are_named_regions(html: str) -> int:
+    """Every table that may scroll sideways is a region named by its own caption
+    (UI/UX critique G-17): a screen reader hears what the table is, and app.js gives
+    a region that overflows a tab stop, so a keyboard can scroll it."""
+    wraps = re.findall(
+        r'<div class="table-wrap"[^>]*>\s*<table[^>]*>\s*<caption[^>]*>', html)
+    assert wraps and len(wraps) == html.count('class="table-wrap"')
+    ids = []
+    for wrap in wraps:
+        region = re.search(r'role="region" aria-labelledby="([^"]+)"', wrap)
+        caption = re.search(r'<caption class="sr-only" id="([^"]+)"', wrap)
+        assert region and caption and region.group(1) == caption.group(1), wrap
+        ids.append(caption.group(1))
+    assert len(set(ids)) == len(ids), ids
+    for name in re.findall(r"<caption[^>]*>([^<]*)</caption>", html):
+        assert name.strip(), "an empty caption names nothing"
+    return len(wraps)
+
+
+def test_every_table_is_a_named_region(client: TestClient) -> None:  # noqa: F811
+    assert assert_tables_are_named_regions(client.get(f"/fund/S1{QS}").text) >= 3
+
+
+def test_rupees_are_written_with_the_rupee_sign(client: TestClient) -> None:  # noqa: F811
+    """UI/UX critique G-02 (2026-10-04): one notation, ₹, not "Rs"."""
+    html = client.get(f"/fund/S1{QS}").text
+    assert "Rs 10,000" not in html and "Growth of ₹10,000" in html
+
+
 def test_growth_and_price_are_one_chart_with_a_switch(
     client: TestClient,  # noqa: F811
 ) -> None:
@@ -341,3 +394,90 @@ def test_a_fund_without_a_portfolio_says_where_portfolios_come_from(
     assert "read directly" not in reason
     assert "python -m jobs.fetch_amc" in reason and "data/inbox/" in reason
     assert "python -m jobs.fetch_groww" in reason
+
+
+def _header(html: str) -> str:
+    panel = html[html.index('id="fund_header"'):]
+    return panel[:panel.index('id="fund_performance"')]
+
+
+def test_the_figures_lead_the_fund_page(client: TestClient) -> None:  # noqa: F811
+    """UI/UX critique F-01: how the fund has done is why a page is opened, so the
+    returns, rank and falls come before the facts, not under them."""
+    head = _header(client.get(f"/fund/S1{QS}").text)
+    assert head.index('<dl class="tiles">') < head.index('<dl class="facts facts--grid">')
+
+
+def test_a_return_says_how_far_it_is_from_its_benchmark(
+    client: TestClient,  # noqa: F811
+) -> None:
+    """F-02: "Behind its benchmark, +11.5% p.a." read as the fund's own figure.
+    The gap is said in points a year, beside the benchmark's own return."""
+    head = re.sub(r"\s+", " ", _header(client.get(f"/fund/S1{QS}").text))
+    found = re.search(r"\d+\.\d points a year (ahead of|behind) its benchmark,"
+                      r" which returned [+\u2212-]\d+\.\d% a year", head)
+    assert found, head[:400]
+    assert "Behind its benchmark, " not in head and "Ahead of its benchmark, " not in head
+
+
+def test_each_fact_is_said_once_and_what_is_not_held_is_said(
+    client: TestClient,  # noqa: F811
+) -> None:
+    """F-04: fund size was a fact and a tile. F-13: the riskometer, manager, exit
+    load and minimum SIP are what a reader looks for first; no source this site
+    loads carries them, and the page says so rather than leaving them out."""
+    head = _header(client.get(f"/fund/S1{QS}").text)
+    facts = head[head.index('<dl class="facts facts--grid">'):]
+    facts = facts[:facts.index("</dl>")]
+    assert "Fund size" not in facts and "Fund size" in head
+    for label in ("Riskometer", "Fund manager", "Exit load", "Minimum SIP"):
+        row = re.search(
+            rf"<dt>{label}</dt>\s*<dd class=\"facts__absent\">([^<]*)</dd>", facts)
+        assert row and row.group(1) == "Not in the data this site loads", label
+
+
+def test_the_peers_picture_names_its_axes_and_its_bubbles(
+    client: TestClient,  # noqa: F811
+) -> None:
+    """UI/UX critique F-08: the y-axis read as untitled and the bubbles' size was
+    unexplained. Each axis is named with its unit, the other funds' legend entry
+    says what their size shows, and the y name turns to run up its axis."""
+    env = client.get(f"/api/views/fund_peers{QS}&scope_id=S1").json()
+    chart = env["payload"]["charts"][0]
+    assert chart["x_name"] == "Volatility, % a year"
+    assert chart["y_name"] == "Return, % a year"
+    # Said only where a bubble is sized: the fixture's funds carry no size.
+    sized = any(pt[4] for s in chart["series"] for pt in s["points"])
+    assert chart["series"][0]["name"].endswith(", sized by fund size") == sized
+    charts = (Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
+              / "charts.js").read_text(encoding="utf-8")
+    scatter = charts[charts.index("scatter: function"):charts.index("hbar: function")]
+    assert "nameRotate: where === \"y\" ? 90 : 0" in scatter
+    assert "o.grid.top = 56" in scatter and "o.grid.left = 36" in scatter
+
+
+def test_what_could_not_be_matched_is_a_bar_of_its_own(tmp_path: Path) -> None:
+    """UI/UX critique F-10: the largest, darkest tile was "Unresolved Holdings" --
+    the part not seen through anchored the picture of what a fund owns. It is a
+    grey bar above the tiles now, said in words, and never a tile. F-11: the
+    sectors take the full width. F-12: the largest holdings as a table, in the page."""
+    app = _one_fund(tmp_path, [
+        ("ACME", "Acme", "equity", "55"),
+        ("BETA", "Beta", "equity", "35"),
+        ("__UNRESOLVED__", "Unresolved Holdings", "unknown", "10"),
+    ])
+    env = app.get("/api/views/fund_portfolio?as_of=2026-09-04&scope_id=S9").json()
+    charts = {c["kind"]: c for c in env["payload"]["charts"]}
+    names = [cell["name"] for cell in charts["treemap"]["cells"]]
+    assert names == ["Acme", "Beta"]
+    assert env["payload"]["unmatched"] == {"value": "10", "label": "10.00%"}
+    assert [r["holding"] for r in env["payload"]["top"]] == ["Acme", "Beta"]
+    # The tiles' own figures, to the same two places (G-20: one precision a panel).
+    assert [r["label"] for r in env["payload"]["top"]] == ["55.00%", "35.00%"]
+    html = app.get("/fund/S9?as_of=2026-09-04").text
+    panel = html[html.index('data-view-id="fund_portfolio"'):]
+    panel = re.sub(r"\s+", " ", panel[:panel.index("</section>")])
+    assert re.search(r'<p class="unmatched"><svg class="bar bar--neutral"', panel)
+    assert "10.00% of the fund is in holdings not matched to a company" in panel
+    assert "<caption" in panel and ">Largest holdings</caption>" in panel
+    assert ">55.00%</td>" in panel

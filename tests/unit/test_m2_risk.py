@@ -594,3 +594,19 @@ def test_a_benchmark_younger_than_the_period_leaves_the_fund_drawn_alone() -> No
     path = growth_path(navs, late, navs[0].nav_date)
     assert path is not None and path.start == navs[0].nav_date  # not cut short
     assert all(b is None for _, _, b in path.points)
+
+
+def test_the_lead_over_the_benchmark_is_the_two_returns_apart() -> None:
+    """UI/UX critique F-02: "Behind its benchmark, +11.5% p.a." read as the fund's
+    own figure. The gap is computed here, beside the two returns, so a page can say
+    "3.9 points a year behind" without deriving a figure (§2.1)."""
+    from src.m2_fund.windows import compute_return_window
+
+    fund = [str(100 + 2 * i) for i in range(60)]
+    bench = [str(100 + i) for i in range(60)]
+    w = compute_return_window(series(fund), "1y", levels(bench), "proxy:X")
+    assert w is not None and w.bench_return_ann is not None
+    assert w.lead_ann == (w.return_ann - w.bench_return_ann).quantize(RATE_Q)
+    assert w.lead_ann > 0
+    alone = compute_return_window(series(fund), "1y", None, None)
+    assert alone is not None and alone.lead_ann is None

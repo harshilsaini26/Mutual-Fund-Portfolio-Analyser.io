@@ -2,9 +2,13 @@
 
 Four pictures of one disclosure: the asset mix as a ring, the companies as
 tiles sized by weight, the equity by the sector the fund house printed, and the
-equity by AMFI size bucket. The sums are M3's (`composition`); this lays them
-out, folds the smallest tiles into one counted "others" tile (§11.2), and keeps
-`__UNRESOLVED__` visible however small (Appendix A).
+equity by AMFI size bucket; then the largest holdings as a table (UI/UX critique
+F-12). The sums are M3's (`composition`); this lays them out and folds the
+smallest tiles into one counted "others" tile (§11.2).
+
+`__UNRESOLVED__` stays visible however small (Appendix A), as a grey bar of its
+own above the tiles and never a tile: the largest, darkest tile was the part not
+seen through (F-10).
 """
 
 from __future__ import annotations
@@ -34,6 +38,8 @@ from src.m6_views.states import empty_envelope
 VIEW_ID = "fund_portfolio"
 TILES = 50
 SECTORS = 10
+#: The largest holdings written out in the page; the file has every one (F-12).
+TOP = 10
 UNRESOLVED = "__UNRESOLVED__"
 #: Netted receivables and payables (`validate.checks.NET_CURRENT_ASSETS`).
 NET_CURRENT_ASSETS = "__RECV__"
@@ -75,11 +81,9 @@ class FundPortfolioBuilder:
         fund, disclosed, tier = found
         name = self.lookthrough.issuer_name
 
-        positive = [h for h in fund.holdings if h.weight > 0]
-        head, tail = aggregate_tail(
-            positive, TILES, lambda h: h.weight,
-            keep=lambda h: str(h.issuer_id) == UNRESOLVED,
-        )
+        positive = [h for h in fund.holdings
+                    if h.weight > 0 and str(h.issuer_id) != UNRESOLVED]
+        head, tail = aggregate_tail(positive, TILES, lambda h: h.weight)
         tiles: list[dict[str, Any]] = [
             {"name": name(h.issuer_id), "value": str(h.weight), "label": _pct(h.weight),
              "group": _class(h.instrument_class)}
@@ -118,7 +122,9 @@ class FundPortfolioBuilder:
                 rest = tail_total(rest_sectors, lambda kv: kv[1])
                 bars.append({"name": f"{len(rest_sectors)} other sectors",
                              "value": str(rest), "label": format_pct(rest)})
-            charts.append({"kind": "hbar", "title": "Shares by sector", "bars": bars})
+            # The full width: beside nothing, half of it stood empty (F-11).
+            charts.append({"kind": "hbar", "title": "Shares by sector", "bars": bars,
+                           "wide": True})
 
         mix = ", ".join(
             f"{format_pct(v)} {CLASS_PHRASES.get(k, k)}"
@@ -188,6 +194,11 @@ class FundPortfolioBuilder:
                     {"key": "weight_pct", "label": "Share of fund", "kind": "pct"},
                 ],
                 "rows": rows,
+                "unmatched": {"value": str(unresolved), "label": _pct(unresolved)}
+                if unresolved else None,
+                # Each with the tiles' own figure, to two places (G-20).
+                "top": [{**_row(h, name(h.issuer_id)), "label": _pct(h.weight)} for h in
+                        sorted(positive, key=lambda h: h.weight, reverse=True)[:TOP]],
             },
             # "High" is a current fund house's file, nearly all of it placed:
             # the badge's own words are "current, complete, and resolved".

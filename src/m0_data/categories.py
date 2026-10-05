@@ -26,10 +26,11 @@ from src.m0_data.config import REPO_ROOT
 CATEGORIES_YAML = REPO_ROOT / "config" / "categories.yaml"
 
 #: The front page's tiles, in reading order: key, name, what is in it.
+#: In SEBI's own order (UI/UX critique H-03), which every list of families follows.
 FAMILIES = (
     ("equity", "Equity", "Shares of listed companies"),
-    ("debt", "Debt", "Bonds, government securities and money-market paper"),
     ("hybrid", "Hybrid", "Shares and bonds together"),
+    ("debt", "Debt", "Bonds, government securities and money-market paper"),
     ("other", "Index funds, ETFs and more",
      "Index funds, exchange-traded funds and funds of funds"),
     ("solution", "Solution oriented", "Retirement and children's funds"),

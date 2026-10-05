@@ -59,10 +59,19 @@
   {% endfor %}
 </div>
 {% endif %}
+{% if env.payload.unmatched %}
+{#- What could not be matched to a company: a grey bar of its own, never a tile,
+    so it no longer anchors the picture (UI/UX critique F-10). -#}
+<p class="unmatched"><svg class="bar bar--neutral" viewBox="0 0 100 6" preserveAspectRatio="none"
+   aria-hidden="true" focusable="false"><rect class="bar__track" width="100" height="6" rx="3"/><rect
+   class="bar__fill" width="{{ env.payload.unmatched.value | bar_width }}" height="6" rx="3"/></svg>
+  <span>{{ env.payload.unmatched.label }} of the fund is in holdings not matched to a company,
+  so it is not in the tiles below.</span></p>
+{% endif %}
 <div class="echarts{% if env.payload.charts | length > 1 %} echarts--several{% endif %}"
      data-chart="echart"{% if env.payload.switch %} data-switch="{{ env.payload.switch | join('|') }}"{% endif %}>
   {% for chart in env.payload.charts %}
-  <figure class="echart echart--{{ chart.kind }}">
+  <figure class="echart echart--{{ chart.kind }}{% if chart.wide %} echart--wide{% endif %}">
     {% if env.payload.charts | length > 1 %}<figcaption>{{ chart.title }}</figcaption>{% endif %}
     {#- The 1Y/3Y/5Y/All row's place, held before scripts run so the chart never
         drops when charts.js fills it (V1-83). Only where there are no period tabs. -#}
@@ -76,6 +85,23 @@
   {% endfor %}
   <script type="application/json" class="echart-data">{{ payload_json | safe }}</script>
 </div>
+{% if env.payload.top %}
+{#- The largest holdings in the page, not only in the file (UI/UX critique F-12). -#}
+<h3 class="panel-sub">Its {{ env.payload.top | length }} largest holdings</h3>
+<div class="table-wrap" role="region" aria-labelledby="tbl-{{ env.view_id }}-top">
+<table class="table--stack">
+  <caption class="sr-only" id="tbl-{{ env.view_id }}-top">Largest holdings</caption>
+  <thead><tr><th scope="col">Holding</th><th scope="col">Kind</th>
+    <th scope="col" class="col--pct">Share of fund</th></tr></thead>
+  <tbody>
+    {% for row in env.payload.top %}
+    <tr><td>{{ row.holding }}</td><td data-label="Kind">{{ row.kind }}</td>
+      <td class="col--pct" data-label="Share of fund">{{ row.label }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
 {% if env.payload.ranks %}
 {#- One tap away on a phone (V1-84): open in the HTML, closed by app.js there. -#}
 <details class="tuck" open><summary>All ranks ({{ env.payload.ranks | length }})</summary>
@@ -92,8 +118,9 @@
 {% else %}
 <details class="chart-table">
   <summary>The same figures as a table ({{ env.payload.rows | length }} rows)</summary>
-  <div class="table-wrap">
+  <div class="table-wrap" role="region" aria-labelledby="tbl-{{ env.view_id }}-data">
   <table>
+    <caption class="sr-only" id="tbl-{{ env.view_id }}-data">{{ view_names.get(env.view_id, env.view_id) }}: the figures</caption>
     <thead><tr>
       {% for column in env.payload.columns %}
       <th scope="col" class="col--{{ column.kind }}">{{ column.label }}</th>

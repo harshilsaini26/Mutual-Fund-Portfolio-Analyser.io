@@ -23,30 +23,32 @@
     <label class="cmp__label" for="cmp-pick">Add a fund to compare</label>
     <div class="field-search">
       {{ icon.i("search", "icon field-search__icon") }}
-      <input id="cmp-pick" class="cmp__pick" list="cmp-funds" autocomplete="off"
-             placeholder="Type part of a fund's name" disabled>
+      <input id="cmp-pick" class="cmp__pick" autocomplete="off"
+             placeholder="A fund's name, fund house or ISIN" disabled>
     </div>
-    <datalist id="cmp-funds"></datalist>
     <p class="cmp__status" id="cmp-status" role="status"></p>
+    <div data-out="chosen"></div>
     <div data-out="suggest"></div>
   </div>
+  {#- With no fund chosen, this instead of four empty sections (UI/UX critique C-02). -#}
+  <div class="card cmp__start" data-out="start" hidden></div>
 
   {#- The explanations the facts table's `?` buttons open (compare.js builds them). -#}
   {% for key in ["amc", "sebi_categories", "aum", "expense_ratio", "benchmark", "annualised_return",
                  "volatility", "max_drawdown", "sharpe", "category_rank"] %}{{ vc.term_pop(key, "cmp") }}{% endfor %}
-  <section class="home-section" aria-labelledby="cmp-facts-h">
+  <section class="home-section" aria-labelledby="cmp-facts-h" data-cmp-section>
     <div class="section-head"><h2 id="cmp-facts-h">Key facts and returns</h2></div>
     <div data-out="facts"></div>
   </section>
-  <section class="home-section" aria-labelledby="cmp-growth-h">
+  <section class="home-section" aria-labelledby="cmp-growth-h" data-cmp-section>
     <div class="section-head"><h2 id="cmp-growth-h">What ₹10,000 became</h2></div>
     <div data-out="growth"></div>
   </section>
-  <section class="home-section" aria-labelledby="cmp-overlap-h">
+  <section class="home-section" aria-labelledby="cmp-overlap-h" data-cmp-section>
     <div class="section-head"><h2 id="cmp-overlap-h">How much of their portfolios is the same</h2>{{ vc.term("overlap", "cmp") }}</div>
     <div data-out="overlap"></div>
   </section>
-  <section class="home-section" aria-labelledby="cmp-mix-h">
+  <section class="home-section" aria-labelledby="cmp-mix-h" data-cmp-section>
     <div class="section-head"><h2 id="cmp-mix-h">Asset mix and sectors</h2></div>
     <div data-out="mix"></div>
   </section>

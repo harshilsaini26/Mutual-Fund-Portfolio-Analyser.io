@@ -280,3 +280,57 @@ test("units are grouped like rupees, to three places", () => {
   assert.equal(M.units(488397n), "488.397");
   assert.equal(M.units(123456789012n), "12,34,56,789.012");
 });
+
+// UI/UX critique P-03: an amount in Indian grouping once typed, and in words, so a
+// lakh is not read as ten.
+test("an amount is grouped the Indian way, and anything else is left as typed", () => {
+  assert.equal(M.grouped("100000"), "1,00,000");
+  assert.equal(M.grouped("1,00,000"), "1,00,000");
+  assert.equal(M.grouped("₹ 12345678.5"), "1,23,45,678.5");
+  assert.equal(M.grouped("999"), "999");
+  assert.equal(M.grouped("12a"), "12a");
+  assert.equal(M.grouped(""), "");
+});
+
+test("an amount in words: thousands, lakhs and crores, to two places", () => {
+  assert.equal(M.inWords("100000"), "₹1 lakh");
+  assert.equal(M.inWords("2,50,000"), "₹2.5 lakh");
+  assert.equal(M.inWords("12345678"), "₹1.23 crore");
+  assert.equal(M.inWords("5000"), "₹5 thousand");
+  assert.equal(M.inWords("950"), "");
+  assert.equal(M.inWords("abc"), "");
+});
+
+// P-01: each holding set beside a reference -- the longest-running index fund on its
+// benchmark (funds.json `tracker`), else its category's middle three-year return.
+const REF = [
+  { id: "INF000000001", amfi: "1", name: "Active Flexi", category: "equity/flexi", prices_from: "2015-01-01", r3: "0.15", ter: "0.01", size: "100", tracker: "INF000000009" },
+  { id: "INF000000002", amfi: "2", name: "Flexi Two", category: "equity/flexi", prices_from: "2015-01-01", r3: "0.12", ter: "0.008", size: "50" },
+  { id: "INF000000003", amfi: "3", name: "Flexi Three", category: "equity/flexi", prices_from: "2015-01-01", r3: "0.10", ter: "0.009", size: "40" },
+  { id: "INF000000004", amfi: "4", name: "Flexi Four", category: "equity/flexi", prices_from: "2015-01-01", r3: "0.08", ter: "0.012", size: "30" },
+  { id: "INF000000009", amfi: "9", name: "Nifty 500 Index Fund", category: "index/broad", prices_from: "2016-01-01", r3: "0.13", ter: "0.002", size: "10" },
+  { id: "INF000000010", amfi: "10", name: "Active Flexi (Regular)", plan: "regular", direct: "INF000000001", category: "equity/flexi", prices_from: "2015-01-01", tracker: "INF000000009" },
+];
+const held = (id) => REF.find((f) => f.id === id);
+
+test("a holding's reference is the index fund on its benchmark, if it was there to buy", () => {
+  const ref = M.reference(held("INF000000001"), REF, "2020-01-01");
+  assert.equal(ref.fund.id, "INF000000009");
+  assert.equal(ref.why, "index");
+  // A Regular plan takes its Direct plan's tracker.
+  assert.equal(M.reference(held("INF000000010"), REF, "2020-01-01").fund.id, "INF000000009");
+});
+
+test("else the category's middle three-year return, never the holding or its own Direct plan", () => {
+  // The index fund's prices begin after the first purchase: it could not take the money.
+  const ref = M.reference(held("INF000000001"), REF, "2015-06-01");
+  assert.equal(ref.why, "middle");
+  assert.equal(ref.fund.id, "INF000000003");   // of 2, 3 and 4 by r3: the middle one
+  const regular = M.reference(held("INF000000010"), REF, "2015-06-01");
+  assert.notEqual(regular.fund.id, "INF000000001");
+  assert.notEqual(regular.fund.id, "INF000000010");
+});
+
+test("no reference where there is no index fund and no category to draw from", () => {
+  assert.equal(M.reference({ ...held("INF000000001"), tracker: null, mixed: true }, REF, "2020-01-01"), null);
+});

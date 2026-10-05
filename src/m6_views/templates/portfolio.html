@@ -25,28 +25,42 @@
   <div class="pf__toolbar">
     <button type="button" class="button button--quiet" data-action="save">Save to file</button>
     <button type="button" class="button button--quiet" data-action="load">Load from file</button>
-    <button type="button" class="button button--quiet" data-action="clear">Clear</button>
+    {#- Clear is two steps away and says what it does (UI/UX critique P-10). -#}
+    <details class="pf__more">
+      <summary class="button button--quiet">More</summary>
+      <div class="pf__more-menu">
+        <p id="pf-clear-q">Remove every fund and entry from this page and this browser?
+          A file you saved is kept.</p>
+        <button type="button" class="button button--danger" data-action="clear"
+                aria-describedby="pf-clear-q">Remove everything</button>
+      </div>
+    </details>
     <input type="file" id="pf-file" accept="application/json,.json" hidden>
   </div>
   <p class="pf__status" id="pf-status" role="status"></p>
 
+  {#- The answer first (P-02): with funds entered, portfolio.js folds the form away. -#}
+  <details class="pf__edit" open>
+  {#- A heading, so the funds' own (h3) sit under one, not straight under the page's. -#}
+  <summary class="pf__edit-summary"><h2 class="pf__edit-title" data-edit-label>Your funds and what you put in</h2></summary>
   <div class="card pf__entry">
     <label class="pf__label" for="pf-pick" id="pf-pick-label">Add a fund</label>
     <div class="field-search">
       {{ icon.i("search", "icon field-search__icon") }}
-      <input id="pf-pick" class="pf__pick" list="pf-funds" autocomplete="off"
-             placeholder="Type part of a fund's name" disabled>
+      <input id="pf-pick" class="pf__pick" autocomplete="off"
+             placeholder="A fund's name, fund house or ISIN" disabled>
     </div>
-    <datalist id="pf-funds"></datalist>
     <p class="pf__hint">Direct and Regular plans are listed: pick the one on your statement.
       Enter a sale as the amount you received; a switch is a sale here and a purchase in
       the other fund. Exit loads and tax on a sale are not taken off.</p>
     <div data-out="holdings"></div>
   </div>
+  </details>
 
   {{ vc.term_pop("xirr", "pf") }}{{ vc.term_pop("overlap", "pf") }}
   <section class="home-section" aria-labelledby="pf-summary-h">
     <div class="section-head"><h2 id="pf-summary-h">Summary</h2></div>
+    <div data-out="verdict"></div>
     <div data-out="summary"></div>
   </section>
   <section class="home-section" aria-labelledby="pf-funds-h">
@@ -59,9 +73,10 @@
     <div data-out="look"></div>
   </section>
   <section class="home-section" aria-labelledby="pf-alts-h">
-    <div class="section-head"><h2 id="pf-alts-h">The same money in other funds</h2>
-      <p>Each fund beside others of its category: what the same amounts on the same
-        dates would be worth today.</p></div>
+    <div class="section-head"><h2 id="pf-alts-h">In hindsight: the same money in other funds</h2>
+      <p>Each fund beside others of its category, picked after the fact by the rule
+        named beside each: what the same amounts on the same dates would be worth
+        today. It looks back, and says nothing of what comes next.</p></div>
     <div data-out="alts"></div>
   </section>
 </section>

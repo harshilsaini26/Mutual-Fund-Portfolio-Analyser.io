@@ -72,3 +72,47 @@ def test_the_local_fund_page_explains_its_terms(client: TestClient) -> None:  # 
 def test_the_benchmark_fact_is_explained() -> None:
     """The header's Benchmark fact (builders/fund/header.py) gets its `?`."""
     assert TERMS_FOR["fact"]["Benchmark"] == "benchmark"
+
+
+def _guide_page(site: Path) -> str:  # noqa: F811
+    guide = site / "learn" / "reading-a-fund-page" / "index.html"
+    return guide.read_text(encoding="utf-8")
+
+
+def test_a_guide_has_contents_neighbours_and_its_terms(site: Path) -> None:  # noqa: F811
+    """UI/UX critique L-04: no table of contents, no previous or next, no list of the
+    terms it uses. Each guide opens with its sections as links, ends with the guides
+    before and after it, and lists the glossary terms it links to."""
+    learn = load()
+    slugs = [g.slug for g in learn.guides]
+    at = slugs.index("reading-a-fund-page")
+    page = _guide_page(site)
+    toc = re.search(r'<nav class="learn__toc" aria-labelledby="toc-h">(.*?)</nav>',
+                    page, re.S)
+    assert toc
+    for section in learn.guide("reading-a-fund-page").sections:
+        assert f">{section.heading}</a>" in toc.group(1), section.heading
+    pager = re.search(r'<nav class="learn__pager" aria-label="More guides">(.*?)</nav>',
+                      page, re.S)
+    assert pager
+    if at > 0:
+        assert f"/learn/{slugs[at - 1]}/" in pager.group(1)
+    if at < len(slugs) - 1:
+        assert f"/learn/{slugs[at + 1]}/" in pager.group(1)
+    related = re.search(r'<ul class="learn__related">(.*?)</ul>', page, re.S)
+    assert related and "/learn/glossary/#nav" in related.group(1)
+
+
+def test_the_fund_page_guide_shows_the_page_it_describes(site: Path) -> None:  # noqa: F811
+    """L-03: a guide to a visual page had no picture of it. Its sections carry
+    screenshots with numbered marks, and a list says what each number points at."""
+    page = _guide_page(site)
+    shots = re.findall(r'<figure class="learn__shot">(.*?)</figure>', page, re.S)
+    assert len(shots) >= 2
+    for shot in shots:
+        img = re.search(r'<img src="([^"]+)" alt="([^"]+)" width="\d+" height="\d+"',
+                        shot)
+        assert img and img.group(2), shot[:200]
+        name = img.group(1).rsplit("/static/", 1)[1]
+        assert (site / "static" / name).is_file(), name
+        assert re.search(r"<ol class=\"learn__callouts\">\s*<li>", shot)

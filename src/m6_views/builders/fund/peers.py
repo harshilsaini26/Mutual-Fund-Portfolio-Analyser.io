@@ -129,7 +129,11 @@ class FundPeersBuilder:
                     "" if p.aum is None else str(p.aum),
                 ]
 
-            series = [{"name": "Other funds in its category", "role": "peer",
+            # The legend says what a bubble's size shows (UI/UX critique F-08).
+            sized = any(p.aum is not None for p in points)
+            series = [{"name": "Other funds in its category"
+                               + (", sized by fund size" if sized else ""),
+                       "role": "peer",
                        "points": [point(p) for p in points if p not in own]}]
             series += [{"name": p.name, "role": "fund", "mark": "This fund",
                         "points": [point(p)]} for p in own]
@@ -137,7 +141,7 @@ class FundPeersBuilder:
                 "kind": "scatter",
                 "title": "Three years: return against volatility",
                 "x": "fraction", "y": "fraction",
-                "x_name": "Volatility, a year", "y_name": "Return, a year",
+                "x_name": "Volatility, % a year", "y_name": "Return, % a year",
                 "series": series,
             })
         rows = [

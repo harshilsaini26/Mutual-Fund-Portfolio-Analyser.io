@@ -20,6 +20,7 @@ from pathlib import Path
 
 import jobs.publish_site as publish
 import pytest
+from PIL import Image
 from src.common.decimals import connect
 from src.common.types import IndexId, SchemeId
 from src.m0_data.categories import category_of
@@ -222,14 +223,105 @@ def test_without_a_benchmark_the_page_does_not_promise_one(site: Path) -> None:
     assert "against its benchmark" not in page
 
 
+def test_a_shared_link_shows_what_it_leads_to(site: Path) -> None:
+    """UI/UX critique G-11 (2026-10-04): no favicon, manifest, theme colour,
+    description or preview, so a link shared on WhatsApp looked broken. A fund
+    page's preview is its own picture; every other page's is the site's."""
+    page = _page(site, DIRECT)
+    image = f'content="{publish.SITE_URL}{BASE}/fund/{DIRECT}/share.png"'
+    assert f'<meta property="og:image" {image}>' in page
+    assert '<meta name="twitter:card" content="summary_large_image">' in page
+    assert re.search(r'<meta name="description" content="Fund One[^"]*">', page)
+    with Image.open(site / "fund" / DIRECT / "share.png") as img:
+        assert img.size == (1200, 630)
+    home = (site / "index.html").read_text(encoding="utf-8")
+    assert f'content="{publish.SITE_URL}{BASE}/static/share.png"' in home
+    assert (site / "static" / "share.png").is_file()
+    for head in (page, home):
+        icon = f'<link rel="icon" href="{BASE}/static/favicon.svg" type="image/svg+xml">'
+        assert icon in head
+        assert f'<link rel="manifest" href="{BASE}/static/site.webmanifest">' in head
+        assert '<meta name="theme-color"' in head
+    manifest = json.loads(
+        (site / "static" / "site.webmanifest").read_text(encoding="utf-8"))
+    assert manifest["name"]
+    assert {i["sizes"] for i in manifest["icons"]} >= {"192x192", "512x512"}
+    for icon in manifest["icons"]:
+        assert (site / "static" / icon["src"]).is_file(), icon["src"]
+
+
+def test_the_footer_is_a_way_around_and_says_what_this_is(site: Path) -> None:
+    """UI/UX critique G-10 (2026-10-04): one tiny line, no links, no "not advice"."""
+    page = _page(site, DIRECT)
+    foot = page[page.index('<footer class="colophon">'):]
+    foot = foot[:foot.index("</footer>")]   # each section has a footer of its own
+    for heading in ("Product", "Data", "About"):
+        assert f">{heading}</h2>" in foot, heading
+    for href in (f"{BASE}/funds/", f"{BASE}/compare/", f"{BASE}/portfolio/",
+                 f"{BASE}/learn/", f"{BASE}/#about", f"{BASE}/learn/reading-a-fund-page/",
+                 f"{BASE}/#privacy",
+                 "/issues"):
+        assert href in foot, href
+    assert "Descriptive, not advice" in foot
+    # Once: the line under the columns repeated the code's link, at a larger size.
+    repo = "https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io\""
+    assert foot.count(repo) == 1
+
+
+def test_every_table_on_the_public_pages_is_a_named_region(site: Path) -> None:
+    """G-17: the fund pages and Explore funds, whose table scrolls on a phone."""
+    from tests.unit.test_m6_fund_page import assert_tables_are_named_regions
+
+    assert_tables_are_named_regions(_page(site, DIRECT))
+    explore = (site / "funds" / "index.html").read_text(encoding="utf-8")
+    assert_tables_are_named_regions(explore)
+
+
+def test_the_recently_viewed_list_can_be_cleared(site: Path) -> None:
+    """G-21: Settings clears the funds viewed lately, as the privacy text says."""
+    page = _page(site, DIRECT)
+    assert re.search(
+        r"<button[^>]*data-recent-clear[^>]*>Clear recently viewed</button>", page)
+    script = (Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
+              / "app.js").read_text(encoding="utf-8")
+    clear = script[script.index("data-recent-clear"):][:600]
+    assert "removeItem(RECENT)" in clear
+
+
+def test_the_header_says_what_its_controls_do(site: Path) -> None:
+    """UI/UX critique G-06-G-08 (2026-10-04): the settings button looked like a
+    light/dark switch (a sun); the search placeholder was cut short on a phone;
+    the home page had two search boxes on its first screen."""
+    page = _page(site, DIRECT)
+    button = page[page.index("data-settings-open"):]
+    button = button[:button.index("</button>")]
+    assert ">Display<" in button and 'aria-label="Display settings"' in button
+    assert '<circle cx="12" cy="12" r="3"/>' not in button      # the sun
+    assert 'id="q"' in page and 'placeholder="Search funds"' in page
+    home = (site / "index.html").read_text(encoding="utf-8")
+    assert 'id="q"' not in home and 'id="q-hero"' in home
+
+
+def test_categories_are_named_as_the_site_names_them(site: Path) -> None:
+    """UI/UX critique G-05 (2026-10-04): AMFI's raw headings ("Solution Oriented
+    Schemes ** - Retirement Fund") leaked into search and the grouped list."""
+    found = json.loads((site / "search.json").read_text(encoding="utf-8"))
+    fund = next(f for f in found if f["url"].endswith(f"/fund/{DIRECT}/"))
+    assert fund["detail"] == "Flexi cap · Direct · Growth"
+    listing = (site / "funds" / "index.html").read_text(encoding="utf-8")
+    assert "Equity Scheme - Flexi Cap Fund" not in listing
+
+
 def test_compare_lines_each_funds_column_up_on_one_edge() -> None:
     """Design review, 2026-10-04: a fund's column held left-aligned text and
     rank under right-aligned figures. Every value and the heading align right."""
     static = Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
     script = (static / "compare.js").read_text(encoding="utf-8")
-    body = script[script.index("function facts("):]
+    # Every table there, the facts too, is Kit.table with each fund's column numeric.
+    body = script[script.index("function table(caption, head, rows)"):]
     body = body[:body.index("\n  }\n")]
-    assert 'el("td", { "class": "num" }' in body
+    assert "numeric: head.map(function (h, i) { return i > 0; })" in body
+    assert 'fill(box, table("Key facts and returns"' in script
     css = (static / "app.css").read_text(encoding="utf-8")
     assert re.search(r"\.cmp__table thead th \+ th\s*\{[^}]*text-align:\s*right", css)
 
@@ -257,6 +349,9 @@ def test_your_portfolio_can_hold_a_regular_plan(site: Path) -> None:
     assert regular["plan"] == "regular" and regular["direct"] == DIRECT
     assert regular["amfi"] == "900002" and regular["name"].endswith("(Regular)")
     assert regular["prices_from"] == (TODAY - timedelta(days=300)).isoformat()
+    # Its fund house, as its Direct plan's: the picker finds a fund by its house (C-01).
+    direct = next(f for f in funds if f["id"] == DIRECT)
+    assert regular["house"] == direct["house"]
     assert (site / "data" / "nav" / "900002.csv.gz").exists()
     assert not (site / "fund" / REGULAR).exists()
 
@@ -278,7 +373,9 @@ def test_funds_json_lists_every_published_fund_for_the_portfolio_page(site: Path
                         "prices_from", "ter", "size", "r1", "r3", "r5",
                         "vol3", "fall3",
                         # for the compare page (V1-85)
-                        "house", "benchmark", "sharpe3", "rank3", "labels"}
+                        "house", "benchmark", "sharpe3", "rank3", "labels",
+                        # Your portfolio's reference (UI/UX critique P-01)
+                        "tracker"}
     assert one["amfi"] == "900001"
     assert one["category"] == "equity/flexi_cap"
     assert one["prices_from"] == (TODAY - timedelta(days=300)).isoformat()
@@ -375,6 +472,61 @@ def test_an_index_funds_price_stands_in_for_the_benchmark_it_declares(
                                TODAY - timedelta(days=9), TODAY) == []
 
 
+def test_funds_json_names_the_index_fund_on_each_funds_benchmark(
+    warehouse: sqlite3.Connection, tmp_path: Path,
+) -> None:
+    """UI/UX critique P-01: Your portfolio sets each holding beside the same money
+    in the index fund standing in for its benchmark -- the one its page draws
+    (`tracker`), a Regular plan its Direct plan's -- and None where there is none."""
+    tracker = "INF000T01052"
+    warehouse.execute(
+        "INSERT INTO scheme (scheme_id, scheme_name, fund_name, plan, option,"
+        " amc_id, scheme_family, sebi_category, status, last_seen) VALUES"
+        " (?,?,?,'direct','growth','amc1',?,'Index Funds - Equity Funds',"
+        " 'active',?)", (tracker, "Test 50 Index Fund", "Test 50 Index Fund",
+                         "Test 50 Index Fund", TODAY))
+    _prices(warehouse, tracker, 400)
+    declared = {DIRECT: "Test 50 Total Return Index", tracker: "TEST 50 TRI"}
+    out = tmp_path / "site"
+    publish.build_site(warehouse, out, BASE, TODAY, declared)
+    listed = json.loads((out / "funds.json").read_text(encoding="utf-8"))
+    funds = {f["id"]: f for f in listed}
+    assert funds[DIRECT]["tracker"] == tracker
+    assert funds[REGULAR]["tracker"] == tracker
+    assert funds[AGGREGATED]["tracker"] is None
+
+
+def test_the_growth_chart_starts_where_its_benchmark_does(
+    warehouse: sqlite3.Connection,
+) -> None:
+    """UI/UX critique F-06: over the fund's whole record ("All", the page's view) a
+    benchmark younger than the fund was dropped, so a reader never saw it. The
+    growth chart starts on the benchmark's first day instead, both lines drawn,
+    and the price per unit beside it keeps the fund's whole record."""
+    from src.m6_views.builder import Scope
+
+    tracker = "INF000T01052"
+    warehouse.execute(
+        "INSERT INTO scheme (scheme_id, scheme_name, fund_name, plan, option,"
+        " amc_id, scheme_family, sebi_category, status, last_seen) VALUES"
+        " (?,?,?,'direct','growth','amc1',?,'Index Funds - Equity Funds',"
+        " 'active',?)", (tracker, "Test 50 Index Fund", "Test 50 Index Fund",
+                         "Test 50 Index Fund", TODAY))
+    _prices(warehouse, tracker, 200)   # the fund has 300 days
+    deps = publish.public_deps(warehouse, {DIRECT: "Test 50 Total Return Index",
+                                           tracker: "TEST 50 TRI"})
+    scope = Scope(user_id=publish.PUBLIC_USER, as_of=TODAY, scope_type="scheme",
+                  scope_id=DIRECT)
+    env = publish._build(deps, "fund_growth", scope, {"window": "max"})
+    growth, price = env.payload["charts"]
+    assert [s["role"] for s in growth["series"]] == ["fund", "benchmark"]
+    begins = (TODAY - timedelta(days=200)).isoformat()
+    assert growth["series"][0]["points"][0][0] == begins
+    assert price["series"][0]["points"][0][0] == (TODAY - timedelta(days=300)).isoformat()
+    assert any("the first day its benchmark has prices" in c for c in env.caveats)
+    assert growth.get("log") is True   # a log scale on offer, for long records
+
+
 def test_an_index_fund_whose_page_is_not_read_yet_names_its_index_itself(
     warehouse: sqlite3.Connection,
 ) -> None:
@@ -452,7 +604,7 @@ def test_every_fund_is_listed_in_one_table_on_its_own_page(site: Path) -> None:
     fund, sortable and narrowed by family or category in the browser, and the
     grouped lists beneath for no script."""
     index = (site / "funds" / "index.html").read_text(encoding="utf-8")
-    assert "<table data-sortable data-filterable>" in index
+    assert re.search(r'<table data-filterable data-rows="[^"]+"', index)
     flexi = '<tr data-family="equity" data-category="equity/flexi_cap">'
     assert index.count(flexi) == 2
     assert '<option value="equity/flexi_cap">Flexi cap</option>' in index
@@ -466,14 +618,63 @@ def test_every_fund_is_listed_in_one_table_on_its_own_page(site: Path) -> None:
     # three dashes more.
     row = re.search(r'<tr data-family="equity"[^>]*>(.*?)</tr>', index, re.S)
     assert row is not None and "data-value=\"0." not in row.group(1)
-    assert row.group(1).count("—") == 6
+    # Volatility, deepest fall and Sharpe too (E-05), shown when chosen: nine.
+    assert row.group(1).count("—") == 9
+
+
+def test_explore_draws_fifty_funds_and_publishes_every_row(site: Path) -> None:
+    """UI/UX critique E-01, E-02, E-04: all 1,662 rows were drawn at once (1.88 MB,
+    31,170 nodes), alphabetically, and the no-script lists showed beneath for
+    everyone. The page draws the largest 50; every fund's cells, formatted here,
+    are in funds/rows.json for app.js to filter, sort and show 50 more; the
+    grouped lists are inside <noscript>."""
+    index = (site / "funds" / "index.html").read_text(encoding="utf-8")
+    rows = json.loads((site / "funds" / "rows.json").read_text(encoding="utf-8"))
+    assert {r["id"] for r in rows} == {DIRECT, AGGREGATED}
+    one = next(r for r in rows if r["id"] == DIRECT)
+    assert {"id", "name", "house", "family", "cat", "cat_name", "c"} <= set(one)
+    assert set(one["c"]) == {"size", "ter", "r1", "r3", "r5", "rank",
+                             "vol3", "fall3", "sharpe3"}
+    assert one["c"]["r3"] == ["", DASH, "", ""]   # three hundred days: no 3 years
+    assert f'data-rows="{BASE}/funds/rows.json"' in index
+    assert publish.EXPLORE_FIRST == 50
+    assert index.count("<tr data-family=") <= publish.EXPLORE_FIRST
+    # Largest first, and the heading says so.
+    largest = r'<th scope="col"[^>]*data-col="size"[^>]*aria-sort="descending"'
+    assert re.search(largest, index)
+    after = index[index.index('id="funds"'):]
+    fold = re.search(r"<noscript>(.*?)</noscript>", after, re.S)
+    assert fold and 'class="explorer__group"' in fold.group(1)
+    assert index.count('class="explorer__group"') == fold.group(1).count(
+        'class="explorer__group"')
+
+
+def test_explore_says_when_nothing_matches_and_offers_more(site: Path) -> None:
+    """E-03: a filter matching nothing left "0 of 1662 funds" in small type. The
+    page says so and offers to clear the filters; past fifty, "Show 50 more";
+    E-05: a chooser for the columns, the three measures of risk off at first."""
+    index = _flat((site / "funds" / "index.html").read_text(encoding="utf-8"))
+    raw = (site / "funds" / "index.html").read_text(encoding="utf-8")
+    assert "No funds match these filters." in index and "Clear filters" in index
+    assert re.search(r"<div class=\"table-empty\" data-empty hidden>", raw)
+    assert re.search(r'<button type="button"[^>]*data-more>Show 50 more</button>', raw)
+    chooser = re.search(r'<details class="columns" data-columns hidden>(.*?)</details>',
+                        raw, re.S)
+    assert chooser
+    for key in ("vol3", "fall3", "sharpe3", "r1", "ter"):
+        assert f'value="{key}"' in chooser.group(1), key
+    assert 'data-hide="vol3 fall3 sharpe3"' in raw
 
 
 PRIVACY = (
     "Nothing you enter leaves your browser",
-    "Your portfolio and your settings are kept in this browser's own storage, on this"
-    " device. Nothing you enter is sent anywhere or kept on any server. You can clear"
-    " them at any time: Clear on Your portfolio, Reset to defaults in Settings.",
+    # The funds viewed lately too (UI/UX critique G-21, 2026-10-04): a key the
+    # page kept and did not mention.
+    "Your portfolio, your settings and the funds you viewed lately are kept in this"
+    " browser's own storage, on this device. Nothing you enter is sent anywhere or kept"
+    " on any server. You can clear them at any time: More, then Remove everything, on"
+    " Your portfolio; Reset to"
+    " defaults and Clear recently viewed in Settings.",
     "No accounts, no cookies, no analytics.",
     "The page loads nothing from any other site: its content security policy allows"
     " only this one.",
@@ -498,7 +699,7 @@ def test_the_front_page_is_a_way_in_not_a_list(site: Path) -> None:
     # External audit, 2026-10-04: the address asks "Did my SIP work?", so the page
     # leads with it, and its first door is Your portfolio.
     assert re.search(r"<h1[^>]*>\s*Did my SIP work\?", index)
-    first = index[index.index('class="lp-door"'):]
+    first = index[index.index('class="lp-door'):]
     first = first[:first.index("</li>")]
     assert "Did my SIP work?" in first and 'href="/Repo/portfolio/"' in first
     # The doors once, not again at the foot of the page (design review).
@@ -506,7 +707,7 @@ def test_the_front_page_is_a_way_in_not_a_list(site: Path) -> None:
     assert re.search(r'<a[^>]*href="#privacy"[^>]*>[^<]*Nothing you enter leaves your'
                      r' browser', index)
     hero = index[index.index('class="lp-hero"'):index.index('id="lookup"')]
-    assert hero.count('class="lp-door"') == 3
+    assert len(re.findall(r'<li class="lp-door[ "]', hero)) == 3
     assert 'data-index="/Repo/search.json"' in hero
     assert 'href="/Repo/learn/"' in hero and 'href="/Repo/portfolio/"' in hero
     at = [index.index(f'id="{key}"') for key, _ in SECTIONS]
@@ -611,6 +812,11 @@ def test_the_example_and_pair_render() -> None:
     assert "No example tonight" in alone
 
 
+#: Explore funds' table, empty: what explorer.html needs beside the leaders.
+EXPLORE_EMPTY = {"explore": [], "columns": publish.EXPLORE_COLUMNS,
+                 "hidden": publish.EXPLORE_HIDDEN, "first": publish.EXPLORE_FIRST}
+
+
 def test_the_leader_tables_live_on_the_funds_page(site: Path) -> None:
     """V1-89: the front page tells the story; each category's highest three-year
     returns sit on /funds/, folded above the table. The fixture's funds have no
@@ -627,7 +833,7 @@ def test_the_leader_tables_live_on_the_funds_page(site: Path) -> None:
     engine = templates(root=BASE, static=True)
     page = engine.get_template("explorer.html").render({
         "catalogue": [], "health": {}, "qs": "", "active": "funds", "built": TODAY,
-        "categories": [], "category_options": [], "count": 0, "funds": [],
+        "categories": [], "category_options": [], "count": 0, **EXPLORE_EMPTY,
         "families": [], "stats": {"houses": 0, "categories": 0, "prices_to": None},
         "leaders": [card]})
     fold = (r'<details class="leaders-fold">\s*<summary>Highest three-year returns'
@@ -807,7 +1013,9 @@ def test_the_fund_card_does_not_repeat_its_facts(site: Path) -> None:
     assert chips
     shown = re.findall(r"<li[^>]*>([^<]+)</li>", chips.group(1))
     assert shown == ["Direct", "Growth", DIRECT]
-    category = re.search(r"<dt>Category.*?</dt><dd>([^<]+)</dd>", page, re.S)
+    facts = re.search(r'<dl class="facts facts--grid">(.*?)</dl>', page, re.S)
+    assert facts
+    category = re.search(r"<dt>Category.*?</dt>\s*<dd>([^<]+)</dd>", facts.group(1), re.S)
     assert category and category.group(1).strip() == "Flexi cap"
 
 
@@ -855,13 +1063,24 @@ def test_headings_carry_only_their_words(site: Path) -> None:
 
 def test_the_fund_pickers_are_search_fields(site: Path) -> None:
     """Compare's and Your portfolio's fund box reads like the top bar's search: a
-    magnifier beside it, the list of names still the browser's own (V1-93)."""
-    for page, pick in (("compare/index.html", "cmp-pick"),
-                       ("portfolio/index.html", "pf-pick")):
+    magnifier beside it (V1-93). Its list is Kit.picker's combobox, which finds a
+    fund by its house or ISIN too, not the browser's <datalist> of 1,662 names
+    matched only on a run of letters (UI/UX critique C-01)."""
+    static = Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
+    for page, pick, script in (("compare/index.html", "cmp-pick", "compare.js"),
+                               ("portfolio/index.html", "pf-pick", "portfolio.js")):
         html = (site / page).read_text(encoding="utf-8")
         box = re.search(r'<div class="field-search">(.*?)</div>', html, re.S)
         assert box and 'class="icon field-search__icon"' in box.group(1), page
-        assert f'id="{pick}"' in box.group(1) and ' list="' in box.group(1), page
+        assert f'id="{pick}"' in box.group(1), page
+        assert " list=" not in box.group(1) and "<datalist" not in html, page
+        code = (static / script).read_text(encoding="utf-8")
+        assert f'K.picker(document.getElementById("{pick}")' in code, script
+    css = (static / "app.css").read_text(encoding="utf-8")
+    # The active option, chosen with the arrows while focus stays in the box, is
+    # ringed: a tint alone is about 1.05:1.
+    active = r'\.picker \[aria-selected="true"\]\s*\{[^}]*outline: 2px solid'
+    assert re.search(active, css)
 
 
 def test_icon_buttons_say_what_they_do() -> None:
@@ -893,8 +1112,10 @@ def test_row_errors_are_tied_to_their_fields() -> None:
     assert ".remove()" not in body
     card = script[script.index("function holdingCard"):]
     card = card[:card.index("\n  }\n") + 4]
-    # Purchases, SIPs and (since the audit of 2026-10-04) sales: one slot each.
-    assert card.count("errorSlot()") == 3 and 'err && el("p"' not in card
+    # Purchases, SIPs and (since the audit of 2026-10-04) sales: one slot each,
+    # from the one row builder all three use (UI/UX critique P-05).
+    assert card.count("errorSlot()") == 1 and 'err && el("p"' not in card
+    assert card.count('return row("') == 3
     css = (Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
            / "app.css").read_text(encoding="utf-8")
     # Empty, it leaves the row's flex flow (a flex line's gap would remain) but
@@ -1020,7 +1241,7 @@ def test_every_labelled_figure_with_a_glossary_entry_explains_itself() -> None:
     card = {"key": "equity/flexi_cap", "name": "Flexi cap", "count": 7, "funds": []}
     page = engine.get_template("explorer.html").render({
         "catalogue": [], "health": {}, "qs": "", "active": "funds", "built": TODAY,
-        "categories": [], "category_options": [], "count": 0, "funds": [],
+        "categories": [], "category_options": [], "count": 0, **EXPLORE_EMPTY,
         "families": [], "stats": {"houses": 0, "categories": 0, "prices_to": None},
         "leaders": [card, {**card, "key": "equity/mid_cap", "name": "Mid cap"}]})
     fold = page[page.index('class="leaders-fold"'):page.index('id="funds"')]
@@ -1081,3 +1302,141 @@ def test_links_start_at_the_root_unless_asked(
                                       "--workdir", str(tmp_path / "w")])
     build_site.main()
     assert seen == {"publish": "", "build": ""}
+
+
+STATIC_DIR = Path(__file__).resolve().parents[2] / "src" / "m6_views" / "static"
+
+
+def test_your_portfolio_answers_first(site: Path) -> None:
+    """UI/UX critique P-01, P-02: the answer (one sentence beside each holding's
+    reference) leads the summary, and once a portfolio exists the entry form folds
+    away above the results instead of sitting 1,300px over them."""
+    page = (site / "portfolio" / "index.html").read_text(encoding="utf-8")
+    assert page.index('data-out="verdict"') < page.index('data-out="summary"')
+    fold = re.search(r'<details class="pf__edit" open>\s*<summary[^>]*><h2', page)
+    assert fold and fold.start() < page.index('id="pf-summary-h"')
+    holds = r'<details class="pf__edit" open>.*?id="pf-pick".*?</details>'
+    assert re.search(holds, page, re.S)
+    script = (STATIC_DIR / "portfolio.js").read_text(encoding="utf-8")
+    assert "editFold.open = !state.funds.length" in script
+    assert "M.reference(x.fund, all, x.pos.firstDate)" in script
+
+
+def test_clearing_your_portfolio_asks_on_the_page(site: Path) -> None:
+    """P-10: Clear sat beside Save with equal weight and asked through `confirm()`.
+    It is behind More now, which says what it removes and what it keeps."""
+    page = (site / "portfolio" / "index.html").read_text(encoding="utf-8")
+    more = re.search(r'<details class="pf__more">(.*?)</details>', page, re.S)
+    assert more and 'data-action="clear"' in more.group(1)
+    assert "A file you saved is kept" in _flat(more.group(1))
+    toolbar = page[page.index('class="pf__toolbar"'):
+                   page.index('<details class="pf__more">')]
+    assert 'data-action="clear"' not in toolbar
+    script = (STATIC_DIR / "portfolio.js").read_text(encoding="utf-8")
+    assert "window.confirm" not in script
+
+
+def test_the_other_funds_say_they_are_hindsight(site: Path) -> None:
+    """P-07: picked after the fact, and titled so."""
+    page = _flat((site / "portfolio" / "index.html").read_text(encoding="utf-8"))
+    assert "In hindsight: the same money in other funds" in page
+    assert "says nothing of what comes next" in page
+
+
+def test_your_portfolios_form_reads_at_a_glance() -> None:
+    """P-03: amounts in Indian grouping and in words; P-04: a "Still running" box,
+    not "Until (blank if running)"; P-05: each kind of entry under its own name."""
+    script = (STATIC_DIR / "portfolio.js").read_text(encoding="utf-8")
+    assert "M.grouped(" in script and "M.inWords(" in script
+    assert '"Still running"' in script and "Until (blank if running)" not in script
+    for legend in ('"Lump sums"', '"SIPs"', '"Sales"'):
+        assert legend in script, legend
+
+
+def test_a_door_card_is_one_link(site: Path) -> None:
+    """UI/UX critique H-02: a large card answered only on its small link. The two
+    cards with one destination are a link across their whole face (the link's own
+    ::after); the search card keeps its box usable."""
+    page = (site / "index.html").read_text(encoding="utf-8")
+    doors = re.findall(r'<li class="(lp-door[^"]*)">', page)
+    assert doors == ["lp-door lp-door--link", "lp-door", "lp-door lp-door--link"]
+    css = re.sub(r"/\*.*?\*/", "", (STATIC_DIR / "app.css").read_text(encoding="utf-8"),
+                 flags=re.S)
+    assert re.search(r"\.lp-door--link \.lp-door__link::after\s*\{[^}]*inset: 0", css)
+    assert re.search(r"\.lp-door--link:focus-within\s*\{", css)
+
+
+def test_the_fund_map_reads_in_sebis_order_with_mixed_headings_folded() -> None:
+    """UI/UX critique H-03: legacy and catch-all headings came first and the families
+    in no order a reader knows. Families run equity, hybrid, debt, index funds and
+    ETFs, solution oriented; within each, its categories largest first, then the
+    headings that mix funds doing different jobs (never ranked), folded away."""
+    from src.m0_data.categories import FAMILIES
+
+    assert [key for key, _, _ in FAMILIES] == ["equity", "hybrid", "debt", "other",
+                                               "solution"]
+    funds = [{"category": "Equity Scheme - Flexi Cap Fund"}] * 2 + [
+        {"category": "Other Scheme - Index Funds"},
+        {"category": "Equity Scheme - Large Cap Fund"},
+        {"category": "Growth"}]
+    shown = publish.fund_map(funds)
+    assert [f["key"] for f in shown] == ["equity", "other"]
+    equity = next(f for f in shown if f["key"] == "equity")
+    names = [c["name"] for c in equity["categories"]]
+    assert names == ["Flexi cap", "Growth", "Large cap"]
+    assert equity["mixed"] == []
+    assert [c["name"] for f in shown for c in f["mixed"]] == [
+        "Index funds (earlier AMFI heading)"]
+
+
+def test_the_privacy_picture_draws_one_way(site: Path) -> None:
+    """UI/UX critique H-05: a crossed-out arrow back to the site still drew data
+    going back. One arrow, from the site to the browser; the browser keeps yours."""
+    page = (site / "index.html").read_text(encoding="utf-8")
+    flow = page[page.index('class="lp-pic lp-flow"'):]
+    flow = flow[:flow.index("</section>")]
+    assert "lp-flow__back" not in flow and "lp-flow__cross" not in flow
+    assert flow.count('class="lp-flow__head') == 1
+    assert "kept here" in _flat(flow)
+
+
+def test_the_about_section_dates_the_holdings(site: Path) -> None:
+    """UI/UX critique H-07: "fund portfolios, monthly" said nothing of how old they
+    are. The date most of them were disclosed for is given, and each fund's page has
+    its own."""
+    page = _flat((site / "index.html").read_text(encoding="utf-8"))
+    about = page[page.index("Where every figure comes from"):]
+    dated = r"Fund portfolios Monthly; most disclosed for \d{2} \w{3} \d{4}"
+    assert re.search(dated, about)
+    assert "Benchmark comparisons and your own ledger" not in about
+
+
+def test_an_empty_compare_offers_somewhere_to_start(site: Path) -> None:
+    """UI/UX critique C-02: four sections each said "Shown once two funds are
+    chosen". With no fund chosen they are hidden, and one panel offers comparisons
+    to start from (compare.js `starters`)."""
+    page = (site / "compare" / "index.html").read_text(encoding="utf-8")
+    assert re.search(r'<div class="card cmp__start" data-out="start" hidden>', page)
+    assert page.count("data-cmp-section") == 4
+    script = (STATIC_DIR / "compare.js").read_text(encoding="utf-8")
+    assert "Shown once two funds are chosen" not in script
+    assert "starters(Array.from(FUNDS.values()))" in script
+
+
+def test_overlap_figures_are_tinted_by_their_size() -> None:
+    """C-05: the overlap grid's figures were plain numbers. Each sits on a tint as
+    strong as it is large (Kit.heat), the same fund against itself in grey; the
+    figure stays written, so the tint is never the only way to read it."""
+    kit = (STATIC_DIR / "kit.js").read_text(encoding="utf-8")
+    assert "function heat(" in kit and "heat: heat" in kit
+    for name in ("compare.js", "portfolio.js"):
+        script = (STATIC_DIR / name).read_text(encoding="utf-8")
+        assert "K.heat(" in script and "heat--self" in script, name
+
+
+def test_the_zoom_slider_is_big_enough_or_absent() -> None:
+    """C-08: the slider's handles were about 8px wide. On a wide screen it is 24px
+    tall with handles to match; on a phone the period buttons do its job."""
+    charts = (STATIC_DIR / "charts.js").read_text(encoding="utf-8")
+    assert 'type: "slider", height: 24' in charts and 'handleSize: "120%"' in charts
+    assert "show: !phone()" in charts

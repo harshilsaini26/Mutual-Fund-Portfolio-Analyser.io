@@ -32,6 +32,7 @@
     style: "currency", currency: "INR", maximumFractionDigits: 0,
   });
   // The reader's settings (V1-83): motion and text size, read at each draw.
+  function phone() { return window.matchMedia("(max-width: 720px)").matches; }
   function moving() { return document.documentElement.getAttribute("data-motion") !== "off"; }
   function textSize() {
     // 12px at standard text, ECharts' own default; scaled with the reader's choice.
@@ -114,7 +115,7 @@
   var KINDS = {
     line: function (c, p, filled) {
       var o = base(p);
-      o.grid.bottom = 48;
+      o.grid.bottom = phone() ? 16 : 54;   // room for the slider, where there is one
       o.tooltip.trigger = "axis";
       o.tooltip.formatter = listed;
       o.xAxis = {
@@ -135,7 +136,10 @@
         // A chart that swallows the wheel traps a reader scrolling past it.
         { type: "inside", zoomOnMouseWheel: "ctrl", moveOnMouseWheel: false,
           preventDefaultMouseMove: false },
-        { type: "slider", height: 18, bottom: 6, borderColor: p.rule,
+        // Handles big enough to hold (UI/UX critique C-08); on a phone none, the
+        // period buttons above do its job.
+        { type: "slider", height: 24, bottom: 6, borderColor: p.rule, show: !phone(),
+          handleSize: "120%",
           fillerColor: alpha(p.fund, 0.14), backgroundColor: "transparent",
           handleStyle: { color: p.fund, borderColor: p.fund },
           moveHandleStyle: { color: p.rule },
@@ -146,21 +150,14 @@
       // Several funds on one chart (compare.js, V1-85): a hue each, and no fills,
       // which would cover one another.
       var many = c.series.filter(function (s) { return s.role === "fund"; }).length > 1;
-      // Fund names run to 80 characters: one scrolling row, each name cut to fit
-      // and whole on hover, so the legend never lies over the lines (a wrapping
-      // one covered the chart, V1-85). A wide gap between names: at 18px a cut
-      // name ran into the next one's mark (design review, 2026-10-04).
-      if (many) {
-        o.legend.type = "scroll";
-        o.legend.right = 0;
-        o.legend.itemGap = 32;
-        o.legend.pageTextStyle = { color: p.faint };
-        o.legend.textStyle = { color: p.ink, width: 180, overflow: "truncate" };
-        o.legend.tooltip = { show: true };
-      }
+      // A page that names the lines itself asks for no legend: Compare's chips,
+      // whole names in the lines' colours. Its fund names run to 80 characters, and
+      // a legend of them wrapped over the lines or cut them (V1-85, C-03).
+      if (c.legend === false) { o.legend.show = false; o.grid.top = 16; }
       o.series = c.series.map(function (s, i) {
         var fund = s.role === "fund";
-        var hue = many && fund ? p.cats[i % p.cats.length] : colour(s.role, p);
+        // `hue`: the page's own colour order (Compare: the fund's place among the chips).
+        var hue = many && fund ? p.cats[(s.hue != null ? s.hue : i) % p.cats.length] : colour(s.role, p);
         var series = {
           name: s.name,
           type: "line",
@@ -275,6 +272,9 @@
             return { value: n, caption: v[1],
                      label: { position: n !== null && n < 0 ? "bottom" : "top" } };
           }),
+          // A label that would run into another is left off (F-09); the tooltip
+          // and the table still carry it.
+          labelLayout: { hideOverlap: true },
           label: { show: true, color: p.ink, fontSize: textSize() * 11 / 12,
                    formatter: function (d) { return d.data.caption; } },
         };
@@ -355,8 +355,12 @@
         var d = largest > 0 && size ? 7 + 23 * Math.sqrt(size / largest) : 9;
         return fund ? Math.max(d, 16) : d;
       }
+      // Room for the axes' names, kept clear of the plot, and for the legend above
+      // it, kept off the points (UI/UX critique F-08).
       o.grid.bottom = 28;
       o.grid.right = 28;
+      o.grid.left = 36;
+      o.grid.top = 56;
       // The legend's marks at one size: drawn at a bubble's, they ran into the
       // next item's words (design review).
       o.legend.itemWidth = 14;
@@ -367,6 +371,7 @@
       function axis(kind, name, where) {
         return {
           type: "value", scale: true, name: name, nameLocation: "middle",
+          nameRotate: where === "y" ? 90 : 0,
           nameGap: where === "x" ? 28 : 44, nameTextStyle: { color: p.soft },
           axisLabel: { fontSize: textSize(), color: p.faint, formatter: ticks(kind) },
           axisLine: { lineStyle: { color: p.rule } },
@@ -403,6 +408,7 @@
       var o = base(p);
       o.legend.show = false;
       o.grid.top = 4;
+      o.grid.right = 56;   // the longest bar's figure beside it, not past the edge
       o.tooltip.trigger = "item";
       o.tooltip.formatter = function (d) { return d.name + ": " + d.data.caption; };
       o.xAxis = { type: "value", show: false };
@@ -448,9 +454,11 @@
     var existing = el.previousElementSibling;
     if (existing && existing.classList.contains("zoom") && !existing.hasAttribute("data-zoom-slot")) {
       // Redrawn (a theme switch starts every chart at its full range): put
-      // back the period the reader chose, so the pressed button is still true.
-      var pressed = existing.querySelector('button[aria-pressed="true"]');
+      // back the period and the scale the reader chose, so the pressed buttons
+      // are still true.
+      var pressed = existing.querySelector('button[aria-pressed="true"]:not(.zoom__scale)');
       if (pressed) pressed.click();
+      if (existing.querySelector('.zoom__scale[aria-pressed="true"]')) logScale(chart, true);
       return;
     }
     var last = null;
@@ -465,8 +473,14 @@
     if (!slot) {
       group.className = "zoom";
       group.setAttribute("role", "group");
-      group.setAttribute("aria-label", "Show a period");
     }
+    // Said, not only in the group's name: beside rolling returns "3Y" read as the
+    // stretch's length (UI/UX critique F-07). The server may name it (`zoom_label`).
+    var label = document.createElement("span");
+    label.className = "zoom__label";
+    label.textContent = spec.zoom_label || "Period";
+    group.setAttribute("aria-label", label.textContent);
+    group.appendChild(label);
     ZOOMS.forEach(function (z) {
       var button = document.createElement("button");
       button.type = "button";
@@ -479,14 +493,33 @@
         var live = echarts.getInstanceByDom(el) || chart;
         if (z[1] === 0) live.dispatchAction({ type: "dataZoom", start: 0, end: 100 });
         else live.dispatchAction({ type: "dataZoom", startValue: start.getTime(), endValue: end.getTime() });
-        group.querySelectorAll("button").forEach(function (b) {
+        group.querySelectorAll("button:not(.zoom__scale)").forEach(function (b) {
           b.setAttribute("aria-pressed", b === button ? "true" : "false");
         });
       });
       group.appendChild(button);
     });
+    // A long record's early years lie flat on a linear axis (UI/UX critique F-06):
+    // a chart the server marks `log` can be read on a log scale instead.
+    if (spec.log) {
+      var scale = document.createElement("button");
+      scale.type = "button";
+      scale.className = "zoom__scale";
+      scale.textContent = "Log scale";
+      scale.setAttribute("aria-pressed", "false");
+      scale.addEventListener("click", function () {
+        var on = scale.getAttribute("aria-pressed") !== "true";
+        scale.setAttribute("aria-pressed", String(on));
+        logScale(echarts.getInstanceByDom(el) || chart, on);
+      });
+      group.appendChild(scale);
+    }
     if (!slot) el.parentNode.insertBefore(group, el);
     slot && slot.removeAttribute("data-zoom-slot");
+  }
+
+  function logScale(chart, on) {
+    chart.setOption({ yAxis: { type: on ? "log" : "value", logBase: 10, scale: on } });
   }
 
   function init(root) {
