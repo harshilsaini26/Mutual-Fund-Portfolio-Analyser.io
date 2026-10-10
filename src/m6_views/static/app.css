@@ -1909,13 +1909,35 @@ body, .topbar, .card, .view, .settings {
 .sip__note { max-width: 72ch; font-size: var(--text-sm); color: var(--ink-soft); }
 .sip__notes-list { display: grid; gap: 6px; max-width: 72ch; margin: 0; padding-left: 1.2em; font-size: var(--text-sm); color: var(--ink-soft); }
 .sip__out { display: grid; gap: 8px; margin: 10px 0 0; padding-left: 1.2em; font-size: var(--text-sm); }
+/* The same money in other kinds of fund (§5.1): every bar on one ₹ axis. */
+.sip__family { margin: 18px 0 0; }
+.sip__family > h3 { margin: 0 0 8px; font-size: var(--text-md); }
+.sip__kinds { display: grid; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; }
+.sip__krow { padding: 10px 14px 12px; border: 1px solid var(--line); border-radius: 12px; }
+.sip__krow--current { border-color: var(--accent); }
+.sip__krow-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; }
+.sip__krow-name { min-height: 32px; padding: 0; border: 0; background: none; font: inherit; font-weight: 600;
+  color: var(--accent); text-align: left; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.sip__krow-count, .sip__krow-about { font-size: var(--text-sm); color: var(--ink-soft); }
+.sip__krow-about { margin: 0 0 8px; }
+.sip__krow-figs { margin: 6px 0 0; font-size: var(--text-sm); }
+.sip__bar { position: relative; height: 16px; background: linear-gradient(var(--line), var(--line)) center / 100% 1px no-repeat; }
+.sip__bar > span { position: absolute; }
+.sip__bar-range, .sip__key-range { top: 4px; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 35%, transparent); }
+.sip__bar-mid, .sip__key-mid { top: 0; width: 3px; height: 16px; margin-left: -1px; background: var(--accent); }
+.sip__bar-index, .sip__key-index { top: 3px; width: 10px; height: 10px; margin-left: -5px; background: var(--ink); transform: rotate(45deg); }
+.sip__bar-putin, .sip__key-putin { top: 0; height: 16px; margin-left: -1px; border-left: 2px dashed var(--ink-soft); }
+.sip__key span { display: inline-block; position: relative; margin: 0 6px 0 0; vertical-align: middle; }
+.sip__key .sip__key-range { width: 18px; top: 0; }
+.sip__key .sip__key-index, .sip__key .sip__key-mid, .sip__key .sip__key-putin { top: 0; margin-left: 2px; }
+.sip__axis { display: flex; justify-content: space-between; margin: 10px 0 0; font-size: var(--text-xs); color: var(--ink-faint); }
 .echart--band .echart__canvas { height: 360px; }
 /* A way into /sip/ from a panel (SPEC_SIP_WHAT_IF §4.8), and from the SIP guide. */
-.panel-link, .learn__try { margin: 12px 0 0; font-size: var(--text-sm); }
-.panel-link a, .learn__try a { display: inline-flex; align-items: center; min-height: 24px; font-weight: 600; }
+.panel-link, .learn__try, .learn__next { margin: 12px 0 0; font-size: var(--text-sm); }
+.panel-link a, .learn__try a, .learn__next a { display: inline-flex; align-items: center; min-height: 24px; font-weight: 600; }
 .echart--dots .echart__canvas { height: 260px; }
 @media (max-width: 720px) {
-  .sip__choice .settings__chip { min-height: 44px; }
+  .sip__choice .settings__chip, .sip__krow-name { min-height: 44px; }
   .sip__kind select, .sip__more select { min-height: 44px; width: 100%; }
   .echart--band .echart__canvas { height: 260px; }
 }

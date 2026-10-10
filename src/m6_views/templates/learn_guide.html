@@ -35,8 +35,11 @@
     </ol></figcaption>
   </figure>
   {% endif %}
+  {% if section.guide %}
+  <p class="learn__next"><a href="{{ root }}/learn/{{ section.guide }}/">More: {{ learn.guide(section.guide).title }} →</a></p>
+  {% endif %}
   {% endfor %}
-  {% if guide.slug == "sip-and-lump-sum" and static %}
+  {% if guide.slug in ("sip-and-lump-sum", "start-here") and static %}
   <p class="learn__try"><a href="{{ root }}/sip/">Try it with real funds →</a></p>
   {% endif %}
   <h2>Sources</h2>

@@ -50,12 +50,14 @@ from src.common.decimals import connect
 from src.common.types import IndexId, SchemeId, UserId
 from src.m0_data.categories import FAMILIES, category_of
 from src.m0_data.config import REPO_ROOT, warehouse_path
+from src.m0_data.derive.nav_adj import rescale_splits
 from src.m0_data.normalise.index_id import index_key
 from src.m0_data.providers.warehouse import SchemeFacts, WarehouseMarketDataProvider
 from src.m0_data.store import save as save_navs
 from src.m0_data.universe import ISIN, Fund, live_funds, regular_twins
 from src.m1_ledger.db import apply_ledger_schema, connect_ledger
 from src.m1_ledger.providers.position import SqlitePositionProvider
+from src.m2_fund import sip
 from src.m2_fund.windows import spans, window_start
 from src.m3_lookthrough.providers.sqlite import SqliteLookThroughProvider
 from src.m6_views.api.pages import STATIC, fund_context, templates
@@ -611,6 +613,31 @@ def sip_opening(funds: list[dict[str, str]],
                        if f["amfi_code"] and category_of(f["category"]).key == key)
 
 
+def sip_overview(market: Any, kinds: list[dict[str, Any]],
+                 records: list[dict[str, Any]], today: date) -> dict[str, Any]:
+    """`data/sip/kinds.json` (SPEC_SIP_WHAT_IF §5.1): /sip/'s range for every kind
+    it offers, at its standard amounts, which the page scales."""
+    direct = [r for r in records if r.get("plan") != "regular"]
+    offered = [{"key": k["key"], "name": k["name"], "about": k["about"],
+                "family": category_of(k["key"]).family}
+               for family in kinds for k in family["kinds"]]
+    keys = {k["key"] for k in offered}
+    wanted = {r["id"] for r in direct if r["category"] in keys}
+    wanted |= {t for key in keys if (t := sip.index_for(direct, key))}
+    prices = {sid: p for sid in sorted(wanted)
+              if (p := site_prices(market, sid, today)) is not None}
+    return sip.overview(offered, direct, prices)
+
+
+def site_prices(market: Any, sid: str, today: date) -> sip.Prices | None:
+    """A fund's prices as the browser reads its NAV file: the raw rows the file
+    carries (never a filled-in day), on one scale where the fund re-denominated its
+    units (portfolio-math.js's `parseNavFile`), so kinds.json and the page agree."""
+    rows = rescale_splits([(p.nav_date, p.nav) for p in market.nav_series(
+        SchemeId(sid), date.min, today, adjusted=False) if not p.is_interpolated])
+    return sip.Prices([d for d, _ in rows], [v for _, v in rows]) if rows else None
+
+
 def fund_map(funds: list[dict[str, str]]) -> list[dict[str, Any]]:
     """The front page's map (V1-81): each family, in SEBI's order, then its
     categories with what SEBI's rules say they hold and how many funds they have
@@ -878,6 +905,10 @@ def build_site(
     (out / "funds.json").write_text(
         json.dumps(records, ensure_ascii=False), encoding="utf-8")
     nav_files = save_navs(warehouse, out, [*live, *twins.values()])
+    (out / "data" / "sip").mkdir()
+    (out / "data" / "sip" / "kinds.json").write_text(
+        json.dumps(sip_overview(market, kinds, records, today), ensure_ascii=False),
+        encoding="utf-8")
     for name in STATIC_FILES:
         target = out / "static" / name
         target.parent.mkdir(parents=True, exist_ok=True)

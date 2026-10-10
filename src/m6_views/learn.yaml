@@ -25,6 +25,8 @@ refs:
   amfi_tax: &amfi_tax {source: amfi, url: "https://www.amfiindia.com/investor/knowledge-center-info?zoneName=TaxRegimeForMutualFunds", checked: 2026-10-02}
   amfi_aaum: &amfi_aaum {source: amfi, url: "https://www.amfiindia.com/aum-data/average-aum", checked: 2026-10-02}
   mfsh_direct: &mfsh_direct {source: amfi, url: "https://www.mutualfundssahihai.com/en/what-direct-plan-regular-plan", checked: 2026-10-02}
+  mfsh_loads: &mfsh_loads {source: amfi, url: "https://www.mutualfundssahihai.com/en/what-are-loads", checked: 2026-10-11}
+  sebi_stamp: &sebi_stamp {source: sebi, url: "https://www.sebi.gov.in/sebi_data/faqfiles/dec-2021/1639980911330.pdf", checked: 2026-10-11}
   mfsh_idcw: &mfsh_idcw {source: amfi, url: "https://www.mutualfundssahihai.com/en/idcw-plans-simplifying-income-and-capital-distributions-mutual-funds", checked: 2026-10-02}
   v_ter: &v_ter {source: zerodha, url: "https://zerodha.com/varsity/chapter/mutual-fund-expense-ratio-direct-and-regular-plans/", checked: 2026-10-02}
   v_returns: &v_returns {source: zerodha, url: "https://zerodha.com/varsity/chapter/measuring-mutual-fund-returns/", checked: 2026-10-02}
@@ -111,6 +113,24 @@ terms:
       a unit over time.
     sources: [*sebi_faq]
     related: [lump_sum, xirr]
+  exit_load:
+    title: Exit load
+    short: >-
+      A charge some funds take when units are sold back within a set period after
+      they were bought, worked out as a share of the NAV. Each fund sets its own
+      period and rate in its scheme information document. It cannot raise the load
+      beyond that, and a change applies only to money put in afterwards.
+    sources: [*sebi_faq, *mfsh_loads]
+    related: [units, nav, expense_ratio]
+  stamp_duty:
+    title: Stamp duty on purchases
+    short: >-
+      A duty under the Indian Stamp Act on units a fund issues, from 1 July 2020: on
+      each purchase, SIP instalment and switch in, not on redemptions. SEBI's FAQ on
+      the Act gives the rate as 0.005% of the units' value, ₹500 on ₹1 crore. This
+      site takes it off each such purchase before working out the units.
+    sources: [*sebi_stamp]
+    related: [units, sip, lump_sum]
   expense_ratio:
     title: Expense ratio (TER)
     short: >-
@@ -280,6 +300,51 @@ terms:
     related: [look_through]
 
 guides:
+  # SPEC_SIP_WHAT_IF §5.3: first in Learn, for someone who has never held a fund.
+  # Each section points on to the fuller guide; the last to /sip/ (the template).
+  - slug: start-here
+    title: New to mutual funds? Start here
+    group: Basics
+    summary: What a fund is, its three main kinds, two ways to put money in, and what looking back can and cannot say.
+    sections:
+      - heading: What a fund is
+        guide: what-a-mutual-fund-is
+        paragraphs:
+          - >-
+            A mutual fund pools money from many people and invests it in shares, bonds
+            or both, as the objective in its offer document says. Each person holds
+            [[units]], priced every business day at the fund's [[nav]], and shares in
+            the gains and losses in proportion to what they put in.
+      - heading: Its three main kinds
+        guide: equity-debt-and-hybrid
+        paragraphs:
+          - >-
+            Equity funds invest mostly in company shares, so their value moves the
+            most. Debt funds lend, by holding bonds and money-market paper, and move
+            less. Hybrid funds hold both, in proportions SEBI sets for each
+            [[sebi_categories|category]].
+      - heading: SIP or once
+        guide: sip-and-lump-sum
+        paragraphs:
+          - >-
+            Money can go in all at once, as a [[lump_sum]], or a fixed amount at a time,
+            as a [[sip]]. Each purchase buys units at the NAV of its own day, so the same
+            money put in the two ways ends up as a different number of units.
+      - heading: Looking back is not looking forward
+        paragraphs:
+          - >-
+            Every figure on this site describes what already happened, at prices
+            already published. No fund promises a return. A scheme can also be wound up,
+            its holdings sold and the money paid out, so comparisons of the funds open
+            today, this site's included, leave out the ones that closed or merged.
+      - heading: Try it with real funds
+        paragraphs:
+          - >-
+            "What would a SIP have become?" takes an amount and a kind of fund and shows
+            what it would be worth today in every fund of that kind, at their real past
+            prices. No fund names are needed.
+    sources: [*sebi_faq, *sebi_categories]
+
   - slug: what-a-mutual-fund-is
     title: What a mutual fund is
     group: Basics

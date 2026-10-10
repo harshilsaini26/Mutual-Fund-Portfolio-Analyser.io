@@ -168,13 +168,14 @@ def test_stale_lists_old_checks(tmp_path: Path) -> None:
 
 TERMS = {
     "nav", "units", "amc", "direct_plan", "regular_plan", "growth_idcw", "lump_sum",
-    "sip",
+    "sip", "exit_load", "stamp_duty",
     "expense_ratio", "aum", "annualised_return", "xirr", "volatility", "max_drawdown",
     "sharpe", "rolling_returns", "category_rank", "benchmark", "index_fund",
     "sebi_categories", "asset_mix", "sectors", "market_cap", "portfolio_disclosure",
     "look_through", "overlap",
 }
 GUIDES = [
+    ("start-here", "Basics"),
     ("what-a-mutual-fund-is", "Basics"), ("equity-debt-and-hybrid", "Basics"),
     ("how-funds-are-grouped", "Basics"), ("direct-and-regular-plans", "Costs"),
     ("what-a-fund-costs", "Costs"), ("risk-and-return", "Risk and return"),
@@ -186,7 +187,7 @@ GUIDES = [
 #: Entries that state an Indian rule cite the body that sets it.
 RULES = {"direct_plan", "regular_plan", "sebi_categories", "market_cap", "expense_ratio",
          "portfolio_disclosure", "how-funds-are-grouped", "direct-and-regular-plans",
-         "what-a-fund-costs"}
+         "what-a-fund-costs", "exit_load", "stamp_duty"}
 
 
 def test_the_content_covers_the_spec() -> None:
@@ -237,6 +238,32 @@ def test_the_reviewed_statements_say_what_their_sources_say() -> None:
     assert "hold only government securities" not in _text("equity-debt-and-hybrid")
     index = _text("index-and-active-funds")
     assert "is often called alpha" not in index and "beyond what its beta" in index
+
+
+def test_the_sip_spec_entries_say_what_their_sources_say() -> None:
+    """SPEC_SIP_WHAT_IF §5.3. Stamp duty's rate is printed because the page cited
+    states it (SEBI's FAQ on the Stamp Act: 0.005% on issue, ₹500 on ₹1 crore);
+    exit load's period and rate are each fund's own, in its scheme documents."""
+    stamp = _text("stamp_duty")
+    assert "1 July 2020" in stamp and "0.005%" in stamp and "₹500 on ₹1 crore" in stamp
+    assert "not on redemptions" in stamp
+    assert any("1639980911330.pdf" in r.url for r in load().terms["stamp_duty"].sources)
+    load_ = _text("exit_load")
+    assert "scheme information document" in load_ and "set period" in load_
+    start = _text("start-here")
+    assert "wound up" in start and "this site's included" in start
+
+
+def test_a_section_may_point_to_a_guide_that_exists(tmp_path: Path) -> None:
+    """"Start here" leads to the fuller guide on each point (§5.3): a section's
+    `guide` names one, or the file is refused."""
+    other = _guide(slug="other")
+    first = _guide(sections=[{**_guide()["sections"][0], "guide": "other"},
+                             *_guide()["sections"][1:]])
+    learn = load(_write(tmp_path, guides=[first, other]), today=TODAY)
+    assert learn.guide("what-a-mutual-fund-is").sections[0].guide == "other"
+    assert learn.guide("what-a-mutual-fund-is").sections[1].guide is None
+    _refused(_write(tmp_path, guides=[first]), "what-a-mutual-fund-is", "other")
 
 
 def _with_figure(figure: dict[str, Any]) -> dict[str, Any]:

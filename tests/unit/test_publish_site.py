@@ -21,6 +21,7 @@ from pathlib import Path
 import jobs.publish_site as publish
 import pytest
 from PIL import Image
+from src.common.contracts.market import NavPoint
 from src.common.decimals import connect
 from src.common.types import IndexId, SchemeId
 from src.m0_data.categories import category_of
@@ -709,7 +710,18 @@ def test_the_front_page_is_a_way_in_not_a_list(site: Path) -> None:
     hero = index[index.index('class="lp-hero"'):index.index('id="lookup"')]
     assert len(re.findall(r'<li class="lp-door[ "]', hero)) == 3
     assert 'data-index="/Repo/search.json"' in hero
-    assert 'href="/Repo/learn/"' in hero and 'href="/Repo/portfolio/"' in hero
+    assert 'href="/Repo/portfolio/"' in hero
+    # SPEC_SIP_WHAT_IF §5.2: the second door is /sip/; "Understand funds" folds
+    # into its sub-line as a way into Learn.
+    second = re.findall(r'<li class="lp-door[^"]*">(.*?)</li>', hero, re.S)[1]
+    assert "What would a SIP have become?" in second
+    assert 'href="/Repo/sip/"' in second
+    assert "Choose an amount and a kind of fund. No fund names needed." in _flat(second)
+    assert re.search(r'<a href="/Repo/learn/start-here/">New to funds\? Start here</a>',
+                     second)
+    assert "Understand funds" not in _flat(hero)
+    assert ("company by company. Or see what a SIP in any kind of fund would have"
+            " become.") in _flat(hero)
     at = [index.index(f'id="{key}"') for key, _ in SECTIONS]
     assert at == sorted(at)
     for (key, eyebrow), here, after in zip(SECTIONS, at, [*at[1:], len(index)],
@@ -1355,12 +1367,13 @@ def test_your_portfolios_form_reads_at_a_glance() -> None:
 
 
 def test_a_door_card_is_one_link(site: Path) -> None:
-    """UI/UX critique H-02: a large card answered only on its small link. The two
-    cards with one destination are a link across their whole face (the link's own
-    ::after); the search card keeps its box usable."""
+    """UI/UX critique H-02: a large card answered only on its small link. The card
+    with one destination is a link across its whole face (the link's own ::after);
+    the search card keeps its box usable."""
     page = (site / "index.html").read_text(encoding="utf-8")
     doors = re.findall(r'<li class="(lp-door[^"]*)">', page)
-    assert doors == ["lp-door lp-door--link", "lp-door", "lp-door lp-door--link"]
+    # The SIP door holds two links (§5.2), so it is not one.
+    assert doors == ["lp-door lp-door--link", "lp-door", "lp-door"]
     css = re.sub(r"/\*.*?\*/", "", (STATIC_DIR / "app.css").read_text(encoding="utf-8"),
                  flags=re.S)
     assert re.search(r"\.lp-door--link \.lp-door__link::after\s*\{[^}]*inset: 0", css)
@@ -1489,6 +1502,43 @@ def test_the_sip_page_fetches_its_opening_kinds_prices_while_it_loads(site: Path
     assert all((site / "data" / "nav" / f"{c}.csv.gz").is_file() for c in codes)
 
 
+def test_the_build_writes_the_overview_of_kinds(site: Path) -> None:
+    """§5.1.2: data/sip/kinds.json, one entry a kind /sip/ offers, each standard
+    window for ₹1,000 a month and ₹1,00,000 once; two flexi cap funds here, so no
+    window is a range."""
+    found = json.loads((site / "data" / "sip" / "kinds.json").read_text(encoding="utf-8"))
+    assert found["version"] == 1 and found["day"] == 5
+    assert found["unit"] == {"sip": "1000.00", "once": "100000.00"}
+    assert found["valued_on"]
+    page = (site / "sip" / "index.html").read_text(encoding="utf-8")
+    offered = re.findall(r'<option value="([^"]+)" data-about=', page)
+    assert [k["category"] for k in found["kinds"]] == offered == ["equity/flexi_cap"]
+    flexi = found["kinds"][0]
+    assert (flexi["name"], flexi["family"], flexi["funds"]) == ("Flexi cap", "equity", 2)
+    assert "65%" in flexi["about"]
+    assert set(flexi["sip"]) == set(flexi["once"]) == {"1", "3", "5", "10"}
+    assert all(w is None for mode in ("sip", "once") for w in flexi[mode].values())
+
+
+def test_the_overview_reads_prices_as_the_page_does() -> None:
+    """The NAV file's rows (raw, never a filled-in day), put on one scale where the
+    fund re-denominated its units, as portfolio-math.js's parseNavFile does: so a
+    kind's figure in kinds.json is the page's at the same amount."""
+    class Market:
+        def nav_series(self, sid: SchemeId, start: date, end: date,
+                       adjusted: bool = True) -> list[NavPoint]:
+            assert not adjusted and end == date(2026, 9, 26)
+            rows = [("2018-11-01", "10.0034", False), ("2018-11-02", "505", True),
+                    ("2018-11-04", "1000.6884", False)]
+            return [NavPoint(sid, date.fromisoformat(d), Decimal(v), filled)
+                    for d, v, filled in rows]
+
+    got = publish.site_prices(Market(), "INF209KB1ZH2", date(2026, 9, 26))
+    assert got is not None
+    assert got.dates == [date(2018, 11, 1), date(2018, 11, 4)]
+    assert got.navs == [Decimal("1000.34"), Decimal("1000.6884")]
+
+
 def test_the_sip_page_always_carries_its_notes(site: Path) -> None:
     """§4.6.5: four notes, never folded."""
     page = _flat((site / "sip" / "index.html").read_text(encoding="utf-8"))
@@ -1497,6 +1547,22 @@ def test_the_sip_page_always_carries_its_notes(site: Path) -> None:
                  "A Regular plan of the same fund has a higher expense ratio",
                  "This looks back. It says nothing of what comes next."):
         assert note in page, note
+
+
+def test_start_here_leads_learn_and_on_to_each_fuller_guide(site: Path) -> None:
+    """SPEC_SIP_WHAT_IF §5.3: the newcomer's guide is Learn's first, each of its
+    points links on to the guide that says more, and it ends at /sip/."""
+    index = (site / "learn" / "index.html").read_text(encoding="utf-8")
+    slugs = re.findall(rf'href="{BASE}/learn/([a-z-]+)/"', index)
+    assert slugs and slugs[0] == "start-here"
+    page = (site / "learn" / "start-here" / "index.html").read_text(encoding="utf-8")
+    assert "New to mutual funds? Start here" in page
+    for slug, title in (("what-a-mutual-fund-is", "What a mutual fund is"),
+                        ("equity-debt-and-hybrid", None), ("sip-and-lump-sum", None)):
+        link = re.search(rf'<p class="learn__next"><a href="{BASE}/learn/{slug}/">'
+                         r"More: ([^<]+) →</a></p>", page)
+        assert link and (title is None or link.group(1) == title), slug
+    assert f'<a href="{BASE}/sip/">Try it with real funds →</a>' in page
 
 
 def test_every_way_into_the_sip_page(site: Path) -> None:

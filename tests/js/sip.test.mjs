@@ -1,7 +1,7 @@
 // "What would a SIP have become?" (SPEC_SIP_WHAT_IF §4.5): the pure functions in
 // portfolio-math.js that /sip/ uses. Run: node --test tests/js/
-// tests/fixtures/sip_cases.json pins the arithmetic; tests/unit/test_sip_cases.py
-// derives every expected figure again with Decimal and M1's xirr.
+// tests/fixtures/sip_cases.json pins the arithmetic; tests/unit/test_sip_kinds.py
+// holds M2's Decimal twin (src/m2_fund/sip.py, the build's overview) to the same file.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -225,4 +225,13 @@ test("the path starts when the first purchase is priced, not on a holiday before
   const p = M.pathOf([{ date: "2025-10-05", paise: 100000 }], s, "2025-10-17", "week");
   assert.ok(p.points.every((x) => x[1] > 0), JSON.stringify(p.points));
   assert.equal(p.points[0][0], "2025-10-12");
+});
+
+// §5.1.3: the overview's figures are the build's, for ₹1,000 a month (₹1,00,000
+// once), scaled to the amount and rounded to the nearest ₹100.
+test("an overview figure is scaled to the amount and rounded to ₹100", () => {
+  assert.equal(S.scaled("73465.61", "1000.00", 500000), 36730000);       // ₹5,000: ₹3,67,328.05
+  assert.equal(S.scaled("73465.61", "1000.00", 100000), 7350000);        // ₹1,000 itself
+  assert.equal(S.scaled("100049.99", "100000.00", 100000000), 100050000); // ₹10 lakh once
+  assert.equal(S.scaled("1000.50", "1000.00", 10000000), 10010000);      // ₹1 lakh: ₹1,00,050 rounds up
 });

@@ -282,6 +282,28 @@ address (V1-92; GitHub Pages served it until 2026-10-03). Measured on the first 
   the site pays, about 1 s under the slowdown (the same on `/compare/` and `/learn/`).
   Not yet measured on the live site, where `funds.json` is 1.47 MB raw and NAV files
   are larger (about 19 KB each): re-measure after the first build that carries it.
+- **A way in for newcomers** (V1-101, V1-102; SPEC_SIP_WHAT_IF Part B): `/sip/` ends
+  with "The same money in other kinds of fund", every kind's lowest, middle and
+  highest on one ₹ axis, each family's three largest kinds first, a tap to work any
+  of them out exactly. The build writes it (`data/sip/kinds.json`, from
+  `src/m2_fund/sip.py`, a `Decimal` twin of the page's arithmetic pinned to it by
+  `sip_cases.json` and to Your portfolio's by `portfolio_cases.json`) for ₹1,000 a
+  month and ₹1,00,000 once; the page scales and rounds to ₹100. Measured 2026-10-11 on
+  the full build's warehouse (1,661 funds, 51 kinds): **17.9 s, 93 KB (13 KB
+  gzipped)**. On the preview, large cap at ₹1,000 a month for 5 years is ₹69,136.08 /
+  ₹73,754.17 / ₹80,570.07 in the file and on the page; scaled figures came within ₹100
+  of the exact ones at ₹5,000, ₹12,345 and ₹2,50,000 a month. The front page's second
+  door is now /sip/ ("Understand funds" folds into its line), and Learn opens with
+  "New to mutual funds? Start here", plus the terms exit load and stamp duty.
+  **Not shipped: `survivorship_bias`.** No page on Learn's allowed list defines it
+  (Varsity and NISM have none that a search finds; Investopedia refuses automated
+  readers), so the term waits for one; "Start here" and /sip/'s notes say the same
+  thing in their own words.
+  **Fixed on the way:** funds that re-denominate their units move their NAV ×100 or
+  ×10 in a day; six published overnight funds have done so. The warehouse's `nav_adj` divided that out, but the
+  pages that read the published NAV files (Your portfolio, Compare, /sip/) took it as a
+  900% gain: an overnight fund's ₹60,000 SIP showed as ₹10.3 lakh. They now read the
+  files on one scale, as `nav_adj` does (V1-102).
 - **Explanations on hover** (V1-91): pausing on any labelled figure with a glossary
   entry, or tabbing to its `?`, opens its plain explanation beside it; a click pins it.
   The fund card's confidence badge no longer covers the NAV box.

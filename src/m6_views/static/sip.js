@@ -53,7 +53,16 @@
     return "#" + parts.join("&");
   }
 
-  var api = { parseHash: parseHash, writeHash: writeHash };
+  // §5.1.3. A figure from kinds.json (rupees as text, for the build's unit amount)
+  // at `paise` instead, to the nearest ₹100, in paise: "about", never exact, since
+  // units round per instalment. Integers throughout, so a half rounds up every time.
+  function scaled(worth, unit, paise) {
+    var w = BigInt(Math.round(Number(worth) * 100)), u = BigInt(Math.round(Number(unit) * 100));
+    var d = u * 10000n;
+    return Number((2n * w * BigInt(paise) + d) / (2n * d)) * 10000;
+  }
+
+  var api = { parseHash: parseHash, writeHash: writeHash, scaled: scaled };
   if (typeof module === "object" && module.exports) { module.exports = api; return; }
 
   // --- in the browser ------------------------------------------------------------
@@ -165,8 +174,23 @@
     }))));
   }
   page.addEventListener("click", function (e) {
-    var b = e.target.closest("[data-remove], [data-retry], [data-kind]");
+    var b = e.target.closest("[data-remove], [data-retry], [data-kind], [data-family]");
     if (!b) return;
+    if (b.hasAttribute("data-family")) {
+      // The rest of a family's kinds, kept open while the figures change; focus
+      // goes to the first one just shown.
+      var name = b.getAttribute("data-family");
+      var shown = b.parentNode.querySelectorAll(".sip__krow").length;
+      opened[name] = true;
+      kindsFile.then(function (j) {
+        drawKinds(j);
+        var f = Array.prototype.find.call(page.querySelectorAll("[data-family-of]"),
+          function (x) { return x.getAttribute("data-family-of") === name; });
+        var next = f && f.querySelectorAll(".sip__krow-name")[shown];
+        if (next) next.focus();
+      });
+      return;
+    }
     if (b.hasAttribute("data-remove")) {
       state.f = state.f.filter(function (id) { return id !== b.getAttribute("data-remove"); });
       showState();
@@ -175,6 +199,8 @@
       kind.value = b.getAttribute("data-kind");
       state.c = kind.value;
       showState();
+      // From the overview: to the answer, which now works out this kind exactly.
+      if (b.closest("[data-sip-kinds]")) out("answer-box").scrollIntoView({ block: "start" });
     }
     run();
   });
@@ -232,6 +258,7 @@
       out("answer-box").classList.remove("sip__answer--busy");
       say("");
       draw(ofKind, index, extra, series);
+      overview();
     });
   }
 
@@ -538,6 +565,118 @@
     return el("details", { "class": "chart-table" },
       el("summary", null, left.length + " fund" + (left.length === 1 ? "" : "s") + " not in the range, and why"),
       el.apply(null, ["ul", { "class": "sip__out" }].concat(items)));
+  }
+
+  // --- the same money in other kinds of fund (§5.1) -----------------------------------
+  // data/sip/kinds.json, written by the build (src/m2_fund/sip.py) for ₹1,000 a month
+  // and ₹1,00,000 once on the 5th, scaled here. Fetched once an answer is up: the
+  // answer does not wait for it. No fund is named: these are ranges of kinds.
+  var kindsFile = null, opened = {};
+  function overview() {
+    var box = page.querySelector("[data-sip-kinds]");
+    if (!kindsFile) {
+      kindsFile = fetch(BASE + "/data/sip/kinds.json").then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      }).then(function (j) {
+        if (j.version !== 1) throw new Error("version " + j.version);
+        return j;
+      });
+    }
+    var mine = generation;
+    kindsFile.then(function (j) {
+      if (mine === generation) { box.hidden = false; drawKinds(j); }
+    }, function () {
+      kindsFile = null;
+      box.hidden = false;
+      fill(out("kinds"), el("p", { "class": "sip__note" }, "The comparison of kinds did not load."));
+    });
+  }
+
+  function drawKinds(j) {
+    var paise = M.toPaise(state.a);
+    if (state.from || state.d !== j.day || !paise || paise > M.SIP_MAX_PAISE) {
+      fill(out("kinds"), el("p", { "class": "sip__note" },
+        "For SIPs on the 5th, over standard periods. Choose one to compare kinds."));
+      return;
+    }
+    var unit = j.unit[state.m], period = String(state.y);
+    var scale = function (worth) { return scaled(worth, unit, paise); };
+    var rows = [];
+    j.kinds.forEach(function (k) {
+      var option = kind.querySelector('option[value="' + k.category + '"]');
+      if (option) rows.push({ k: k, w: k[state.m][period], family: option.parentNode.label });
+    });
+    var ranged = rows.filter(function (r) { return r.w; });
+    if (!ranged.length) { fill(out("kinds"), el("p", { "class": "sip__note" }, "No kind has three funds with prices back that far.")); return; }
+    var putIn = ranged[0].w.count * paise;
+    // One ₹ axis for every kind, from the lowest of them (or what was put in) to the highest.
+    var lo = Math.min.apply(null, ranged.map(function (r) { return scale(r.w.min); }).concat(putIn));
+    var hi = Math.max.apply(null, ranged.map(function (r) { return scale(r.w.max); }));
+    var at = function (p) { return ((p - lo) / (hi - lo || 1) * 100).toFixed(2) + "%"; };
+    function mark(cls, p) { var m = el("span", { "class": "sip__bar-" + cls }); m.style.left = at(p); return m; }
+    function row(r) {
+      var w = r.w, k = r.k, current = k.category === state.c;
+      var head = el("div", { "class": "sip__krow-head" },
+        el("button", { type: "button", "class": "sip__krow-name", "data-kind": k.category,
+                       "aria-current": current ? "true" : null }, k.name),
+        el("span", { "class": "sip__krow-count" },
+          (w ? w.eligible + " of " : "") + k.funds + " fund" + (k.funds === 1 ? "" : "s")));
+      var body = [el("p", { "class": "sip__krow-about" }, k.about)];
+      if (!w) {
+        body.push(el("p", { "class": "sip__krow-figs" }, "No range: fewer than 3 funds of this kind have prices for the whole period."));
+      } else {
+        var range = el("span", { "class": "sip__bar-range" });
+        range.style.left = at(scale(w.min));
+        range.style.width = ((scale(w.max) - scale(w.min)) / (hi - lo || 1) * 100).toFixed(2) + "%";
+        var low = Number(w.middle_low);
+        body.push(
+          el("div", { "class": "sip__bar", "aria-hidden": "true" }, range, mark("putin", putIn),
+            mark("mid", scale(w.middle)), w.index ? mark("index", scale(w.index.worth)) : null),
+          el("p", { "class": "sip__krow-figs" },
+            el("strong", null, "about " + rupees(scale(w.middle))), " in the middle · ",
+            low < 0 ? "middle at its lowest: " + pct(low) + " below" : "the middle never below what was put in",
+            el("span", { "class": "sr-only" }, ". From about " + rupees(scale(w.min)) + " to about " +
+              rupees(scale(w.max)) + (w.index ? "; its index fund about " + rupees(scale(w.index.worth)) : "") + ".")));
+      }
+      return el.apply(null, ["li", { "class": "sip__krow" + (current ? " sip__krow--current" : "") }, head].concat(body));
+    }
+    // Each family's three kinds holding the most money first, the rest a tap away.
+    var families = [];
+    rows.forEach(function (r) {
+      var f = families.length && families[families.length - 1].name === r.family ? families[families.length - 1] : null;
+      if (!f) families.push(f = { name: r.family, rows: [] });
+      f.rows.push(r);
+    });
+    var blocks = families.map(function (f) {
+      f.rows.sort(function (a, b) {
+        return (Number(b.k.assets) || 0) - (Number(a.k.assets) || 0) || (a.k.name < b.k.name ? -1 : 1);
+      });
+      var shown = opened[f.name] ? f.rows : f.rows.slice(0, 3);
+      var list = el.apply(null, ["ul", { "class": "sip__kinds" }].concat(shown.map(row)));
+      var more = f.rows.length > shown.length
+        ? el("button", { type: "button", "class": "button button--quiet", "data-family": f.name },
+            "Show all " + f.rows.length + " kinds")
+        : null;
+      return el("div", { "class": "sip__family", "data-family-of": f.name }, el("h3", null, f.name), list, more);
+    });
+    // Each kind is valued on its own latest prices, as choosing it would be.
+    var dates = ranged.map(function (r) { return r.k.valued_on; }).sort();
+    var on = dates[0] === dates[dates.length - 1] ? M.day(dates[0])
+      : M.day(dates[0]) + " to " + M.day(dates[dates.length - 1]);
+    var how = state.m === "sip"
+      ? rupees(paise) + " a month for " + years(state.y) + ", " + rupees(putIn) + " put in"
+      : rupees(paise) + " once, " + years(state.y) + " ago";
+    fill.apply(null, [out("kinds"),
+      el("p", { "class": "sip__note" }, how + ", in every kind of fund, valued on " + on +
+        ". Worked out for ₹1,000 a month (₹1,00,000 once) and scaled, so each figure is about, to the nearest ₹100. Choose a kind for its exact range."),
+      el("p", { "class": "sip__note sip__key", "aria-hidden": "true" },
+        el("span", { "class": "sip__key-range" }), " lowest to highest  ",
+        el("span", { "class": "sip__key-mid" }), " the middle fund  ",
+        el("span", { "class": "sip__key-index" }), " the index fund  ",
+        el("span", { "class": "sip__key-putin" }), " put in"),
+      el("div", { "class": "sip__axis", "aria-hidden": "true" },
+        el("span", null, "about " + rupees(lo)), el("span", null, "about " + rupees(hi)))].concat(blocks));
   }
 
   // --- start -------------------------------------------------------------------------

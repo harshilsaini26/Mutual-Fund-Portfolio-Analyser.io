@@ -5,9 +5,9 @@
 {#
   The public copy's front page (DECISIONS V1-89): a product story told in one scroll.
 
-  A hero with three equal doors (look up a fund, understand funds, see your
-  portfolio), then one section per door, each named by its door, then where the
-  data comes from. Every word, figure and link is here at rest and with scripts
+  A hero with three equal doors (see your portfolio, what a SIP would have become,
+  look up a fund; SPEC_SIP_WHAT_IF §5.2), then one section per way in, then where
+  the data comes from. Every word, figure and link is here at rest and with scripts
   off; the motion in app.css only builds the pictures (bars, markers, lines), never
   the words. Every figure was formatted by `jobs/publish_site.py` and
   `jobs/landing.py`; geometry arrives as text for SVG attributes, so nothing here
@@ -31,6 +31,14 @@
     <a class="button lp-door__link" href="{{ root }}/portfolio/">Add your SIPs and lump sums</a>
     <span class="lp-door__more">What they are worth, what they earned a year and what they own, worked out in your browser</span>
   </li>
+  {#- Two links, so not one across the card: /sip/, and Learn's first guide for a
+      newcomer ("Understand funds" was a door of its own until §5.2). -#}
+  <li class="lp-door">
+    <p class="lp-door__title">What would a SIP have become?</p>
+    <a class="button lp-door__link" href="{{ root }}/sip/">Try an amount</a>
+    <span class="lp-door__more">Choose an amount and a kind of fund. No fund names needed.
+      <a href="{{ root }}/learn/start-here/">New to funds? Start here</a></span>
+  </li>
   <li class="lp-door">
     <p class="lp-door__title">Look up a fund</p>
     <form class="search search--hero" action="{{ root }}/funds/" method="get" role="search">
@@ -42,10 +50,6 @@
       <ul class="search__suggest" hidden data-lenis-prevent></ul>
     </form>
     <a class="lp-door__more" href="{{ root }}/funds/">or explore all {{ count | fmt_count }}</a>
-  </li>
-  <li class="lp-door lp-door--link">
-    <p class="lp-door__title">Understand funds</p>
-    <a class="lp-door__link" href="{{ root }}/learn/">How funds are organised, in plain words</a>
   </li>
 </ul>
 {%- endmacro %}
@@ -65,7 +69,8 @@
       <p class="eyebrow">Indian mutual funds, looked through</p>
       <h1 id="lp-title" class="lp-hero__title">Did my SIP work?</h1>
       <p class="lp-hero__lede">Enter your SIPs and lump sums to see what they are worth, what
-        they earned a year and what they own, company by company. Or look up any of
+        they earned a year and what they own, company by company. Or see what a SIP in
+        any kind of fund would have become. Or look up any of
         {{ count | fmt_count }} fund{{ '' if count == 1 else 's' }}, each set against the funds that do the
         same job, from AMFI's prices and each fund's published portfolio, most read from an
         aggregator's pages. Free, rebuilt every night.</p>

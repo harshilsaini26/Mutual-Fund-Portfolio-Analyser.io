@@ -9,7 +9,8 @@ the build and the app rather than reaching a reader:
   site, a `checked` date that is missing or more than a day ahead;
 - text over its length (a term's explanation 60 words, a guide's summary 25,
   a paragraph 120) and a guide outside 4 to 6 sections;
-- a `[[key]]` link or a related term that names no term;
+- a `[[key]]` link or a related term that names no term, or a section's `guide`
+  (the fuller guide on its point) that names no guide;
 - any percentage in the tax guide: rates change with each Budget and are not
   this site's to print (invariant 8);
 - a figure that is not a PNG in static/learn/, or has no alt text or no numbered
@@ -104,6 +105,7 @@ class Section:
     heading: str
     paragraphs: tuple[str, ...]
     figure: Figure | None = None
+    guide: str | None = None
 
 
 @dataclass(frozen=True)
@@ -228,7 +230,7 @@ def _load(path: Path, today: date) -> Learn:
         sections = tuple(
             Section(s["heading"],
                     tuple(_length(p, "paragraph", slug) for p in s["paragraphs"]),
-                    _figure(s.get("figure"), slug))
+                    _figure(s.get("figure"), slug), s.get("guide"))
             for s in raw["sections"]
         )
         guides.append(Guide(slug, raw["title"], raw["group"],
@@ -249,6 +251,10 @@ def _check_links(learn: Learn) -> None:
         for match in LINK.finditer(text):
             if match.group(1) not in learn.terms:
                 raise LearnError(f"{guide.slug}: [[{match.group(1)}]] names no term")
+        slugs = {g.slug for g in learn.guides}
+        for section in guide.sections:
+            if section.guide is not None and section.guide not in slugs:
+                raise LearnError(f"{guide.slug}: guide {section.guide!r} does not exist")
         if guide.slug == TAX_GUIDE and PERCENT.search(text + " " + guide.summary):
             raise LearnError(f"{guide.slug}: no tax figure may be printed")
 

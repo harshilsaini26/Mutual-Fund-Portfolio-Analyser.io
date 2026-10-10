@@ -283,8 +283,10 @@ FORWARD_LOOKING_PATTERNS = [
 
 
 def test_nothing_looks_forward() -> None:
-    """/sip/, the scripts that write sentences about past money, and Learn: none
-    says what money will do."""
+    """/sip/, the scripts that write sentences about past money, Learn, and the
+    kinds' one-line descriptions kinds.json carries (§7.2): none says what money
+    will do."""
+    from src.m0_data.categories import _table
     from src.m6_views.learn import load
 
     static = TEMPLATES.parent / "static"
@@ -297,6 +299,7 @@ def test_nothing_looks_forward() -> None:
         [t for term in learn.terms.values() for t in (term.title, term.short)]
         + [p for g in learn.guides for s in g.sections
            for p in (s.heading, *s.paragraphs)])
+    texts["categories"] = " ".join(c.about or "" for c in _table().values())
     offences = [(name, p) for name, text in texts.items()
                 for p in FORWARD_LOOKING_PATTERNS if re.search(p, text, re.I)]
     assert not offences, offences

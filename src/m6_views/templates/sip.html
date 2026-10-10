@@ -107,6 +107,11 @@
     <div class="section-head"><h2 id="sip-end-h">Where each fund ended</h2></div>
     <div data-out="ends"></div>
   </section>
+  {#- Every kind's range from the build's data/sip/kinds.json, scaled (§5.1). -#}
+  <section class="home-section" aria-labelledby="sip-kinds-h" data-sip-kinds hidden>
+    <div class="section-head"><h2 id="sip-kinds-h">The same money in other kinds of fund</h2></div>
+    <div data-out="kinds"></div>
+  </section>
 
   {#- Always shown, never folded (§4.6.5). -#}
   <section class="home-section sip__notes" aria-labelledby="sip-notes-h">
