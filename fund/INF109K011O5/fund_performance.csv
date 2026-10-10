@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the benchmark had 8 rising and 5 falling months; a capture ratio needs six each way, so a blank one is left blank.
+# Generated: 2026-10-10T00:21:42.343616+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.056381,0.133090,0.127807,"Annualised, with dividends reinvested."
+Benchmark a year,-0.041109,0.105320,,"The benchmark over the same days, dividends included."
+Ahead of benchmark,-0.015272,0.027770,,The fund's return a year less the benchmark's.
+Volatility,0.145531,0.133044,0.134503,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.134038,-0.147639,-0.147639,The largest fall from a high within the period.
+Sharpe ratio,-0.753846,0.543850,0.514531,Return above cash for each unit of volatility.
+Sortino ratio,-1.022004,0.758663,0.713038,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.115679,0.085083,,Return above cash for each unit of beta.
+Alpha a year,-0.020147,0.034439,,Return beyond what its beta to the benchmark accounts for.
+Beta,0.948379,0.850421,,How far it moved for each 1% the benchmark moved.
+Tracking error,0.039094,0.043617,,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,-0.390648,0.636678,,Its lead over the benchmark for each unit of tracking error.
+Up capture,1.025768,0.999984,,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,,0.882495,,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."

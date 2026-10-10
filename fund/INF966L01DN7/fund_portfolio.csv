@@ -1,0 +1,25 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 100.0% of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:42.209744+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,27.253121
+TREPS / Repo / Reverse Repo,Cash and equivalents,26.765613
+Capri Global Capital Limited,Shares,10.374919
+LG Electronics India Limited,Shares,10.258102
+ICICI Prudential Asset Management Company Limited,Shares,9.040195
+Aurobindo Pharma Ltd.,Shares,8.129368
+Ventive Hospitality Limited,Shares,8.031109
+Heritage Foods Limited,Shares,7.562998
+Zydus Wellness Limited,Shares,7.081114
+Government Securities,Bonds and other debt,5.485102
+Bharti Airtel  Ltd.,Shares,4.454776
+Procter & Gamble Hygiene & Health Care Ltd.,Shares,2.402955
+Torrent Pharmaceuticals Ltd.,Shares,0.898368
+Net Receivables / Payables,Cash and equivalents,-27.737740

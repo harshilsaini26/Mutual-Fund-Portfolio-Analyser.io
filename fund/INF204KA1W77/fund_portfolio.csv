@@ -1,0 +1,61 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 79.7% of portfolio value | Unresolved: 20.3% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 79.7% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 20.3% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:23:57.527280+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,45.273216
+Unresolved Holdings,Shares,20.341893
+Government Securities,Bonds and other debt,11.969953
+ICICI Bank Ltd.,Shares,9.085202
+Mahindra & Mahindra Ltd.,Shares,8.589413
+HDFC Bank Ltd.,Shares,7.069081
+Reliance Industries Ltd,Shares,4.753093
+Bharti Airtel  Ltd.,Shares,4.746673
+Ashok Leyland Ltd.,Shares,3.701522
+Grasim Industries Ltd,Shares,3.490466
+AXIS Bank Ltd.,Shares,3.234939
+Knowledge Realty Trust,"REITs, InvITs and other",1.971573
+ITC Ltd,Shares,1.751957
+Sun Pharmaceutical Industries Ltd.,Shares,1.519982
+State Bank Of India,Shares,1.460196
+TATA STEEL LIMITED,Shares,1.446449
+Infosys Ltd,Shares,1.394832
+ICICI Prudential Life Insurance Company Limited,Shares,1.352178
+Larsen & Toubro Limited,Shares,1.206537
+Cummins India Ltd.,Shares,0.926888
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.910080
+Maruti Suzuki India  Ltd.,Shares,0.799741
+Vedanta Aluminium Metal Limited,Shares,0.648990
+Power Finance Corporation Ltd,Shares,0.610602
+Bharat Electronics Ltd.,Shares,0.591253
+AU Small Finance Bank Limited,Shares,0.563473
+Net Receivables / Payables,Cash and equivalents,0.473054
+JSW Energy Limited,Shares,0.472431
+Tata Consultancy Services Ltd.,Shares,0.466751
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,0.422799
+Max Financial Services Limited,Shares,0.408028
+Asian Paints Ltd.,Shares,0.344143
+HCL Technologies Ltd,Shares,0.340356
+Hindustan Unilever Ltd.,Shares,0.331693
+Bajaj Auto Limited,Shares,0.288351
+Bajaj Finance Limited,Shares,0.274163
+IndusInd Bank Ltd.,Shares,0.263684
+Coal India Limited,Shares,0.234465
+JSW Steel Limited,Shares,0.228953
+Oil And Natural Gas Corporation Ltd,Shares,0.180372
+Persistent Systems Limited,Shares,0.132555
+Eicher Motors Ltd.,Shares,0.103155
+Ambuja Cements Ltd.,Shares,0.068670
+Varun Beverages Limited,Shares,0.052978
+Bank Of Baroda,Shares,0.009052
+Cash & Bank Balance,Cash and equivalents,0.008702
+Derivative Positions,Derivatives,-44.514537

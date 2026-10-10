@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the capture ratios rest on 6 rising and 7 falling months of the benchmark; that few makes them rough.
+# Generated: 2026-10-10T00:25:07.576042+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.067576,0.126315,0.131270,"Annualised, with dividends reinvested."
+Benchmark a year,-0.057397,0.085807,,"The benchmark over the same days, dividends included."
+Ahead of benchmark,-0.010179,0.040508,,The fund's return a year less the benchmark's.
+Volatility,0.130642,0.131685,0.134714,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.142831,-0.158481,-0.166679,The largest fall from a high within the period.
+Sharpe ratio,-0.925453,0.498014,0.539432,Return above cash for each unit of volatility.
+Sortino ratio,-1.242120,0.690283,0.741029,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.132265,0.072515,,Return above cash for each unit of beta.
+Alpha a year,-0.019691,0.042906,,Return beyond what its beta to the benchmark accounts for.
+Beta,0.914096,0.904374,,How far it moved for each 1% the benchmark moved.
+Tracking error,0.027974,0.033590,,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,-0.363874,1.205954,,Its lead over the benchmark for each unit of tracking error.
+Up capture,0.970131,1.120856,,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,1.023124,0.938259,,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."

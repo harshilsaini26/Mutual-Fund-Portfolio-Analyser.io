@@ -1,0 +1,30 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 80.3% of portfolio value | Unresolved: 19.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 80.3% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 19.7% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:48.987994+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,21.024655
+Unresolved Holdings,Shares,19.698554
+TREPS / Repo / Reverse Repo,Cash and equivalents,14.820957
+Adani Enterprises Ltd.,Shares,8.461336
+Adani Green Energy Limited,Shares,8.147719
+Aurobindo Pharma Ltd.,Shares,7.079958
+LIFE INSURANCE CORPORATION OF INDIA,Shares,6.630093
+DLF LIMITED,Shares,5.675007
+INDUS TOWERS LIMITED,Shares,5.423089
+Government Securities,Bonds and other debt,5.201876
+Zydus Lifesciences Limited,Shares,4.280173
+ICICI Prudential Asset Management Company Limited,Shares,4.241085
+Adani Power Limited,Shares,3.894924
+Bharat Heavy Electricals Ltd.,Shares,2.926326
+Bharti Airtel  Ltd.,Shares,1.842603
+BLACK BOX LIMITED,Shares,1.687930
+Net Receivables / Payables,Cash and equivalents,-21.036285

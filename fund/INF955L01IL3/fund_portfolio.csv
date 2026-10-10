@@ -1,0 +1,62 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 73.1% of portfolio value | Unresolved: 26.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 73.1% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 26.9% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:19:27.118066+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,27.861004
+Unresolved Holdings,Bonds and other debt,26.858423
+Government Securities,Bonds and other debt,9.010478
+State Bank Of India,Shares,3.827492
+Bharti Airtel  Ltd.,Shares,3.334685
+Reliance Industries Ltd,Shares,3.065180
+ICICI Bank Ltd.,Shares,2.991474
+Cash & Bank Balance,Cash and equivalents,2.854036
+Larsen & Toubro Limited,Shares,2.773992
+Sun Pharmaceutical Industries Ltd.,Shares,2.371760
+AXIS Bank Ltd.,Shares,2.161309
+HDFC Bank Ltd.,Shares,2.157361
+TATA STEEL LIMITED,Shares,1.966653
+One 97 Communications Limited,Shares,1.926960
+DLF LIMITED,Shares,1.796346
+Lic Housing Finance Ltd.,Shares,1.734277
+Tata Power Co. Ltd,Shares,1.730710
+Adani Ports and Special Economic Zone Ltd,Shares,1.677439
+Bajaj Finance Limited,Shares,1.669438
+Mahindra & Mahindra Ltd.,Shares,1.534633
+Ajanta Pharma Ltd.,Shares,1.459646
+Godrej Properties Limited,Shares,1.428785
+Bharat Heavy Electricals Ltd.,Shares,1.379878
+Ambuja Cements Ltd.,Shares,1.267171
+HITACHI ENERGY INDIA LIMITED,Shares,1.202055
+TVS Motor Company Ltd.,Shares,1.082629
+PNB Housing Finance Limited,Shares,1.002619
+NIPPON LIFE INDIA ASSET MANAGEMENT LIMITED,Shares,0.986686
+Mankind Pharma Limited,Shares,0.980382
+Hindalco Industries Ltd.,Shares,0.949625
+IndusInd Bank Ltd.,Shares,0.936637
+Fractal Analytics Limited,Shares,0.929744
+Linde India Limited,Shares,0.862549
+Pidilite Industries Ltd.,Shares,0.841768
+POWER GRID CORPORATION OF INDIA LIMITED,Shares,0.821575
+Navin Fluorine International Limited,Shares,0.811322
+Punjab National Bank,Shares,0.791302
+AU Small Finance Bank Limited,Shares,0.778764
+Bharat Electronics Ltd.,Shares,0.775162
+Hindustan Petroleum Corporation Ltd,Shares,0.741080
+LIFE INSURANCE CORPORATION OF INDIA,Shares,0.521208
+Max Financial Services Limited,Shares,0.514904
+Persistent Systems Limited,Shares,0.484424
+NHPC Limited,Shares,0.398595
+Britannia Industries Ltd.,Shares,0.363682
+National Securities Depository Limited,Shares,0.262821
+Nestle India Ltd.,Shares,0.259184
+Derivative Positions,Derivatives,-26.137847

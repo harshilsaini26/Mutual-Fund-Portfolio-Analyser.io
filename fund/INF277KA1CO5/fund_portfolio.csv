@@ -1,0 +1,31 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 91.3% of portfolio value | Unresolved: 8.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 91.3% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 8.7% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:26:00.544162+00:00
+holding,kind,weight_pct
+Multi Commodity Exchange of India Ltd,Shares,19.724795
+BSE Ltd.,Shares,16.874861
+HDFC Asset Management Company Limited,Shares,12.157375
+Unresolved Holdings,Shares,8.667759
+Central Depository Services (India) Ltd.,Shares,5.681627
+NIPPON LIFE INDIA ASSET MANAGEMENT LIMITED,Shares,4.779828
+Anand Rathi Wealth Limited,Shares,4.475101
+Computer Age Management Services Limited,Shares,4.273324
+ANGEL ONE LIMITED,Shares,4.238718
+Motilal Oswal Financial Services Limited,Shares,3.709869
+ICICI Prudential Asset Management Company Limited,Shares,3.408633
+Billionbrains Garage Ventures Limited,Shares,3.361379
+Nuvama Wealth Management Limited,Shares,3.082285
+KFin Technologies Limited,Shares,2.949210
+Indian Energy Exchange Limited,Shares,2.177914
+UTI Asset Management Company Limited,Shares,0.833250
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.145090
+Net Receivables / Payables,Cash and equivalents,-0.541018

@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the benchmark had 5 rising and 8 falling months; a capture ratio needs six each way, so a blank one is left blank.
+# Generated: 2026-10-10T00:22:58.994633+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.113813,0.040948,0.046181,"Annualised, with dividends reinvested."
+Benchmark a year,-0.111157,0.043529,0.048033,"The benchmark over the same days, dividends included."
+Ahead of benchmark,-0.002656,-0.002581,-0.001852,The fund's return a year less the benchmark's.
+Volatility,0.136830,0.132892,0.138422,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.161061,-0.161061,-0.162108,The largest fall from a high within the period.
+Sharpe ratio,-1.221516,-0.148888,-0.089726,Return above cash for each unit of volatility.
+Sortino ratio,-1.648746,-0.210588,-0.126173,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.167904,-0.019848,-0.012462,Return above cash for each unit of beta.
+Alpha a year,-0.003404,-0.002634,-0.001888,Return beyond what its beta to the benchmark accounts for.
+Beta,0.995452,0.996892,0.996636,How far it moved for each 1% the benchmark moved.
+Tracking error,0.001523,0.001060,0.001361,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,-1.743926,-2.434906,-1.360764,Its lead over the benchmark for each unit of tracking error.
+Up capture,,0.989176,0.990861,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,1.001595,1.002967,1.000973,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."

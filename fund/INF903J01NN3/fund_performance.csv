@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the capture ratios rest on 7 rising and 6 falling months of the benchmark; that few makes them rough.
+# Generated: 2026-10-10T00:25:45.126911+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.088154,0.055824,0.064431,"Annualised, with dividends reinvested."
+Benchmark a year,-0.051457,0.092445,0.079896,"The benchmark over the same days, dividends included."
+Ahead of benchmark,-0.036697,-0.036621,-0.015465,The fund's return a year less the benchmark's.
+Volatility,0.140381,0.130389,0.135700,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.154091,-0.159324,-0.163173,The largest fall from a high within the period.
+Sharpe ratio,-1.007836,-0.037657,0.042962,Return above cash for each unit of volatility.
+Sortino ratio,-1.358148,-0.051942,0.058954,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.148544,-0.005579,0.006399,Return above cash for each unit of beta.
+Alpha a year,-0.041679,-0.032818,-0.013570,Return beyond what its beta to the benchmark accounts for.
+Beta,0.952450,0.880069,0.911012,How far it moved for each 1% the benchmark moved.
+Tracking error,0.033565,0.035226,0.033559,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,-1.093311,-1.039601,-0.460830,Its lead over the benchmark for each unit of tracking error.
+Up capture,0.883223,0.797081,0.837409,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,1.074038,0.951891,0.904864,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."

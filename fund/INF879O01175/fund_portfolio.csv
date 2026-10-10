@@ -1,0 +1,30 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 27.6% of portfolio value | Unresolved: 72.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 27.6% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 72.4% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:31.264278+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,72.358232
+Brookfield India Real Estate Trust,"REITs, InvITs and other",5.104169
+EMBASSY OFFICE PARKS REIT,"REITs, InvITs and other",5.011905
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.756676
+Knowledge Realty Trust,"REITs, InvITs and other",2.261900
+PETRONET LNG LTD.,Shares,2.192764
+Coal India Limited,Shares,1.943688
+POWER GRID CORPORATION OF INDIA LIMITED,Shares,1.847064
+ITC Ltd,Shares,1.806523
+Units of Other Schemes,Other funds,1.000668
+Government Securities,Bonds and other debt,0.868091
+Power Finance Corporation Ltd,Shares,0.798547
+Swaraj Engines Ltd.,Shares,0.637823
+INDUS TOWERS LIMITED,Shares,0.067978
+Derivative Positions,Derivatives,-0.000701
+Net Receivables / Payables,Cash and equivalents,-0.655327

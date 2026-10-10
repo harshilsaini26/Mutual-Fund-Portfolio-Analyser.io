@@ -1,0 +1,23 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 93.5% of portfolio value | Unresolved: 6.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 93.5% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 6.5% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:25:01.722433+00:00
+holding,kind,weight_pct
+State Bank Of India,Shares,31.651414
+Bank Of Baroda,Shares,13.838114
+Canara Bank,Shares,13.241516
+Punjab National Bank,Shares,12.321241
+Bank of India,Shares,11.956248
+Indian Bank,Shares,9.828235
+Unresolved Holdings,Shares,6.507929
+UCO Bank,Shares,0.879157
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.599050
+Net Receivables / Payables,Cash and equivalents,-0.822904

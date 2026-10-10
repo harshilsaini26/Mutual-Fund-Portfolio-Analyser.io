@@ -1,0 +1,52 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 82.0% of portfolio value | Unresolved: 18.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 82.0% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 18.0% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:21:56.698875+00:00
+holding,kind,weight_pct
+State Bank Of India,Shares,18.630317
+Unresolved Holdings,Shares,17.985510
+POWER GRID CORPORATION OF INDIA LIMITED,Shares,7.599853
+LIFE INSURANCE CORPORATION OF INDIA,Shares,6.000223
+Bharat Electronics Ltd.,Shares,5.914871
+Oil And Natural Gas Corporation Ltd,Shares,4.807171
+Indian Oil Corporation Ltd.,Shares,4.652221
+Coal India Limited,Shares,3.473366
+Indian Railway Catering & Tourism Corporation Ltd,Shares,2.701948
+Oil India Limited,Shares,2.569935
+Margin / Deposits,Cash and equivalents,2.519529
+General Insurance Corporation of India,Shares,2.230718
+Bank Of Baroda,Shares,2.095262
+NHPC Limited,Shares,1.952824
+SBI Life Insurance Company Limited,Shares,1.910259
+Hindustan Aeronautics Limited,Shares,1.887868
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.770577
+Bank of India,Shares,1.422863
+Gail (India) Ltd.,Shares,1.246448
+Indian Bank,Shares,1.237444
+National Aluminium Co. Ltd.,Shares,1.035979
+Gujarat Gas Limited,Shares,0.915645
+Lic Housing Finance Ltd.,Shares,0.872918
+Data Patterns (India) Limited,Shares,0.798007
+Repco Home Finance Limited,Shares,0.551999
+SJVN LIMITED,Shares,0.499777
+Hindustan Petroleum Corporation Ltd,Shares,0.496377
+NLC India Limited,Shares,0.434432
+PETRONET LNG LTD.,Shares,0.417781
+NMDC Steel Limited,Shares,0.383204
+Mangalore Refinery & Petrochemicals,Shares,0.330446
+Tamil Nadu Newsprint And Papers Ltd,Shares,0.324577
+Derivative Positions,Derivatives,0.268799
+Astra Microwave Products Ltd.,Shares,0.243019
+Chennai Petroleum Corporation Ltd.,Shares,0.236529
+Central Mine Planning & Design Institute Limited,Shares,0.218856
+Canara HSBC Life Insurance Company Limited,Shares,0.205199
+Steel Authority of India Ltd.,Shares,0.070738
+Net Receivables / Payables,Cash and equivalents,-0.913489

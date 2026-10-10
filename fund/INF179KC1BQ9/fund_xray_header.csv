@@ -1,0 +1,14 @@
+﻿# View: fund_xray_header
+# Question: How has this fund done, and against what?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+# Generated: 2026-10-10T00:21:04.584087+00:00
+window_key,obs_days,return_ann,return_cum,volatility_ann,max_dd,confidence,sharpe,sortino,risk_free_pct,bench_return_ann,beta,tracking_error,alpha_ann,up_capture,down_capture,interpolated_pct
+1y,365,-0.000211,-0.000211,0.173033,-0.144409,medium,-0.309409,-0.422777,5.3327,-0.001000,1.000989,0.001189,0.000843,1.004478,,0.000000
+3y,1096,0.156695,0.548212,0.185507,-0.266736,high,0.517290,0.701392,6.0734,0.156943,1.000827,0.000974,-0.000328,0.999486,1.000250,0.000000
+5y,1801,0.102072,0.615382,0.179395,-0.266736,high,0.240620,0.321219,5.8906,0.102911,1.000577,0.001052,-0.000864,0.997240,1.000246,0.000000
+since_first_nav,1801,0.102072,0.615382,0.179395,-0.266736,high,0.240620,0.321219,5.8906,0.102911,1.000577,0.001052,-0.000864,0.997240,1.000246,0.000000

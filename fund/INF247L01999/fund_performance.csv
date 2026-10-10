@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the benchmark had 8 rising and 5 falling months; a capture ratio needs six each way, so a blank one is left blank.
+# Generated: 2026-10-10T00:23:37.254198+00:00
+measure,1y,3y,5y,meaning
+Return a year,0.042592,0.209372,0.179540,"Annualised, with dividends reinvested."
+Benchmark a year,-0.041109,0.105320,,"The benchmark over the same days, dividends included."
+Ahead of benchmark,0.083701,0.104052,,The fund's return a year less the benchmark's.
+Volatility,0.187824,0.193392,0.177373,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.158793,-0.260644,-0.260644,The largest fall from a high within the period.
+Sharpe ratio,-0.057155,0.768584,0.681834,Return above cash for each unit of volatility.
+Sortino ratio,-0.081071,1.068170,0.938028,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.009600,0.130091,,Return above cash for each unit of beta.
+Alpha a year,0.094867,0.097696,,Return beyond what its beta to the benchmark accounts for.
+Beta,1.118242,1.142567,,How far it moved for each 1% the benchmark moved.
+Tracking error,0.090457,0.091822,,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,0.925313,1.133192,,Its lead over the benchmark for each unit of tracking error.
+Up capture,1.401123,1.523894,,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,,1.079391,,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."

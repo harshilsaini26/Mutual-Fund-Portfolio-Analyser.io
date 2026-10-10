@@ -1,0 +1,43 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 87.5% of portfolio value | Unresolved: 12.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 87.5% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 12.5% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:26:54.946516+00:00
+holding,kind,weight_pct
+Bharti Airtel  Ltd.,Shares,16.727414
+Unresolved Holdings,Shares,12.482486
+Derivative Positions,Derivatives,11.990772
+Government Securities,Bonds and other debt,8.109861
+COFORGE LIMITED,Shares,5.494313
+PB Fintech Limited,Shares,4.812537
+Cash & Bank Balance,Cash and equivalents,4.426424
+Info Edge(India) Ltd.,Shares,4.164861
+Infosys Ltd,Shares,4.096970
+Persistent Systems Limited,Shares,3.567144
+eClerx Services Limited,Shares,3.269658
+Tata Consultancy Services Ltd.,Shares,3.039852
+Oracle Financial Services Software Limited,Shares,2.853112
+Firstsource Solutions Ltd.,Shares,2.749950
+Fractal Analytics Limited,Shares,2.680772
+FSN E-Commerce Ventures Limited,Shares,2.244777
+HCL Technologies Ltd,Shares,2.148757
+KRN HEAT EXCHANGER AND REFRIGERATION LIMITED,Shares,2.037570
+Lenskart Solutions Limited,Shares,2.017678
+Honasa Consumer Limited,Shares,1.890324
+CarTrade Tech Limited,Shares,1.855841
+INTELLECT DESIGN ARENA LIMITED,Shares,1.826273
+Billionbrains Garage Ventures Limited,Shares,1.725895
+TBO TEK LIMITED,Shares,1.629165
+Bharti Hexacom Limited,Shares,1.534105
+Newgen Software Technologies Limited,Shares,1.132036
+Mastek Limited,Shares,0.817424
+INVENTURUS KNOWLEDGE SOLUTIONS LIMITED,Shares,0.719542
+Le Travenues Technology Limited,Shares,0.368641
+Net Receivables / Payables,Cash and equivalents,-12.414154

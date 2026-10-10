@@ -1,0 +1,68 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 66.7% of portfolio value | Unresolved: 33.3% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 66.7% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 33.3% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:20:24.223328+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,33.258480
+Margin / Deposits,Cash and equivalents,5.310055
+HDFC Bank Ltd.,Shares,3.776823
+ICICI Bank Ltd.,Shares,3.644629
+Bharti Airtel  Ltd.,Shares,3.594883
+AXIS Bank Ltd.,Shares,2.648340
+State Bank Of India,Shares,2.628854
+Larsen & Toubro Limited,Shares,2.584918
+Mahindra & Mahindra Ltd.,Shares,2.209300
+Reliance Industries Ltd,Shares,2.187511
+Net Receivables / Payables,Cash and equivalents,2.142870
+UltraTech Cement Ltd,Shares,2.028327
+Bharat Electronics Ltd.,Shares,1.806093
+Government Securities,Bonds and other debt,1.795259
+Cholamandalam Investment and Finance Company Ltd,Shares,1.431290
+InterGlobe Aviation Limited,Shares,1.316602
+Kirloskar Oil Engines Limited,Shares,1.240171
+Tata Power Co. Ltd,Shares,1.229397
+Infosys Ltd,Shares,1.229195
+Britannia Industries Ltd.,Shares,1.209025
+Ashok Leyland Ltd.,Shares,1.182332
+RBL Bank Limited,Shares,1.145422
+Metropolis Healthcare Limited,Shares,1.140873
+Marico Limited,Shares,1.133029
+Cipla Ltd.,Shares,1.123357
+Global Health Limited,Shares,1.084370
+The Phoenix Mills Ltd.,Shares,1.009735
+PB Fintech Limited,Shares,0.996449
+Pine Labs Limited,Shares,0.987949
+SEDEMAC MECHATRONICS LIMITED,Shares,0.985097
+Dixon Technologies (India) Limited,Shares,0.947025
+TATA STEEL LIMITED,Shares,0.935783
+TBO TEK LIMITED,Shares,0.927415
+Dr. Reddy's Laboratories Ltd.,Shares,0.920241
+Eris Lifesciences Limited,Shares,0.868368
+SUZLON ENERGY LTD.,Shares,0.867054
+ANGEL ONE LIMITED,Shares,0.863997
+Amber Enterprises India Limited,Shares,0.863908
+ICICI Lombard General Insurance Company Limited,Shares,0.860471
+Timken India Ltd,Shares,0.858236
+Asian Paints Ltd.,Shares,0.846137
+Multi Commodity Exchange of India Ltd,Shares,0.843217
+Lenskart Solutions Limited,Shares,0.821393
+HYUNDAI MOTOR INDIA LIMITED,Shares,0.781216
+Exide Industries Ltd.,Shares,0.779887
+Cash & Bank Balance,Cash and equivalents,0.737436
+Hindustan Aeronautics Limited,Shares,0.680469
+Aptus Value Housing Finance India Limited,Shares,0.617161
+CESC Limited,Shares,0.613178
+Emmvee Photovoltaic Power Limited,Shares,0.592768
+ZF Commercial Vehicle Control Systems India Limited,Shares,0.592675
+ASTRAL LIMITED,Shares,0.386569
+Lemon Tree Hotels Limited,Shares,0.044822
+Derivative Positions,Derivatives,-5.310061

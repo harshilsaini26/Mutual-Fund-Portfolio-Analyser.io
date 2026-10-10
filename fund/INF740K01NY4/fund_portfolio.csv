@@ -1,0 +1,55 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 76.5% of portfolio value | Unresolved: 23.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 76.5% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 23.5% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:19:47.657383+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Shares,23.495895
+HDFC Bank Ltd.,Shares,7.861131
+ICICI Bank Ltd.,Shares,7.858020
+Government Securities,Bonds and other debt,7.735165
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.181643
+Mahindra & Mahindra Ltd.,Shares,3.778640
+AXIS Bank Ltd.,Shares,3.769385
+ITC Ltd,Shares,3.589788
+Units of Other Schemes,Other funds,3.388835
+Cipla Ltd.,Shares,3.165070
+SBI Life Insurance Company Limited,Shares,2.619235
+Infosys Ltd,Shares,2.122453
+Alkem Laboratories Limited,Shares,1.819113
+Maruti Suzuki India  Ltd.,Shares,1.806271
+State Bank Of India,Shares,1.552877
+INDUS TOWERS LIMITED,Shares,1.539344
+Emami Ltd,Shares,1.448511
+Hero MotoCorp Limited,Shares,1.442260
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,1.429337
+PETRONET LNG LTD.,Shares,1.275712
+Bharti Airtel  Ltd.,Shares,1.213245
+Oil And Natural Gas Corporation Ltd,Shares,1.146093
+Prudent Corporate Advisory Services Limited,Shares,1.095538
+Syngene International Limited,Shares,1.050392
+Coromandel International Limited,Shares,1.046434
+Mphasis Limited,Shares,1.012441
+Knowledge Realty Trust,"REITs, InvITs and other",0.995138
+Asian Paints Ltd.,Shares,0.959654
+ICICI Lombard General Insurance Company Limited,Shares,0.903438
+Canara HSBC Life Insurance Company Limited,Shares,0.857460
+APL Apollo Tubes Limited,Shares,0.856606
+UNO Minda Limited,Shares,0.592461
+OBEROI REALTY LIMITED,Shares,0.575857
+Century Plyboards (India) Ltd.,Shares,0.560443
+LIFE INSURANCE CORPORATION OF INDIA,Shares,0.545104
+Indian Oil Corporation Ltd.,Shares,0.446242
+PI Industries Limited,Shares,0.373712
+Ipca Laboratories Ltd.,Shares,0.327567
+Hindustan Petroleum Corporation Ltd,Shares,0.278233
+Power Finance Corporation Ltd,Shares,0.227264
+MUTHOOT FINANCE LIMITED,Bonds and other debt,0.216956
+Net Receivables / Payables,Cash and equivalents,-1.158963

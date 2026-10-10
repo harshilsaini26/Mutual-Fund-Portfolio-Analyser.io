@@ -1,0 +1,31 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 95.0% of portfolio value | Unresolved: 5.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 95.0% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 5.0% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:18.464170+00:00
+holding,kind,weight_pct
+Mahindra & Mahindra Ltd.,Shares,22.782081
+Maruti Suzuki India  Ltd.,Shares,13.741545
+Bajaj Auto Limited,Shares,10.445672
+Eicher Motors Ltd.,Shares,8.522668
+TVS Motor Company Ltd.,Shares,7.928979
+Samvardhana Motherson International Limited,Shares,5.853544
+Hero MotoCorp Limited,Shares,5.501369
+Unresolved Holdings,Shares,5.016164
+Bharat Forge Ltd,Shares,4.355168
+Ashok Leyland Ltd.,Shares,3.907575
+Bosch Ltd,Shares,3.375255
+Sona BLW Precision Forgings Limited,Shares,2.834224
+Tube Investments of India Ltd,Shares,2.309823
+UNO Minda Limited,Shares,1.804623
+Exide Industries Ltd.,Shares,1.557368
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.400675
+Cash & Bank Balance,Cash and equivalents,0.002376
+Net Receivables / Payables,Cash and equivalents,-0.339109

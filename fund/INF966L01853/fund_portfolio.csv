@@ -1,0 +1,28 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 90.2% of portfolio value | Unresolved: 9.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 90.2% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 9.8% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:44.541204+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,25.592124
+TREPS / Repo / Reverse Repo,Cash and equivalents,19.741318
+Unresolved Holdings,Shares,9.807203
+ICICI Prudential Asset Management Company Limited,Shares,9.396677
+Adani Enterprises Ltd.,Shares,8.348524
+Adani Green Energy Limited,Shares,8.320154
+LG Electronics India Limited,Shares,7.500406
+Bharat Heavy Electricals Ltd.,Shares,6.562498
+Divi's Laboratories Ltd.,Shares,5.921050
+Samvardhana Motherson International Limited,Shares,5.263405
+Capri Global Capital Limited,Shares,5.255360
+Government Securities,Bonds and other debt,5.137988
+Infosys Ltd,Shares,4.923838
+HFCL LIMITED,Shares,3.921345
+Net Receivables / Payables,Cash and equivalents,-25.691890

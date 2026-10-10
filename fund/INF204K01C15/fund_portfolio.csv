@@ -1,0 +1,18 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 12.9% of portfolio value | Unresolved: 87.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 12.9% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 87.1% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-10-10T00:23:51.677516+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,87.142584
+TREPS / Repo / Reverse Repo,Cash and equivalents,7.242806
+Net Receivables / Payables,Cash and equivalents,2.929065
+Government Securities,Bonds and other debt,2.668802
+Cash & Bank Balance,Cash and equivalents,0.011495
+Derivative Positions,Derivatives,0.005248

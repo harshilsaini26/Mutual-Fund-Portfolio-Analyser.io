@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the capture ratios rest on 6 rising and 7 falling months of the benchmark; that few makes them rough.
+# Generated: 2026-10-10T00:26:09.453814+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.031034,0.102472,0.095964,"Annualised, with dividends reinvested."
+Benchmark a year,-0.057397,0.085807,,"The benchmark over the same days, dividends included."
+Ahead of benchmark,0.026363,0.016665,,The fund's return a year less the benchmark's.
+Volatility,0.132021,0.137338,0.137103,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.166954,-0.166954,-0.166954,The largest fall from a high within the period.
+Sharpe ratio,-0.638997,0.303907,0.272518,Return above cash for each unit of volatility.
+Sortino ratio,-0.875223,0.420263,0.373469,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.096364,0.046341,,Return above cash for each unit of beta.
+Alpha a year,0.012572,0.019156,,Return beyond what its beta to the benchmark accounts for.
+Beta,0.875445,0.900669,,How far it moved for each 1% the benchmark moved.
+Tracking error,0.048450,0.050260,,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,0.544128,0.331576,,Its lead over the benchmark for each unit of tracking error.
+Up capture,0.980632,0.942247,,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,0.888939,0.862196,,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."

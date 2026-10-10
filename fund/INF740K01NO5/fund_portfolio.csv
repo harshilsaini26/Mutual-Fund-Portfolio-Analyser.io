@@ -1,0 +1,44 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 67.8% of portfolio value | Unresolved: 32.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 67.8% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 32.2% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:19:49.411828+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,46.764575
+Unresolved Holdings,Bonds and other debt,32.176912
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.975743
+HDFC Bank Ltd.,Shares,2.662430
+ICICI Bank Ltd.,Shares,1.972951
+Mahindra & Mahindra Ltd.,Shares,1.182324
+ITC Ltd,Shares,1.068280
+Indigo Paints Limited,Shares,0.907419
+Alkem Laboratories Limited,Shares,0.844453
+INDUS TOWERS LIMITED,Shares,0.838398
+Cipla Ltd.,Shares,0.803971
+AXIS Bank Ltd.,Shares,0.791300
+Oil And Natural Gas Corporation Ltd,Shares,0.761135
+SBI Life Insurance Company Limited,Shares,0.721270
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,0.716168
+Maruti Suzuki India  Ltd.,Shares,0.701085
+Hero MotoCorp Limited,Shares,0.668004
+Canara HSBC Life Insurance Company Limited,Shares,0.590517
+PETRONET LNG LTD.,Shares,0.510956
+Infosys Ltd,Shares,0.506582
+ICICI Lombard General Insurance Company Limited,Shares,0.423432
+Syngene International Limited,Shares,0.353346
+Knowledge Realty Trust,"REITs, InvITs and other",0.298342
+LIFE INSURANCE CORPORATION OF INDIA,Shares,0.268290
+Coromandel International Limited,Shares,0.256347
+La Opala RG Ltd.,Shares,0.209978
+Indian Oil Corporation Ltd.,Shares,0.148639
+Hindustan Petroleum Corporation Ltd,Shares,0.140901
+Ipca Laboratories Ltd.,Shares,0.045528
+Power Finance Corporation Ltd,Shares,0.026577
+Net Receivables / Payables,Cash and equivalents,-0.335853

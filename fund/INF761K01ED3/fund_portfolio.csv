@@ -1,0 +1,49 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 87.2% of portfolio value | Unresolved: 12.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 87.2% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 12.8% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:19:16.079010+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,77.333054
+Units of Other Schemes,Other funds,14.422767
+Unresolved Holdings,Shares,12.832824
+HDFC Bank Ltd.,Shares,6.224702
+Canara Bank,Shares,5.113697
+TATA STEEL LIMITED,Shares,4.842438
+VODAFONE IDEA LIMITED,Shares,3.745239
+Government Securities,Bonds and other debt,3.658749
+Steel Authority of India Ltd.,Shares,3.624870
+ITC Ltd,Shares,3.584946
+Bank Of Baroda,Shares,3.437340
+AXIS Bank Ltd.,Shares,3.395401
+Bharat Forge Ltd,Shares,2.984445
+Reliance Industries Ltd,Shares,2.906538
+Samvardhana Motherson International Limited,Shares,2.584982
+Power Finance Corporation Ltd,Shares,2.414242
+Hindustan Unilever Ltd.,Shares,2.158206
+State Bank Of India,Shares,1.957766
+Bajaj Finance Limited,Shares,1.774787
+JSW Steel Limited,Shares,1.712625
+Container Corporation Of India Ltd.,Shares,1.480245
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.455172
+Divi's Laboratories Ltd.,Shares,1.412934
+Hero MotoCorp Limited,Shares,1.403159
+Ambuja Cements Ltd.,Shares,1.400995
+UPL Limited,Shares,0.966458
+Cipla Ltd.,Shares,0.938548
+Bank of India,Shares,0.622888
+Godrej Properties Limited,Shares,0.390882
+Bharti Airtel  Ltd.,Shares,0.385359
+CG Power and Industrial Solutions Limited,Shares,0.290512
+UltraTech Cement Ltd,Shares,0.085445
+Grasim Industries Ltd,Shares,0.062908
+INDUS TOWERS LIMITED,Shares,0.049327
+Derivative Positions,Derivatives,-71.654450

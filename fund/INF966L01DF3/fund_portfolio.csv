@@ -1,0 +1,26 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 88.8% of portfolio value | Unresolved: 11.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 88.8% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 11.2% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:41.938222+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,21.961077
+TREPS / Repo / Reverse Repo,Cash and equivalents,21.701630
+Unresolved Holdings,Shares,11.238191
+Kalyani Steels Ltd,Shares,10.723850
+Premier Energies Limited,Shares,9.822410
+Adani Enterprises Ltd.,Shares,9.373091
+Adani Green Energy Limited,Shares,8.678427
+Lloyds Metals and Energy Limited,Shares,7.594503
+HFCL LIMITED,Shares,7.032191
+SUMITOMO CHEMICAL INDIA LIMITED,Shares,6.192795
+Government Securities,Bonds and other debt,4.786006
+Adani Power Limited,Shares,3.220326
+Net Receivables / Payables,Cash and equivalents,-22.324497

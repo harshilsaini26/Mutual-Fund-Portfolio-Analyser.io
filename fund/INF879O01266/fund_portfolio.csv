@@ -1,0 +1,46 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 43.3% of portfolio value | Unresolved: 56.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 43.3% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 56.7% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:31.472959+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,56.730565
+Margin / Deposits,Cash and equivalents,8.328625
+TREPS / Repo / Reverse Repo,Cash and equivalents,5.687765
+Brookfield India Real Estate Trust,"REITs, InvITs and other",5.600097
+EMBASSY OFFICE PARKS REIT,"REITs, InvITs and other",5.526508
+PETRONET LNG LTD.,Shares,2.923593
+Coal India Limited,Shares,2.811104
+Units of Other Schemes,Other funds,2.711485
+POWER GRID CORPORATION OF INDIA LIMITED,Shares,2.593912
+Knowledge Realty Trust,"REITs, InvITs and other",2.397833
+ITC Ltd,Shares,2.332442
+Reliance Industries Ltd,Shares,1.611857
+HDFC Bank Ltd.,Shares,1.591161
+Bharti Airtel  Ltd.,Shares,1.547608
+Government Securities,Bonds and other debt,1.173746
+Swaraj Engines Ltd.,Shares,0.986401
+Nesco Ltd,Shares,0.921682
+Power Finance Corporation Ltd,Shares,0.906788
+COFORGE LIMITED,Shares,0.747142
+VST Industries Ltd.,Shares,0.731090
+UltraTech Cement Ltd,Shares,0.357978
+Mahindra & Mahindra Ltd.,Shares,0.349255
+TATA STEEL LIMITED,Shares,0.291398
+DLF LIMITED,Shares,0.260068
+Bajaj Finserv Limited,Shares,0.138930
+Bharat Heavy Electricals Ltd.,Shares,0.094768
+INDUS TOWERS LIMITED,Shares,0.056229
+SBI Life Insurance Company Limited,Shares,0.043094
+Ambuja Cements Ltd.,Shares,0.035521
+Bandhan Bank Limited,Shares,0.002288
+Net Receivables / Payables,Cash and equivalents,-1.162312
+Derivative Positions,Derivatives,-8.328621

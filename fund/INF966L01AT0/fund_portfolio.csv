@@ -1,0 +1,33 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 94.4% of portfolio value | Unresolved: 5.6% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 94.4% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 5.6% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:46.226354+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,30.037314
+TREPS / Repo / Reverse Repo,Cash and equivalents,24.573149
+ICICI Prudential Asset Management Company Limited,Shares,8.811148
+Adani Green Energy Limited,Shares,8.097446
+Adani Enterprises Ltd.,Shares,8.079443
+LG Electronics India Limited,Shares,7.318934
+Unresolved Holdings,Shares,5.574147
+Divi's Laboratories Ltd.,Shares,4.973451
+Samvardhana Motherson International Limited,Shares,4.756061
+Government Securities,Bonds and other debt,4.665120
+Capri Global Capital Limited,Shares,4.127178
+Infosys Ltd,Shares,3.578896
+Bharti Airtel  Ltd.,Shares,3.327031
+Reliance Industries Ltd,Shares,3.014786
+Zydus Lifesciences Limited,Shares,2.785342
+State Bank Of India,Shares,2.383685
+DLF LIMITED,Shares,2.381217
+LIFE INSURANCE CORPORATION OF INDIA,Shares,1.211004
+Oil And Natural Gas Corporation Ltd,Shares,0.476161
+Net Receivables / Payables,Cash and equivalents,-30.171513

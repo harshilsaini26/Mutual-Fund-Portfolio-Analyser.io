@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the benchmark had 8 rising and 5 falling months; a capture ratio needs six each way, so a blank one is left blank.
+# Generated: 2026-10-10T00:25:49.637358+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.150348,0.037062,0.020785,"Annualised, with dividends reinvested."
+Benchmark a year,-0.182980,-0.023288,,"The benchmark over the same days, dividends included."
+Ahead of benchmark,0.032632,0.060350,,The fund's return a year less the benchmark's.
+Volatility,0.186442,0.183520,0.185003,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.255189,-0.332728,-0.332728,The largest fall from a high within the period.
+Sharpe ratio,-1.092431,-0.128989,-0.204407,Return above cash for each unit of volatility.
+Sortino ratio,-1.465688,-0.188953,-0.289749,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.297239,-0.030696,,Return above cash for each unit of beta.
+Alpha a year,-0.041752,0.041125,,Return beyond what its beta to the benchmark accounts for.
+Beta,0.685222,0.771185,,How far it moved for each 1% the benchmark moved.
+Tracking error,0.104618,0.080556,,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,0.311916,0.749168,,Its lead over the benchmark for each unit of tracking error.
+Up capture,0.708662,0.894222,,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,,0.817822,,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."

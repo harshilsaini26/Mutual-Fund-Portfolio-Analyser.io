@@ -1,0 +1,43 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 80.1% of portfolio value | Unresolved: 19.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 80.1% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 19.9% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:19:48.226419+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Shares,19.916132
+ICICI Bank Ltd.,Shares,9.942621
+AXIS Bank Ltd.,Shares,7.144780
+State Bank Of India,Shares,6.246283
+Cholamandalam Investment and Finance Company Ltd,Shares,5.513838
+PB Fintech Limited,Shares,4.947408
+Bajaj Finance Limited,Shares,4.438244
+Max Financial Services Limited,Shares,4.256151
+Ujjivan Small Finance Bank Limited,Shares,4.197708
+Canara HSBC Life Insurance Company Limited,Shares,4.041278
+HDFC Bank Ltd.,Shares,3.763757
+City Union Bank Ltd,Shares,3.746932
+SBI Life Insurance Company Limited,Shares,3.702305
+Multi Commodity Exchange of India Ltd,Shares,3.274912
+Karur Vysya Bank Ltd.,Shares,2.671297
+Bank of India,Shares,2.525780
+PNB Housing Finance Limited,Shares,2.524552
+Prudent Corporate Advisory Services Limited,Shares,1.535748
+BSE Ltd.,Shares,1.400237
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.298738
+NIPPON LIFE INDIA ASSET MANAGEMENT LIMITED,Shares,0.984591
+KFin Technologies Limited,Shares,0.921014
+Seshaasai Technologies Limited,Shares,0.669299
+LIFE INSURANCE CORPORATION OF INDIA,Shares,0.254637
+Billionbrains Garage Ventures Limited,Shares,0.186284
+ICICI Prudential Asset Management Company Limited,Shares,0.016733
+Bajaj Finserv Limited,Shares,0.010162
+ICICI Lombard General Insurance Company Limited,Shares,0.003586
+Power Finance Corporation Ltd,Shares,0.001539
+Net Receivables / Payables,Cash and equivalents,-0.136546

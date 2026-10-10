@@ -1,0 +1,21 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 16.8% of portfolio value | Unresolved: 83.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 16.8% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 83.2% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-10-10T00:25:28.685939+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,83.183901
+TREPS / Repo / Reverse Repo,Cash and equivalents,6.574633
+Margin / Deposits,Cash and equivalents,5.582536
+Government Securities,Bonds and other debt,5.047443
+Net Receivables / Payables,Cash and equivalents,4.078199
+TORRENT POWER LIMITED,Bonds and other debt,0.745712
+Godrej Industries Ltd.,Bonds and other debt,0.370112
+Derivative Positions,Derivatives,-5.582536

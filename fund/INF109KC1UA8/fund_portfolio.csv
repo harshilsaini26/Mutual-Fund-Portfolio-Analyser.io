@@ -1,0 +1,31 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 68.2% of portfolio value | Unresolved: 31.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 68.2% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 31.8% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:21:57.807512+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,39.231920
+Unresolved Holdings,Bonds and other debt,31.780017
+TREPS / Repo / Reverse Repo,Cash and equivalents,10.695796
+LIFE INSURANCE CORPORATION OF INDIA,Shares,2.158462
+Samvardhana Motherson International Limited,Shares,1.791666
+Mahindra & Mahindra Ltd.,Shares,1.586137
+Net Receivables / Payables,Cash and equivalents,1.570564
+SWIGGY LIMITED,Shares,1.516364
+Hindustan Aeronautics Limited,Shares,1.428661
+V-Mart Retail Limited,Shares,1.151310
+HDFC Bank Ltd.,Shares,1.066065
+InterGlobe Aviation Limited,Shares,1.029591
+NIPPON LIFE INDIA ASSET MANAGEMENT LIMITED,Shares,0.986149
+TATA STEEL LIMITED,Shares,0.960637
+TATA CONSUMER PRODUCTS LIMITED,Shares,0.906027
+Pfizer Ltd.,Shares,0.789534
+Motherson Sumi Wiring India Limited,Shares,0.740354
+Jindal Stainless Limited,Shares,0.610746

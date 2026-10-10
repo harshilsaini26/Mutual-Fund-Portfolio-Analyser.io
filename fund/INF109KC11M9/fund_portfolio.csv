@@ -1,0 +1,35 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 97.1% of portfolio value | Unresolved: 2.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 97.1% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 2.9% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:21:52.847605+00:00
+holding,kind,weight_pct
+Sun Pharmaceutical Industries Ltd.,Shares,20.761607
+Divi's Laboratories Ltd.,Shares,11.880437
+Cipla Ltd.,Shares,7.832626
+Laurus Labs Limited,Shares,7.359477
+Torrent Pharmaceuticals Ltd.,Shares,7.337868
+Dr. Reddy's Laboratories Ltd.,Shares,6.951406
+Lupin Ltd,Shares,5.249202
+Aurobindo Pharma Ltd.,Shares,4.694145
+Glenmark Pharmaceuticals ltd,Shares,3.687164
+Alkem Laboratories Limited,Shares,3.076397
+Unresolved Holdings,Shares,2.903723
+Zydus Lifesciences Limited,Shares,2.869685
+Ipca Laboratories Ltd.,Shares,2.708739
+Mankind Pharma Limited,Shares,2.703767
+Gland Pharma Limited,Shares,2.270073
+Sai Life Sciences Limited,Shares,1.988720
+Wockhardt Ltd,Shares,1.535458
+Ajanta Pharma Ltd.,Shares,1.496002
+PIRAMAL PHARMA LIMITED,Shares,1.317272
+Abbott India Ltd.,Shares,1.309942
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.074036
+Net Receivables / Payables,Cash and equivalents,-1.007746

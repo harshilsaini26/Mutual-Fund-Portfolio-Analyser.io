@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the benchmark had 8 rising and 5 falling months; a capture ratio needs six each way, so a blank one is left blank.
+# Generated: 2026-10-10T00:20:29.908201+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.062942,0.100965,0.078960,"Annualised, with dividends reinvested."
+Benchmark a year,-0.041109,0.105320,,"The benchmark over the same days, dividends included."
+Ahead of benchmark,-0.021833,-0.004355,,The fund's return a year less the benchmark's.
+Volatility,0.140974,0.139236,0.144099,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.150728,-0.177617,-0.195294,The largest fall from a high within the period.
+Sharpe ratio,-0.824755,0.288941,0.141285,Return above cash for each unit of volatility.
+Sortino ratio,-1.107651,0.402959,0.193584,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.127626,0.045281,,Return above cash for each unit of beta.
+Alpha a year,-0.030237,0.000617,,Return beyond what its beta to the benchmark accounts for.
+Beta,0.911010,0.888482,,How far it moved for each 1% the benchmark moved.
+Tracking error,0.043137,0.044458,,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,-0.506132,-0.097958,,Its lead over the benchmark for each unit of tracking error.
+Up capture,0.873868,0.941827,,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,,0.957782,,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."

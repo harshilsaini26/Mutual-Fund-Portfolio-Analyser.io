@@ -1,0 +1,42 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 90.9% of portfolio value | Unresolved: 9.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 90.9% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 9.1% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:23:19.138311+00:00
+holding,kind,weight_pct
+ICICI Bank Ltd.,Shares,13.975566
+HDFC Bank Ltd.,Shares,13.459197
+Unresolved Holdings,Shares,9.055141
+State Bank Of India,Shares,8.874603
+AXIS Bank Ltd.,Shares,7.864286
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.079055
+Bajaj Finance Limited,Shares,3.433555
+L&T Finance Limited,Shares,3.037500
+SBI Life Insurance Company Limited,Shares,2.926684
+KFin Technologies Limited,Shares,2.908420
+HDB FINANCIAL SERVICES LIMITED,Shares,2.661483
+Karur Vysya Bank Ltd.,Shares,2.617834
+Multi Commodity Exchange of India Ltd,Shares,2.547637
+Federal Bank Ltd.,Shares,2.117655
+Canara HSBC Life Insurance Company Limited,Shares,2.090777
+Equitas Small Finance Bank Limited,Shares,2.008066
+CRISIL Ltd.,Shares,1.947879
+Home First Finance Company India Limited,Shares,1.852960
+Central Depository Services (India) Ltd.,Shares,1.782500
+DCB Bank Limited,Shares,1.751012
+IndusInd Bank Ltd.,Shares,1.654153
+PB Fintech Limited,Shares,1.508926
+Pine Labs Limited,Shares,1.399307
+CARE Ratings Limited,Shares,1.279130
+Go Digit General Insurance Limited,Shares,1.155914
+Billionbrains Garage Ventures Limited,Shares,0.978020
+General Insurance Corporation of India,Shares,0.885307
+Turtlemint Fintech Solutions Limited,Shares,0.252177
+Net Receivables / Payables,Cash and equivalents,-0.104744

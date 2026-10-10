@@ -1,0 +1,72 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 73.8% of portfolio value | Unresolved: 26.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 73.8% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 26.2% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:19:51.909993+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,38.287849
+Unresolved Holdings,Shares,26.154895
+Government Securities,Bonds and other debt,9.848030
+HDFC Bank Ltd.,Shares,6.774968
+AXIS Bank Ltd.,Shares,4.643913
+Mahindra & Mahindra Ltd.,Shares,3.222559
+Reliance Industries Ltd,Shares,3.111132
+ITC Ltd,Shares,2.941850
+ICICI Bank Ltd.,Shares,2.407810
+VODAFONE IDEA LIMITED,Shares,2.354375
+Bajaj Finance Limited,Shares,2.126774
+Cipla Ltd.,Shares,2.021844
+Bharti Airtel  Ltd.,Shares,1.965336
+Hindalco Industries Ltd.,Shares,1.870413
+Larsen & Toubro Limited,Shares,1.789839
+Sun Pharmaceutical Industries Ltd.,Shares,1.788036
+INDUS TOWERS LIMITED,Shares,1.770170
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.730228
+Indigo Paints Limited,Shares,1.374458
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,1.332375
+Alkem Laboratories Limited,Shares,1.152985
+Eicher Motors Ltd.,Shares,1.113784
+Infosys Ltd,Shares,1.095549
+SBI Life Insurance Company Limited,Shares,1.095289
+Hero MotoCorp Limited,Shares,1.074613
+PETRONET LNG LTD.,Shares,1.021973
+Maruti Suzuki India  Ltd.,Shares,1.008239
+Bank Of Baroda,Shares,0.951994
+Syngene International Limited,Shares,0.885233
+State Bank Of India,Shares,0.877651
+Oil And Natural Gas Corporation Ltd,Shares,0.865897
+Bandhan Bank Limited,Shares,0.842061
+Canara HSBC Life Insurance Company Limited,Shares,0.831532
+ICICI Lombard General Insurance Company Limited,Shares,0.768319
+Punjab National Bank,Shares,0.757325
+Hindustan Aeronautics Limited,Shares,0.651344
+Coromandel International Limited,Shares,0.547892
+Bharat Electronics Ltd.,Shares,0.521594
+LIFE INSURANCE CORPORATION OF INDIA,Shares,0.443736
+Tata Power Co. Ltd,Shares,0.398712
+Net Receivables / Payables,Cash and equivalents,0.359257
+Ambuja Cements Ltd.,Shares,0.343608
+Hindustan Petroleum Corporation Ltd,Shares,0.290971
+TVS Motor Company Ltd.,Shares,0.238976
+Indian Oil Corporation Ltd.,Shares,0.210098
+La Opala RG Ltd.,Shares,0.207654
+POWER GRID CORPORATION OF INDIA LIMITED,Shares,0.183258
+JSW Steel Limited,Shares,0.170866
+United Spirits Limited,Shares,0.140606
+Ipca Laboratories Ltd.,Shares,0.112441
+Lic Housing Finance Ltd.,Shares,0.079794
+Aurobindo Pharma Ltd.,Shares,0.074262
+Power Finance Corporation Ltd,Shares,0.040593
+Steel Authority of India Ltd.,Shares,0.033264
+Info Edge(India) Ltd.,Shares,0.024027
+Pidilite Industries Ltd.,Shares,0.005105
+UltraTech Cement Ltd,Shares,0.003463
+Derivative Positions,Derivatives,-36.940819

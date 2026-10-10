@@ -1,0 +1,37 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 82.3% of portfolio value | Unresolved: 17.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 82.3% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 17.7% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:45.399348+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Shares,17.713493
+Derivative Positions,Derivatives,10.548388
+Samvardhana Motherson International Limited,Shares,9.903575
+Adani Green Energy Limited,Shares,7.636556
+Kalyani Steels Ltd,Shares,7.072462
+Adani Power Limited,Shares,6.258132
+Adani Enterprises Ltd.,Shares,5.855149
+Bharat Heavy Electricals Ltd.,Shares,5.024348
+ICICI Bank Ltd.,Shares,4.872731
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.753239
+Government Securities,Bonds and other debt,4.144032
+INDUS TOWERS LIMITED,Shares,3.625710
+Welspun Corp Limited,Shares,3.410604
+DLF LIMITED,Shares,3.113946
+JSW Infrastructure Limited,Shares,3.016870
+Simplex Infrastructures Limited,Shares,2.980609
+Mangalam Cement Ltd.,Shares,2.945533
+Lloyds Metals and Energy Limited,Shares,2.677543
+Tata Power Co. Ltd,Shares,2.335416
+OM INFRA LIMITED,Shares,0.980300
+Bharat Bijlee Ltd.,Shares,0.963269
+Orissa Minerals Development Company Limited,Shares,0.688964
+RAVINDRA ENERGY LIMITED,Shares,0.165780
+Net Receivables / Payables,Cash and equivalents,-10.686649

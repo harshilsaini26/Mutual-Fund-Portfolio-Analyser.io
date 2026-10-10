@@ -1,0 +1,31 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-10
+# Data as of: 31 Aug 2026 (40 days old)
+# Coverage: 87.5% of portfolio value | Unresolved: 12.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 87.5% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 12.5% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-10T00:24:56.785554+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,94.756334
+Unresolved Holdings,Shares,12.494246
+InterGlobe Aviation Limited,Shares,9.675058
+Bharti Airtel  Ltd.,Shares,9.046558
+HDFC Bank Ltd.,Shares,7.349535
+Reliance Industries Ltd,Shares,7.174469
+One 97 Communications Limited,Shares,6.768155
+Cash & Bank Balance,Cash and equivalents,5.799308
+VODAFONE IDEA LIMITED,Shares,4.454956
+AXIS Bank Ltd.,Shares,3.828630
+Mahindra & Mahindra Ltd.,Shares,3.806521
+ITC Ltd,Shares,3.195056
+Bajaj Finance Limited,Shares,3.160623
+ICICI Bank Ltd.,Shares,2.951123
+Hindalco Industries Ltd.,Shares,2.061291
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,1.732906
+Derivative Positions,Derivatives,-78.254769

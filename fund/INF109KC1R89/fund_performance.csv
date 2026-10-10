@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-10
+# Data as of: 09 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the capture ratios rest on 7 rising and 6 falling months of the benchmark; that few makes them rough.
+# Generated: 2026-10-10T00:21:49.833146+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.070255,0.080466,0.069027,"Annualised, with dividends reinvested."
+Benchmark a year,-0.067216,0.083241,,"The benchmark over the same days, dividends included."
+Ahead of benchmark,-0.003039,-0.002775,,The fund's return a year less the benchmark's.
+Volatility,0.131098,0.130236,0.131754,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.133195,-0.250756,-0.250756,The largest fall from a high within the period.
+Sharpe ratio,-0.942669,0.151510,0.079132,Return above cash for each unit of volatility.
+Sortino ratio,-1.250071,0.212870,0.109816,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.132379,0.021730,,Return above cash for each unit of beta.
+Alpha a year,-0.011050,-0.000706,,Return beyond what its beta to the benchmark accounts for.
+Beta,0.933546,0.908060,,How far it moved for each 1% the benchmark moved.
+Tracking error,0.040445,0.051867,,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,-0.075139,-0.053502,,Its lead over the benchmark for each unit of tracking error.
+Up capture,1.033216,1.000645,,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,1.025020,1.010978,,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."
