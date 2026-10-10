@@ -48,7 +48,30 @@
       navs.push(BigInt(dot < 0 ? nav + "000000"
         : nav.slice(0, dot) + nav.slice(dot + 1).padEnd(6, "0")));
     }
-    return { dates: dates, navs: navs };
+    return { dates: dates, navs: oneScale(navs) };
+  }
+
+  // A fund that re-denominates its units moves its NAV by 100, 10, 1/10 or 1/100 in
+  // a day (within 10%: it also moved that day); read raw, that is a 900% gain. The
+  // file keeps the raw prices, and every earlier one is restated here onto the later
+  // scale, rounded half up to the millionth: the warehouse's nav_adj
+  // (`rescale_splits`), so these pages and the fund pages agree.
+  var SPLITS = [[100n, 1n], [10n, 1n], [1n, 10n], [1n, 100n]];
+  function splitAt(prev, cur) {
+    for (var k = 0; k < SPLITS.length; k++) {
+      var a = 10n * SPLITS[k][1] * cur, b = SPLITS[k][0] * prev;
+      if (a >= 9n * b && a <= 11n * b) return SPLITS[k];
+    }
+    return null;
+  }
+  function oneScale(navs) {
+    var num = 1n, den = 1n, out = navs;
+    for (var i = navs.length - 1; i > 0; i--) {
+      var s = splitAt(navs[i - 1], navs[i]);
+      if (s) { num *= s[0]; den *= s[1]; if (out === navs) out = navs.slice(); }
+      if (out !== navs) out[i - 1] = roundDiv(navs[i - 1] * num, den);
+    }
+    return out;
   }
 
   // Index of the first NAV dated on or after `iso`, or -1.

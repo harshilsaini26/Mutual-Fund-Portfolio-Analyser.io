@@ -337,14 +337,51 @@ test("no reference where there is no index fund and no category to draw from", (
 
 test("a NAV file reads to exact millionths, past headers, blanks and spaces", () => {
   const s = M.parseNavFile("# scheme_id=X amfi_code=1\n2024-01-01,12\n\n 2024-01-02,12.5 \n" +
-    "2024-01-03,0.123456\r\n# a note\n2024-01-04,1000.000001\n");
+    "2024-01-03,0.723456\r\n# a note\n2024-01-04,1000.000001\n");
   assert.deepEqual(s.dates, ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04"]);
-  assert.deepEqual(s.navs, [12000000n, 12500000n, 123456n, 1000000001n]);
+  assert.deepEqual(s.navs, [12000000n, 12500000n, 723456n, 1000000001n]);
 });
 
 test("a NAV file with a figure that is not a NAV is refused", () => {
   for (const bad of ["2024-01-01,12.1234567", "2024-01-01,abc", "2024-01-01,-1", "2024-01-01,.5",
     "2024-01-01,1e3", "2024-01-01"]) {
     assert.throws(() => M.parseNavFile(bad + "\n"), /not a NAV/, bad);
+  }
+});
+
+// A fund that re-denominates its units moves its NAV ten- or a hundred-fold in a day.
+// The file keeps the raw prices (the build restores the warehouse from it); a page
+// reads them on one scale, as the warehouse's nav_adj does (rescale_splits, whose
+// tests in tests/unit/test_m0_nav_adj_splits.py these mirror, value for value).
+const navsOf = (values) => M.parseNavFile(
+  values.map((v, i) => `2024-01-${String(i + 1).padStart(2, "0")},${v}`).join("\n")).navs;
+
+test("a ten-for-one re-denomination leaves the series continuous", () => {
+  assert.deepEqual(navsOf(["100", "116.4731", "1164.8919"]), [1000000000n, 1164731000n, 1164891900n]);
+});
+
+test("a hundred-for-one re-denomination, the other way", () => {
+  assert.deepEqual(navsOf(["4120.0604", "41.5242", "41.7432"]), [41200604n, 41524200n, 41743200n]);
+});
+
+test("two re-denominations compound onto everything before them", () => {
+  assert.deepEqual(navsOf(["1", "10", "100"]), [100000000n, 100000000n, 100000000n]);
+});
+
+test("an ETF's split lands near its ratio, and is still one", () => {
+  assert.deepEqual(navsOf(["149.9692", "14.5898"]), [14996920n, 14589800n]);
+});
+
+test("a restated price rounds half up, as the warehouse's does", () => {
+  assert.deepEqual(navsOf(["1.000005", "0.100001"]), [100001n, 100001n]);
+  assert.deepEqual(navsOf(["1.000015", "0.100002"]), [100002n, 100002n]);
+});
+
+test("a real move, a real crash and a dying fund's last row are left alone", () => {
+  assert.deepEqual(navsOf(["100", "150", "140"]), [100000000n, 150000000n, 140000000n]);
+  assert.deepEqual(navsOf(["100", "49"]), [100000000n, 49000000n]);
+  assert.deepEqual(navsOf(["10.0727", "0.0001"]), [10072700n, 100n]);
+  for (const r of ["0.30", "0.5", "0.8", "2", "3"]) {
+    assert.deepEqual(navsOf(["100", String(100 * Number(r))]), [100000000n, BigInt(Math.round(100 * Number(r) * 1e6))]);
   }
 });
