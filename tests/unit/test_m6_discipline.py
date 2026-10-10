@@ -261,7 +261,7 @@ def test_no_prescriptive_language_in_the_learn_content() -> None:
     assert not offences, offences
 
 
-@pytest.mark.parametrize("name", ["portfolio.js", "compare.js", "kit.js"])
+@pytest.mark.parametrize("name", ["portfolio.js", "compare.js", "kit.js", "sip.js"])
 def test_no_prescriptive_language_in_the_page_scripts(name: str) -> None:
     """The portfolio (V1-82) and compare (V1-85) pages write their sentences in
     JavaScript, out of reach of the template lint, and they are the pages most
@@ -269,6 +269,48 @@ def test_no_prescriptive_language_in_the_page_scripts(name: str) -> None:
     script = (TEMPLATES.parent / "static" / name).read_text(encoding="utf-8")
     offences = [p for p in PRESCRIPTIVE_PATTERNS if re.search(p, script, re.I)]
     assert not offences, offences
+
+
+#: What a past figure must never become (SPEC_SIP_WHAT_IF §7.2): /sip/ shows what
+#: real prices did, and a projection would need a rate this site would invent.
+FORWARD_LOOKING_PATTERNS = [
+    r"\bwill (be worth|grow|become|return|earn|double)\b",
+    r"\bexpected (return|growth|value)\b",
+    r"\bprojected\b",
+    r"\bassum(e|ed|ing) (a |an )?(return|rate|growth)\b",
+    r"\bcould (earn|make|grow)\b",
+]
+
+
+def test_nothing_looks_forward() -> None:
+    """/sip/, the scripts that write sentences about past money, and Learn: none
+    says what money will do."""
+    from src.m6_views.learn import load
+
+    static = TEMPLATES.parent / "static"
+    texts = {name: (static / name).read_text(encoding="utf-8")
+             for name in ("sip.js", "portfolio.js", "compare.js")}
+    sip_page = (TEMPLATES / "sip.html").read_text(encoding="utf-8")
+    texts["sip.html"] = _template_text(sip_page)
+    learn = load()
+    texts["learn"] = " ".join(
+        [t for term in learn.terms.values() for t in (term.title, term.short)]
+        + [p for g in learn.guides for s in g.sections
+           for p in (s.heading, *s.paragraphs)])
+    offences = [(name, p) for name, text in texts.items()
+                for p in FORWARD_LOOKING_PATTERNS if re.search(p, text, re.I)]
+    assert not offences, offences
+
+
+def test_the_sip_page_never_takes_a_rate() -> None:
+    """/sip/ values money at real prices only: no field's name, id or label asks for
+    a rate or a return."""
+    page = (TEMPLATES / "sip.html").read_text(encoding="utf-8")
+    for tag in re.findall(r"<(?:input|select)\b[^>]*>", page):
+        named = r'(name|id|aria-label)="[^"]*(rate|return|%)'
+        assert not re.search(named, tag, re.I), tag
+    for label in re.findall(r"<label\b[^>]*>(.*?)</label>", page, re.S):
+        assert not re.search(r"rate|return|%", _template_text(label), re.I), label
 
 
 def test_no_template_carries_inline_style_or_script() -> None:

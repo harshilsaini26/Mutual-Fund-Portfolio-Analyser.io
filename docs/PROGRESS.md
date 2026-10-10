@@ -263,6 +263,25 @@ address (V1-92; GitHub Pages served it until 2026-10-03). Measured on the first 
   an index fund that declares the same benchmark on its Groww page, named as such.
   The crawl map gained that column on 2026-09-26, so proxies fill in as pages are
   read, about 100 a night.
+- **What would a SIP have become?** (V1-97 to V1-100): `/sip/` takes an amount, every
+  month or once, and a period, and shows what it would be worth today in every Direct
+  fund of one kind at their real past prices: the lowest, middle and highest, the index
+  fund most of the kind follow, what it was worth month by month, where each fund ended,
+  and every fund left out with its reason. No field takes a rate and nothing looks
+  forward; it opens on Large cap. Worked out in the browser from files the site already
+  publishes, pinned to the ledger's arithmetic by `tests/fixtures/sip_cases.json`. Ways
+  in: "What if" in the top bar, each fund page's growth panel, Compare, an empty Your
+  portfolio and the SIP guide.
+  **Cold load**, against §4.10's budget (the answer within 2.5 s on Fast 4G with a 4× CPU
+  slowdown), measured 2026-10-10 in headless Chrome on the 213-fund local preview
+  (Python's server: HTTP/1.1, nothing compressed), 32 Large cap files: **2.4–3.0 s
+  throttled** over six loads, three within budget; 0.5–1.8 s unthrottled. It was
+  4.2–10.3 s at first. ECharts now loads after the answer, the opening kind's NAV files
+  are fetched with the page rather than after its scripts, and each line is parsed
+  with one BigInt instead of two. Most of what remains is the first layout every page of
+  the site pays, about 1 s under the slowdown (the same on `/compare/` and `/learn/`).
+  Not yet measured on the live site, where `funds.json` is 1.47 MB raw and NAV files
+  are larger (about 19 KB each): re-measure after the first build that carries it.
 - **Explanations on hover** (V1-91): pausing on any labelled figure with a glossary
   entry, or tabbing to its `?`, opens its plain explanation beside it; a click pins it.
   The fund card's confidence badge no longer covers the NAV box.

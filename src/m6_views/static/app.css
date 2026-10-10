@@ -1883,6 +1883,42 @@ body, .topbar, .card, .view, .settings {
 .cmp__swatch--2 { background: var(--cat-2); }
 .cmp__swatch--3 { background: var(--cat-3); }
 .cmp__swatch--4 { background: var(--cat-4); }
+.cmp__swatch--5 { background: var(--cat-5); }
+
+/* What would a SIP have become? (SPEC_SIP_WHAT_IF, Part A). The answer leads, in
+   large type; the inputs reuse Your portfolio's fields and the settings' chips. */
+.sip__entry { display: grid; gap: 14px; margin-bottom: 20px; }
+.sip__row { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; }
+.sip__choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.sip__choice > legend { float: left; margin-right: 6px; padding: 0; font-size: var(--text-sm); font-weight: 500; color: var(--ink-soft); }
+.sip__choice .settings__chip { min-height: 36px; }
+.sip__kind { display: grid; gap: 4px; }
+.sip__kind select, .sip__more select { min-height: 40px; max-width: 100%; padding: 0 12px; border: 1px solid var(--field-line);
+  border-radius: 12px; background: var(--surface); color: var(--ink); font: inherit; }
+.sip__about { margin: 0; font-size: var(--text-sm); color: var(--ink-soft); }
+.sip__more > summary { cursor: pointer; min-height: 32px; display: inline-flex; align-items: center; font-weight: 600; }
+.sip__more-body { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 10px; }
+.sip__add { display: grid; gap: 8px; flex: 1 1 280px; min-width: 0; }
+.sip__status { min-height: 1.4em; margin: 0 0 6px; font-size: var(--text-sm); color: var(--ink-soft); }
+.sip__answer { margin: 8px 0 12px; transition: opacity 0.2s; }
+.sip__answer--busy { opacity: 0.55; }
+.sip__lead { margin: 0 0 12px; max-width: 72ch; font-size: var(--text-lead); line-height: 1.55; color: var(--ink); }
+.sip__index, .sip__along { max-width: 72ch; margin: 12px 0; }
+.sip__tiles { margin: 14px 0; }
+.sip__lines { margin: 8px 0; padding-left: 1.2em; font-size: var(--text-sm); }
+.sip__note { max-width: 72ch; font-size: var(--text-sm); color: var(--ink-soft); }
+.sip__notes-list { display: grid; gap: 6px; max-width: 72ch; margin: 0; padding-left: 1.2em; font-size: var(--text-sm); color: var(--ink-soft); }
+.sip__out { display: grid; gap: 8px; margin: 10px 0 0; padding-left: 1.2em; font-size: var(--text-sm); }
+.echart--band .echart__canvas { height: 360px; }
+/* A way into /sip/ from a panel (SPEC_SIP_WHAT_IF §4.8), and from the SIP guide. */
+.panel-link, .learn__try { margin: 12px 0 0; font-size: var(--text-sm); }
+.panel-link a, .learn__try a { display: inline-flex; align-items: center; min-height: 24px; font-weight: 600; }
+.echart--dots .echart__canvas { height: 260px; }
+@media (max-width: 720px) {
+  .sip__choice .settings__chip { min-height: 44px; }
+  .sip__kind select, .sip__more select { min-height: 44px; width: 100%; }
+  .echart--band .echart__canvas { height: 260px; }
+}
 .cmp__picked .cmp__remove { border-radius: 50%; border: 0; background: transparent; }
 @media (max-width: 720px) { .cmp__remove { width: 40px; height: 40px; } }
 

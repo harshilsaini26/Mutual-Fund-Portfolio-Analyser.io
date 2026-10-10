@@ -51,6 +51,7 @@
   <script src="{{ root }}/static/settings.js"></script>
   <link rel="stylesheet" href="{{ root }}/static/lenis.css">
   <link rel="stylesheet" href="{{ root }}/static/app.css">
+  {%- block head_extra %}{% endblock %}
 </head>
 <body class="{{ 'is-public' if static else 'is-app' }}" data-root="{{ root }}"
       {% block body_attrs %}{% endblock %}>
@@ -136,6 +137,8 @@
        {% if active == 'funds' %}aria-current="page"{% endif %}>Explore funds</a>
     <a class="topnav__link" href="{{ root }}/compare/"
        {% if active == 'compare' %}aria-current="page"{% endif %}>Compare</a>
+    <a class="topnav__link" href="{{ root }}/sip/"
+       {% if active == 'sip' %}aria-current="page"{% endif %}>What if</a>
     <a class="topnav__link" href="{{ root }}/portfolio/"
        {% if active == 'portfolio' %}aria-current="page"{% endif %}>Your portfolio</a>
     <a class="topnav__link" href="{{ root }}/learn/"
@@ -221,6 +224,7 @@
       <ul>
         <li><a href="{{ root }}/funds/">Explore funds</a></li>
         <li><a href="{{ root }}/compare/">Compare</a></li>
+        <li><a href="{{ root }}/sip/">What would a SIP have become?</a></li>
         <li><a href="{{ root }}/portfolio/">Your portfolio</a></li>
         <li><a href="{{ root }}/learn/">Learn</a></li>
       </ul>

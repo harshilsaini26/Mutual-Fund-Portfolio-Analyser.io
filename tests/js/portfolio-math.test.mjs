@@ -334,3 +334,17 @@ test("else the category's middle three-year return, never the holding or its own
 test("no reference where there is no index fund and no category to draw from", () => {
   assert.equal(M.reference({ ...held("INF000000001"), tracker: null, mixed: true }, REF, "2020-01-01"), null);
 });
+
+test("a NAV file reads to exact millionths, past headers, blanks and spaces", () => {
+  const s = M.parseNavFile("# scheme_id=X amfi_code=1\n2024-01-01,12\n\n 2024-01-02,12.5 \n" +
+    "2024-01-03,0.123456\r\n# a note\n2024-01-04,1000.000001\n");
+  assert.deepEqual(s.dates, ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04"]);
+  assert.deepEqual(s.navs, [12000000n, 12500000n, 123456n, 1000000001n]);
+});
+
+test("a NAV file with a figure that is not a NAV is refused", () => {
+  for (const bad of ["2024-01-01,12.1234567", "2024-01-01,abc", "2024-01-01,-1", "2024-01-01,.5",
+    "2024-01-01,1e3", "2024-01-01"]) {
+    assert.throws(() => M.parseNavFile(bad + "\n"), /not a NAV/, bad);
+  }
+});

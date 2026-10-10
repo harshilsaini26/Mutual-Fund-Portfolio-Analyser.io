@@ -332,7 +332,10 @@
           el("div", { "class": "echart__canvas", "data-index": "0", role: "img", "aria-label": headline })),
         data);
       fill.apply(null, [box, el("p", { "class": "cmp__lead" }, headline), container,
-        note("From " + day(start) + ", the first date all " + lines.length + " funds have prices.")].concat(notes));
+        note("From " + day(start) + ", the first date all " + lines.length + " funds have prices."),
+        // The same funds as a monthly SIP, on /sip/ (SPEC_SIP_WHAT_IF §4.8).
+        el("p", { "class": "cmp__note" }, el("a", { href: BASE + "/sip/#c=" + funds[0].category + "&f=" +
+          funds.slice(0, 3).map(function (f) { return f.id; }).join(",") }, "The same funds as a monthly SIP →"))].concat(notes));
       if (window.Charts) window.Charts.draw(box);   // draws the charts inside box
     });
   }

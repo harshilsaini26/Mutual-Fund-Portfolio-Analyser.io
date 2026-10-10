@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% import "icons.html" as icon %}
+{% import "macros.html" as vc %}
+{% block title %}What would a SIP have become?{% endblock %}
+{% block description %}Enter an amount and a period, pick a kind of fund, and see what it would be worth today in every fund of that kind, at their real past prices. Descriptive, not advice.{% endblock %}
+
+{#
+  What would a SIP have become? (SPEC_SIP_WHAT_IF, Part A). A shell: `sip.js` fills
+  it in the browser from funds.json and the NAV files this site publishes, with the
+  arithmetic in `portfolio-math.js` (as Your portfolio and Compare, V1-82 and V1-85).
+  The inputs live in the address (#a=…&m=…&y=…&d=…&c=…&f=…); nothing is stored.
+  The page shows only what real prices did: no field takes a rate.
+#}
+{#- funds.json and the opening kind's NAV files are the answer's first needs: fetched
+    while the page itself loads, not after its scripts have run (§4.10). -#}
+{% block head_extra %}
+  <link rel="preload" href="{{ root }}/funds.json" as="fetch" crossorigin>
+  {% for code in sip_opening_navs %}
+  <link rel="preload" href="{{ root }}/data/nav/{{ code }}.csv.gz" as="fetch" crossorigin>
+  {% endfor %}
+{% endblock %}
+{% block content %}
+<section class="plain sip" data-sip data-root="{{ root }}">
+  <p class="eyebrow">Looking back</p>
+  <h1>What would a SIP have become?</h1>
+  <p class="lede">Enter an amount and a period. See what it would be worth today in real
+    funds, at their real past prices. This looks back; it says nothing of what comes next.</p>
+  <noscript><p class="sip__note">This page works out the figures in your browser, so it
+    needs JavaScript. Nothing you enter would be sent anywhere.</p></noscript>
+
+  <form class="card sip__entry" data-sip-form novalidate>
+    <h2 class="sr-only">Your money</h2>
+    <div class="sip__row">
+      <label class="pf__field" for="sip-amount">
+        <span>Amount <span class="pf__words" data-sip-words aria-live="polite"></span></span>
+        <span class="pf__affix"><span class="pf__prefix">₹</span>
+          <input id="sip-amount" type="text" inputmode="numeric" autocomplete="off"
+                 value="5,000" aria-describedby="sip-amount-error" disabled></span>
+      </label>
+      <fieldset class="sip__choice" data-sip-mode>
+        <legend class="sr-only">How it is put in</legend>
+        <label class="settings__chip"><input type="radio" name="mode" value="sip" checked disabled>Every month (SIP)</label>
+        <label class="settings__chip"><input type="radio" name="mode" value="once" disabled>Once</label>
+      </fieldset>
+    </div>
+    <p class="pf__error" id="sip-amount-error" data-sip-error="amount"></p>
+    <fieldset class="sip__choice" data-sip-period>
+      <legend>For</legend>
+      {% for years in (1, 3, 5, 10) %}
+      <label class="settings__chip"><input type="radio" name="period" value="{{ years }}"
+        {%- if years == 5 %} checked{% endif %} disabled>{{ years }} year{{ '' if years == 1 else 's' }}</label>
+      {% endfor %}
+      <label class="settings__chip"><input type="radio" name="period" value="from" disabled>From a month…</label>
+      <label class="pf__field sip__from" for="sip-from" hidden>
+        <span data-sip-from-label>First instalment</span>
+        <input id="sip-from" type="month" aria-describedby="sip-from-error" disabled>
+      </label>
+    </fieldset>
+    <p class="pf__error" id="sip-from-error" data-sip-error="from"></p>
+    <div class="sip__kind">
+      <label class="pf__field" for="sip-kind">Kind of fund
+        <select id="sip-kind" disabled>
+          {% for family in sip_kinds %}
+          <optgroup label="{{ family.name }}">
+            {% for k in family.kinds %}
+            <option value="{{ k.key }}" data-about="{{ k.about }}"
+              {%- if k.key == sip_opens_on %} selected{% endif %}>{{ k.name }} ({{ k.count }})</option>
+            {% endfor %}
+          </optgroup>
+          {% endfor %}
+        </select>
+      </label>
+      <p class="sip__about" data-sip-about></p>
+    </div>
+    <details class="sip__more">
+      <summary>More options</summary>
+      <div class="sip__more-body">
+        <label class="pf__field" for="sip-day">SIP date
+          <select id="sip-day" disabled>
+            {% for day in range(1, 32) %}<option value="{{ day }}"{% if day == 5 %} selected{% endif %}>{{ day }}</option>{% endfor %}
+          </select>
+        </label>
+        <div class="sip__add">
+          <label class="pf__field" for="sip-pick">Add a fund by name (up to three)</label>
+          <div class="field-search">
+            {{ icon.i("search", "icon field-search__icon") }}
+            <input id="sip-pick" class="pf__pick" autocomplete="off"
+                   placeholder="A fund's name, fund house or ISIN" disabled>
+          </div>
+          <div data-out="added"></div>
+        </div>
+      </div>
+    </details>
+  </form>
+  <p class="sip__status" id="sip-status" role="status"></p>
+
+  <section class="sip__answer" aria-labelledby="sip-answer-h" data-out="answer-box">
+    <h2 id="sip-answer-h" class="sr-only">What it would be worth</h2>
+    <div data-out="answer" role="status"></div>
+  </section>
+
+  <section class="home-section" aria-labelledby="sip-path-h" data-sip-section hidden>
+    <div class="section-head"><h2 id="sip-path-h">What it was worth, month by month</h2></div>
+    <div data-out="path"></div>
+  </section>
+  <section class="home-section" aria-labelledby="sip-end-h" data-sip-section hidden>
+    <div class="section-head"><h2 id="sip-end-h">Where each fund ended</h2></div>
+    <div data-out="ends"></div>
+  </section>
+
+  {#- Always shown, never folded (§4.6.5). -#}
+  <section class="home-section sip__notes" aria-labelledby="sip-notes-h">
+    <div class="section-head"><h2 id="sip-notes-h">Notes</h2></div>
+    <ul class="sip__notes-list">
+      <li>Direct plans, growth option, at their published prices. Stamp duty on each
+        purchase is taken off, as fund houses take it. Nothing is sold, so no exit load or
+        tax is taken off.</li>
+      <li>Only funds open today are here. Funds wound up or merged before today are not in
+        the data, so the range may leave out some that did worst.</li>
+      <li>A Regular plan of the same fund has a higher expense ratio, so the same money in it
+        would be worth less. <a href="{{ root }}/learn/glossary/#regular_plan">Regular plan</a></li>
+      <li>This looks back. It says nothing of what comes next.</li>
+      <li data-out="no-index" hidden></li>
+    </ul>
+  </section>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{#- No ECharts here: sip.js fetches it once the answer is painted (§4.10). Loaded with
+    the page, its 1.1 MB held the answer back by two seconds on a slow phone. -#}
+<script src="{{ root }}/static/portfolio-math.js" defer></script>
+<script src="{{ root }}/static/kit.js" defer></script>
+<script src="{{ root }}/static/sip.js" defer></script>
+{% endblock %}

@@ -95,7 +95,7 @@ STATIC_FILES = (
     "vendor/echarts.v6.1.0.min.js", "vendor/lenis.v1.3.26.min.js",
     "fonts/rubik-latin-wght-normal.woff2",
     "fonts/terminess-Regular.woff2", "fonts/terminess-Bold.woff2",
-    "portfolio-math.js", "kit.js", "portfolio.js", "compare.js",
+    "portfolio-math.js", "kit.js", "portfolio.js", "compare.js", "sip.js",
     "fonts/atkinson-hyperlegible-latin-400-normal.woff2",
     "fonts/atkinson-hyperlegible-latin-700-normal.woff2",
     "favicon.svg",
@@ -575,6 +575,42 @@ def category_leaders(
     return cards
 
 
+def sip_kinds(funds: list[dict[str, str]]) -> list[dict[str, Any]]:
+    """/sip/'s list of kinds (SPEC_SIP_WHAT_IF §4.2): each family in the site's
+    order, its ranked categories by name, each with SEBI's one line on it and its
+    count of published (Direct) funds. A heading of unlike funds is never a kind:
+    a range across it would set unlike funds side by side."""
+    counts: dict[str, int] = defaultdict(int)
+    found = {}
+    for fund in funds:
+        category = category_of(fund["category"])
+        if category.ranked:
+            counts[category.key] += 1
+            found[category.key] = category
+    families = []
+    for key, name, _ in FAMILIES:
+        kinds = sorted((c for c in found.values() if c.family == key),
+                       key=lambda c: c.name.lower())
+        if kinds:
+            families.append({"name": name, "kinds": [
+                {"key": c.key, "name": c.name, "about": c.about or "",
+                 "count": counts[c.key]}
+                for c in kinds]})
+    return families
+
+
+def sip_opening(funds: list[dict[str, str]],
+                kinds: list[dict[str, Any]]) -> tuple[str | None, list[str]]:
+    """The kind /sip/ opens on (large cap, else the first it offers) and the AMFI
+    codes of its funds, whose NAV files the page fetches while it loads (§4.10)."""
+    keys = [k["key"] for family in kinds for k in family["kinds"]]
+    if not keys:
+        return None, []
+    key = "equity/large_cap" if "equity/large_cap" in keys else keys[0]
+    return key, sorted(f["amfi_code"] for f in funds
+                       if f["amfi_code"] and category_of(f["category"]).key == key)
+
+
 def fund_map(funds: list[dict[str, str]]) -> list[dict[str, Any]]:
     """The front page's map (V1-81): each family, in SEBI's order, then its
     categories with what SEBI's rules say they hold and how many funds they have
@@ -683,8 +719,12 @@ def build_site(
             lambda v, s, p: _build(deps, v, s, p), scope, "max", base,
             _adapter(folder, f"{base}/fund/{sid}/", scope),
         )
+        # /sip/ opens on this fund's kind with the fund added (SPEC_SIP_WHAT_IF §4.8):
+        # only a ranked kind is one /sip/ offers.
+        kind = category_of(fund["category"])
         (folder / "index.html").write_text(
-            engine.get_template("fund.html").render({**shell, **context}),
+            engine.get_template("fund.html").render(
+                {**shell, **context, "sip_category": kind.key if kind.ranked else None}),
             encoding="utf-8",
         )
         # The front page's table and counts, from what this page just drew.
@@ -787,6 +827,15 @@ def build_site(
         engine.get_template("compare.html").render({**shell, "active": "compare"}),
         encoding="utf-8",
     )
+    (out / "sip").mkdir()
+    kinds = sip_kinds(funds)
+    opens_on, opening_navs = sip_opening(funds, kinds)
+    (out / "sip" / "index.html").write_text(
+        engine.get_template("sip.html").render(
+            {**shell, "active": "sip", "sip_kinds": kinds, "sip_opens_on": opens_on,
+             "sip_opening_navs": opening_navs}),
+        encoding="utf-8",
+    )
     learn = load_learn()
     learn_page = {**shell, "active": "learn"}
     (out / "learn" / "glossary").mkdir(parents=True)
@@ -810,7 +859,9 @@ def build_site(
             + [{"name": t.title, "detail": "Glossary",
                 "url": f"{base}/learn/glossary/#{t.key}"} for t in learn.terms.values()]
             + [{"name": g.title, "detail": "Guide",
-                "url": f"{base}/learn/{g.slug}/"} for g in learn.guides],
+                "url": f"{base}/learn/{g.slug}/"} for g in learn.guides]
+            + [{"name": "What would a SIP have become?", "detail": "Page",
+                "url": f"{base}/sip/"}],
             ensure_ascii=False,
         ),
         encoding="utf-8",

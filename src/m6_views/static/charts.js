@@ -78,8 +78,15 @@
       " " + d.getUTCFullYear();
   }
 
+  // ₹3.5L, ₹1.2Cr: a scale's ticks in lakhs and crores (/sip/'s worth axis).
+  function short(v) {
+    var unit = Math.abs(v) >= 1e7 ? [1e7, "Cr"] : Math.abs(v) >= 1e5 ? [1e5, "L"] : null;
+    return unit ? "₹" + String(Math.round(v / unit[0] * 100) / 100) + unit[1] : INR.format(v);
+  }
+
   function ticks(kind) {
     if (kind === "inr") return function (v) { return INR.format(v); };
+    if (kind === "inr_short") return short;
     if (kind === "fraction") return function (v) { return Math.round(v * 100) + "%"; };
     return function (v) { return String(v); };
   }
@@ -198,6 +205,101 @@
     },
 
     area: function (c, p) { return KINDS.line(c, p, true); },
+
+    // /sip/'s chart 1 (SPEC_SIP_WHAT_IF §4.6.3): what the money was worth on each
+    // date -- the band from the lowest fund to the highest, the middle on each date,
+    // the index fund and added funds -- over a stepped line of what was put in.
+    // Lines differ in dash as well as colour, and every value is in the table below.
+    band: function (c, p) {
+      var o = base(p);
+      o.tooltip.trigger = "axis";
+      o.tooltip.formatter = listed;
+      o.legend.type = "scroll";
+      o.grid.top = 44;
+      o.xAxis = { type: "time", axisLine: { lineStyle: { color: p.rule } }, axisTick: { show: false },
+                  axisLabel: { fontSize: textSize(), color: p.faint, hideOverlap: true },
+                  splitLine: { show: false } };
+      o.yAxis = { type: "value", axisLabel: { fontSize: textSize(), color: p.faint, formatter: short },
+                  splitLine: { lineStyle: { color: p.rule } } };
+      var at = function (pt) { return pt[0]; };
+      o.series = [
+        { name: c.band.name + " (lowest)", type: "line", stack: "band", showSymbol: false, silent: true,
+          lineStyle: { opacity: 0 }, tooltip: { show: false }, legendHoverLink: false,
+          data: c.band.points.map(function (pt) { return { value: [at(pt), number(pt[1])] }; }) },
+        { name: c.band.name, type: "line", stack: "band", showSymbol: false,
+          lineStyle: { opacity: 0 }, itemStyle: { color: alpha(p.cats[0], 0.3) },
+          areaStyle: { color: alpha(p.cats[0], 0.15) },
+          data: c.band.points.map(function (pt) {
+            return { value: [at(pt), number(pt[2]) - number(pt[1])], caption: pt[3] };
+          }) },
+        { name: c.putIn.name, type: "line", step: "end", showSymbol: false,
+          lineStyle: { color: p.soft, width: 1.6, type: "dashed" }, itemStyle: { color: p.soft },
+          data: c.putIn.points.map(function (pt) { return { value: [at(pt), number(pt[1])], caption: pt[2] }; }) },
+      ].concat(c.lines.map(function (s) {
+        var hue = p.cats[s.hue % p.cats.length];
+        return { name: s.name, type: "line", showSymbol: false,
+                 lineStyle: { color: hue, width: s.role === "middle" ? 2.4 : 2,
+                              type: s.role === "index" ? "dotted" : s.role === "added" ? [8, 4] : "solid" },
+                 itemStyle: { color: hue },
+                 data: s.points.map(function (pt) { return { value: [at(pt), number(pt[1])], caption: pt[2] }; }) };
+      }));
+      o.legend.data = [c.band.name, c.putIn.name].concat(c.lines.map(function (s) { return s.name; }));
+      return o;
+    },
+
+    // /sip/'s chart 2 (§4.6.4): one dot a fund on a rupee axis, spread across lanes
+    // so none covers another -- a beeswarm laid out in the order given (by fund id),
+    // so it is the same every time. The middle fund is a ring, the index fund a
+    // diamond, added funds labelled; shape, not colour alone, tells them apart.
+    dots: function (c, p) {
+      var o = base(p);
+      var xs = c.points.map(function (d) { return d.x; }).concat([c.putIn]);
+      var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
+      var gap = (hi - lo || 1) * 0.018, lanes = [];
+      var placed = c.points.map(function (d) {
+        for (var k = 0; ; k++) {
+          var lane = k === 0 ? 0 : (k % 2 ? 1 : -1) * Math.ceil(k / 2);
+          var row = lanes[lane + 100] || (lanes[lane + 100] = []);
+          if (row.every(function (x) { return Math.abs(x - d.x) >= gap; })) { row.push(d.x); return [d, lane]; }
+        }
+      });
+      var deep = Math.max(1, Math.max.apply(null, placed.map(function (x) { return Math.abs(x[1]); })));
+      o.legend.show = false;
+      o.grid = { left: 8, right: 24, top: 28, bottom: 8, containLabel: true };
+      o.tooltip.trigger = "item";
+      o.tooltip.formatter = function (it) { return it.data.name + "\n" + it.data.caption; };
+      // The axis spans the put-in figure too, so its rule is always on the chart.
+      var pad = (hi - lo || hi || 1) * 0.04;
+      o.xAxis = { type: "value", min: Math.floor(lo - pad), max: Math.ceil(hi + pad),
+                  axisLabel: { fontSize: textSize(), color: p.faint, formatter: short, hideOverlap: true,
+                               showMinLabel: false, showMaxLabel: false },
+                  splitLine: { lineStyle: { color: p.rule } }, axisLine: { lineStyle: { color: p.rule } } };
+      o.yAxis = { type: "value", show: false, min: -deep - 1, max: deep + 1 };
+      var look = {
+        null: { symbol: "circle", size: 10, color: alpha(p.cats[0], 0.55), z: 2 },
+        middle: { symbol: "emptyCircle", size: 16, color: p.cats[0], z: 4 },
+        index: { symbol: "diamond", size: 16, color: p.cats[1], z: 4 },
+        added: { symbol: "pin", size: 22, color: null, z: 5 },
+      };
+      o.series = [{
+        type: "scatter",
+        data: placed.map(function (x) {
+          var d = x[0], s = look[d.mark] || look["null"];
+          var colour = s.color || p.cats[(d.hue || 2) % p.cats.length];
+          return { value: [d.x, x[1]], name: d.name, caption: d.caption, href: d.href,
+                   symbol: s.symbol, symbolSize: s.size, z: s.z,
+                   itemStyle: { color: colour, borderColor: s.symbol === "emptyCircle" ? colour : p.bg,
+                                borderWidth: s.symbol === "emptyCircle" ? 3 : 1 },
+                   label: { show: d.mark === "index" || d.mark === "added", position: "top", color: p.ink,
+                            formatter: function () { return d.name.length > 28 ? d.name.slice(0, 27) + "…" : d.name; } },
+                   labelLayout: { hideOverlap: true } };
+        }),
+        markLine: { silent: true, symbol: "none", lineStyle: { color: p.soft, type: "dashed" },
+                    label: { formatter: c.putInLabel, color: p.soft, position: "end" },
+                    data: [{ xAxis: c.putIn }] },
+      }];
+      return o;
+    },
 
     // The look-through (MODULE_6 §8.1): funds on the left, companies on the right,
     // flow width in rupees. The values are parsed only to size the flows; every
@@ -437,6 +539,10 @@
     if (bars) el.style.height = (Number(bars) * 30 + 16) + "px";
     var chart = echarts.init(el, null, { renderer: "svg" });
     chart.setOption(KINDS[spec.kind](spec, palette()));
+    // A fund's dot opens its page (/sip/'s chart 2).
+    if (spec.kind === "dots") {
+      chart.on("click", function (it) { if (it.data && it.data.href) window.location.assign(it.data.href); });
+    }
     specs.set(el, spec);
     if (spec.kind === "line" || spec.kind === "area") zoomButtons(el, chart, spec);
     el.classList.add("is-drawn");

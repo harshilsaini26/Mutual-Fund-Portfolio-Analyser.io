@@ -36,6 +36,9 @@
   <div class="fund-page__panel fund-page__panel--{{ env.view_id }}" id="{{ env.view_id }}">
     {% call vc.view_container(env, expanded=False, quiet=(env.view_id == 'fund_header')) %}
       {% include panel.chart_template %}
+      {%- if env.view_id == "fund_growth" and sip_category %}
+      <p class="panel-link"><a href="{{ root }}/sip/#c={{ sip_category }}&amp;f={{ fund_id }}">Your own amount, as a SIP or once →</a></p>
+      {%- endif %}
     {% endcall %}
   </div>
   {% endwith %}

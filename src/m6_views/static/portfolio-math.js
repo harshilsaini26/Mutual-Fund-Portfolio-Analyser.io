@@ -32,15 +32,22 @@
     return BigInt(m[1]) * 1000000n + BigInt((m[2] || "").padEnd(6, "0"));
   }
 
+  // One BigInt per line, not two: /sip/ reads some 30 of these files on opening,
+  // and on a slow phone this loop was half a second of it (§4.10).
+  var NAV = /^\d+(?:\.\d{1,6})?$/;
   function parseNavFile(text) {
-    var dates = [], navs = [];
-    text.split("\n").forEach(function (line) {
-      line = line.trim();
-      if (!line || line.charAt(0) === "#") return;
-      var parts = line.split(",");
-      dates.push(parts[0]);
-      navs.push(toMicro(parts[1]));
-    });
+    var dates = [], navs = [], lines = text.split("\n");
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line || line.charAt(0) === "#") continue;
+      var comma = line.indexOf(",");
+      var nav = comma < 0 ? "" : line.slice(comma + 1).trim();
+      if (!NAV.test(nav)) throw new Error("not a NAV: " + nav);
+      var dot = nav.indexOf(".");
+      dates.push(line.slice(0, comma));
+      navs.push(BigInt(dot < 0 ? nav + "000000"
+        : nav.slice(0, dot) + nav.slice(dot + 1).padEnd(6, "0")));
+    }
     return { dates: dates, navs: navs };
   }
 
@@ -498,7 +505,173 @@
     });
   }
 
+  // --- What would a SIP have become? (/sip/, SPEC_SIP_WHAT_IF §4) -------------------
+  // The same money in every fund of a kind, at real past prices, all valued on one
+  // date. Built on allot/position/sipDates/xirr above; nothing re-derived.
+
+  var STALE_DAYS = 7;
+  // ₹10 crore an instalment: 120 of them grown a hundredfold stay exact in paise as a
+  // Number (toPaise's 13 digits would not).
+  var SIP_MAX_PAISE = 10000000000;
+  function shiftDays(iso, n) { return new Date(Date.parse(iso) + n * DAY_MS).toISOString().slice(0, 10); }
+  function lastDay(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+  function monthsBack(y, m, n) { var t = y * 12 + (m - 1) - n; return [Math.floor(t / 12), t % 12 + 1]; }
+  // A series cut at `iso`: no price after the valuation date is ever used.
+  function cutAt(series, iso) {
+    var i = onOrAfter(series.dates, iso);
+    var n = i < 0 ? series.dates.length : series.dates[i] === iso ? i + 1 : i;
+    return { dates: series.dates.slice(0, n), navs: series.navs.slice(0, n) };
+  }
+  function lastOf(series) { return series && series.dates.length ? series.dates[series.dates.length - 1] : null; }
+
+  // §4.3. The newest date on which every fund priced in the week to the latest NAV
+  // has a price; funds whose last price is older are "stale".
+  function valuationDate(seriesById) {
+    var lasts = [];
+    seriesById.forEach(function (s, id) { var l = lastOf(s); if (l) lasts.push([id, l]); });
+    if (!lasts.length) return null;
+    var latest = lasts.reduce(function (m, x) { return x[1] > m ? x[1] : m; }, "");
+    var floor = shiftDays(latest, -STALE_DAYS);
+    var kept = lasts.filter(function (x) { return x[1] >= floor; });
+    return {
+      valuedOn: kept.reduce(function (m, x) { return x[1] < m ? x[1] : m; }, latest),
+      latest: latest,
+      stale: lasts.filter(function (x) { return x[1] < floor; }).map(function (x) { return x[0]; }),
+    };
+  }
+
+  // §4.3. The purchases: `years` (1, 3, 5, 10) or `from` ("YYYY-MM" for a SIP,
+  // "YYYY-MM-DD" once). A SIP's last instalment is in the valuation date's month if
+  // its day (clamped to the month) has come, else the month before.
+  function windowOf(w, valuedOn) {
+    if (!w.amountPaise || w.amountPaise > SIP_MAX_PAISE) return { error: "amount" };
+    var v = valuedOn.split("-").map(Number), dates;
+    if (w.mode === "once") {
+      var on = w.from || (v[0] - w.years) + "-" + pad(v[1]) + "-" +
+        pad(Math.min(v[2], lastDay(v[0] - w.years, v[1])));
+      if (on >= valuedOn) return { error: "after" };
+      dates = [on];
+    } else {
+      var day = w.day || 5;
+      var end = Math.min(day, lastDay(v[0], v[1])) <= v[2] ? [v[0], v[1]] : monthsBack(v[0], v[1], 1);
+      var start = w.from ? w.from : (function (s) { return s[0] + "-" + pad(s[1]); })(monthsBack(end[0], end[1], 12 * w.years - 1));
+      var stop = end[0] + "-" + pad(end[1]);
+      if (start > stop) return { error: "after" };
+      dates = sipDates({ day: day, start: start, stop: stop }, valuedOn);
+    }
+    return { buys: dates.map(function (d) { return { date: d, paise: w.amountPaise }; }),
+             first: dates[0], last: dates[dates.length - 1], count: dates.length };
+  }
+
+  // §4.4. Which funds take the same money: Direct plans (a Regular plan is the same
+  // fund at a higher cost) that loaded, were priced by the first purchase and have a
+  // recent price. Every other one is listed with its reason, never dropped.
+  function poolOf(funds, seriesById, window, valuedOn) {
+    var latest = "";
+    seriesById.forEach(function (s) { var l = lastOf(s); if (l && l > latest) latest = l; });
+    var floor = shiftDays(latest || valuedOn, -STALE_DAYS);
+    var inRange = [], out = [];
+    funds.forEach(function (f) {
+      if (f.plan === "regular") return;
+      var s = seriesById.get(f.id);
+      var reason = !lastOf(s) ? "load" : lastOf(s) < floor ? "stale"
+        : s.dates[0] > window.first ? "later" : null;
+      if (reason) out.push({ fund: f, reason: reason }); else inRange.push(f);
+    });
+    return { inRange: inRange, out: out };
+  }
+
+  // Worth, in paise, of `units` thousandths at a NAV in millionths.
+  function worth(units, nav) { return Number(roundDiv(units * nav, 10000000n)); }
+
+  // §4.5. One fund on one window, valued on `valuedOn`, and its lowest point against
+  // what had been put in by then. The scan starts the day after the first purchase is
+  // priced: on that day only its stamp duty is off it, which no fund could avoid.
+  function outcome(buys, series, valuedOn) {
+    var cut = cutAt(series, valuedOn);
+    var pos = position(buys, cut);
+    var lots = pos.lots.filter(function (l) { return !l.error; })
+      .sort(function (a, b) { return a.navDate < b.navDate ? -1 : a.navDate > b.navDate ? 1 : 0; });
+    var low = 0, lowOn = null, k = 0, units = 0n, paid = 0;
+    for (var i = 0; i < cut.dates.length; i++) {
+      var d = cut.dates[i];
+      while (k < lots.length && lots[k].navDate <= d) { units += lots[k].unitsMilli; paid += lots[k].paise; k++; }
+      if (!lots.length || d <= lots[0].navDate || !paid) continue;
+      var fall = (worth(units, cut.navs[i]) - paid) / paid;
+      if (fall < low) { low = fall; lowOn = d; }
+    }
+    return Object.assign(pos, { low: low, lowOn: lowOn });
+  }
+
+  // §4.5. The range: lowest, the lower middle (index floor((n-1)/2), as
+  // `alternatives` takes "middle") and highest worth, ties on fund id.
+  function spread(outcomes) {
+    var s = outcomes.slice().sort(function (a, b) {
+      return a.valuePaise - b.valuePaise || (a.fund.id < b.fund.id ? -1 : a.fund.id > b.fund.id ? 1 : 0);
+    });
+    var n = s.length;
+    if (!n) return { n: 0 };
+    return { n: n, min: s[0], middle: s[Math.floor((n - 1) / 2)], max: s[n - 1], sorted: s,
+             belowEver: s.filter(function (o) { return o.low < 0; }).length };
+  }
+
+  // §4.5. Chart 1: worth at each month's (or, under three years, each week's) end
+  // from the first purchase, the last point on `valuedOn`; and what had been put in,
+  // stepping on each purchase. Every fund on one grid, so the band lines up.
+  function pathOf(buys, series, valuedOn, step) {
+    var cut = cutAt(series, valuedOn);
+    var lots = position(buys, cut).lots.filter(function (l) { return !l.error; });
+    // From the first purchase's price: a holiday before it would draw nothing held.
+    var grid = [], d = lots.reduce(function (m, l) { return l.navDate < m ? l.navDate : m; }, valuedOn);
+    while (d < valuedOn) {
+      var p = d.split("-").map(Number), end;
+      if (step === "week") {
+        end = shiftDays(d, (7 - new Date(Date.parse(d)).getUTCDay()) % 7);   // that week's Sunday
+        if (end === d && grid.length && grid[grid.length - 1] === d) end = shiftDays(d, 7);
+      } else end = p[0] + "-" + pad(p[1]) + "-" + pad(lastDay(p[0], p[1]));
+      if (end >= valuedOn) break;
+      grid.push(end);
+      d = shiftDays(end, 1);
+    }
+    grid.push(valuedOn);
+    var points = grid.map(function (g) {
+      var i = onOrAfter(cut.dates, g);
+      var at = i < 0 ? cut.dates.length - 1 : cut.dates[i] === g ? i : i - 1;
+      var units = lots.reduce(function (s, l) { return l.navDate <= g ? s + l.unitsMilli : s; }, 0n);
+      return [g, at < 0 ? 0 : worth(units, cut.navs[at])];
+    });
+    var total = 0;
+    var putIn = buys.map(function (b) { total += b.paise; return [b.date, total]; });
+    putIn.push([valuedOn, total]);
+    return { points: points, putIn: putIn };
+  }
+
+  // §4.5. The index fund a kind is measured against: the `tracker` most of its funds
+  // name (each fund's benchmark, as its page draws it); on a tie the one with the
+  // longer record, then the lower id. None when none names one.
+  function indexFor(funds, categoryKey) {
+    var byId = new Map(funds.map(function (f) { return [f.id, f]; }));
+    var count = new Map();
+    funds.forEach(function (f) {
+      if (f.category === categoryKey && f.tracker && byId.has(f.tracker)) {
+        count.set(f.tracker, (count.get(f.tracker) || 0) + 1);
+      }
+    });
+    var best = null;
+    count.forEach(function (n, id) {
+      var f = byId.get(id);
+      if (!best || n > best.sharedBy ||
+          (n === best.sharedBy && ((f.prices_from || "9") < (best.fund.prices_from || "9") ||
+            (f.prices_from === best.fund.prices_from && id < best.fund.id)))) {
+        best = { fund: f, sharedBy: n };
+      }
+    });
+    return best;
+  }
+
   var api = {
+    valuationDate: valuationDate, windowOf: windowOf, poolOf: poolOf, outcome: outcome,
+    spread: spread, pathOf: pathOf, indexFor: indexFor, cutAt: cutAt, SIP_MAX_PAISE: SIP_MAX_PAISE,
     toPaise: toPaise, toMicro: toMicro, parseNavFile: parseNavFile, allot: allot,
     sipDates: sipDates, purchasesOf: purchasesOf, position: position, xirr: xirr,
     showsXirr: showsXirr, isSynthetic: isSynthetic, lookThrough: lookThrough,

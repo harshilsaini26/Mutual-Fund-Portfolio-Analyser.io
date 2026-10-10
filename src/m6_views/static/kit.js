@@ -207,10 +207,11 @@
   function navSeries(base, fund) {
     if (!navs.has(fund.id)) {
       var M = window.PortfolioMath;
+      // A failed load leaves the cache, so a Retry fetches again (/sip/'s Retry).
       navs.set(fund.id, fetch(base + "/data/nav/" + fund.amfi + ".csv.gz").then(function (r) {
         if (!r.ok) throw new Error("its prices did not load (" + r.status + ")");
         return M.gzipText(r).then(M.parseNavFile);
-      }));
+      }).catch(function (e) { navs.delete(fund.id); throw e; }));
     }
     return navs.get(fund.id);
   }

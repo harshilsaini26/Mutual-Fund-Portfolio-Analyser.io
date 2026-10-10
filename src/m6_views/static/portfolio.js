@@ -487,7 +487,10 @@
     if (!ok.length) {
       box.replaceChildren(el("p", { "class": "pf__note" }, list.length
         ? "Nothing is valued yet; the funds table says why for each fund."
-        : "Add a fund and a purchase to see what it is worth."));
+        : "Add a fund and a purchase to see what it is worth."),
+        // Someone holding nothing yet can still look back (SPEC_SIP_WHAT_IF §4.8).
+        !list.length && el("p", { "class": "pf__note" },
+          el("a", { href: BASE + "/sip/" }, "Holding no funds yet? See what a SIP would have become →")));
       return;
     }
     var all = whole(ok.map(function (x) { return x.pos; }));

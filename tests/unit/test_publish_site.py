@@ -974,8 +974,9 @@ def test_the_public_menu_holds_every_link(site: Path) -> None:
                     html, re.S)
     assert nav
     links = re.findall(r'class="topnav__link"[^>]*>([^<]+)<', nav.group(1))
-    assert [x.strip() for x in links] == ["Explore funds", "Compare", "Your portfolio",
-                                         "Learn", "Categories", "About the data"]
+    assert [x.strip() for x in links] == ["Explore funds", "Compare", "What if",
+                                         "Your portfolio", "Learn", "Categories",
+                                         "About the data"]
     current = re.search(r'aria-current="page"[^>]*>([^<]+)<', nav.group(1))
     assert current and current.group(1).strip() == "Explore funds"
 
@@ -1440,3 +1441,77 @@ def test_the_zoom_slider_is_big_enough_or_absent() -> None:
     charts = (STATIC_DIR / "charts.js").read_text(encoding="utf-8")
     assert 'type: "slider", height: 24' in charts and 'handleSize: "120%"' in charts
     assert "show: !phone()" in charts
+
+
+def test_the_sip_page_is_published_and_linked(site: Path) -> None:
+    """SPEC_SIP_WHAT_IF §4.1, §4.8: /sip/ is built, its script published, listed in
+    search, and in the top bar between Compare and Your portfolio and in the footer."""
+    page = (site / "sip" / "index.html").read_text(encoding="utf-8")
+    assert "sip.js" in publish.STATIC_FILES and (site / "static" / "sip.js").is_file()
+    assert f'<script src="{BASE}/static/sip.js" defer></script>' in page
+    found = json.loads((site / "search.json").read_text(encoding="utf-8"))
+    assert {"name": "What would a SIP have become?", "detail": "Page",
+            "url": f"{BASE}/sip/"} in found
+    nav = page[page.index('<nav class="topnav"'):page.index("</nav>")]
+    hrefs = re.findall(r'href="([^"]+)"', nav)
+    at = hrefs.index(f"{BASE}/sip/")
+    assert hrefs[at - 1] == f"{BASE}/compare/" and hrefs[at + 1] == f"{BASE}/portfolio/"
+    assert 'aria-current="page">What if</a>' in re.sub(r"\s+", " ", nav)
+    foot = page[page.index('class="colophon__columns"'):]
+    assert f'href="{BASE}/sip/"' in foot[:foot.index("</nav>")]
+
+
+def test_the_sip_page_offers_the_ranked_kinds_by_family(site: Path) -> None:
+    """§4.2: one <optgroup> a family, in the site's order; only ranked kinds, each
+    with its count of Direct funds here and SEBI's one line on it."""
+    page = (site / "sip" / "index.html").read_text(encoding="utf-8")
+    select = re.search(r'<select id="sip-kind"[^>]*>(.*?)</select>', page, re.S)
+    assert select
+    groups = re.findall(r'<optgroup label="([^"]+)">', select.group(1))
+    assert groups == ["Equity"]
+    option = re.search(r'<option value="equity/flexi_cap" data-about="([^"]+)"[^>]*>'
+                       r"Flexi cap \(2\)</option>", select.group(1))
+    assert option and "65%" in option.group(1)
+
+
+def test_the_sip_page_fetches_its_opening_kinds_prices_while_it_loads(site: Path) -> None:
+    """§4.10: the page opens on large cap, or the first kind where there is none (as
+    here); that kind's Direct NAV files are preloaded, and no other fund's."""
+    page = (site / "sip" / "index.html").read_text(encoding="utf-8")
+    assert re.search(r'<option value="equity/flexi_cap"[^>]* selected>', page)
+    rows = json.loads((site / "funds.json").read_text(encoding="utf-8"))
+    codes = sorted(r["amfi"] for r in rows
+                   if r["category"] == "equity/flexi_cap" and r.get("plan") != "regular")
+    link = (rf'<link rel="preload" href="{BASE}/data/nav/(\w+)\.csv\.gz"'
+            r' as="fetch" crossorigin>')
+    preloaded = sorted(re.findall(link, page))
+    assert codes and preloaded == codes
+    assert all((site / "data" / "nav" / f"{c}.csv.gz").is_file() for c in codes)
+
+
+def test_the_sip_page_always_carries_its_notes(site: Path) -> None:
+    """§4.6.5: four notes, never folded."""
+    page = _flat((site / "sip" / "index.html").read_text(encoding="utf-8"))
+    for note in ("Direct plans, growth option, at their published prices.",
+                 "Only funds open today are here.",
+                 "A Regular plan of the same fund has a higher expense ratio",
+                 "This looks back. It says nothing of what comes next."):
+        assert note in page, note
+
+
+def test_every_way_into_the_sip_page(site: Path) -> None:
+    """SPEC_SIP_WHAT_IF §4.8: from a fund page (its kind and itself filled in),
+    Compare, Your portfolio when empty, and the SIP guide."""
+    fund = _page(site, DIRECT)
+    growth = fund[fund.index('data-view-id="fund_growth"'):]
+    growth = growth[:growth.index("</section>")]
+    assert (f'href="{BASE}/sip/#c=equity/flexi_cap&amp;f={DIRECT}">'
+            "Your own amount, as a SIP or once →</a>") in growth
+    guide = (site / "learn" / "sip-and-lump-sum" / "index.html").read_text(
+        encoding="utf-8")
+    assert f'<a href="{BASE}/sip/">Try it with real funds →</a>' in guide
+    for name, text in (
+            ("compare.js", "The same funds as a monthly SIP →"),
+            ("portfolio.js", "Holding no funds yet? See what a SIP would have become →")):
+        script = (STATIC_DIR / name).read_text(encoding="utf-8")
+        assert text in script and 'BASE + "/sip/' in script, name

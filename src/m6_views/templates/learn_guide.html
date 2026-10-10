@@ -36,6 +36,9 @@
   </figure>
   {% endif %}
   {% endfor %}
+  {% if guide.slug == "sip-and-lump-sum" and static %}
+  <p class="learn__try"><a href="{{ root }}/sip/">Try it with real funds →</a></p>
+  {% endif %}
   <h2>Sources</h2>
   {{ vc.learn_sources(guide.sources) }}
   {% if guide.terms %}
