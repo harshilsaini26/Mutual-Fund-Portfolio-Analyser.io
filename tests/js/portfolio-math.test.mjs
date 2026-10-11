@@ -385,3 +385,16 @@ test("a real move, a real crash and a dying fund's last row are left alone", () 
     assert.deepEqual(navsOf(["100", String(100 * Number(r))]), [100000000n, BigInt(Math.round(100 * Number(r) * 1e6))]);
   }
 });
+
+// "In hindsight" (design critique, 2026-10-11): only the funds chosen are rows; one
+// "Compare another fund" fills the first free place, while there is one.
+test("chosen slots are the rows; the next free place is offered once", () => {
+  const f = (id) => ({ id });
+  const slots = [{ slot: 0, fund: null }, { slot: 1, fund: f("B") }, { slot: 2, fund: null }];
+  const got = M.chosenSlots(slots);
+  assert.deepEqual(got.chosen.map((s) => s.fund.id), ["B"]);
+  assert.equal(got.next, 0);
+  const full = M.chosenSlots([0, 1, 2].map((k) => ({ slot: k, fund: f("F" + k) })));
+  assert.equal(full.chosen.length, 3);
+  assert.equal(full.next, null);
+});

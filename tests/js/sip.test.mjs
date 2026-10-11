@@ -431,3 +431,16 @@ test("a start before the kind's first price names that price's date", () => {
   assert.equal(S.fromError("2006-04-03", "2006-04-03"), null);
   assert.equal(S.fromError("2010-01-05", "2006-04-03"), null);
 });
+
+// The range strip (design critique, 2026-10-11): one mark wherever a range is shown,
+// placed by the same pure geometry.
+test("the range strip places the range and each mark on its axis", () => {
+  const g = S.stripGeometry({ min: 150, max: 300, middle: 200, putIn: 100, index: 250, yours: 175 }, 100, 300);
+  assert.equal(g.left, "25.00%");
+  assert.equal(g.width, "75.00%");
+  assert.deepEqual(g.marks, [["putin", "0.00%"], ["mid", "50.00%"], ["index", "75.00%"], ["yours", "37.50%"]]);
+  // The middle, as a share of the range: where the range grows from.
+  assert.equal(g.origin, "33.33%");
+  // No middle, index or yours: only what is given is marked; one value is not a span.
+  assert.deepEqual(S.stripGeometry({ min: 5, max: 5 }, 5, 5), { left: "0.00%", width: "0.00%", origin: "50.00%", marks: [] });
+});

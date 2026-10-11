@@ -214,8 +214,11 @@
       var o = base(p);
       o.tooltip.trigger = "axis";
       o.tooltip.formatter = listed;
-      o.legend.type = "scroll";
-      o.grid.top = 44;
+      // A phone's width pages a one-line legend ("1/2"): there it is a list, one line
+      // a series, above the plot (design critique, 2026-10-11).
+      var named = 2 + c.lines.length;
+      if (p.narrow) { o.legend.orient = "vertical"; o.legend.itemGap = 6; o.grid.top = named * 20 + 16; }
+      else { o.legend.type = "scroll"; o.grid.top = 44; }
       o.xAxis = { type: "time", axisLine: { lineStyle: { color: p.rule } }, axisTick: { show: false },
                   axisLabel: { fontSize: textSize(), color: p.faint, hideOverlap: true },
                   splitLine: { show: false } };
@@ -223,11 +226,13 @@
                   splitLine: { lineStyle: { color: p.rule } } };
       var at = function (pt) { return pt[0]; };
       o.series = [
+        // The band's edges are drawn: its 15% fill alone is 1.29:1 on the page, and
+        // the edges at 70% are 4.1:1 or more (WCAG 1.4.11, design critique).
         { name: c.band.name + " (lowest)", type: "line", stack: "band", showSymbol: false, silent: true,
-          lineStyle: { opacity: 0 }, tooltip: { show: false }, legendHoverLink: false,
+          lineStyle: { color: alpha(p.cats[0], 0.7), width: 1 }, tooltip: { show: false }, legendHoverLink: false,
           data: c.band.points.map(function (pt) { return { value: [at(pt), number(pt[1])] }; }) },
         { name: c.band.name, type: "line", stack: "band", showSymbol: false,
-          lineStyle: { opacity: 0 }, itemStyle: { color: alpha(p.cats[0], 0.3) },
+          lineStyle: { color: alpha(p.cats[0], 0.7), width: 1 }, itemStyle: { color: alpha(p.cats[0], 0.3) },
           areaStyle: { color: alpha(p.cats[0], 0.15) },
           data: c.band.points.map(function (pt) {
             return { value: [at(pt), number(pt[2]) - number(pt[1])], caption: pt[3] };
@@ -276,7 +281,10 @@
                   splitLine: { lineStyle: { color: p.rule } }, axisLine: { lineStyle: { color: p.rule } } };
       o.yAxis = { type: "value", show: false, min: -deep - 1, max: deep + 1 };
       var look = {
-        null: { symbol: "circle", size: 10, color: alpha(p.cats[0], 0.55), z: 2 },
+        // 80%: 5.3:1 on the light page, about 3.9:1 on the dark (sampled from the
+        // drawn chart); at 55% it was 2.87:1 on the light. The middle is set apart by
+        // its ring, not by colour alone.
+        null: { symbol: "circle", size: 10, color: alpha(p.cats[0], 0.8), z: 2 },
         middle: { symbol: "emptyCircle", size: 16, color: p.cats[0], z: 4 },
         index: { symbol: "diamond", size: 16, color: p.cats[1], z: 4 },
         added: { symbol: "pin", size: 22, color: null, z: 5 },
@@ -295,7 +303,10 @@
                    labelLayout: { hideOverlap: true } };
         }),
         markLine: { silent: true, symbol: "none", lineStyle: { color: p.soft, type: "dashed" },
-                    label: { formatter: c.putInLabel, color: p.soft, position: "end" },
+                    // From the line rightwards: centred on it, the label ran off the
+                    // left edge on a phone ("ut in").
+                    label: { formatter: c.putInLabel, color: p.soft, position: "end", align: "left",
+                             padding: [0, 0, 0, 4] },
                     data: [{ xAxis: c.putIn }] },
       }];
       return o;
@@ -538,7 +549,9 @@
     var bars = el.getAttribute("data-bars");
     if (bars) el.style.height = (Number(bars) * 30 + 16) + "px";
     var chart = echarts.init(el, null, { renderer: "svg" });
-    chart.setOption(KINDS[spec.kind](spec, palette()));
+    var p = palette();
+    p.narrow = el.clientWidth < 520;   // a phone: legends stack rather than page
+    chart.setOption(KINDS[spec.kind](spec, p));
     // A fund's dot opens its page (/sip/'s chart 2).
     if (spec.kind === "dots") {
       chart.on("click", function (it) { if (it.data && it.data.href) window.location.assign(it.data.href); });

@@ -116,7 +116,25 @@
     return v < 0.05 ? "less than 0.1%" : v.toFixed(1) + "%";
   }
 
+  // The range strip's geometry (design critique, 2026-10-11): one small mark wherever
+  // a range is shown -- under /sip/'s answer, in each overview row, under a Portfolio
+  // card's sentence. `v`: min, max, and any of middle, putIn, index, yours, all in one
+  // unit; `lo`..`hi` the axis. Positions as percentages; `origin` is where the range
+  // grows from when it is first drawn (the middle, as a share of the range).
+  function stripGeometry(v, lo, hi) {
+    var span = hi - lo;
+    var at = function (x) { return (span ? (x - lo) / span * 100 : 0).toFixed(2) + "%"; };
+    var marks = [];
+    [["putin", v.putIn], ["mid", v.middle], ["index", v.index], ["yours", v.yours]].forEach(function (m) {
+      if (m[1] != null) marks.push([m[0], at(m[1])]);
+    });
+    var origin = v.middle != null && v.max > v.min ? (v.middle - v.min) / (v.max - v.min) * 100 : 50;
+    return { left: at(v.min), width: (span ? (v.max - v.min) / span * 100 : 0).toFixed(2) + "%",
+             origin: origin.toFixed(2) + "%", marks: marks };
+  }
+
   var api = { parseHash: parseHash, writeHash: writeHash, scaled: scaled, readAmount: readAmount,
+              stripGeometry: stripGeometry,
               SIP_MAX_RUPEES: SIP_MAX_RUPEES, pointsOf: pointsOf, fallText: fallText, fromError: fromError };
   if (typeof module === "object" && module.exports) { module.exports = api; return; }
 
@@ -276,7 +294,33 @@
       el.apply(null, ["ul", { "class": "sip__out" }].concat(items)));
   }
 
-  window.SipStrip = { strip: strip, load: load };
+  // The range strip, drawn (design critique, 2026-10-11): aria-hidden, since the
+  // sentence beside it always says the same in words. `fresh`: its first appearance,
+  // when the range grows out from the middle -- the page's one moment of motion, off
+  // with the site's motion setting or a reduced-motion preference (app.css).
+  function rangeBar(v, lo, hi, fresh) {
+    var g = stripGeometry(v, lo, hi);
+    var range = el("span", { "class": "sip__bar-range" });
+    range.style.left = g.left;
+    range.style.width = g.width;
+    range.style.transformOrigin = g.origin + " 50%";
+    return el.apply(null, ["div", { "class": "sip__bar" + (fresh ? " sip__bar--fresh" : ""), "aria-hidden": "true" },
+      range].concat(g.marks.map(function (m) {
+        var s = el("span", { "class": "sip__bar-" + m[0] });
+        s.style.left = m[1];
+        return s;
+      })));
+  }
+  // What the strip's marks mean, once beside each set of strips.
+  var KEY = { range: "lowest to highest", mid: "the middle fund", index: "the index fund", yours: "yours",
+              putin: "put in" };
+  function stripKey(marks) {
+    return el.apply(null, ["p", { "class": "sip__note sip__key", "aria-hidden": "true" }].concat(marks.map(function (m) {
+      return el("span", { "class": "sip__key-item" }, el("span", { "class": "sip__key-" + m }), KEY[m]);
+    })));
+  }
+
+  window.SipStrip = { strip: strip, load: load, bar: rangeBar, key: stripKey };
 
   // --- /sip/ itself ----------------------------------------------------------------
   var page = document.querySelector("[data-sip]");
@@ -554,11 +598,13 @@
     if (firsts.length) fromBox.min = state.m === "sip" ? firsts[0].slice(0, 7) : firsts[0];
   }
 
+  var answered = false;   // the strip grows once, with the first answer
   function answer(w, v, r, name, idx, adds, pool, kindSeries) {
     var box = out("answer");
     var today = M.localDay(new Date());
+    // A stalled nightly build shows itself (§10), as a notice above the answer.
     var behind = (Date.parse(today) - Date.parse(v.valuedOn)) / 86400000 > 7
-      ? "Prices on this site run to " + M.day(v.valuedOn) + ". " : "";
+      ? el("p", { "class": "sip__behind" }, "Prices on this site run to " + M.day(v.valuedOn) + ".") : null;
     var each = rupees(w.buys[0].paise);
     var put = w.buys.reduce(function (s, b) { return s + b.paise; }, 0);
     var what = state.m === "sip"
@@ -571,14 +617,14 @@
     if (r.n === 0) {
       var firsts = pool.out.map(function (o) { var s = kindSeries.get(o.fund.id); return s && s.dates.length ? s.dates[0] : null; })
         .filter(Boolean).sort();
-      fill(box, el("p", { "class": "sip__lead" }, behind + (firsts.length
+      fill(box, behind, el("p", { "class": "sip__lead" }, (firsts.length
         ? kindName() + " funds have prices from " + M.day(firsts[0]) + " at the earliest. A shorter period includes more of them."
         : "No " + name + " fund has prices to show.")));
       return;
     }
     if (r.n < 3) {
-      fill(box,
-        el("p", { "class": "sip__lead" }, behind + "Only " + r.n + " " + name + " fund" + (r.n === 1 ? " has" : "s have") +
+      fill(box, behind,
+        el("p", { "class": "sip__lead" }, "Only " + r.n + " " + name + " fund" + (r.n === 1 ? " has" : "s have") +
           " prices back to " + M.day(w.first) + "; a range needs at least three."),
         el.apply(null, ["ul", { "class": "sip__lines" }].concat(r.sorted.map(function (o) {
           return el("li", null, el("a", { href: fundPage(o.fund) }, o.fund.name), ": " + rupees(o.valuePaise) + ", " +
@@ -587,7 +633,7 @@
         addedLines(adds, w, v));
       return;
     }
-    var lead = el("p", { "class": "sip__lead" }, behind,
+    var lead = el("p", { "class": "sip__lead" },
       el("strong", null, what), how, "would be worth ",
       el("strong", null, "between " + rupees(r.min.valuePaise) + " and " + rupees(r.max.valuePaise)),
       " on " + M.day(v.valuedOn) + " in the " + r.n + " " + name + " funds with prices back that far. ",
@@ -603,7 +649,13 @@
         : r.belowEver + " of the " + r.n + " at some point fell below the " + rupees(put) + " put in. ") +
         (r.middle.low < 0 ? "The middle fund at its lowest: " + pct(r.middle.low) + " below, on " + M.day(r.middle.lowOn) + "."
           : "The middle fund was never below it.");
-    fill(box, lead,
+    // The range strip: the answer's figures as one mark, on this kind's own axis.
+    var lo = Math.min(put, r.min.valuePaise), hi = Math.max(r.max.valuePaise, idx ? idx.valuePaise : 0);
+    var bar = rangeBar({ min: r.min.valuePaise, max: r.max.valuePaise, middle: r.middle.valuePaise, putIn: put,
+                         index: idx ? idx.valuePaise : null }, lo, hi, !answered);
+    answered = true;
+    fill(box, behind, lead,
+      el("div", { "class": "sip__strip" }, bar, stripKey(idx ? ["range", "mid", "index", "putin"] : ["range", "mid", "putin"])),
       idx && el("p", { "class": "sip__index" }, "In " + idx.fund.name + ", the index fund on the benchmark of " +
         idx.sharedBy + " of these funds: " + rupees(idx.valuePaise) + ", " + returnText(idx, w.first, v.valuedOn) + "."),
       el("dl", { "class": "pf__tiles sip__tiles" }, tile("Lowest", r.min), tile("Middle", r.middle), tile("Highest", r.max)),
@@ -708,7 +760,7 @@
   // data/sip/kinds.json, written by the build (src/m2_fund/sip.py) for ₹1,000 a month
   // and ₹1,00,000 once on the 5th, scaled here. Fetched once an answer is up: the
   // answer does not wait for it. No fund is named: these are ranges of kinds.
-  var kindsFile = null, opened = {};
+  var kindsFile = null, opened = {}, kindsDrawn = false;
   function overview() {
     var box = page.querySelector("[data-sip-kinds]");
     if (!kindsFile) {
@@ -750,33 +802,24 @@
     // One ₹ axis for every kind, from the lowest of them (or what was put in) to the highest.
     var lo = Math.min.apply(null, ranged.map(function (r) { return scale(r.w.min); }).concat(putIn));
     var hi = Math.max.apply(null, ranged.map(function (r) { return scale(r.w.max); }));
-    var at = function (p) { return ((p - lo) / (hi - lo || 1) * 100).toFixed(2) + "%"; };
-    function mark(cls, p) { var m = el("span", { "class": "sip__bar-" + cls }); m.style.left = at(p); return m; }
+    var fresh = !kindsDrawn;   // the strips grow once, when the overview first appears
+    kindsDrawn = true;
     function row(r) {
       var w = r.w, k = r.k, current = k.category === state.c;
       var head = el("div", { "class": "sip__krow-head" },
         el("button", { type: "button", "class": "sip__krow-name", "data-kind": k.category,
                        "aria-current": current ? "true" : null }, k.name),
-        el("span", { "class": "sip__krow-count" },
-          (w ? w.eligible + " of " : "") + k.funds + " fund" + (k.funds === 1 ? "" : "s")));
-      var body = [el("p", { "class": "sip__krow-about" }, k.about)];
-      if (!w) {
-        body.push(el("p", { "class": "sip__krow-figs" }, "No range: fewer than 3 funds of this kind have prices for the whole period."));
-      } else {
-        var range = el("span", { "class": "sip__bar-range" });
-        range.style.left = at(scale(w.min));
-        range.style.width = ((scale(w.max) - scale(w.min)) / (hi - lo || 1) * 100).toFixed(2) + "%";
-        var low = Number(w.middle_low);
-        body.push(
-          el("div", { "class": "sip__bar", "aria-hidden": "true" }, range, mark("putin", putIn),
-            mark("mid", scale(w.middle)), w.index ? mark("index", scale(w.index.worth)) : null),
-          el("p", { "class": "sip__krow-figs" },
-            el("strong", null, "about " + rupees(scale(w.middle))), " in the middle · ",
-            low < 0 ? "middle at its lowest: " + pct(low) + " below" : "the middle never below what was put in",
-            el("span", { "class": "sr-only" }, ". From about " + rupees(scale(w.min)) + " to about " +
-              rupees(scale(w.max)) + (w.index ? "; its index fund about " + rupees(scale(w.index.worth)) : "") + ".")));
-      }
-      return el.apply(null, ["li", { "class": "sip__krow" + (current ? " sip__krow--current" : "") }, head].concat(body));
+        el("span", { "class": "sip__krow-count" }, w.eligible + " of " + k.funds + " fund" + (k.funds === 1 ? "" : "s")));
+      var low = Number(w.middle_low);
+      return el("li", { "class": "sip__krow" + (current ? " sip__krow--current" : "") }, head,
+        el("p", { "class": "sip__krow-about" }, k.about),
+        rangeBar({ min: scale(w.min), max: scale(w.max), middle: scale(w.middle), putIn: putIn,
+                   index: w.index ? scale(w.index.worth) : null }, lo, hi, fresh),
+        el("p", { "class": "sip__krow-figs" },
+          el("strong", null, "about " + rupees(scale(w.middle))), " in the middle · ",
+          low < 0 ? "middle at its lowest: " + pct(low) + " below" : "the middle never below what was put in",
+          el("span", { "class": "sr-only" }, ". From about " + rupees(scale(w.min)) + " to about " +
+            rupees(scale(w.max)) + (w.index ? "; its index fund about " + rupees(scale(w.index.worth)) : "") + ".")));
     }
     // Each family's three kinds holding the most money first, the rest a tap away.
     var families = [];
@@ -789,13 +832,23 @@
       f.rows.sort(function (a, b) {
         return (Number(b.k.assets) || 0) - (Number(a.k.assets) || 0) || (a.k.name < b.k.name ? -1 : 1);
       });
-      var shown = opened[f.name] ? f.rows : f.rows.slice(0, 3);
-      var list = el.apply(null, ["ul", { "class": "sip__kinds" }].concat(shown.map(row)));
-      var more = f.rows.length > shown.length
+      // A kind with no range is a name in one line, not a card that says so
+      // (design critique): its name still works it out on the page.
+      var withRange = f.rows.filter(function (r) { return r.w; });
+      var without = f.rows.filter(function (r) { return !r.w; });
+      var shown = opened[f.name] ? withRange : withRange.slice(0, 3);
+      var list = shown.length ? el.apply(null, ["ul", { "class": "sip__kinds" }].concat(shown.map(row))) : null;
+      var more = withRange.length > shown.length
         ? el("button", { type: "button", "class": "button button--quiet", "data-family": f.name },
-            "Show all " + f.rows.length + " kinds")
+            "Show all " + withRange.length + " kinds")
         : null;
-      return el("div", { "class": "sip__family", "data-family-of": f.name }, el("h3", null, f.name), list, more);
+      var none = without.length ? el.apply(null, ["p", { "class": "sip__unranged" },
+        "Fewer than 3 funds with prices for the whole period: "].concat(without.map(function (r, i) {
+          return [i ? ", " : "", el("button", { type: "button", "class": "sip__krow-name", "data-kind": r.k.category,
+            "aria-current": r.k.category === state.c ? "true" : null }, r.k.name),
+            " (" + r.k.funds + " fund" + (r.k.funds === 1 ? "" : "s") + ")"];
+        }).reduce(function (a, b) { return a.concat(b); }, []).concat(["."]))) : null;
+      return el("div", { "class": "sip__family", "data-family-of": f.name }, el("h3", null, f.name), list, more, none);
     });
     // Each kind is valued on its own latest prices, as choosing it would be.
     var dates = ranged.map(function (r) { return r.k.valued_on; }).sort();
@@ -807,11 +860,7 @@
     fill.apply(null, [out("kinds"),
       el("p", { "class": "sip__note" }, how + ", in every kind of fund, valued on " + on +
         ". Worked out for ₹1,000 a month (₹1,00,000 once) and scaled, so each figure is about, to the nearest ₹100. Choose a kind for its exact range."),
-      el("p", { "class": "sip__note sip__key", "aria-hidden": "true" },
-        el("span", { "class": "sip__key-range" }), " lowest to highest  ",
-        el("span", { "class": "sip__key-mid" }), " the middle fund  ",
-        el("span", { "class": "sip__key-index" }), " the index fund  ",
-        el("span", { "class": "sip__key-putin" }), " put in"),
+      stripKey(["range", "mid", "index", "putin"]),
       el("div", { "class": "sip__axis", "aria-hidden": "true" },
         el("span", null, "about " + rupees(lo)), el("span", null, "about " + rupees(hi)))].concat(blocks));
   }

@@ -458,6 +458,12 @@
   }
 
   // The money an alternative is valued on: exactly what the held fund priced.
+  // Your portfolio's comparison (design critique, 2026-10-11): the slots holding a
+  // chosen fund, and the first free one, offered as "Compare another fund".
+  function chosenSlots(slots) {
+    var free = slots.filter(function (s) { return !s.fund; })[0];
+    return { chosen: slots.filter(function (s) { return s.fund; }), next: free ? free.slot : null };
+  }
   function pricedBuys(pos) {
     return pos.lots.filter(function (l) { return !l.error; })
       .map(function (l) { return { date: l.date, paise: l.paise }; });
@@ -771,7 +777,7 @@
   var api = {
     valuationDate: valuationDate, windowOf: windowOf, poolOf: poolOf, outcome: outcome,
     spread: spread, pathsOf: pathsOf, gridOf: gridOf, indexFor: indexFor, cutAt: cutAt, SIP_MAX_PAISE: SIP_MAX_PAISE,
-    ordinal: ordinal, against: against, eligibleOn: eligibleOn,
+    ordinal: ordinal, against: against, eligibleOn: eligibleOn, chosenSlots: chosenSlots,
     toPaise: toPaise, toMicro: toMicro, parseNavFile: parseNavFile, allot: allot,
     sipDates: sipDates, purchasesOf: purchasesOf, position: position, xirr: xirr,
     showsXirr: showsXirr, isSynthetic: isSynthetic, lookThrough: lookThrough,

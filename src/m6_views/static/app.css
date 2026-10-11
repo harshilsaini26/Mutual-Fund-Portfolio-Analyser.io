@@ -1761,6 +1761,14 @@ body, .topbar, .card, .view, .settings {
 .pf__tile dt { color: var(--ink-faint); font-size: var(--text-sm); }
 .pf__tile dd { margin: 2px 0 0; font-size: var(--text-h3); font-weight: 700; font-variant-numeric: tabular-nums; }
 .pf__alt { display: grid; gap: 8px; margin-bottom: 20px; }
+/* One rhythm with /sip/'s answer (design critique, 2026-10-11): the heading, the
+   sentence and its strip close together; a placeholder until the card is worked out. */
+.pf__alt > h3 { margin: 0 0 4px; }
+.pf__alt > h4 { margin: 14px 0 0; }
+.pf__against-lead { margin: 0; max-width: 72ch; font-size: var(--text-lead); line-height: 1.55; color: var(--ink); }
+.pf__waiting { height: 3.2em; max-width: 72ch; border-radius: 8px; background: var(--surface-2); }
+.pf__another { justify-self: start; }
+.pf__alts-intro { flex: 1 1 32rem; max-width: 62ch; display: grid; gap: 8px; }
 .pf__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
 
 /* The answer first (UI/UX critique P-01, P-02, P-09): the reference sentence, the
@@ -1904,7 +1912,14 @@ body, .topbar, .card, .view, .settings {
 .sip__answer--busy { opacity: 0.55; }
 .sip__lead { margin: 0 0 12px; max-width: 72ch; font-size: var(--text-lead); line-height: 1.55; color: var(--ink); }
 .sip__index, .sip__along { max-width: 72ch; margin: 12px 0; }
-.sip__tiles { margin: 14px 0; }
+.sip__tiles { margin: 14px 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* The range strip under the answer (design critique, 2026-10-11): the same mark as each
+   overview row and each Portfolio card, so one reading serves all three. */
+.sip__strip { max-width: 72ch; margin: 4px 0 12px; }
+.sip__strip .sip__key { margin: 6px 0 0; }
+.sip__behind { display: inline-block; margin: 0 0 10px; padding: 3px 10px; border-radius: 999px;
+  background: var(--surface-2); font-size: var(--text-sm); color: var(--ink-soft); }
+.sip__unranged { margin: 6px 0 0; max-width: 72ch; font-size: var(--text-sm); color: var(--ink-soft); }
 .sip__lines { margin: 8px 0; padding-left: 1.2em; font-size: var(--text-sm); }
 .sip__note { max-width: 72ch; font-size: var(--text-sm); color: var(--ink-soft); }
 .sip__notes-list { display: grid; gap: 6px; max-width: 72ch; margin: 0; padding-left: 1.2em; font-size: var(--text-sm); color: var(--ink-soft); }
@@ -1923,13 +1938,30 @@ body, .topbar, .card, .view, .settings {
 .sip__krow-figs { margin: 6px 0 0; font-size: var(--text-sm); }
 .sip__bar { position: relative; height: 16px; background: linear-gradient(var(--line), var(--line)) center / 100% 1px no-repeat; }
 .sip__bar > span { position: absolute; }
-.sip__bar-range, .sip__key-range { top: 4px; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 35%, transparent); }
+/* The fill alone was 1.9:1 on the card; its outline is the accent itself, 9.5:1. */
+.sip__bar-range, .sip__key-range { top: 4px; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--accent); }
+.sip__bar-yours, .sip__key-yours { top: 2px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%;
+  background: var(--cat-3); box-shadow: 0 0 0 2px var(--surface); }
 .sip__bar-mid, .sip__key-mid { top: 0; width: 3px; height: 16px; margin-left: -1px; background: var(--accent); }
 .sip__bar-index, .sip__key-index { top: 3px; width: 10px; height: 10px; margin-left: -5px; background: var(--ink); transform: rotate(45deg); }
 .sip__bar-putin, .sip__key-putin { top: 0; height: 16px; margin-left: -1px; border-left: 2px dashed var(--ink-soft); }
 .sip__key span { display: inline-block; position: relative; margin: 0 6px 0 0; vertical-align: middle; }
+.sip__key .sip__key-item { display: inline-flex; align-items: center; gap: 6px; margin: 0 14px 4px 0; white-space: nowrap; }
+.sip__key .sip__key-item > span { margin: 0; }
 .sip__key .sip__key-range { width: 18px; top: 0; }
-.sip__key .sip__key-index, .sip__key .sip__key-mid, .sip__key .sip__key-putin { top: 0; margin-left: 2px; }
+.sip__key .sip__key-index, .sip__key .sip__key-mid, .sip__key .sip__key-putin, .sip__key .sip__key-yours { top: 0; margin-left: 2px; }
+/* The range grows out from the middle once, as it first appears -- the first answer,
+   the overview, a Portfolio card -- and its marks follow. Recomputing after an input
+   does not move (motion.md: no motion on frequent interactions); the motion setting
+   or a reduced-motion preference stops it all (above). Every mark is in place in the
+   final frame and without the animation. */
+.sip__bar--fresh .sip__bar-range { animation: lp-grow 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.sip__bar--fresh > span:not(.sip__bar-range) { animation: lp-fade 240ms ease-out 300ms both; }
+.sip__krow:nth-child(2) .sip__bar--fresh .sip__bar-range { animation-delay: 60ms; }
+.sip__krow:nth-child(3) .sip__bar--fresh .sip__bar-range { animation-delay: 120ms; }
+.sip__krow:nth-child(2) .sip__bar--fresh > span:not(.sip__bar-range) { animation-delay: 360ms; }
+.sip__krow:nth-child(3) .sip__bar--fresh > span:not(.sip__bar-range) { animation-delay: 420ms; }
 .sip__axis { display: flex; justify-content: space-between; margin: 10px 0 0; font-size: var(--text-xs); color: var(--ink-faint); }
 .echart--band .echart__canvas { height: 360px; }
 /* A way into /sip/ from a panel (SPEC_SIP_WHAT_IF §4.8), and from the SIP guide. */
@@ -1939,6 +1971,10 @@ body, .topbar, .card, .view, .settings {
 @media (max-width: 720px) {
   .sip__choice .settings__chip, .sip__krow-name { min-height: 44px; }
   .sip__kind select, .sip__more select { min-height: 44px; width: 100%; }
+  /* Three tiles across, not two and an orphan (design critique). */
+  .sip__tiles { gap: 8px; }
+  .sip__tiles .pf__tile { padding: 10px; }
+  .sip__tiles dd { font-size: var(--text-lead); }
   .echart--band .echart__canvas { height: 260px; }
 }
 .cmp__picked .cmp__remove { border-radius: 50%; border: 0; background: transparent; }

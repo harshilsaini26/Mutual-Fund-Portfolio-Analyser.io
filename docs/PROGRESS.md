@@ -282,6 +282,26 @@ address (V1-92; GitHub Pages served it until 2026-10-03). Measured on the first 
   the site pays, about 1 s under the slowdown (the same on `/compare/` and `/learn/`).
   Not yet measured on the live site, where `funds.json` is 1.47 MB raw and NAV files
   are larger (about 19 KB each): re-measure after the first build that carries it.
+- **Design pass on the SIP work** (V1-105, 2026-10-11). A design critique, then
+  Apple's design principles, applied to /sip/, the overview and Your portfolio's "In
+  hindsight":
+  - **One range strip** under the answer, in each overview row, and under each
+    Portfolio card (with yours on it), so one reading serves all three. It grows from
+    the middle once, as it first appears, and never on a recompute; the motion setting
+    stops it.
+  - **Chart marks clear 3:1:**
+    - chart 2's dots from 2.87:1 to 5.3:1 on light, 4.06:1 sampled on dark;
+    - the range band's edges drawn at 4.1:1 (its 15% fill was 1.29:1);
+    - the overview bars outlined at 9.5:1 (their fill was 1.9:1).
+  - **Phone layout:** chart 1's legend stacks on a phone, the "Put in" label no longer
+    runs off the left edge, and the three tiles stay three across.
+  - **Your portfolio:**
+    - only chosen comparison funds are rows, with one "Compare another fund"
+      (three empty slots per holding before);
+    - the moving-money note sits with the intro;
+    - cards waiting for the screen show a placeholder.
+  - **Smaller changes:** kinds with no range are one line per family; the "Prices on
+    this site run to" notice is its own line.
 - **Code review of the SIP work, fixed** (V1-104, 2026-10-11): a fresh review of Parts
   A–C found no Critical issues, four Important and fifteen Minor; each fix below went
   in test-first.

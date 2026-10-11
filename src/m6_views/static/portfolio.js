@@ -638,7 +638,7 @@
   // (a saved file's `alts` still fill them). The first card is worked out at once,
   // the rest as each comes within 200px of the screen, so one kind's NAV files load
   // before the visitor scrolls.
-  var watching = null;
+  var watching = null, grown = new Set();
   function alts(list, live) {
     var box = out("alts");
     if (watching) { watching.disconnect(); watching = null; }
@@ -646,8 +646,10 @@
     if (!cards.length) { box.replaceChildren(el("p", { "class": "pf__note" }, "Shown once a fund is valued.")); return Promise.resolve(); }
     return Promise.all(cards.map(function (x) {
       var slots = M.altSlots(x.h.alts, [], function (id) { return FUNDS.get(id); });
+      // Only the funds chosen are rows; one button offers the next free place.
+      var pick = M.chosenSlots(slots);
       var buys = M.pricedBuys(x.pos), sold = M.pricedSales(x.pos);
-      return Promise.all(slots.map(function (s) {
+      return Promise.all(pick.chosen.map(function (s) {
         if (!s.fund) return Promise.resolve({ s: s, pos: null, error: null });
         return K.navSeries(BASE, s.fund).then(function (series) {
           return { s: s, pos: M.position(buys, series, sold), error: null };
@@ -658,9 +660,8 @@
         valued.forEach(function (v) {
           var f = v.s.fund;
           var button = el("button", { type: "button", "class": "button button--quiet", "data-action": "replace",
-                                      "data-held": x.h.id, "data-slot": v.s.slot },
-                                    f ? "Compare a different fund" : "Choose a fund");
-          if (!f) { rows.push(["—", "", "", "", "", "", "", button]); return; }
+                                      "data-held": x.h.id, "data-slot": v.s.slot,
+                                      "aria-label": "Replace " + f.name + " with another fund" }, "Replace");
           // Valued only on exactly the money the held fund priced: a lot this
           // fund cannot price yet would make it a different sum.
           var reason = v.error || (v.pos && gapReason(v.pos));
@@ -669,8 +670,13 @@
             reason || returnText(v.pos),
             figure(f.r3), figure(f.vol3, "fall"), figure(f.fall3, "fall"), figure(f.ter, "ter"), button]);
         });
+        // Until it is worked out (as it reaches the screen), a quiet placeholder.
         var strip = x.fund.mixed ? null : el("div", { "class": "pf__against" },
-          el("p", { "class": "pf__note" }, "Worked out when this card is on the screen."));
+          el("div", { "class": "pf__waiting", "aria-hidden": "true" }),
+          el("p", { "class": "sr-only" }, "Worked out as this card reaches the screen."));
+        var another = pick.next == null ? null
+          : el("button", { type: "button", "class": "button button--quiet pf__another", "data-action": "replace",
+                           "data-held": x.h.id, "data-slot": pick.next }, "Compare another fund");
         var article = el("article", { "class": "pf__alt card" },
           el("h3", null, x.fund.name + " — " + (x.fund.category_name || "")),
           strip || el("p", { "class": "pf__note" },
@@ -682,7 +688,8 @@
           table("Compare a different fund with " + x.fund.name,
                 ["Fund", "Worth today", "Return", "Return a year, 3 years", "Volatility",
                  "Deepest fall", "Expense ratio", ""],
-                rows, [0, 1, 1, 1, 1, 1, 1, 0]));
+                rows, [0, 1, 1, 1, 1, 1, 1, 0]),
+          another);
         return { x: x, buys: buys, sold: sold, box: strip, article: article };
       });
     })).then(function (made) {
@@ -751,7 +758,16 @@
         }
         if (x.fund.plan === "regular") text += " These are Direct plans; part of any gap is the Regular plan's higher cost.";
         var drawn = el("div");
-        fill(m.box, el("p", { "class": "pf__against-lead" }, text), drawn);
+        // The range strip, as on /sip/, with yours on it; it grows the first time this
+        // holding's card is worked out on this visit, not on every edit after.
+        var bar = n ? el("div", { "class": "sip__strip" },
+          S.bar({ min: r.min.valuePaise, max: r.max.valuePaise, middle: n >= 3 ? r.middle.valuePaise : null,
+                  putIn: a.putPaise, yours: a.yours.valuePaise },
+                Math.min(r.min.valuePaise, a.yours.valuePaise, a.putPaise),
+                Math.max(r.max.valuePaise, a.yours.valuePaise), !grown.has(x.fund.id)),
+          S.key(n >= 3 ? ["range", "mid", "yours", "putin"] : ["range", "yours", "putin"])) : null;
+        grown.add(x.fund.id);
+        fill(m.box, el("p", { "class": "pf__against-lead" }, text), bar, drawn);
         S.strip(drawn, {
           first: a.first, valuedOn: a.valuedOn, r: r, idx: null, out: a.out, kindSeries: a.kindSeries,
           putPaise: a.putPaise,
