@@ -282,6 +282,24 @@ address (V1-92; GitHub Pages served it until 2026-10-03). Measured on the first 
   the site pays, about 1 s under the slowdown (the same on `/compare/` and `/learn/`).
   Not yet measured on the live site, where `funds.json` is 1.47 MB raw and NAV files
   are larger (about 19 KB each): re-measure after the first build that carries it.
+- **Code review of the SIP work, fixed** (V1-104, 2026-10-11): a fresh review of Parts
+  A–C found no Critical issues, four Important and fifteen Minor; each fix below went
+  in test-first.
+  - **Chart 1:** every fund's path is now on one set of dates. Before, a fund missing a
+    day's NAV could break /sip/'s charts and its not-in-range list.
+  - **Your portfolio:** purchases and sales after the strip's date are left out of every
+    fund alike, and the card says so. Before, a recent sale emptied the range.
+  - **The amount field** is no longer rewritten while the visitor types.
+  - **A link's notes** stay on the page.
+  - Smaller fixes: a link over the cap is refused aloud; an added fund is one dot; tiny
+    falls read "less than 0.1%"; index and added funds are valued on V or not shown;
+    starts must be real dates; focus follows a chosen kind; charts are disposed when
+    redrawn; Compare links to a ranked kind; disabled periods say why; the shared
+    fixture has the spec's six cases.
+  - Page-only behaviour was checked in headless Chrome on the preview, failing before
+    each fix and passing after (not in CI): the amount field, the link's notes, the
+    disposed chart, the "begins on" error, focus after a chosen kind, and the reason for
+    a disabled period.
 - **Each holding against its whole kind** (V1-103; SPEC_SIP_WHAT_IF Part C): Your
   portfolio's "In hindsight" no longer suggests three funds. Each holding's own priced
   purchases and sales are applied to every other Direct fund of its kind (`M.against`),
