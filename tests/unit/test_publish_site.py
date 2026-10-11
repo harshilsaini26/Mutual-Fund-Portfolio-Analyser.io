@@ -1598,6 +1598,16 @@ def test_choosing_a_kind_in_the_overview_moves_focus_to_the_answer(site: Path) -
     assert 'getElementById("sip-answer-h").focus(' in script
 
 
+def test_a_period_out_of_reach_says_why_to_every_reader(site: Path) -> None:
+    """§4.2, review Minor 13: a disabled period chip names its reason in a line on
+    the page that the chip points to (aria-describedby), not only in a hover title."""
+    page = (site / "sip" / "index.html").read_text(encoding="utf-8")
+    assert '<p class="sip__about" id="sip-period-note" hidden></p>' in page
+    script = (STATIC_DIR / "sip.js").read_text(encoding="utf-8")
+    assert 'setAttribute("aria-describedby", "sip-period-note")' in script
+    assert ".title = " not in script
+
+
 def test_the_sip_page_always_carries_its_notes(site: Path) -> None:
     """§4.6.5: four notes, never folded."""
     page = _flat((site / "sip" / "index.html").read_text(encoding="utf-8"))

@@ -538,13 +538,19 @@
   function chips(ofKind, kindSeries, valuedOn) {
     var firsts = ofKind.map(function (f) { var s = kindSeries.get(f.id); return s && s.dates.length ? s.dates[0] : null; })
       .filter(Boolean).sort();
+    var note = document.getElementById("sip-period-note"), shortest = null;
     form.querySelectorAll('input[name="period"]').forEach(function (input) {
       if (input.value === "from") return;
       var w = M.windowOf({ mode: state.m, amountPaise: 100, years: Number(input.value), day: state.d }, valuedOn);
       var none = !w.first || !firsts.length || firsts[0] > w.first;
       input.disabled = none;
-      input.closest("label").title = none ? "No fund of this kind has prices back " + years(Number(input.value)) + "." : "";
+      if (none) input.setAttribute("aria-describedby", "sip-period-note");
+      else input.removeAttribute("aria-describedby");
+      if (none && shortest == null) shortest = Number(input.value);
     });
+    // The shortest period out of reach: the longer ones are out of reach too.
+    note.textContent = shortest == null ? "" : "No " + lower(kindName()) + " fund has prices back " + years(shortest) + ".";
+    note.hidden = shortest == null;
     if (firsts.length) fromBox.min = state.m === "sip" ? firsts[0].slice(0, 7) : firsts[0];
   }
 
