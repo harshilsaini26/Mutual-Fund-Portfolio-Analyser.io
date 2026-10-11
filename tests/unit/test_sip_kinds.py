@@ -12,6 +12,20 @@ units; 308.318 units at 12 are ₹3,699.82. On 5 Feb it held 224.989 units at 8,
 ₹1,799.91 against ₹2,000 put in: 10.0045% below, its lowest. Funds B (₹3,147.47) and C
 (₹3,024.86) work the same way.
 
+The other cases, by hand:
+- 1-year SIP by years, 5 Jul 2024 to 5 Jun 2025: Q at NAV 10 throughout holds
+  12 times 99.995 = 1,199.940 units, ₹11,999.40. R matches it, but on 20 Dec held
+  599.970 units at 8, ₹4,799.76 against ₹6,000: 20.004% below. P's last instalment is
+  bought at the new NAV of 11: 11 times 99.995 + 90.905 = 1,190.850 units, times 11 is
+  ₹13,099.35. Q and R tie, so the middle goes by id, to R.
+- Once by years from 29 Feb 2028: a year back is 28 Feb 2027, a Sunday, priced on
+  Monday 1 Mar. ₹1,00,000 less ₹5 duty buys 9,999.500 units at 10: S at 12 is
+  ₹1,19,994.00; T at 10 is ₹99,995.00, and at 9 on 1 Sep it was ₹89,995.50, 10.0045%
+  below; U, 4,999.750 units at 20, is ₹1,24,993.75 at 25.
+- A SIP on the 31st: instalments on 31 Jan, 28 Feb and 31 Mar 2025. W at 10 holds
+  299.985 units, ₹2,999.85; X buys 124.994 units at 8 and holds 324.984, ₹3,249.84;
+  Y buys 83.329 at 12 and 66.663 at 15, 249.987 times 15 = ₹3,749.81.
+
 What this does not prove: the fixtures' selection rules (which funds are in a range,
 the valuation date) are restated from the spec on both sides, so a misreading shared by
 both would pass; the node tests check those rules on their own small cases. The
