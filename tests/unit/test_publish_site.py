@@ -1368,6 +1368,10 @@ def test_each_holding_is_set_against_its_whole_kind(site: Path) -> None:
     assert "M.altSlots(x.h.alts, [], " in script
     for used in ("M.against(", "S.strip(", "IntersectionObserver"):
         assert used in script, used
+    # Flows after the strip's date are left out of every fund alike, and said so; the
+    # "put in" mark is what was priced (code review, Important 2).
+    assert "which not every fund has priced yet, are left out." in script
+    assert "putPaise: a.putPaise" in script and "yours.valuedOn" in script
     page = _flat(html)
     assert "picked after the fact" not in page
     assert "every other fund of its category" in page

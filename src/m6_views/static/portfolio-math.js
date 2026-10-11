@@ -706,24 +706,33 @@
   // itself too, so it can be ranked among them. Its own Direct plan is not an "other"
   // fund. A fund that could not have paid out the same sales is out of the range with
   // reason "sales"; every other fund is in the range or out of it, once.
+  // Purchases and sales dated after V are priced by no fund on V: they are left out of
+  // every fund alike and counted in `after`, never read as a sale a fund could not pay.
   function against(buys, sales, held, kindFunds, seriesById) {
     var others = kindFunds.filter(function (f) { return f.id !== held.id && f.id !== held.direct && f.plan !== "regular"; });
     var kindSeries = new Map(others.map(function (f) { return [f.id, seriesById.get(f.id)]; }));
     var mine = seriesById.get(held.id);
-    var v = valuationDate(new Map(kindSeries).set(held.id, mine));
+    var withMine = new Map(kindSeries).set(held.id, mine);
+    var v = valuationDate(withMine);
     if (!v || !buys.length) return null;
-    var first = buys.reduce(function (m, b) { return b.date < m ? b.date : m; }, buys[0].date);
-    var pool = poolOf(others, kindSeries, { first: first }, v.valuedOn);
+    var by = function (x) { return x.date <= v.valuedOn; };
+    var bought = buys.filter(by), sold = (sales || []).filter(by);
+    var after = { buys: buys.length - bought.length, sales: (sales || []).length - sold.length };
+    if (!bought.length) return { valuedOn: v.valuedOn, after: after, r: { n: 0 }, yours: null, out: [] };
+    var first = bought.reduce(function (m, b) { return b.date < m ? b.date : m; }, bought[0].date);
+    var pool = poolOf(others, withMine, { first: first }, v.valuedOn);
     var why = new Map(pool.out.map(function (o) { return [o.fund.id, o.reason]; }));
     var outcomes = [];
     pool.inRange.forEach(function (f) {
-      var o = Object.assign({ fund: f }, outcome(buys, kindSeries.get(f.id), v.valuedOn, sales));
-      if (o.sales.some(function (s) { return s.error; })) why.set(f.id, "sales"); else outcomes.push(o);
+      var o = Object.assign({ fund: f }, outcome(bought, kindSeries.get(f.id), v.valuedOn, sold));
+      if (o.sales.some(function (s) { return s.error === "more"; })) why.set(f.id, "sales"); else outcomes.push(o);
     });
     var r = spread(outcomes);
-    var yours = mine ? Object.assign({ fund: held }, outcome(buys, mine, v.valuedOn, sales)) : null;
+    var yours = mine ? Object.assign({ fund: held }, outcome(bought, mine, v.valuedOn, sold)) : null;
+    if (yours) yours.valuedOn = lastOf(cutAt(mine, v.valuedOn));
     return {
-      valuedOn: v.valuedOn, first: first, r: r, yours: yours,
+      valuedOn: v.valuedOn, first: first, r: r, yours: yours, after: after,
+      putPaise: bought.reduce(function (t, b) { return t + b.paise; }, 0),
       rank: yours ? 1 + outcomes.filter(function (o) { return o.valuePaise > yours.valuePaise; }).length : null,
       out: others.filter(function (f) { return why.has(f.id); }).map(function (f) { return { fund: f, reason: why.get(f.id) }; }),
       kindSeries: kindSeries,

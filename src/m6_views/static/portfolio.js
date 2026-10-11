@@ -719,6 +719,11 @@
       .then(function (series) {
         if (!live()) return;
         var a = M.against(m.buys, m.sold, x.fund, kindFunds, series);
+        if (a && !a.yours && a.after.buys) {
+          fill(m.box, el("p", { "class": "pf__note" }, "Its purchases are all after " + M.day(a.valuedOn) +
+            ", the latest date every fund of its kind has a price; it is set against them once they are priced."));
+          return;
+        }
         if (!a || !a.yours) {
           fill(m.box, el("p", { "class": "pf__note" }, "The prices of this kind of fund did not load. ",
             el("button", { type: "button", "class": "button button--quiet", "data-retry": true }, "Retry")));
@@ -736,14 +741,19 @@
         var text = !n ? "No " + others(1).replace(/^1 /, "") + " has prices back to " + M.day(a.first) + " to set this holding against."
           : same + " would be worth " + (n === 1 ? rupees(r.min.valuePaise)
             : "between " + rupees(r.min.valuePaise) + " and " + rupees(r.max.valuePaise)) + " on " + M.day(a.valuedOn) +
-            (n >= 3 ? "; the middle, " + rupees(r.middle.valuePaise) : "") + ". Yours: " + rupees(a.yours.valuePaise) + ", " +
-            M.ordinal(a.rank) + " highest of " + (n + 1) + ".";
+            (n >= 3 ? "; the middle, " + rupees(r.middle.valuePaise) : "") + ". Yours" +
+            // A holding whose prices stopped is valued on its own last price.
+            (a.yours.valuedOn !== a.valuedOn ? ", at its last price on " + M.day(a.yours.valuedOn) : "") + ": " +
+            rupees(a.yours.valuePaise) + ", " + M.ordinal(a.rank) + " highest of " + (n + 1) + ".";
+        if (a.after.buys + a.after.sales) {
+          text += " Purchases and sales after " + M.day(a.valuedOn) + ", which not every fund has priced yet, are left out.";
+        }
         if (x.fund.plan === "regular") text += " These are Direct plans; part of any gap is the Regular plan's higher cost.";
         var drawn = el("div");
         fill(m.box, el("p", { "class": "pf__against-lead" }, text), drawn);
         S.strip(drawn, {
           first: a.first, valuedOn: a.valuedOn, r: r, idx: null, out: a.out, kindSeries: a.kindSeries,
-          putPaise: m.buys.reduce(function (t, b) { return t + b.paise; }, 0),
+          putPaise: a.putPaise,
           marked: [{ o: a.yours, label: "Yours", hue: 2, tag: " · yours" }],
           note: ", and the named one is yours",
           failed: function () { say("The charts did not load; the tables hold the same figures."); },

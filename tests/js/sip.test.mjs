@@ -311,3 +311,54 @@ test("with no sales the lowest point is worked out; with sales it is not stated"
   assert.equal(bought.out.length, 2);    // F can hold its units now: only D and E are out
   assert.equal(M.against(buys, sold, { id: "H" }, kindOf, kindSeries).yours.low, null);
 });
+
+// Flows after V (review, Important 2). H, O1 and O2 are priced to 3 Oct 2025, O3 to the
+// 2nd, so the kind is valued on 2 Oct. A purchase and a sale on 3 Oct are priced by no
+// fund on that date: they are left out of every fund alike, and said so.
+const priced = (dates, nav) => series(dates.map((d) => [d, nav]));
+const lateDays = ["2024-12-31", "2025-01-02", "2025-06-02", "2025-10-01", "2025-10-02", "2025-10-03"];
+const lateKind = [{ id: "H" }, { id: "O1" }, { id: "O2" }, { id: "O3" }];
+const lateSeries = new Map([["H", priced(lateDays, "10")], ["O1", priced(lateDays, "11")],
+  ["O2", priced(lateDays, "12")], ["O3", priced(lateDays.slice(0, -1), "13")]]);
+const lateBuys = [{ date: "2025-01-02", paise: 1000000 }, { date: "2025-10-03", paise: 1000000 }];
+
+test("a sale after V puts no fund out of the range; it is counted as left out", () => {
+  const a = M.against(lateBuys, [{ date: "2025-10-03", paise: 50000 }], { id: "H" }, lateKind, lateSeries);
+  assert.equal(a.valuedOn, "2025-10-02");
+  assert.equal(a.r.n, 3);
+  assert.ok(!a.out.some((o) => o.reason === "sales"), JSON.stringify(a.out));
+  assert.deepEqual(a.after, { buys: 1, sales: 1 });
+});
+
+test("what was put in is what was priced by V", () => {
+  const a = M.against(lateBuys, [], { id: "H" }, lateKind, lateSeries);
+  assert.equal(a.putPaise, 1000000);
+  assert.ok(a.r.sorted.every((o) => o.investedPaise === 1000000));
+});
+
+test("the stale floor counts the holding's own prices", () => {
+  // H runs to 20 Oct; O1 and O2 stop on the 10th and 12th: more than 7 days behind.
+  const days = (last) => ["2025-01-01", "2025-06-02", last];
+  const s = new Map([["H", priced(days("2025-10-20"), "10")], ["O1", priced(days("2025-10-10"), "11")],
+    ["O2", priced(days("2025-10-12"), "12")]]);
+  const a = M.against([{ date: "2025-06-02", paise: 100000 }], [], { id: "H" }, [{ id: "H" }, { id: "O1" }, { id: "O2" }], s);
+  assert.equal(a.valuedOn, "2025-10-20");
+  assert.deepEqual(a.out.map((o) => [o.fund.id, o.reason]), [["O1", "stale"], ["O2", "stale"]]);
+});
+
+test("a holding whose prices stopped is valued on its own last date", () => {
+  const days = (last) => ["2025-01-01", "2025-06-02", last];
+  const s = new Map([["H", priced(days("2025-10-01"), "10")], ["O1", priced(days("2025-10-20"), "11")],
+    ["O2", priced(days("2025-10-20"), "12")]]);
+  const a = M.against([{ date: "2025-06-02", paise: 100000 }], [], { id: "H" }, [{ id: "H" }, { id: "O1" }, { id: "O2" }], s);
+  assert.equal(a.valuedOn, "2025-10-20");
+  assert.equal(a.yours.valuedOn, "2025-10-01");
+});
+
+test("a holding bought only after V is not a failed load: nothing is priced yet", () => {
+  const a = M.against([{ date: "2025-10-03", paise: 100000 }], [], { id: "H" }, lateKind, lateSeries);
+  assert.equal(a.valuedOn, "2025-10-02");
+  assert.deepEqual(a.after, { buys: 1, sales: 0 });
+  assert.equal(a.yours, null);
+  assert.equal(a.r.n, 0);
+});
