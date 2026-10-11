@@ -93,6 +93,10 @@
     </details>
   </form>
   <p class="sip__status" id="sip-status" role="status"></p>
+  {#- What a shared link could not carry (§4.7), kept while the page loads; and the
+      count of files, shown but not announced (the answer region is aria-busy). -#}
+  <p class="sip__note" id="sip-notes" role="note" hidden></p>
+  <p class="sip__progress" id="sip-progress" aria-hidden="true"></p>
 
   <section class="sip__answer" aria-labelledby="sip-answer-h" data-out="answer-box">
     <h2 id="sip-answer-h" class="sr-only">What it would be worth</h2>

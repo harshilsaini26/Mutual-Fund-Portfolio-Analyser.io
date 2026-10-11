@@ -1575,6 +1575,20 @@ def test_the_overview_reads_prices_as_the_page_does() -> None:
     assert got.navs == [Decimal("1000.34"), Decimal("1000.6884")]
 
 
+def test_the_sip_page_has_a_place_for_a_links_notes(site: Path) -> None:
+    """§4.7: what a shared link could not carry ("… is not published here") is said
+    in a place of its own, which the loading count does not overwrite (code review,
+    Important 4)."""
+    page = (site / "sip" / "index.html").read_text(encoding="utf-8")
+    assert '<p class="sip__note" id="sip-notes" role="note" hidden></p>' in page
+    # The count of files loaded is shown, not announced: one line, outside the live
+    # region, so the status keeps "{fund} added." (Minor 13).
+    assert '<p class="sip__progress" id="sip-progress" aria-hidden="true"></p>' in page
+    script = (STATIC_DIR / "sip.js").read_text(encoding="utf-8")
+    assert "linkNotes(notes)" in script
+    assert 'say("Loaded ' not in script and 'say("")' not in script
+
+
 def test_the_sip_page_always_carries_its_notes(site: Path) -> None:
     """§4.6.5: four notes, never folded."""
     page = _flat((site / "sip" / "index.html").read_text(encoding="utf-8"))

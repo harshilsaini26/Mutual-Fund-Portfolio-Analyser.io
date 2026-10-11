@@ -389,8 +389,17 @@
 
   // --- loading -------------------------------------------------------------------------
   // Each fund's NAV file, at most eight at a time, counting as they come (§4.10).
+  var progress = document.getElementById("sip-progress");
   function loadAll(funds, live) {
-    return load(funds, function (done, n) { if (live() && n > 1) say("Loaded " + done + " of " + n + " funds"); });
+    return load(funds, function (done, n) {
+      if (live() && n > 1) progress.textContent = done < n ? "Loaded " + done + " of " + n + " funds" : "";
+    });
+  }
+  // §4.7: what a link could not carry stays on the page, apart from the status.
+  function linkNotes(notes) {
+    var box = document.getElementById("sip-notes");
+    box.textContent = notes.join(" ");
+    box.hidden = !notes.length;
   }
 
   // --- the answer ------------------------------------------------------------------------
@@ -411,7 +420,7 @@
       if (!live()) return;
       out("answer").removeAttribute("aria-busy");
       out("answer-box").classList.remove("sip__answer--busy");
-      say("");
+      progress.textContent = "";
       draw(ofKind, index, extra, series);
       overview();
     });
@@ -776,7 +785,7 @@
     }
     form.querySelectorAll("input, select").forEach(function (x) { x.disabled = false; });
     showState();
-    say(notes.join(" "));
+    linkNotes(notes);
     run();
   }, function () {
     say("The list of funds did not load. Reload the page to try again.");
