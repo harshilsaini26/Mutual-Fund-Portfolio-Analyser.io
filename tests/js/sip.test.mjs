@@ -362,3 +362,17 @@ test("a holding bought only after V is not a failed load: nothing is priced yet"
   assert.equal(a.yours, null);
   assert.equal(a.r.n, 0);
 });
+
+// The amount field (review, Important 3 and Minor 18): what is typed is read, never
+// rounded; what cannot be read keeps the last amount and says why.
+test("an amount is read as whole rupees, or kept with a reason", () => {
+  assert.deepEqual(S.readAmount("12,345", "5000"), { a: "12345", error: null });
+  assert.deepEqual(S.readAmount("₹ 5,000", "100"), { a: "5000", error: null });
+  assert.deepEqual(S.readAmount("", "5000"), { a: "5000", error: "empty" });
+  assert.deepEqual(S.readAmount("0", "5000"), { a: "5000", error: "empty" });
+  assert.deepEqual(S.readAmount("abc", "5000"), { a: "5000", error: "empty" });
+  assert.deepEqual(S.readAmount("5000.50", "5000"), { a: "5000", error: "paise" });
+  assert.deepEqual(S.readAmount("10,00,00,000", "5000"), { a: "100000000", error: null });
+  assert.deepEqual(S.readAmount("10,00,00,001", "5000"), { a: "5000", error: "cap" });
+  assert.equal(S.SIP_MAX_RUPEES * 100, M.SIP_MAX_PAISE);
+});

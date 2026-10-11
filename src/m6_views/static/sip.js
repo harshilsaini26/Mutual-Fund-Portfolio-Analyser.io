@@ -62,7 +62,22 @@
     return Number((2n * w * BigInt(paise) + d) / (2n * d)) * 10000;
   }
 
-  var api = { parseHash: parseHash, writeHash: writeHash, scaled: scaled };
+  // ₹10 crore: portfolio-math.js's SIP_MAX_PAISE in rupees (a test holds them equal).
+  var SIP_MAX_RUPEES = 100000000;
+
+  // §4.2. The amount as typed: whole rupees in any grouping, never rounded; what cannot
+  // be read keeps the last amount, with why ("empty", "paise", "cap").
+  function readAmount(text, last) {
+    var s = String(text == null ? "" : text).replace(/[₹,\s]/g, "");
+    var m = /^(\d{1,13})(?:\.(\d*))?$/.exec(s);
+    if (!m || Number(m[1]) === 0) return { a: last, error: "empty" };
+    if (m[2] && /[1-9]/.test(m[2])) return { a: last, error: "paise" };
+    if (Number(m[1]) > SIP_MAX_RUPEES) return { a: last, error: "cap" };
+    return { a: String(Number(m[1])), error: null };
+  }
+
+  var api = { parseHash: parseHash, writeHash: writeHash, scaled: scaled, readAmount: readAmount,
+              SIP_MAX_RUPEES: SIP_MAX_RUPEES };
   if (typeof module === "object" && module.exports) { module.exports = api; return; }
 
   // --- in the browser: the strip /sip/ and Your portfolio share (§6.2) -------------
@@ -257,17 +272,21 @@
 
 
   // --- inputs ------------------------------------------------------------------------
-  function readForm() {
+  function readForm(a) {
     var period = form.elements.period.value;
     var mode = form.elements.mode.value;
-    return { a: (M.toPaise(amount.value) ? String(Math.round(M.toPaise(amount.value) / 100)) : state.a),
+    return { a: a,
              m: mode, y: period === "from" ? null : Number(period),
              from: period === "from" ? (fromBox.value || null) : null,
              d: Number(dayBox.value), c: kind.value, f: state.f.slice() };
   }
-  function showState() {
-    amount.value = M.grouped(state.a);
-    words.textContent = M.inWords(state.a);
+  // `fromAmount`: the change began in the amount field, which is the visitor's while
+  // they type; it is grouped when they leave it.
+  function showState(fromAmount) {
+    if (!fromAmount) {
+      amount.value = M.grouped(state.a);
+      words.textContent = M.inWords(state.a);
+    }
     form.elements.mode.value = state.m;
     form.elements.period.value = state.from ? "from" : String(state.y);
     dayBox.value = String(state.d);
@@ -289,9 +308,11 @@
   amount.addEventListener("input", function () {
     words.textContent = M.inWords(amount.value);
     if (typing) typing.cancel();
-    typing = K.fuse(300, changed);
+    typing = K.fuse(300, function () { changed(true); });
   });
-  amount.addEventListener("change", function () { if (M.toPaise(amount.value)) amount.value = M.grouped(amount.value.replace(/[₹,\s]/g, "")); });
+  amount.addEventListener("change", function () {
+    if (!readAmount(amount.value, null).error) amount.value = M.grouped(readAmount(amount.value, null).a);
+  });
   form.addEventListener("change", function (e) {
     if (e.target === amount) return;
     if (e.target.name === "mode") fromBox.value = "";
@@ -299,14 +320,18 @@
   });
   form.addEventListener("submit", function (e) { e.preventDefault(); });
 
-  function changed() {
-    var next = readForm();
-    var paise = M.toPaise(amount.value);
-    if (!paise) fieldError("amount", "Enter an amount in rupees, above zero.", amount);
-    else if (paise > M.SIP_MAX_PAISE) fieldError("amount", "Enter an amount up to ₹10,00,00,000.", amount);
-    else fieldError("amount", "", amount);
-    state = next;
-    showState();
+  var AMOUNT_ERRORS = {
+    empty: "Enter an amount in rupees, above zero.",
+    paise: "Enter whole rupees.",
+    cap: "Enter an amount up to ₹10,00,00,000.",
+  };
+  function changed(fromAmount) {
+    var read = readAmount(amount.value, state.a);
+    fieldError("amount", read.error ? AMOUNT_ERRORS[read.error] : "", amount);
+    state = readForm(read.a);
+    showState(fromAmount);
+    // While the amount cannot be read, the last answer stays, dimmed (§4.2).
+    if (read.error) { out("answer-box").classList.add("sip__answer--busy"); return; }
     run();
   }
 
