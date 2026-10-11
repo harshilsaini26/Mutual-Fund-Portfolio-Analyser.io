@@ -65,12 +65,173 @@
   var api = { parseHash: parseHash, writeHash: writeHash, scaled: scaled };
   if (typeof module === "object" && module.exports) { module.exports = api; return; }
 
-  // --- in the browser ------------------------------------------------------------
+  // --- in the browser: the strip /sip/ and Your portfolio share (§6.2) -------------
+  // "Where each fund ended" -- one dot a fund, the table, and every fund not in the
+  // range with its reason -- is drawn by this one function on both pages
+  // (`window.SipStrip`); Your portfolio marks the holding in it as "Yours".
   var M = window.PortfolioMath, K = window.Kit;
-  var page = document.querySelector("[data-sip]");
-  if (!page || !M || !K) return;
+  var host = document.querySelector("[data-sip], [data-portfolio]");
+  if (!host || !M || !K) return;
   var el = K.el, fill = K.fill, INR = K.INR;
-  var BASE = page.getAttribute("data-root") || "";
+  var BASE = host.getAttribute("data-root") || "";
+
+  function rupees(paise) { return INR.format(Math.round(paise / 100)); }
+  function pct(fraction) { return Math.abs(fraction * 100).toFixed(1) + "%"; }
+  function signed(fraction) {
+    var v = fraction * 100;
+    return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1) + "%";
+  }
+  function fundPage(f) { return BASE + "/fund/" + (f.direct || f.id) + "/"; }
+  // The return a year (XIRR) from a year on; under a year, the change in total.
+  function returnText(o, first, valuedOn) {
+    if (M.showsXirr(first, valuedOn)) return o.xirr == null ? "—" : signed(o.xirr) + " a year";
+    return signed((o.valuePaise - o.investedPaise) / o.investedPaise) + " in total (under a year)";
+  }
+  // No lowest point is stated where money was also taken out (M.outcome).
+  function lowText(o) {
+    return o.low == null ? "—" : o.low < 0 ? pct(o.low) + " below, on " + M.day(o.lowOn) : "Never below";
+  }
+
+  // ECharts and charts.js, fetched only once an answer is on the page (§4.10): the
+  // answer needs neither, and on a slow phone the 1.1 MB held it back two seconds.
+  var chartsReady = null;
+  function script(src) {
+    return new Promise(function (resolve, reject) {
+      var s = el("script", { src: src });
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  function withCharts(draw, failed) {
+    if (!chartsReady) {
+      chartsReady = script(BASE + "/static/vendor/echarts.v6.1.0.min.js")
+        .then(function () { return script(BASE + "/static/charts.js"); });
+    }
+    chartsReady.then(draw, function () { chartsReady = null; if (failed) failed(); });
+  }
+
+  // Each fund's NAV file, at most eight at a time, `tick(done, n)` as each comes
+  // (§4.10). A file that did not load is null in the result.
+  function load(funds, tick) {
+    var results = new Map(), queue = funds.slice(), active = 0, done = 0;
+    return new Promise(function (resolve) {
+      function next() {
+        if (!queue.length && !active) { resolve(results); return; }
+        while (active < 8 && queue.length) {
+          (function (f) {
+            active += 1;
+            var got = f.amfi ? K.navSeries(BASE, f) : Promise.reject(new Error("no file"));
+            got.then(function (s) { results.set(f.id, s); }, function () { results.set(f.id, null); })
+              .then(function () { active -= 1; done += 1; tick(done, funds.length); next(); });
+          })(queue.shift());
+        }
+      }
+      next();
+    });
+  }
+
+  // `s`: first (the first purchase), valuedOn, r (M.spread), idx (the index fund's
+  // outcome, or null), marked ([{o, label, hue, tag}]: drawn named; those with a `tag`
+  // are also rows of the table), out ([{fund, reason}]), kindSeries, putPaise, note
+  // (what the named dots are), failed (the charts did not load).
+  function strip(box, s) {
+    // Under three funds is not a range: the table and the list, no chart (§4.6).
+    if (s.r.n < 3) {
+      fill(box, s.r.n ? el("details", { "class": "chart-table" },
+        el("summary", null, "All " + s.r.n + " fund" + (s.r.n === 1 ? "" : "s") + " as a table"), endsTable(s)) : null, outList(s));
+      return;
+    }
+    var mark = function (o) {
+      return o === s.r.middle ? "middle" : s.idx && o.fund.id === s.idx.fund.id ? "index" : null;
+    };
+    var caption = function (o) {
+      return rupees(o.valuePaise) + " · " + returnText(o, s.first, s.valuedOn) + " · lowest: " + lowText(o).toLowerCase() +
+        (o.fund.labels && o.fund.labels.ter ? " · expense ratio " + o.fund.labels.ter : "");
+    };
+    var r = s.r, idx = s.idx;
+    var points = r.sorted.slice().sort(function (a, b) { return a.fund.id < b.fund.id ? -1 : 1; }).map(function (o) {
+      return { name: o.fund.name, x: Math.round(o.valuePaise / 100), caption: caption(o), mark: mark(o),
+               href: fundPage(o.fund) };
+    });
+    if (idx && !r.sorted.some(function (o) { return o.fund.id === idx.fund.id; })) {
+      points.push({ name: idx.fund.name, x: Math.round(idx.valuePaise / 100), caption: caption(idx), mark: "index", href: fundPage(idx.fund) });
+    }
+    (s.marked || []).forEach(function (m) {
+      points.push({ name: m.label, x: Math.round(m.o.valuePaise / 100), caption: caption(m.o), mark: "added", hue: m.hue,
+                    href: fundPage(m.o.fund) });
+    });
+    var spec = { charts: [{ kind: "dots", title: "Where each fund ended", putIn: Math.round(s.putPaise / 100),
+                            putInLabel: "Put in " + rupees(s.putPaise), points: points }] };
+    var data = el("script", { type: "application/json", "class": "echart-data" });
+    data.textContent = JSON.stringify(spec);
+    fill(box,
+      el("p", { "class": "sip__note" }, "One dot a fund. The ring is the middle fund" + (idx ? ", the diamond the index fund" : "") +
+        (s.note || "") + ". Each opens its page."),
+      el("div", { "class": "echarts", "data-chart": "echart" },
+        el("figure", { "class": "echart echart--dots" },
+          el("div", { "class": "echart__canvas", "data-index": "0", role: "img",
+                      "aria-label": "Where each of the " + r.n + " funds ended: from " + rupees(r.min.valuePaise) +
+                        " to " + rupees(r.max.valuePaise) + ", the middle " + rupees(r.middle.valuePaise) +
+                        ", against " + rupees(s.putPaise) + " put in." })), data),
+      el("details", { "class": "chart-table" }, el("summary", null, "All " + r.n + " funds as a table"), endsTable(s)),
+      outList(s));
+    withCharts(function () { window.Charts.draw(box); }, s.failed);
+  }
+
+  // Every fund in the range, none hidden: worth first, the middle and the index fund
+  // marked in words, and any marked row (Yours) in its place (§4.6.4).
+  function endsTable(s) {
+    var r = s.r, idx = s.idx;
+    var tagged = r.sorted.map(function (o) {
+      return { o: o, tag: o === r.middle ? " · middle" : idx && o.fund.id === idx.fund.id ? " · index fund" : "" };
+    }).concat((s.marked || []).filter(function (m) { return m.tag; }));
+    var rows = tagged.sort(function (a, b) { return b.o.valuePaise - a.o.valuePaise; }).map(function (t) {
+      var o = t.o;
+      return [[el("a", { href: fundPage(o.fund) }, o.fund.name), t.tag], rupees(o.valuePaise),
+              returnText(o, s.first, s.valuedOn), lowText(o),
+              (o.fund.labels && o.fund.labels.ter) || "—", (o.fund.labels && o.fund.labels.size) || "—"];
+    });
+    return K.table("The " + r.n + " funds, by what the money would be worth",
+      ["Fund", "Worth", "Return", "Lowest point", "Expense ratio", "Fund size"], rows,
+      { numeric: [0, 1, 1, 0, 1, 1] });
+  }
+
+  // §4.4. Every fund of the kind not in the range, grouped by why; a Retry for those
+  // whose prices did not load.
+  function outList(s) {
+    var left = s.out;
+    if (!left.length) return null;
+    var groups = { later: [], stale: [], load: [], sales: [] };
+    left.forEach(function (o) { groups[o.reason].push(o.fund); });
+    var items = [];
+    if (groups.later.length) {
+      items.push(el("li", null, el("strong", null, "Started after " + M.day(s.first) + ": "),
+        groups.later.map(function (f) { return f.name + " (from " + M.day(s.kindSeries.get(f.id).dates[0]) + ")"; }).join(", ")));
+    }
+    groups.stale.forEach(function (f) {
+      var d = s.kindSeries.get(f.id).dates;
+      items.push(el("li", null, el("strong", null, "No price since " + M.day(d[d.length - 1]) + ": "), f.name));
+    });
+    if (groups.sales.length) {
+      items.push(el("li", null, el("strong", null, "Could not have paid out the same sales: "),
+        groups.sales.map(function (f) { return f.name; }).join(", ")));
+    }
+    if (groups.load.length) {
+      items.push(el("li", null, el("strong", null, "Its prices did not load: "),
+        groups.load.map(function (f) { return f.name; }).join(", "), " ",
+        el("button", { type: "button", "class": "button button--quiet", "data-retry": true }, "Retry")));
+    }
+    return el("details", { "class": "chart-table" },
+      el("summary", null, left.length + " fund" + (left.length === 1 ? "" : "s") + " not in the range, and why"),
+      el.apply(null, ["ul", { "class": "sip__out" }].concat(items)));
+  }
+
+  window.SipStrip = { strip: strip, load: load };
+
+  // --- /sip/ itself ----------------------------------------------------------------
+  var page = document.querySelector("[data-sip]");
+  if (!page) return;
   var FUNDS = new Map();
   var state = DEFAULT;
   var generation = 0;
@@ -88,25 +249,12 @@
 
   function out(name) { return page.querySelector('[data-out="' + name + '"]'); }
   function say(text) { status.textContent = text; }
-  function rupees(paise) { return INR.format(Math.round(paise / 100)); }
-  function pct(fraction) { return Math.abs(fraction * 100).toFixed(1) + "%"; }
-  function signed(fraction) {
-    var v = fraction * 100;
-    return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1) + "%";
-  }
   function month(iso) { var p = iso.split("-"); return MONTHS[Number(p[1]) - 1] + " " + p[0]; }
   function years(n) { return n + (n === 1 ? " year" : " years"); }
   // "Large cap" -> "large cap"; "ELSS (tax saver)" keeps its capitals.
   function lower(name) { return /^[A-Z][a-z]/.test(name) ? name.charAt(0).toLowerCase() + name.slice(1) : name; }
-  function fundPage(f) { return BASE + "/fund/" + (f.direct || f.id) + "/"; }
   function kindName() { return kind.options[kind.selectedIndex].textContent.replace(/ \(\d+\)$/, ""); }
 
-  // The return a year (XIRR) from a year on; under a year, the change in total.
-  function returnText(o, first, valuedOn) {
-    if (M.showsXirr(first, valuedOn)) return o.xirr == null ? "—" : signed(o.xirr) + " a year";
-    return signed((o.valuePaise - o.investedPaise) / o.investedPaise) + " in total (under a year)";
-  }
-  function lowText(o) { return o.low < 0 ? pct(o.low) + " below, on " + M.day(o.lowOn) : "Never below"; }
 
   // --- inputs ------------------------------------------------------------------------
   function readForm() {
@@ -217,25 +365,7 @@
   // --- loading -------------------------------------------------------------------------
   // Each fund's NAV file, at most eight at a time, counting as they come (§4.10).
   function loadAll(funds, live) {
-    var results = new Map(), queue = funds.slice(), active = 0, done = 0;
-    return new Promise(function (resolve) {
-      function next() {
-        if (!queue.length && !active) { resolve(results); return; }
-        while (active < 8 && queue.length) {
-          (function (f) {
-            active += 1;
-            var got = f.amfi ? K.navSeries(BASE, f) : Promise.reject(new Error("no file"));
-            got.then(function (s) { results.set(f.id, s); }, function () { results.set(f.id, null); })
-              .then(function () {
-                active -= 1; done += 1;
-                if (live() && funds.length > 1) say("Loaded " + done + " of " + funds.length + " funds");
-                next();
-              });
-          })(queue.shift());
-        }
-      }
-      next();
-    });
+    return load(funds, function (done, n) { if (live() && n > 1) say("Loaded " + done + " of " + n + " funds"); });
   }
 
   // --- the answer ------------------------------------------------------------------------
@@ -267,9 +397,10 @@
     var v = M.valuationDate(kindSeries);
     var name = lower(kindName());
     if (!v) {
-      fill(out("answer"), el("p", { "class": "sip__lead" }, "The prices of these funds did not load."));
+      // §10: no answer; every fund listed as not loaded, with a Retry.
+      fill(out("answer"), el("p", { "class": "sip__lead" }, "The prices of these funds did not load."),
+        outList({ out: ofKind.map(function (f) { return { fund: f, reason: "load" }; }), kindSeries: kindSeries }));
       sections(false);
-      notIn(ofKind.map(function (f) { return { fund: f, reason: "load" }; }), null, kindSeries);
       return;
     }
     chips(ofKind, kindSeries, v.valuedOn);
@@ -314,11 +445,12 @@
         path(w, v, outcomes, r, idx, adds.filter(function (a) { return !a.why; }), series);
         ends(w, v, r, idx, adds.filter(function (a) { return !a.why; }), pool, kindSeries);
       };
-      setTimeout(function () { withCharts(charts); }, 0);
+      setTimeout(function () { withCharts(charts, chartsFailed); }, 0);
     } else {
       sections(r.n > 0);
       fill(out("path"));
-      fill(out("ends"), r.n ? endsTable(w, v, r, idx, []) : null, outList(pool.out, w, kindSeries));
+      var few = stripOf(w, v, r, idx, [], pool, kindSeries);
+      fill(out("ends"), r.n ? endsTable(few) : null, outList(few));
     }
   }
 
@@ -416,24 +548,7 @@
       : "No index fund follows the benchmark of " + name + " funds here.";
   }
 
-  // ECharts and charts.js, fetched only once an answer is on the page (§4.10): the
-  // answer needs neither, and on a slow phone the 1.1 MB held it back two seconds.
-  var chartsReady = null;
-  function script(src) {
-    return new Promise(function (resolve, reject) {
-      var s = el("script", { src: src });
-      s.onload = resolve;
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-  function withCharts(draw) {
-    if (!chartsReady) {
-      chartsReady = script(BASE + "/static/vendor/echarts.v6.1.0.min.js")
-        .then(function () { return script(BASE + "/static/charts.js"); });
-    }
-    chartsReady.then(draw, function () { chartsReady = null; say("The charts did not load; the tables below hold the same figures."); });
-  }
+  function chartsFailed() { say("The charts did not load; the tables below hold the same figures."); }
 
   // --- chart 1: what it was worth, month by month (§4.6.3) ----------------------------
   function path(w, v, outcomes, r, idx, adds, series) {
@@ -488,83 +603,14 @@
   }
 
   // --- chart 2: where each fund ended (§4.6.4) -----------------------------------------
+  function stripOf(w, v, r, idx, adds, pool, kindSeries) {
+    return { first: w.first, valuedOn: v.valuedOn, r: r, idx: idx, out: pool.out, kindSeries: kindSeries,
+             putPaise: w.buys.reduce(function (t, b) { return t + b.paise; }, 0),
+             marked: adds.map(function (a, i) { return { o: a, label: a.fund.name, hue: i + 2 }; }),
+             note: adds.length ? ", and the named ones are the funds you added" : "", failed: chartsFailed };
+  }
   function ends(w, v, r, idx, adds, pool, kindSeries) {
-    var mark = function (o) {
-      return o === r.middle ? "middle" : idx && o.fund.id === idx.fund.id ? "index" : null;
-    };
-    var caption = function (o) {
-      return rupees(o.valuePaise) + " · " + returnText(o, w.first, v.valuedOn) + " · lowest: " + lowText(o).toLowerCase() +
-        (o.fund.labels && o.fund.labels.ter ? " · expense ratio " + o.fund.labels.ter : "");
-    };
-    var points = r.sorted.slice().sort(function (a, b) { return a.fund.id < b.fund.id ? -1 : 1; }).map(function (o) {
-      return { name: o.fund.name, x: Math.round(o.valuePaise / 100), caption: caption(o), mark: mark(o),
-               href: fundPage(o.fund) };
-    });
-    if (idx && !r.sorted.some(function (o) { return o.fund.id === idx.fund.id; })) {
-      points.push({ name: idx.fund.name, x: Math.round(idx.valuePaise / 100), caption: caption(idx), mark: "index", href: fundPage(idx.fund) });
-    }
-    adds.forEach(function (a, i) {
-      points.push({ name: a.fund.name, x: Math.round(a.valuePaise / 100), caption: caption(a), mark: "added", hue: i + 2,
-                    href: fundPage(a.fund) });
-    });
-    var put = w.buys.reduce(function (s, b) { return s + b.paise; }, 0);
-    var spec = { charts: [{ kind: "dots", title: "Where each fund ended", putIn: Math.round(put / 100),
-                            putInLabel: "Put in " + rupees(put), points: points }] };
-    var data = el("script", { type: "application/json", "class": "echart-data" });
-    data.textContent = JSON.stringify(spec);
-    var box = out("ends");
-    fill(box,
-      el("p", { "class": "sip__note" }, "One dot a fund. The ring is the middle fund" + (idx ? ", the diamond the index fund" : "") +
-        (adds.length ? ", and the named ones are the funds you added" : "") + ". Each opens its page."),
-      el("div", { "class": "echarts", "data-chart": "echart" },
-        el("figure", { "class": "echart echart--dots" },
-          el("div", { "class": "echart__canvas", "data-index": "0", role: "img",
-                      "aria-label": "Where each of the " + r.n + " funds ended: from " + rupees(r.min.valuePaise) +
-                        " to " + rupees(r.max.valuePaise) + ", the middle " + rupees(r.middle.valuePaise) +
-                        ", against " + rupees(put) + " put in." })), data),
-      el("details", { "class": "chart-table" }, el("summary", null, "All " + r.n + " funds as a table"),
-        endsTable(w, v, r, idx, adds)),
-      outList(pool.out, w, kindSeries));
-    if (window.Charts) window.Charts.draw(box);
-  }
-
-  // Every fund in the range, none hidden: worth first, the middle and the index fund
-  // marked in words (§4.6.4).
-  function endsTable(w, v, r, idx) {
-    var rows = r.sorted.slice().reverse().map(function (o) {
-      var tag = o === r.middle ? " · middle" : idx && o.fund.id === idx.fund.id ? " · index fund" : "";
-      return [[el("a", { href: fundPage(o.fund) }, o.fund.name), tag], rupees(o.valuePaise),
-              returnText(o, w.first, v.valuedOn), lowText(o),
-              (o.fund.labels && o.fund.labels.ter) || "—", (o.fund.labels && o.fund.labels.size) || "—"];
-    });
-    return K.table("The " + r.n + " funds, by what the money would be worth",
-      ["Fund", "Worth", "Return", "Lowest point", "Expense ratio", "Fund size"], rows,
-      { numeric: [0, 1, 1, 0, 1, 1] });
-  }
-
-  // §4.4. Every fund of the kind not in the range, grouped by why; a Retry for those
-  // whose prices did not load.
-  function outList(left, w, kindSeries) {
-    if (!left.length) return null;
-    var groups = { later: [], stale: [], load: [] };
-    left.forEach(function (o) { groups[o.reason].push(o.fund); });
-    var items = [];
-    if (groups.later.length) {
-      items.push(el("li", null, el("strong", null, "Started after " + M.day(w.first) + ": "),
-        groups.later.map(function (f) { return f.name + " (from " + M.day(kindSeries.get(f.id).dates[0]) + ")"; }).join(", ")));
-    }
-    groups.stale.forEach(function (f) {
-      var s = kindSeries.get(f.id);
-      items.push(el("li", null, el("strong", null, "No price since " + M.day(s.dates[s.dates.length - 1]) + ": "), f.name));
-    });
-    if (groups.load.length) {
-      items.push(el("li", null, el("strong", null, "Its prices did not load: "),
-        groups.load.map(function (f) { return f.name; }).join(", "), " ",
-        el("button", { type: "button", "class": "button button--quiet", "data-retry": true }, "Retry")));
-    }
-    return el("details", { "class": "chart-table" },
-      el("summary", null, left.length + " fund" + (left.length === 1 ? "" : "s") + " not in the range, and why"),
-      el.apply(null, ["ul", { "class": "sip__out" }].concat(items)));
+    strip(out("ends"), stripOf(w, v, r, idx, adds, pool, kindSeries));
   }
 
   // --- the same money in other kinds of fund (§5.1) -----------------------------------

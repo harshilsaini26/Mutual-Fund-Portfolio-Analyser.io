@@ -1356,6 +1356,38 @@ def test_the_other_funds_say_they_are_hindsight(site: Path) -> None:
     assert "says nothing of what comes next" in page
 
 
+def test_each_holding_is_set_against_its_whole_kind(site: Path) -> None:
+    """SPEC_SIP_WHAT_IF §6.2: no suggested fund (the slots fill only by choice);
+    each holding against every other fund of its kind, drawn by /sip/'s one strip,
+    so the page loads sip.js before portfolio.js."""
+    html = (site / "portfolio" / "index.html").read_text(encoding="utf-8")
+    scripts = re.findall(r'<script src="/Repo/static/([\w.-]+)" defer>', html)
+    assert scripts.index("sip.js") < scripts.index("portfolio.js")
+    script = (STATIC_DIR / "portfolio.js").read_text(encoding="utf-8")
+    assert "M.alternatives(" not in script
+    assert "M.altSlots(x.h.alts, [], " in script
+    for used in ("M.against(", "S.strip(", "IntersectionObserver"):
+        assert used in script, used
+    page = _flat(html)
+    assert "picked after the fact" not in page
+    assert "every other fund of its category" in page
+
+
+def test_moving_money_names_its_costs_and_estimates_none(site: Path) -> None:
+    """SPEC_SIP_WHAT_IF §6.3: always shown, each cost linked to its explanation."""
+    html = (site / "portfolio" / "index.html").read_text(encoding="utf-8")
+    section = html[html.index('id="pf-alts-h"'):]
+    section = section[:section.index("</section>")]
+    assert ("Moving money from one fund to another is a sale and a new purchase. The sale"
+            " can carry an exit load and tax, and the purchase pays stamp duty. None of"
+            " that is taken off in these figures.") in re.sub(
+                r" ([,.])", r"\1", _flat(section))
+    for href, text in (("/Repo/learn/glossary/#exit_load", "exit load"),
+                       ("/Repo/learn/how-gains-are-taxed/", "tax"),
+                       ("/Repo/learn/glossary/#stamp_duty", "stamp duty")):
+        assert f'<a href="{href}">{text}</a>' in section, href
+
+
 def test_your_portfolios_form_reads_at_a_glance() -> None:
     """P-03: amounts in Indian grouping and in words; P-04: a "Still running" box,
     not "Until (blank if running)"; P-05: each kind of entry under its own name."""

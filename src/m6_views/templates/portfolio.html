@@ -74,9 +74,15 @@
   </section>
   <section class="home-section" aria-labelledby="pf-alts-h">
     <div class="section-head"><h2 id="pf-alts-h">In hindsight: the same money in other funds</h2>
-      <p>Each fund beside others of its category, picked after the fact by the rule
-        named beside each: what the same amounts on the same dates would be worth
-        today. It looks back, and says nothing of what comes next.</p></div>
+      <p>Each fund beside every other fund of its category: what the same amounts on
+        the same dates would be worth today, and where yours sits among them. It looks
+        back, and says nothing of what comes next.</p>
+      {#- Always shown (SPEC_SIP_WHAT_IF §6.3): it names the costs and estimates none. -#}
+      <p class="pf__note">Moving money from one fund to another is a sale and a new
+        purchase. The sale can carry an <a href="{{ root }}/learn/glossary/#exit_load">exit load</a>
+        and <a href="{{ root }}/learn/how-gains-are-taxed/">tax</a>, and the purchase pays
+        <a href="{{ root }}/learn/glossary/#stamp_duty">stamp duty</a>. None of that is taken
+        off in these figures.</p></div>
     <div data-out="alts"></div>
   </section>
 </section>
@@ -85,5 +91,7 @@
 {% block scripts %}
 <script src="{{ root }}/static/portfolio-math.js" defer></script>
 <script src="{{ root }}/static/kit.js" defer></script>
+{#- /sip/'s strip, which each holding's card draws (§6.2); ECharts follows on demand. -#}
+<script src="{{ root }}/static/sip.js" defer></script>
 <script src="{{ root }}/static/portfolio.js" defer></script>
 {% endblock %}

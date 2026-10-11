@@ -319,6 +319,8 @@
   });
 
   page.addEventListener("click", function (e) {
+    // A kind whose prices did not load: the cache let go of them, so try again.
+    if (e.target.closest("[data-retry]")) { results(); return; }
     var b = e.target.closest("[data-action]");
     if (!b) return;
     var card = b.closest("[data-fund]");
@@ -618,12 +620,6 @@
     return ul;
   }
 
-  var REASON = {
-    ter: "lowest expense ratio",
-    r3: "middle three-year return in its category",
-    size: "largest fund today",
-  };
-
   function figure(v, kind) {
     if (v == null) return "—";
     var n = Number(v);
@@ -632,15 +628,24 @@
     if (kind === "fall") return pct(Math.abs(n) * 100);
     return signedPct(n);
   }
+  // "Flexi cap" -> "flexi cap"; "ELSS (tax saver)" keeps its capitals.
+  function lower(name) { return /^[A-Z][a-z]/.test(name) ? name.charAt(0).toLowerCase() + name.slice(1) : name; }
 
+  // In hindsight (SPEC_SIP_WHAT_IF §6.2). Each holding is set against every other
+  // Direct fund of its kind on its own priced purchases and sales: the range, the
+  // middle, and where the holding sits, drawn by /sip/'s strip (sip.js). No fund is
+  // suggested: the slots below start empty and fill only with the visitor's choice
+  // (a saved file's `alts` still fill them). The first card is worked out at once,
+  // the rest as each comes within 200px of the screen, so one kind's NAV files load
+  // before the visitor scrolls.
+  var watching = null;
   function alts(list, live) {
     var box = out("alts");
+    if (watching) { watching.disconnect(); watching = null; }
     var cards = list.filter(function (x) { return x.pos && x.pos.firstDate; });
     if (!cards.length) { box.replaceChildren(el("p", { "class": "pf__note" }, "Shown once a fund is valued.")); return Promise.resolve(); }
-    var all = Array.from(FUNDS.values());
     return Promise.all(cards.map(function (x) {
-      var suggested = M.alternatives(x.fund, all, x.pos.firstDate);
-      var slots = M.altSlots(x.h.alts, suggested, function (id) { return FUNDS.get(id); });
+      var slots = M.altSlots(x.h.alts, [], function (id) { return FUNDS.get(id); });
       var buys = M.pricedBuys(x.pos), sold = M.pricedSales(x.pos);
       return Promise.all(slots.map(function (s) {
         if (!s.fund) return Promise.resolve({ s: s, pos: null, error: null });
@@ -648,45 +653,102 @@
           return { s: s, pos: M.position(buys, series, sold), error: null };
         }, function (e) { return { s: s, pos: null, error: e.message }; });
       })).then(function (valued) {
-        var label = "the same " + rupees(x.pos.investedPaise) + (sold.length ? ", and the same sales," : "") + " on the same dates";
-        var rows = [[el("strong", null, x.fund.name), "yours", rupees(x.pos.valuePaise), returnText(x.pos),
+        var rows = [[el("strong", null, x.fund.name + " (yours)"), rupees(x.pos.valuePaise), returnText(x.pos),
                      figure(x.fund.r3), figure(x.fund.vol3, "fall"), figure(x.fund.fall3, "fall"), figure(x.fund.ter, "ter"), ""]];
         valued.forEach(function (v) {
           var f = v.s.fund;
           var button = el("button", { type: "button", "class": "button button--quiet", "data-action": "replace",
                                       "data-held": x.h.id, "data-slot": v.s.slot },
                                     f ? "Compare a different fund" : "Choose a fund");
-          if (!f) { rows.push(["—", "", "", "", "", "", "", "", button]); return; }
-          var why = v.s.reasons.map(function (r) { return r === "chosen" ? "your choice" : REASON[r]; }).join(", ");
+          if (!f) { rows.push(["—", "", "", "", "", "", "", button]); return; }
           // Valued only on exactly the money the held fund priced: a lot this
           // fund cannot price yet would make it a different sum.
           var reason = v.error || (v.pos && gapReason(v.pos));
-          rows.push([el("a", { href: BASE + "/fund/" + f.id + "/" }, f.name), why,
+          rows.push([el("a", { href: BASE + "/fund/" + f.id + "/" }, f.name),
             reason ? "—" : rupees(v.pos.valuePaise),
             reason || returnText(v.pos),
             figure(f.r3), figure(f.vol3, "fall"), figure(f.fall3, "fall"), figure(f.ter, "ter"), button]);
         });
-        var count = suggested.length;
-        return el("article", { "class": "pf__alt card" },
+        var strip = x.fund.mixed ? null : el("div", { "class": "pf__against" },
+          el("p", { "class": "pf__note" }, "Worked out when this card is on the screen."));
+        var article = el("article", { "class": "pf__alt card" },
           el("h3", null, x.fund.name + " — " + (x.fund.category_name || "")),
-          el("p", { "class": "pf__note" }, "What " + label + " would be worth today in each fund. " +
-            (x.fund.mixed
-              ? "AMFI files this fund under a heading that mixes funds doing different jobs, so none is suggested; choose any fund to compare."
-              : "Funds of the same category whose prices go back to " + M.day(x.pos.firstDate) + ", picked by the rule named beside each." +
-                " The largest is today's largest, which leans towards funds that have done well." +
-                (x.fund.plan === "regular" ? " These are Direct plans; part of any gap is the Regular plan's higher cost." : "") +
-                (count === 0 ? " No other fund of this category has prices back that far; choose any fund to compare."
-                  : count < 3 ? " Only " + count + " of this category " + (count === 1 ? "qualifies" : "qualify") + ", so the rest are empty; choose any fund to compare." : ""))),
+          strip || el("p", { "class": "pf__note" },
+            "AMFI files this fund under a heading that mixes funds doing different jobs, so none is suggested; choose any fund to compare."),
+          el("h4", null, "Compare a different fund"),
+          el("p", { "class": "pf__note" }, "What the same amounts on the same dates" + (sold.length ? ", and the same sales," : "") +
+            " would be worth today in a fund you choose."),
           // "Return a year, 3 years", as Compare says it: "3 years a year" read garbled (P-08).
-          table("In hindsight: " + x.fund.name,
-                ["Fund", "Why it is here", "Worth today", "Return", "Return a year, 3 years", "Volatility",
+          table("Compare a different fund with " + x.fund.name,
+                ["Fund", "Worth today", "Return", "Return a year, 3 years", "Volatility",
                  "Deepest fall", "Expense ratio", ""],
-                rows, [0, 0, 1, 1, 1, 1, 1, 1, 0]));
+                rows, [0, 1, 1, 1, 1, 1, 1, 0]));
+        return { x: x, buys: buys, sold: sold, box: strip, article: article };
       });
-    })).then(function (articles) {
+    })).then(function (made) {
       if (!live()) return;
-      fill.apply(null, [box].concat(articles, [el("p", { "class": "pf__estimate" }, ESTIMATE)]));
+      fill.apply(null, [box].concat(made.map(function (m) { return m.article; }),
+        [el("p", { "class": "pf__estimate" }, ESTIMATE)]));
+      var todo = made.filter(function (m) { return m.box; });
+      if (!todo.length) return;
+      var start = function (m) { if (!m.started) { m.started = true; against(m, live); } };
+      start(todo[0]);
+      if (!("IntersectionObserver" in window)) { todo.forEach(start); return; }
+      watching = new IntersectionObserver(function (seen) {
+        seen.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          watching.unobserve(e.target);
+          start(todo.filter(function (m) { return m.box === e.target; })[0]);
+        });
+      }, { rootMargin: "200px 0px" });
+      todo.slice(1).forEach(function (m) { watching.observe(m.box); });
     });
+  }
+
+  // One card's strip: every other Direct fund of the holding's kind, loaded and
+  // counted, then M.against (portfolio-math.js) and the strip (sip.js).
+  function against(m, live) {
+    var x = m.x, S = window.SipStrip;
+    var kindFunds = Array.from(FUNDS.values()).filter(function (f) {
+      return f.category === x.fund.category && f.plan !== "regular";
+    });
+    var wanted = kindFunds.filter(function (f) { return f.id !== x.fund.id && f.id !== x.fund.direct; }).concat([x.fund]);
+    var note = el("p", { "class": "pf__note" }, "Loading the other funds of its kind");
+    fill(m.box, note);
+    return S.load(wanted, function (done, n) { if (live()) note.textContent = "Loaded " + done + " of " + n + " funds"; })
+      .then(function (series) {
+        if (!live()) return;
+        var a = M.against(m.buys, m.sold, x.fund, kindFunds, series);
+        if (!a || !a.yours) {
+          fill(m.box, el("p", { "class": "pf__note" }, "The prices of this kind of fund did not load. ",
+            el("button", { type: "button", "class": "button button--quiet", "data-retry": true }, "Retry")));
+          return;
+        }
+        var r = a.r, n = r.n, name = x.fund.category_name || "";
+        // "23 other flexi cap funds"; a category named as funds already is named whole:
+        // "5 other funds of its category (Index funds, equity)".
+        var others = function (k) {
+          return /fund/i.test(name) ? k + " other fund" + (k === 1 ? "" : "s") + " of its category (" + name + ")"
+            : k + " other " + lower(name) + " fund" + (k === 1 ? "" : "s");
+        };
+        var same = "The same money on the same dates" + (m.sold.length ? ", and the same sales," : "") + " in the " +
+          others(n) + " with prices back to " + M.day(a.first);
+        var text = !n ? "No " + others(1).replace(/^1 /, "") + " has prices back to " + M.day(a.first) + " to set this holding against."
+          : same + " would be worth " + (n === 1 ? rupees(r.min.valuePaise)
+            : "between " + rupees(r.min.valuePaise) + " and " + rupees(r.max.valuePaise)) + " on " + M.day(a.valuedOn) +
+            (n >= 3 ? "; the middle, " + rupees(r.middle.valuePaise) : "") + ". Yours: " + rupees(a.yours.valuePaise) + ", " +
+            M.ordinal(a.rank) + " highest of " + (n + 1) + ".";
+        if (x.fund.plan === "regular") text += " These are Direct plans; part of any gap is the Regular plan's higher cost.";
+        var drawn = el("div");
+        fill(m.box, el("p", { "class": "pf__against-lead" }, text), drawn);
+        S.strip(drawn, {
+          first: a.first, valuedOn: a.valuedOn, r: r, idx: null, out: a.out, kindSeries: a.kindSeries,
+          putPaise: m.buys.reduce(function (t, b) { return t + b.paise; }, 0),
+          marked: [{ o: a.yours, label: "Yours", hue: 2, tag: " · yours" }],
+          note: ", and the named one is yours",
+          failed: function () { say("The charts did not load; the tables hold the same figures."); },
+        });
+      });
   }
 
   // Edits can start a run while an earlier one is still fetching; only the

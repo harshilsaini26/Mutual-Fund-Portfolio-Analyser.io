@@ -235,3 +235,55 @@ test("an overview figure is scaled to the amount and rounded to ₹100", () => {
   assert.equal(S.scaled("100049.99", "100000.00", 100000000), 100050000); // ₹10 lakh once
   assert.equal(S.scaled("1000.50", "1000.00", 10000000), 10010000);      // ₹1 lakh: ₹1,00,050 rounds up
 });
+
+// --- Part C (§6.2): a holding against every other fund of its kind --------------------
+test("ordinals are worked out, not templated", () => {
+  assert.deepEqual([1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 101, 111, 112].map(M.ordinal),
+    ["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "22nd", "23rd", "101st", "111th", "112th"]);
+});
+
+// ₹1,000 on 5 Jan 2024 at NAV 10 (₹0.05 stamp duty: 99.995 units), ₹600 sold on 5 Mar.
+// By hand, valued on 5 Apr: A 59.995 × 15 = ₹899.93; B 45.450 × 11 = ₹499.95;
+// C 33.328 × 9 = ₹299.95; yours (H) 49.995 × 12 = ₹599.94, so 2nd of 4. F's NAV halved,
+// so ₹600 needed 120 units it never had; D began after the purchase; E did not load.
+const D = ["2024-01-05", "2024-02-05", "2024-03-05", "2024-04-05"];
+const kindOf = [
+  { id: "H", navs: ["10", "10", "12", "12"] }, { id: "A", navs: ["10", "10", "15", "15"] },
+  { id: "B", navs: ["10", "10", "11", "11"] }, { id: "C", navs: ["10", "10", "9", "9"] },
+  { id: "F", navs: ["10", "10", "5", "5"] }, { id: "D", navs: null, from: 1 }, { id: "E", navs: null },
+];
+const kindSeries = new Map(kindOf.map((f) => [f.id, f.navs ? series(f.navs.map((v, i) => [D[i], v]))
+  : f.from ? series([["2024-02-05", "10"], ["2024-03-05", "12"], ["2024-04-05", "12"]]) : null]));
+const buys = [{ date: D[0], paise: 100000 }];
+const sold = [{ date: D[2], paise: 60000 }];
+
+test("a holding's own purchases and sales, in every other fund of its kind", () => {
+  const a = M.against(buys, sold, { id: "H" }, kindOf, kindSeries);
+  assert.equal(a.valuedOn, D[3]);
+  assert.deepEqual(a.r.sorted.map((o) => [o.fund.id, o.valuePaise]), [["C", 29995], ["B", 49995], ["A", 89993]]);
+  assert.equal(a.r.middle.fund.id, "B");
+  assert.deepEqual(a.out.map((o) => [o.fund.id, o.reason]), [["F", "sales"], ["D", "later"], ["E", "load"]]);
+  assert.equal(a.yours.valuePaise, 59994);
+  assert.equal(a.rank, 2);
+  assert.equal(a.r.n + 1, 4);
+  // Every other fund of the kind is in the range or out of it, once (§4.4).
+  assert.deepEqual([...a.r.sorted.map((o) => o.fund.id), ...a.out.map((o) => o.fund.id)].sort(),
+    ["A", "B", "C", "D", "E", "F"]);
+});
+
+test("a Regular holding is set against Direct funds, never its own Direct plan", () => {
+  const regular = { id: "HR", plan: "regular", direct: "H" };
+  const withOwn = new Map(kindSeries).set("HR", kindSeries.get("H"));
+  const a = M.against(buys, sold, regular, kindOf, withOwn);
+  assert.ok(!a.r.sorted.some((o) => o.fund.id === "H") && !a.out.some((o) => o.fund.id === "H"));
+  assert.equal(a.yours.valuePaise, 59994);
+});
+
+test("with no sales the lowest point is worked out; with sales it is not stated", () => {
+  const bought = M.against(buys, [], { id: "H" }, kindOf, kindSeries);
+  // On 5 Feb the NAV is still 10: ₹999.95 against ₹1,000, the stamp duty below.
+  assert.equal(bought.yours.low, -0.00005);
+  assert.equal(bought.yours.lowOn, D[1]);
+  assert.equal(bought.out.length, 2);    // F can hold its units now: only D and E are out
+  assert.equal(M.against(buys, sold, { id: "H" }, kindOf, kindSeries).yours.low, null);
+});

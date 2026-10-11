@@ -282,6 +282,21 @@ address (V1-92; GitHub Pages served it until 2026-10-03). Measured on the first 
   the site pays, about 1 s under the slowdown (the same on `/compare/` and `/learn/`).
   Not yet measured on the live site, where `funds.json` is 1.47 MB raw and NAV files
   are larger (about 19 KB each): re-measure after the first build that carries it.
+- **Each holding against its whole kind** (V1-103; SPEC_SIP_WHAT_IF Part C): Your
+  portfolio's "In hindsight" no longer suggests three funds. Each holding's own priced
+  purchases and sales are applied to every other Direct fund of its kind (`M.against`),
+  valued on one date: a sentence with the range, the middle and where the holding sits
+  ("10th highest of 24"), then /sip/'s strip (one function in `sip.js`, `SipStrip`)
+  with "Yours" marked, its table, and every fund left out with its reason, including
+  "Could not have paid out the same sales". Funds to compare are the visitor's choice
+  only; a saved file's choices keep working. The first card loads at once, the rest as
+  they reach the screen. A note under the section's intro names what moving money costs
+  (exit load, tax, stamp duty, each linked) and estimates none of it. Checked
+  2026-10-11 on the preview with the §8.3 test portfolio: Parag Parikh Flexi Cap
+  ₹9,79,277 to ₹13,73,249, middle ₹11,20,178, yours ₹11,58,127, 10th of 24; HDFC Mid
+  Cap 18th of 27; both equal to `portfolio-math.js` run on the same files in node. 44
+  NAV files load before scrolling (one kind), 72 after; the saved choice (Axis Flexi
+  Cap) came back in its slot.
 - **A way in for newcomers** (V1-101, V1-102; SPEC_SIP_WHAT_IF Part B): `/sip/` ends
   with "The same money in other kinds of fund", every kind's lowest, middle and
   highest on one ₹ axis, each family's three largest kinds first, a tap to work any

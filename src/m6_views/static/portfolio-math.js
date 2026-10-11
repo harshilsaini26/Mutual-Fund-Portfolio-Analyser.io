@@ -610,9 +610,12 @@
   // §4.5. One fund on one window, valued on `valuedOn`, and its lowest point against
   // what had been put in by then. The scan starts the day after the first purchase is
   // priced: on that day only its stamp duty is off it, which no fund could avoid.
-  function outcome(buys, series, valuedOn) {
+  // `sales` (Your portfolio, §6.2): the same sums paid out on the same dates. With
+  // sales there is no single "put in" to fall below, so no lowest point is stated.
+  function outcome(buys, series, valuedOn, sales) {
     var cut = cutAt(series, valuedOn);
-    var pos = position(buys, cut);
+    var pos = position(buys, cut, sales);
+    if (sales && sales.length) return Object.assign(pos, { low: null, lowOn: null });
     var lots = pos.lots.filter(function (l) { return !l.error; })
       .sort(function (a, b) { return a.navDate < b.navDate ? -1 : a.navDate > b.navDate ? 1 : 0; });
     var low = 0, lowOn = null, k = 0, units = 0n, paid = 0;
@@ -672,6 +675,42 @@
   // §4.5. The index fund a kind is measured against: the `tracker` most of its funds
   // name (each fund's benchmark, as its page draws it); on a tie the one with the
   // longer record, then the lower id. None when none names one.
+  // "1st", "2nd", "3rd", "11th", "21st": worked out, never templated (§6.2).
+  function ordinal(n) {
+    var tens = n % 100, ones = n % 10;
+    var tail = tens >= 11 && tens <= 13 ? "th" : ones === 1 ? "st" : ones === 2 ? "nd" : ones === 3 ? "rd" : "th";
+    return n + tail;
+  }
+
+  // §6.2. A holding's own priced purchases and sales applied to every other Direct
+  // fund of its kind (`kindFunds`), each valued on one date V as on /sip/; the holding
+  // itself too, so it can be ranked among them. Its own Direct plan is not an "other"
+  // fund. A fund that could not have paid out the same sales is out of the range with
+  // reason "sales"; every other fund is in the range or out of it, once.
+  function against(buys, sales, held, kindFunds, seriesById) {
+    var others = kindFunds.filter(function (f) { return f.id !== held.id && f.id !== held.direct && f.plan !== "regular"; });
+    var kindSeries = new Map(others.map(function (f) { return [f.id, seriesById.get(f.id)]; }));
+    var mine = seriesById.get(held.id);
+    var v = valuationDate(new Map(kindSeries).set(held.id, mine));
+    if (!v || !buys.length) return null;
+    var first = buys.reduce(function (m, b) { return b.date < m ? b.date : m; }, buys[0].date);
+    var pool = poolOf(others, kindSeries, { first: first }, v.valuedOn);
+    var why = new Map(pool.out.map(function (o) { return [o.fund.id, o.reason]; }));
+    var outcomes = [];
+    pool.inRange.forEach(function (f) {
+      var o = Object.assign({ fund: f }, outcome(buys, kindSeries.get(f.id), v.valuedOn, sales));
+      if (o.sales.some(function (s) { return s.error; })) why.set(f.id, "sales"); else outcomes.push(o);
+    });
+    var r = spread(outcomes);
+    var yours = mine ? Object.assign({ fund: held }, outcome(buys, mine, v.valuedOn, sales)) : null;
+    return {
+      valuedOn: v.valuedOn, first: first, r: r, yours: yours,
+      rank: yours ? 1 + outcomes.filter(function (o) { return o.valuePaise > yours.valuePaise; }).length : null,
+      out: others.filter(function (f) { return why.has(f.id); }).map(function (f) { return { fund: f, reason: why.get(f.id) }; }),
+      kindSeries: kindSeries,
+    };
+  }
+
   function indexFor(funds, categoryKey) {
     var byId = new Map(funds.map(function (f) { return [f.id, f]; }));
     var count = new Map();
@@ -695,6 +734,7 @@
   var api = {
     valuationDate: valuationDate, windowOf: windowOf, poolOf: poolOf, outcome: outcome,
     spread: spread, pathOf: pathOf, indexFor: indexFor, cutAt: cutAt, SIP_MAX_PAISE: SIP_MAX_PAISE,
+    ordinal: ordinal, against: against,
     toPaise: toPaise, toMicro: toMicro, parseNavFile: parseNavFile, allot: allot,
     sipDates: sipDates, purchasesOf: purchasesOf, position: position, xirr: xirr,
     showsXirr: showsXirr, isSynthetic: isSynthetic, lookThrough: lookThrough,
