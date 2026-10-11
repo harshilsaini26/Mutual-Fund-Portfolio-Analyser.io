@@ -82,3 +82,14 @@ test("starting points: each listed category's three largest funds, largest first
     { label: "The two largest large cap funds", ids: ["L2", "L1"] },
   ]);
 });
+
+// The link to /sip/ (review, Minor 16): the kind of the first fund whose kind /sip/
+// offers, since a mixed heading is not one; with none, no kind, and /sip/ opens on its own.
+test("the /sip/ link names the first ranked fund's kind", () => {
+  const idx = { id: "I", category: "index/undivided", mixed: true };
+  const flexi = { id: "F", category: "equity/flexi_cap" };
+  assert.equal(C.sipHash([idx, flexi]), "#c=equity/flexi_cap&f=I,F");
+  assert.equal(C.sipHash([idx]), "#f=I");
+  assert.equal(C.sipHash([flexi, idx, { id: "G", category: "equity/mid_cap" }, { id: "H", category: "x/y" }]),
+    "#c=equity/flexi_cap&f=F,I,G");
+});

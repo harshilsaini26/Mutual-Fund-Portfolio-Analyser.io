@@ -113,8 +113,16 @@
     }).filter(function (s) { return s.ids.length >= 2; });
   }
 
+  // The same funds on /sip/ (SPEC_SIP_WHAT_IF §4.8): the kind of the first fund whose
+  // kind /sip/ offers (a mixed heading is not one), and up to three of the funds.
+  function sipHash(funds) {
+    var ranked = funds.filter(function (f) { return !f.mixed; })[0];
+    return "#" + (ranked ? "c=" + ranked.category + "&" : "") + "f=" +
+      funds.slice(0, 3).map(function (f) { return f.id; }).join(",");
+  }
+
   var api = {
-    starters: starters,
+    starters: starters, sipHash: sipHash,
     parseHash: parseHash, writeHash: writeHash, sharedStart: sharedStart,
     growthSeries: growthSeries, highLow: highLow, commonHoldings: commonHoldings,
     shownFigure: shownFigure, nextFocus: nextFocus, MAX: MAX,
@@ -334,8 +342,8 @@
       fill.apply(null, [box, el("p", { "class": "cmp__lead" }, headline), container,
         note("From " + day(start) + ", the first date all " + lines.length + " funds have prices."),
         // The same funds as a monthly SIP, on /sip/ (SPEC_SIP_WHAT_IF §4.8).
-        el("p", { "class": "cmp__note" }, el("a", { href: BASE + "/sip/#c=" + funds[0].category + "&f=" +
-          funds.slice(0, 3).map(function (f) { return f.id; }).join(",") }, "The same funds as a monthly SIP →"))].concat(notes));
+        el("p", { "class": "cmp__note" }, el("a", { href: BASE + "/sip/" + sipHash(funds) },
+          "The same funds as a monthly SIP →"))].concat(notes));
       if (window.Charts) window.Charts.draw(box);   // draws the charts inside box
     });
   }
