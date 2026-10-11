@@ -687,6 +687,7 @@
       });
     })).then(function (made) {
       if (!live()) return;
+      if (window.Charts && window.Charts.clear) window.Charts.clear(box);   // the strips' charts go with them
       fill.apply(null, [box].concat(made.map(function (m) { return m.article; }),
         [el("p", { "class": "pf__estimate" }, ESTIMATE)]));
       var todo = made.filter(function (m) { return m.box; });

@@ -186,11 +186,15 @@
     });
   }
 
+  // A box about to be refilled lets go of its charts (charts.js, once loaded).
+  function clearCharts(box) { if (window.Charts && window.Charts.clear) window.Charts.clear(box); }
+
   // `s`: first (the first purchase), valuedOn, r (M.spread), idx (the index fund's
   // outcome, or null), marked ([{o, label, hue, tag}]: drawn named; those with a `tag`
   // are also rows of the table), out ([{fund, reason}]), kindSeries, putPaise, note
   // (what the named dots are), failed (the charts did not load).
   function strip(box, s) {
+    clearCharts(box);
     // Under three funds is not a range: the table and the list, no chart (§4.6).
     if (s.r.n < 3) {
       fill(box, s.r.n ? el("details", { "class": "chart-table" },
@@ -403,7 +407,11 @@
       state.c = kind.value;
       showState();
       // From the overview: to the answer, which now works out this kind exactly.
-      if (b.closest("[data-sip-kinds]")) out("answer-box").scrollIntoView({ block: "start" });
+      // The overview redraws, so the button chosen goes; focus follows the reader.
+      if (b.closest("[data-sip-kinds]")) {
+        out("answer-box").scrollIntoView({ block: "start" });
+        document.getElementById("sip-answer-h").focus({ preventScroll: true });
+      }
     }
     run();
   });
@@ -519,6 +527,7 @@
       sections(r.n > 0);
       fill(out("path"));
       var few = stripOf(w, v, r, idx, [], pool, kindSeries);
+      clearCharts(out("ends"));
       fill(out("ends"), r.n ? endsTable(few) : null, outList(few));
     }
   }
@@ -667,6 +676,7 @@
         .concat(others.map(function (s) { return rupees(s.pts[i][1]); }));
     }).reverse();
     var box = out("path");
+    clearCharts(box);
     fill(box,
       el("div", { "class": "echarts", "data-chart": "echart" },
         el("figure", { "class": "echart echart--band" },

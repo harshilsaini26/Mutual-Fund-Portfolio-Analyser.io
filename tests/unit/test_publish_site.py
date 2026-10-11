@@ -1589,6 +1589,15 @@ def test_the_sip_page_has_a_place_for_a_links_notes(site: Path) -> None:
     assert 'say("Loaded ' not in script and 'say("")' not in script
 
 
+def test_choosing_a_kind_in_the_overview_moves_focus_to_the_answer(site: Path) -> None:
+    """Review, Minor 9: the overview redraws, so the button chosen is gone; focus
+    goes to the answer's heading, not to the page itself."""
+    page = (site / "sip" / "index.html").read_text(encoding="utf-8")
+    assert '<h2 id="sip-answer-h" class="sr-only" tabindex="-1">' in page
+    script = (STATIC_DIR / "sip.js").read_text(encoding="utf-8")
+    assert 'getElementById("sip-answer-h").focus(' in script
+
+
 def test_the_sip_page_always_carries_its_notes(site: Path) -> None:
     """§4.6.5: four notes, never folded."""
     page = _flat((site / "sip" / "index.html").read_text(encoding="utf-8"))

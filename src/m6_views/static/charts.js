@@ -731,5 +731,15 @@
   init(document);
   watch(document);
   // For pages that build a chart after load (compare.js, V1-85).
-  window.Charts = { draw: function (box) { init(box); watch(box); } };
+  // Before a page refills a box (sip.js; Your portfolio through it): dispose its
+  // charts, or ECharts keeps every instance it ever drew there (code review, Minor 10).
+  function clear(box) {
+    box.querySelectorAll(".echart__canvas").forEach(function (el) {
+      resize.unobserve(el);
+      var chart = echarts.getInstanceByDom(el);
+      if (chart) chart.dispose();
+    });
+  }
+
+  window.Charts = { draw: function (box) { init(box); watch(box); }, clear: clear };
 })();
