@@ -644,11 +644,9 @@
   // §4.5. Chart 1: worth at each month's (or, under three years, each week's) end
   // from the first purchase, the last point on `valuedOn`; and what had been put in,
   // stepping on each purchase. Every fund on one grid, so the band lines up.
-  function pathOf(buys, series, valuedOn, step) {
-    var cut = cutAt(series, valuedOn);
-    var lots = position(buys, cut).lots.filter(function (l) { return !l.error; });
-    // From the first purchase's price: a holiday before it would draw nothing held.
-    var grid = [], d = lots.reduce(function (m, l) { return l.navDate < m ? l.navDate : m; }, valuedOn);
+  // Week or month ends from `fromIso`, then the valuation date.
+  function gridOf(fromIso, valuedOn, step) {
+    var grid = [], d = fromIso;
     while (d < valuedOn) {
       var p = d.split("-").map(Number), end;
       if (step === "week") {
@@ -660,6 +658,27 @@
       d = shiftDays(end, 1);
     }
     grid.push(valuedOn);
+    return grid;
+  }
+
+  // §4.6.3. Every fund's worth on one set of dates: from the latest day any of them
+  // priced the first purchase (a fund without that day's NAV prices it later), so each
+  // holds units at every point and the band compares like with like.
+  function pathsOf(buys, seriesList, valuedOn, step) {
+    var cuts = seriesList.map(function (s) { return cutAt(s, valuedOn); });
+    var lots = cuts.map(function (cut) {
+      return position(buys, cut).lots.filter(function (l) { return !l.error; });
+    });
+    var from = lots.reduce(function (m, ls) {
+      if (!ls.length) return m;   // nothing priced: no say in where the grid starts
+      var first = ls.reduce(function (f, l) { return l.navDate < f ? l.navDate : f; }, valuedOn);
+      return first > m ? first : m;
+    }, "");
+    var grid = gridOf(from || valuedOn, valuedOn, step);
+    return { grid: grid, paths: cuts.map(function (cut, k) { return pathOn(buys, cut, lots[k], valuedOn, grid); }) };
+  }
+
+  function pathOn(buys, cut, lots, valuedOn, grid) {
     var points = grid.map(function (g) {
       var i = onOrAfter(cut.dates, g);
       var at = i < 0 ? cut.dates.length - 1 : cut.dates[i] === g ? i : i - 1;
@@ -733,7 +752,7 @@
 
   var api = {
     valuationDate: valuationDate, windowOf: windowOf, poolOf: poolOf, outcome: outcome,
-    spread: spread, pathOf: pathOf, indexFor: indexFor, cutAt: cutAt, SIP_MAX_PAISE: SIP_MAX_PAISE,
+    spread: spread, pathsOf: pathsOf, gridOf: gridOf, indexFor: indexFor, cutAt: cutAt, SIP_MAX_PAISE: SIP_MAX_PAISE,
     ordinal: ordinal, against: against,
     toPaise: toPaise, toMicro: toMicro, parseNavFile: parseNavFile, allot: allot,
     sipDates: sipDates, purchasesOf: purchasesOf, position: position, xirr: xirr,

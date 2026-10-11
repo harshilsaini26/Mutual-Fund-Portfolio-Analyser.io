@@ -155,10 +155,34 @@ test("the path: worth at each month's end, the last point on the valuation date"
   const s = series([["2024-01-05", "10"], ["2024-01-31", "11"], ["2024-02-05", "10"],
                     ["2024-02-29", "12"], ["2024-03-04", "13"]]);
   const buys = [{ date: "2024-01-05", paise: 100000 }, { date: "2024-02-05", paise: 100000 }];
-  const p = M.pathOf(buys, s, "2024-03-05", "month");
+  const p = M.pathsOf(buys, [s], "2024-03-05", "month").paths[0];
   assert.deepEqual(p.points.map((x) => x[0]), ["2024-01-31", "2024-02-29", "2024-03-05"]);
   assert.equal(p.points[0][1], 109995);   // 99.995 units x 11 = 1,099.945 -> half up
   assert.deepEqual(p.putIn, [["2024-01-05", 100000], ["2024-02-05", 200000], ["2024-03-05", 200000]]);
+});
+
+test("every fund's path is on the same dates, from the last first price among them", () => {
+  // The review's case: A priced the purchase on Friday 3 Oct, B (no NAV that day) on
+  // Monday the 6th. Weekly points must still be one set of dates, with B holding units
+  // at each, or chart 1's band mixes dates and its table reads ₹0.
+  const a = series([["2025-10-03", "10"], ["2025-10-06", "10"], ["2025-10-20", "11"], ["2025-10-27", "12"]]);
+  const b = series([["2025-10-01", "10"], ["2025-10-06", "10"], ["2025-10-20", "11"], ["2025-10-27", "12"]]);
+  const got = M.pathsOf([{ date: "2025-10-03", paise: 100000 }], [a, b], "2025-10-27", "week");
+  const want = ["2025-10-12", "2025-10-19", "2025-10-26", "2025-10-27"];
+  assert.deepEqual(got.grid, want);
+  assert.deepEqual(got.paths.map((p) => p.points.map((x) => x[0])), [want, want]);
+  assert.ok(got.paths.every((p) => p.points.every((x) => x[1] > 0)));
+});
+
+test("a fund with nothing priced does not move the grid's start", () => {
+  const a = series([["2025-10-03", "10"], ["2025-10-27", "12"]]);
+  const later = series([["2025-10-20", "10"], ["2025-10-27", "12"]]);
+  const got = M.pathsOf([{ date: "2025-10-03", paise: 100000 }], [a, later], "2025-10-27", "week");
+  assert.equal(got.grid[0], "2025-10-05");
+});
+
+test("a weekly grid from a Sunday starts on that Sunday", () => {
+  assert.deepEqual(M.gridOf("2025-10-05", "2025-10-17", "week"), ["2025-10-05", "2025-10-12", "2025-10-17"]);
 });
 
 // --- the shared fixture ---------------------------------------------------------------
@@ -222,7 +246,7 @@ test("what cannot be read falls back, and an unreadable amount says so", () => {
 test("the path starts when the first purchase is priced, not on a holiday before it", () => {
   // 5 Oct 2025 is a Sunday: the first instalment is priced on Monday the 6th.
   const s = series([["2025-10-03", "9"], ["2025-10-06", "10"], ["2025-10-10", "11"], ["2025-10-17", "12"]]);
-  const p = M.pathOf([{ date: "2025-10-05", paise: 100000 }], s, "2025-10-17", "week");
+  const p = M.pathsOf([{ date: "2025-10-05", paise: 100000 }], [s], "2025-10-17", "week").paths[0];
   assert.ok(p.points.every((x) => x[1] > 0), JSON.stringify(p.points));
   assert.equal(p.points[0][0], "2025-10-12");
 });

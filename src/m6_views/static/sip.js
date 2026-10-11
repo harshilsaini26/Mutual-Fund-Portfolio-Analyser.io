@@ -3,7 +3,7 @@
  *
  * The page is a shell (sip.html); this fills it in the browser from funds.json and
  * each fund's NAV file, as Your portfolio and Compare do (V1-82, V1-85). Every
- * figure comes from portfolio-math.js (windowOf, poolOf, outcome, spread, pathOf,
+ * figure comes from portfolio-math.js (windowOf, poolOf, outcome, spread, pathsOf,
  * indexFor), which is pinned to the ledger by tests/fixtures/sip_cases.json; this
  * file only wires inputs and writes sentences. The inputs live in the address and
  * nowhere else. It shows what real prices did, never what money will do.
@@ -553,8 +553,15 @@
   // --- chart 1: what it was worth, month by month (§4.6.3) ----------------------------
   function path(w, v, outcomes, r, idx, adds, series) {
     var step = (Date.parse(v.valuedOn) - Date.parse(w.first)) / 86400000 < 3 * 365 ? "week" : "month";
-    var paths = outcomes.map(function (o) { return M.pathOf(w.buys, series.get(o.fund.id), v.valuedOn, step); });
-    var grid = paths[0].points.map(function (p) { return p[0]; });
+    var marked = (idx ? [{ o: idx, role: "index", hue: 1 }] : []).concat(adds.map(function (a, i) {
+      return { o: a, role: "added", hue: i + 2 };
+    }));
+    // One set of dates for every line (M.pathsOf): the range, the index and added funds.
+    var all = M.pathsOf(w.buys, outcomes.concat(marked.map(function (x) { return x.o; })).map(function (o) {
+      return series.get(o.fund.id);
+    }), v.valuedOn, step);
+    var paths = all.paths.slice(0, outcomes.length);
+    var grid = all.grid;
     var putIn = paths[0].putIn;
     var put = grid.map(function (g) {
       var last = 0;
@@ -565,11 +572,7 @@
       var vals = paths.map(function (p) { return p.points[i][1]; }).sort(function (a, b) { return a - b; });
       return [g, vals[0], vals[Math.floor((vals.length - 1) / 2)], vals[vals.length - 1]];
     });
-    var others = (idx ? [{ o: idx, role: "index", hue: 1 }] : []).concat(adds.map(function (a, i) {
-      return { o: a, role: "added", hue: i + 2 };
-    })).map(function (x) {
-      return { x: x, pts: M.pathOf(w.buys, series.get(x.o.fund.id), v.valuedOn, step).points };
-    });
+    var others = marked.map(function (x, k) { return { x: x, pts: all.paths[outcomes.length + k].points }; });
     var r2 = function (p) { return String(Math.round(p / 100)); };
     var spec = { charts: [{ kind: "band", title: "What it was worth", legend: true,
       putIn: { name: "Put in", points: putIn.map(function (p) { return [p[0], r2(p[1]), rupees(p[1])]; }) },
@@ -589,7 +592,7 @@
       .concat(others.map(function (s) { return s.x.o.fund.name; }));
     var rows = band.map(function (b, i) {
       return [M.day(b[0]), rupees(put[i]), rupees(b[1]), rupees(b[2]), rupees(b[3])]
-        .concat(others.map(function (s) { return rupees(s.pts[i] ? s.pts[i][1] : 0); }));
+        .concat(others.map(function (s) { return rupees(s.pts[i][1]); }));
     }).reverse();
     var box = out("path");
     fill(box,
