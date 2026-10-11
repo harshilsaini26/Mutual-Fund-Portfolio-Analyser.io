@@ -44,10 +44,21 @@
       }
     });
     // A start in the shape its mode takes replaces the years; any other is dropped.
-    var shape = state.m === "sip" ? /^\d{4}-\d{2}$/ : /^\d{4}-\d{2}-\d{2}$/;
-    if (state.from && shape.test(state.from)) state.y = null; else state.from = null;
+    if (state.from && realStart(state.m, state.from)) state.y = null; else state.from = null;
     return { state: state, notes: notes };
   }
+
+  // A month ("2019-04") for a SIP, a date ("2019-04-01") for once: a real one.
+  function realStart(mode, from) {
+    var m = (mode === "sip" ? /^(\d{4})-(\d{2})$/ : /^(\d{4})-(\d{2})-(\d{2})$/).exec(from);
+    if (!m) return false;
+    var d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, m[3] ? Number(m[3]) : 1));
+    return d.getUTCMonth() === Number(m[2]) - 1 && (!m[3] || d.getUTCDate() === Number(m[3]));
+  }
+
+  // §4.2: a start before the kind's first price is the field's error; this is that
+  // price's date, or null.
+  function fromError(first, earliest) { return earliest && first < earliest ? earliest : null; }
 
   function writeHash(s) {
     var parts = ["a=" + s.a, "m=" + s.m, s.from ? "from=" + s.from : "y=" + s.y, "d=" + s.d];
@@ -106,7 +117,7 @@
   }
 
   var api = { parseHash: parseHash, writeHash: writeHash, scaled: scaled, readAmount: readAmount,
-              SIP_MAX_RUPEES: SIP_MAX_RUPEES, pointsOf: pointsOf, fallText: fallText };
+              SIP_MAX_RUPEES: SIP_MAX_RUPEES, pointsOf: pointsOf, fallText: fallText, fromError: fromError };
   if (typeof module === "object" && module.exports) { module.exports = api; return; }
 
   // --- in the browser: the strip /sip/ and Your portfolio share (§6.2) -------------
@@ -463,8 +474,18 @@
       fieldError("from", "Choose a date before " + M.day(v.valuedOn) + ", the latest date with prices.", fromBox);
       return;
     }
-    fieldError("from", "", fromBox);
     if (w.error) return;
+    if (state.from) {
+      var firsts = Array.from(kindSeries.values()).filter(function (s) { return s && s.dates.length; })
+        .map(function (s) { return s.dates[0]; }).sort();
+      var begins = fromError(w.first, firsts[0]);
+      if (begins) {
+        fieldError("from", "Prices for this kind of fund begin on " + M.day(begins) + ".", fromBox);
+        out("answer-box").classList.add("sip__answer--busy");
+        return;
+      }
+    }
+    fieldError("from", "", fromBox);
     var pool = M.poolOf(ofKind, kindSeries, w, v.valuedOn);
     var outcomes = pool.inRange.map(function (f) {
       return Object.assign({ fund: f }, M.outcome(w.buys, kindSeries.get(f.id), v.valuedOn));

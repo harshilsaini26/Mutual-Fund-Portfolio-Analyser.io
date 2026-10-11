@@ -414,3 +414,20 @@ test("a fund beside the range needs a price from the first purchase to V", () =>
   assert.equal(M.eligibleOn(s, "2023-12-05", "2024-09-20"), "later");
   assert.equal(M.eligibleOn(null, "2024-01-05", "2024-09-20"), "load");
 });
+
+// Custom starts (review, Minor 17): only a real month or date is read from a link, and
+// a start before the kind's first price is the field's error, not an empty answer.
+test("a link's start must be a real month or date", () => {
+  assert.equal(S.parseHash("#m=sip&from=2019-13").state.from, null);
+  assert.equal(S.parseHash("#m=sip&from=2019-00").state.from, null);
+  assert.equal(S.parseHash("#m=once&from=2019-02-30").state.from, null);
+  assert.equal(S.parseHash("#m=once&from=2019-02-30").state.y, 5);
+  assert.equal(S.parseHash("#m=sip&from=2019-02").state.from, "2019-02");
+  assert.equal(S.parseHash("#m=once&from=2020-02-29").state.from, "2020-02-29");
+});
+
+test("a start before the kind's first price names that price's date", () => {
+  assert.equal(S.fromError("2003-01-05", "2006-04-03"), "2006-04-03");
+  assert.equal(S.fromError("2006-04-03", "2006-04-03"), null);
+  assert.equal(S.fromError("2010-01-05", "2006-04-03"), null);
+});
