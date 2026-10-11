@@ -27,7 +27,10 @@
       try { value = decodeURIComponent(pair.slice(at + 1)); } catch (e) { return; }
       if (seen[key]) return;
       seen[key] = true;
-      if (key === "a") { if (/^\d{1,9}$/.test(value) && Number(value) > 0) state.a = value; else notes.push("amount"); }
+      if (key === "a") {
+        if (/^\d{1,9}$/.test(value) && Number(value) > 0 && Number(value) <= SIP_MAX_RUPEES) state.a = value;
+        else notes.push("amount");
+      }
       else if (key === "m") { if (value === "sip" || value === "once") state.m = value; }
       else if (key === "y") { if (PERIODS.indexOf(Number(value)) >= 0) state.y = Number(value); }
       else if (key === "from") state.from = value;
@@ -76,8 +79,27 @@
     return { a: String(Number(m[1])), error: null };
   }
 
+  // §4.6.4. Chart 2's dots, one a fund: the range by id (so a redraw places them the
+  // same), the middle a ring, the index fund a diamond, each marked outcome named. A
+  // marked fund already in the range (an added fund of the kind) marks its own dot.
+  function pointsOf(s) {
+    var r = s.r, idx = s.idx;
+    var points = r.sorted.slice().sort(function (a, b) { return a.fund.id < b.fund.id ? -1 : 1; }).map(function (o) {
+      return { o: o, name: o.fund.name,
+               mark: o === r.middle ? "middle" : idx && o.fund.id === idx.fund.id ? "index" : null };
+    });
+    var at = function (id) { return points.filter(function (p) { return p.o.fund.id === id; })[0]; };
+    if (idx && !at(idx.fund.id)) points.push({ o: idx, name: idx.fund.name, mark: "index" });
+    (s.marked || []).forEach(function (m) {
+      var p = at(m.o.fund.id);
+      if (p) { p.mark = "added"; p.name = m.label; p.hue = m.hue; }
+      else points.push({ o: m.o, name: m.label, mark: "added", hue: m.hue });
+    });
+    return points;
+  }
+
   var api = { parseHash: parseHash, writeHash: writeHash, scaled: scaled, readAmount: readAmount,
-              SIP_MAX_RUPEES: SIP_MAX_RUPEES };
+              SIP_MAX_RUPEES: SIP_MAX_RUPEES, pointsOf: pointsOf };
   if (typeof module === "object" && module.exports) { module.exports = api; return; }
 
   // --- in the browser: the strip /sip/ and Your portfolio share (§6.2) -------------
@@ -157,24 +179,14 @@
         el("summary", null, "All " + s.r.n + " fund" + (s.r.n === 1 ? "" : "s") + " as a table"), endsTable(s)) : null, outList(s));
       return;
     }
-    var mark = function (o) {
-      return o === s.r.middle ? "middle" : s.idx && o.fund.id === s.idx.fund.id ? "index" : null;
-    };
     var caption = function (o) {
       return rupees(o.valuePaise) + " · " + returnText(o, s.first, s.valuedOn) + " · lowest: " + lowText(o).toLowerCase() +
         (o.fund.labels && o.fund.labels.ter ? " · expense ratio " + o.fund.labels.ter : "");
     };
     var r = s.r, idx = s.idx;
-    var points = r.sorted.slice().sort(function (a, b) { return a.fund.id < b.fund.id ? -1 : 1; }).map(function (o) {
-      return { name: o.fund.name, x: Math.round(o.valuePaise / 100), caption: caption(o), mark: mark(o),
-               href: fundPage(o.fund) };
-    });
-    if (idx && !r.sorted.some(function (o) { return o.fund.id === idx.fund.id; })) {
-      points.push({ name: idx.fund.name, x: Math.round(idx.valuePaise / 100), caption: caption(idx), mark: "index", href: fundPage(idx.fund) });
-    }
-    (s.marked || []).forEach(function (m) {
-      points.push({ name: m.label, x: Math.round(m.o.valuePaise / 100), caption: caption(m.o), mark: "added", hue: m.hue,
-                    href: fundPage(m.o.fund) });
+    var points = pointsOf(s).map(function (p) {
+      return { name: p.name, x: Math.round(p.o.valuePaise / 100), caption: caption(p.o), mark: p.mark, hue: p.hue,
+               href: fundPage(p.o.fund) };
     });
     var spec = { charts: [{ kind: "dots", title: "Where each fund ended", putIn: Math.round(s.putPaise / 100),
                             putInLabel: "Put in " + rupees(s.putPaise), points: points }] };

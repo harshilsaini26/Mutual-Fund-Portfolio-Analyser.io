@@ -376,3 +376,23 @@ test("an amount is read as whole rupees, or kept with a reason", () => {
   assert.deepEqual(S.readAmount("10,00,00,001", "5000"), { a: "5000", error: "cap" });
   assert.equal(S.SIP_MAX_RUPEES * 100, M.SIP_MAX_PAISE);
 });
+
+test("a link's amount over ₹10 crore is not read, and the page says so", () => {
+  const over = S.parseHash("#a=200000000");
+  assert.equal(over.state.a, "5000");
+  assert.deepEqual(over.notes, ["amount"]);
+  assert.equal(S.parseHash("#a=100000000").state.a, "100000000");
+});
+
+// Chart 2's dots (review, Minor 6): one a fund. A fund added by name that is already
+// in the range (a fund page's link adds the fund itself) marks its own dot.
+test("an added fund in the range is one dot, named", () => {
+  const outs = ["A", "B", "C"].map((id, i) => ({ fund: { id, name: "Fund " + id }, valuePaise: (i + 1) * 1000 }));
+  const r = M.spread(outs);
+  const added = S.pointsOf({ r, idx: null, marked: [{ o: outs[0], label: "Fund A", hue: 2 }] });
+  assert.equal(added.length, 3);
+  assert.deepEqual(added.filter((p) => p.mark === "added").map((p) => [p.o.fund.id, p.name, p.hue]), [["A", "Fund A", 2]]);
+  // Yours (Part C) is never one of the others: one more dot.
+  const yours = { fund: { id: "H", name: "Mine" }, valuePaise: 1500 };
+  assert.equal(S.pointsOf({ r, idx: null, marked: [{ o: yours, label: "Yours", hue: 2 }] }).length, 4);
+});
