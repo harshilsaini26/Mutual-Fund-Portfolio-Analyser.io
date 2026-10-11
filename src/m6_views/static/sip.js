@@ -98,8 +98,15 @@
     return points;
   }
 
+  // How far below: one decimal of a percent, or "less than 0.1%" where one decimal
+  // would read 0.0% (a day's stamp duty is 0.005%).
+  function fallText(fraction) {
+    var v = Math.abs(fraction * 100);
+    return v < 0.05 ? "less than 0.1%" : v.toFixed(1) + "%";
+  }
+
   var api = { parseHash: parseHash, writeHash: writeHash, scaled: scaled, readAmount: readAmount,
-              SIP_MAX_RUPEES: SIP_MAX_RUPEES, pointsOf: pointsOf };
+              SIP_MAX_RUPEES: SIP_MAX_RUPEES, pointsOf: pointsOf, fallText: fallText };
   if (typeof module === "object" && module.exports) { module.exports = api; return; }
 
   // --- in the browser: the strip /sip/ and Your portfolio share (§6.2) -------------
@@ -113,7 +120,7 @@
   var BASE = host.getAttribute("data-root") || "";
 
   function rupees(paise) { return INR.format(Math.round(paise / 100)); }
-  function pct(fraction) { return Math.abs(fraction * 100).toFixed(1) + "%"; }
+  var pct = fallText;   // every percent this page prints is how far below
   function signed(fraction) {
     var v = fraction * 100;
     return (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1) + "%";
@@ -465,12 +472,7 @@
     var r = M.spread(outcomes);
     // The index fund and added funds: valued on the same date, where they could take
     // every instalment.
-    function eligible(f) {
-      var both = new Map(kindSeries);
-      both.set(f.id, series.get(f.id));
-      var p = M.poolOf([f], both, w, v.valuedOn);
-      return p.inRange.length ? null : p.out[0].reason;
-    }
+    function eligible(f) { return M.eligibleOn(series.get(f.id), w.first, v.valuedOn); }
     var idx = index && !eligible(index.fund) && index.fund.plan !== "regular"
       ? Object.assign({ fund: index.fund, sharedBy: index.sharedBy }, M.outcome(w.buys, series.get(index.fund.id), v.valuedOn))
       : null;
@@ -480,7 +482,7 @@
         : Object.assign({ fund: f }, M.outcome(w.buys, series.get(f.id), v.valuedOn));
     });
     answer(w, v, r, name, idx, adds, pool, kindSeries);
-    notIndex(index, idx, name, w);
+    notIndex(index, idx, name, w, index && eligible(index.fund), series);
     if (r.n >= 3) {
       sections(true);
       // The answer is painted first; the charts follow, once charts.js is there
@@ -585,13 +587,16 @@
     })));
   }
 
-  function notIndex(index, idx, name, w) {
+  // Why the index fund is not drawn: each reason M.eligibleOn gives, in words.
+  function notIndex(index, idx, name, w, why, series) {
     var li = out("no-index");
     li.hidden = !!idx;
-    li.textContent = idx ? "" : index
-      ? index.fund.name + ", the index fund on the benchmark of " + index.sharedBy + " of these funds, has no prices back to " +
-        M.day(w.first) + ", so it is not shown."
-      : "No index fund follows the benchmark of " + name + " funds here.";
+    if (idx) { li.textContent = ""; return; }
+    if (!index) { li.textContent = "No index fund follows the benchmark of " + name + " funds here."; return; }
+    var s = series.get(index.fund.id);
+    li.textContent = index.fund.name + ", the index fund on the benchmark of " + index.sharedBy + " of these funds, " +
+      (why === "stale" ? "has no price since " + M.day(s.dates[s.dates.length - 1])
+        : why === "load" ? "did not load" : "has no prices back to " + M.day(w.first)) + ", so it is not shown.";
   }
 
   function chartsFailed() { say("The charts did not load; the tables below hold the same figures."); }

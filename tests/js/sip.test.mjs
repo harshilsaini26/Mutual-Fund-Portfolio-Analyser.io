@@ -396,3 +396,21 @@ test("an added fund in the range is one dot, named", () => {
   const yours = { fund: { id: "H", name: "Mine" }, valuePaise: 1500 };
   assert.equal(S.pointsOf({ r, idx: null, marked: [{ o: yours, label: "Yours", hue: 2 }] }).length, 4);
 });
+
+// A fall too small for one decimal (review, Minor 11) is not "0.0% below".
+test("a fall reads to one decimal, or as less than 0.1%", () => {
+  assert.equal(S.fallText(-0.0123), "1.2%");
+  assert.equal(S.fallText(-0.0005), "0.1%");
+  assert.equal(S.fallText(-0.00049), "less than 0.1%");
+  assert.equal(S.fallText(-0.00004), "less than 0.1%");
+});
+
+// An index or added fund beside the range (review, Minor 15): valued on V or not at
+// all, never on an earlier date under V's name.
+test("a fund beside the range needs a price from the first purchase to V", () => {
+  const s = series([["2024-01-02", "10"], ["2024-06-03", "11"], ["2024-09-20", "12"]]);
+  assert.equal(M.eligibleOn(s, "2024-01-05", "2024-09-20"), null);
+  assert.equal(M.eligibleOn(s, "2024-01-05", "2024-09-24"), "stale");
+  assert.equal(M.eligibleOn(s, "2023-12-05", "2024-09-20"), "later");
+  assert.equal(M.eligibleOn(null, "2024-01-05", "2024-09-20"), "load");
+});

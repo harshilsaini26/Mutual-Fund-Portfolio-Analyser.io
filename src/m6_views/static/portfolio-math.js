@@ -694,6 +694,15 @@
   // §4.5. The index fund a kind is measured against: the `tracker` most of its funds
   // name (each fund's benchmark, as its page draws it); on a tie the one with the
   // longer record, then the lower id. None when none names one.
+  // An index or added fund beside a range is valued on V, so it needs a price from
+  // the first purchase to V: else why not ("load", "later", "stale").
+  function eligibleOn(series, first, valuedOn) {
+    var last = lastOf(series);
+    if (!last) return "load";
+    if (series.dates[0] > first) return "later";
+    return last < valuedOn ? "stale" : null;
+  }
+
   // "1st", "2nd", "3rd", "11th", "21st": worked out, never templated (§6.2).
   function ordinal(n) {
     var tens = n % 100, ones = n % 10;
@@ -762,7 +771,7 @@
   var api = {
     valuationDate: valuationDate, windowOf: windowOf, poolOf: poolOf, outcome: outcome,
     spread: spread, pathsOf: pathsOf, gridOf: gridOf, indexFor: indexFor, cutAt: cutAt, SIP_MAX_PAISE: SIP_MAX_PAISE,
-    ordinal: ordinal, against: against,
+    ordinal: ordinal, against: against, eligibleOn: eligibleOn,
     toPaise: toPaise, toMicro: toMicro, parseNavFile: parseNavFile, allot: allot,
     sipDates: sipDates, purchasesOf: purchasesOf, position: position, xirr: xirr,
     showsXirr: showsXirr, isSynthetic: isSynthetic, lookThrough: lookThrough,
