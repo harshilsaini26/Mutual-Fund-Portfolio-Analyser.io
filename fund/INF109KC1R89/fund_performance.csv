@@ -1,0 +1,25 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-16
+# Data as of: 16 Oct 2026 (0 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the capture ratios rest on 6 rising and 7 falling months of the benchmark; that few makes them rough.
+# Generated: 2026-10-16T23:07:24.935259+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.073590,0.078845,0.068324,"Annualised, with dividends reinvested."
+Benchmark a year,-0.073007,0.079660,,"The benchmark over the same days, dividends included."
+Ahead of benchmark,-0.000583,-0.000815,,The fund's return a year less the benchmark's.
+Volatility,0.130935,0.130337,0.131719,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.133195,-0.250756,-0.250756,The largest fall from a high within the period.
+Sharpe ratio,-0.969137,0.139730,0.073270,Return above cash for each unit of volatility.
+Sortino ratio,-1.284040,0.196299,0.101652,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.135875,0.020042,,Return above cash for each unit of beta.
+Alpha a year,-0.008932,0.000923,,Return beyond what its beta to the benchmark accounts for.
+Beta,0.933902,0.908682,,How far it moved for each 1% the benchmark moved.
+Tracking error,0.040551,0.051890,,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,-0.014377,-0.015706,,Its lead over the benchmark for each unit of tracking error.
+Up capture,1.031959,1.000645,,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,1.016823,1.003568,,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."
