@@ -48,7 +48,7 @@ dependencies = [
     # manifest icons with it (`jobs/share_image.py`, UI/UX critique G-11). It was
     # only present here as pdfplumber's dependency, under the optional `cas`
     # extra, so CI and the nightly build -- which install neither -- had none.
-    "pillow==12.3.0",
+    "pillow==13.0.0",
 ]
 
 # `cas/pdf.py` imports these INSIDE its functions so the ledger stays
