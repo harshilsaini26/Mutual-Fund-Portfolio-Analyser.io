@@ -1,0 +1,56 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 80.1% of portfolio value | Unresolved: 19.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 80.1% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 19.9% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-31T00:18:20.139142+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Shares,19.874734
+Units of Other Schemes,Other funds,12.241914
+TREPS / Repo / Reverse Repo,Cash and equivalents,8.206201
+ICICI Bank Ltd.,Shares,5.880557
+HDFC Bank Ltd.,Shares,4.352831
+Margin / Deposits,Cash and equivalents,3.742270
+Bharti Airtel  Ltd.,Shares,3.728952
+Max Healthcare Institute Limited,Shares,2.356058
+Info Edge(India) Ltd.,Shares,2.095767
+Kotak Mahindra Bank Ltd.,Shares,2.076209
+Reliance Industries Ltd,Shares,2.056133
+Bajaj Finance Limited,Shares,1.964817
+Larsen & Toubro Limited,Shares,1.879624
+Vishal Mega Mart Limited,Shares,1.829010
+Varun Beverages Limited,Shares,1.613306
+Jubilant Foodworks Limited,Shares,1.605876
+One 97 Communications Limited,Shares,1.604181
+Delhivery Limited,Shares,1.570976
+Indian Hotels Co. Ltd,Shares,1.556817
+TATA STEEL LIMITED,Shares,1.534965
+Persistent Systems Limited,Shares,1.490626
+Lenskart Solutions Limited,Shares,1.488939
+Hindustan Aeronautics Limited,Shares,1.442576
+InterGlobe Aviation Limited,Shares,1.438280
+Gujarat Fluorochemicals Limited,Shares,1.437031
+UltraTech Cement Ltd,Shares,1.401145
+Dr. Lal Pathlabs Limited,Shares,1.392641
+Max Financial Services Limited,Shares,1.358574
+Torrent Pharmaceuticals Ltd.,Shares,1.339418
+Tech Mahindra Limited,Shares,1.297117
+Divi's Laboratories Ltd.,Shares,1.193163
+Government Securities,Bonds and other debt,1.091006
+PB Fintech Limited,Shares,0.925332
+FSN E-Commerce Ventures Limited,Shares,0.887218
+Mrs. Bectors Food Specialities Limited,Shares,0.853626
+TVS Motor Company Ltd.,Shares,0.834535
+APL Apollo Tubes Limited,Shares,0.806423
+GE Vernova T&D India Limited,Shares,0.610766
+Bharat Electronics Ltd.,Shares,0.544561
+Hindustan Petroleum Corporation Ltd,Shares,0.409535
+Net Receivables / Payables,Cash and equivalents,-0.271441
+Derivative Positions,Derivatives,-3.742269

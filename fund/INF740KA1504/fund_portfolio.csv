@@ -1,0 +1,76 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 83.9% of portfolio value | Unresolved: 16.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 83.9% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 16.1% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-31T00:18:27.890247+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,33.082296
+Unresolved Holdings,Bonds and other debt,16.122384
+Government Securities,Bonds and other debt,10.452299
+HDFC Bank Ltd.,Shares,7.252307
+AXIS Bank Ltd.,Shares,4.690118
+Kotak Mahindra Bank Ltd.,Shares,3.680025
+ITC Ltd,Shares,3.239848
+Mahindra & Mahindra Ltd.,Shares,3.101966
+Reliance Industries Ltd,Shares,3.096923
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.859104
+NTPC Limited,Shares,2.455751
+ICICI Bank Ltd.,Shares,2.343924
+VODAFONE IDEA LIMITED,Shares,2.278515
+Cipla Ltd.,Shares,2.068108
+Bharti Airtel  Ltd.,Shares,2.040923
+Hindalco Industries Ltd.,Shares,1.857762
+INDUS TOWERS LIMITED,Shares,1.819629
+Larsen & Toubro Limited,Shares,1.781749
+Sun Pharmaceutical Industries Ltd.,Shares,1.752552
+Titan Company Limited,Shares,1.554829
+Net Receivables / Payables,Cash and equivalents,1.485750
+Indigo Paints Limited,Shares,1.392891
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,1.368686
+Alkem Laboratories Limited,Shares,1.196285
+SBI Life Insurance Company Limited,Shares,1.143233
+PETRONET LNG LTD.,Shares,1.035824
+Infosys Ltd,Shares,1.028675
+Bank Of Baroda,Shares,0.985104
+Bandhan Bank Limited,Shares,0.983012
+HDFC Asset Management Company Limited,Shares,0.971695
+Hero MotoCorp Limited,Shares,0.966632
+Maruti Suzuki India  Ltd.,Shares,0.953802
+Oil And Natural Gas Corporation Ltd,Shares,0.903296
+Syngene International Limited,Shares,0.864146
+State Bank Of India,Shares,0.850772
+Canara HSBC Life Insurance Company Limited,Shares,0.846979
+ICICI Lombard General Insurance Company Limited,Shares,0.837265
+Knowledge Realty Trust,"REITs, InvITs and other",0.821138
+Punjab National Bank,Shares,0.802721
+Hindustan Aeronautics Limited,Shares,0.678122
+Coromandel International Limited,Shares,0.541273
+NMDC Ltd,Shares,0.455170
+LIFE INSURANCE CORPORATION OF INDIA,Shares,0.449282
+Tata Power Co. Ltd,Shares,0.441751
+Ambuja Cements Ltd.,Shares,0.343068
+Brookfield India Real Estate Trust,"REITs, InvITs and other",0.305330
+Cyient Limited,Shares,0.285562
+ALEMBIC PHARMACEUTICALS LIMITED,Shares,0.264738
+TVS Motor Company Ltd.,Shares,0.242049
+Indian Oil Corporation Ltd.,Shares,0.218203
+Hindustan Petroleum Corporation Ltd,Shares,0.204269
+La Opala RG Ltd.,Shares,0.200052
+POWER GRID CORPORATION OF INDIA LIMITED,Shares,0.193982
+JSW Steel Limited,Shares,0.175383
+Biocon Ltd.,Shares,0.173913
+OBEROI REALTY LIMITED,Shares,0.172815
+United Spirits Limited,Shares,0.136833
+Ipca Laboratories Ltd.,Shares,0.099678
+Lic Housing Finance Ltd.,Shares,0.084150
+Bharat Electronics Ltd.,Shares,0.077066
+Steel Authority of India Ltd.,Shares,0.033155
+Derivative Positions,Derivatives,-32.744762

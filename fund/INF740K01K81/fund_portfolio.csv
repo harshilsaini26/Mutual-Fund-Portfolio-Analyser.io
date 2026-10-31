@@ -1,0 +1,63 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 80.2% of portfolio value | Unresolved: 19.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 80.2% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 19.8% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-31T00:18:26.769585+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,19.839435
+Margin / Deposits,Cash and equivalents,16.916434
+ICICI Bank Ltd.,Shares,7.407106
+HDFC Bank Ltd.,Shares,7.277012
+Government Securities,Bonds and other debt,5.598592
+AXIS Bank Ltd.,Shares,4.959393
+State Bank Of India,Shares,4.270565
+Bharti Airtel  Ltd.,Shares,3.956376
+TREPS / Repo / Reverse Repo,Cash and equivalents,3.869797
+Kotak Mahindra Bank Ltd.,Shares,3.859343
+Bajaj Finserv Limited,Shares,2.008006
+Bandhan Bank Limited,Shares,1.874410
+Titan Company Limited,Shares,1.850883
+TATA STEEL LIMITED,Shares,1.791166
+SBI Life Insurance Company Limited,Shares,1.547909
+Reliance Industries Ltd,Shares,1.502928
+LG Electronics India Limited,Shares,1.475502
+Oil And Natural Gas Corporation Ltd,Shares,1.457585
+Cipla Ltd.,Shares,1.399474
+LIFE INSURANCE CORPORATION OF INDIA,Shares,1.395125
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,1.358168
+Mahindra & Mahindra Ltd.,Shares,1.298712
+NTPC Limited,Shares,1.237011
+Hindalco Industries Ltd.,Shares,1.199695
+Bank Of Baroda,Shares,1.141597
+Punjab National Bank,Shares,1.103804
+Hindustan Unilever Ltd.,Shares,1.066453
+Max Financial Services Limited,Shares,1.065878
+Mankind Pharma Limited,Shares,1.038387
+Alkem Laboratories Limited,Shares,1.027393
+PNB Housing Finance Limited,Shares,1.010658
+ITC Ltd,Shares,0.970373
+Bharat Electronics Ltd.,Shares,0.967786
+Century Plyboards (India) Ltd.,Shares,0.812909
+HYUNDAI MOTOR INDIA LIMITED,Shares,0.776476
+COFORGE LIMITED,Shares,0.728474
+Infosys Ltd,Shares,0.688177
+Emami Ltd,Shares,0.647762
+Maruti Suzuki India  Ltd.,Shares,0.633279
+Samvardhana Motherson International Limited,Shares,0.578616
+Mrs. Bectors Food Specialities Limited,Shares,0.567090
+Syngene International Limited,Shares,0.562417
+Hindustan Aeronautics Limited,Shares,0.551220
+PB Fintech Limited,Shares,0.503863
+Tata Motors Limited,Shares,0.468194
+Canara HSBC Life Insurance Company Limited,Shares,0.226401
+La Opala RG Ltd.,Shares,0.212458
+Net Receivables / Payables,Cash and equivalents,0.194029
+Derivative Positions,Derivatives,-16.894321

@@ -1,0 +1,15 @@
+﻿# View: fund_performance
+# Question: How has it done for the risk taken?
+# As of: 2026-10-31
+# Data as of: 30 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - Benchmark comparisons are left out of this public copy: the index data is licensed for personal use. The self-hosted app shows them.
+# Generated: 2026-10-31T00:22:34.750187+00:00
+measure,1y,3y,5y,meaning
+Return a year,0.247831,0.238531,0.100509,"Annualised, with dividends reinvested."
+Volatility,0.190248,0.188138,0.180654,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.097186,-0.157355,-0.277299,The largest fall from a high within the period.
+Sharpe ratio,1.022776,0.946656,0.230806,Return above cash for each unit of volatility.
+Sortino ratio,1.532363,1.401870,0.334459,Return above cash for each unit of downward swings only.

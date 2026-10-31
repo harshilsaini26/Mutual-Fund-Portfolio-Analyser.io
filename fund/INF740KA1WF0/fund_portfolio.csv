@@ -1,0 +1,35 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 92.6% of portfolio value | Unresolved: 7.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 92.6% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 7.4% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-31T00:18:35.988803+00:00
+holding,kind,weight_pct
+Sun Pharmaceutical Industries Ltd.,Shares,17.008019
+Divi's Laboratories Ltd.,Shares,10.439556
+Unresolved Holdings,Shares,7.431201
+Laurus Labs Limited,Shares,6.818455
+Cipla Ltd.,Shares,6.698073
+Dr. Reddy's Laboratories Ltd.,Shares,6.648716
+Torrent Pharmaceuticals Ltd.,Shares,6.246238
+Max Healthcare Institute Limited,Shares,6.118633
+Lupin Ltd,Shares,4.361051
+Aurobindo Pharma Ltd.,Shares,4.085776
+Fortis Healthcare Ltd,Shares,3.547667
+Glenmark Pharmaceuticals ltd,Shares,3.108673
+Alkem Laboratories Limited,Shares,2.753545
+Zydus Lifesciences Limited,Shares,2.546086
+Mankind Pharma Limited,Shares,2.508768
+Ipca Laboratories Ltd.,Shares,2.367118
+Biocon Ltd.,Shares,2.282048
+Gland Pharma Limited,Shares,2.042888
+Krishna Institute of Medical Sciences Limited,Shares,1.761194
+Abbott India Ltd.,Shares,1.251575
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.384020
+Net Receivables / Payables,Cash and equivalents,-0.409300

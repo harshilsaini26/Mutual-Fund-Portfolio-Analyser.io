@@ -1,0 +1,19 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 22.9% of portfolio value | Unresolved: 77.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 22.9% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 77.1% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-10-31T00:17:30.066551+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,77.138118
+Cash & Bank Balance,Cash and equivalents,12.364220
+Government Securities,Bonds and other debt,9.443014
+Derivative Positions,Derivatives,2.621027
+Union Bank of India,Bonds and other debt,2.172541
+Canara Bank,Bonds and other debt,1.082746
+Net Receivables / Payables,Cash and equivalents,-4.821666

@@ -1,0 +1,26 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-10-31
+# Data as of: 30 Oct 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the capture ratios rest on 7 rising and 6 falling months of the benchmark; that few makes them rough.
+#   - Over 3 years the capture ratios rest on 26 rising and 11 falling months of the benchmark; that few makes them rough.
+# Generated: 2026-10-31T00:21:18.978355+00:00
+measure,1y,3y,5y,meaning
+Return a year,-0.027195,0.161608,0.104460,"Annualised, with dividends reinvested."
+Benchmark a year,-0.029731,0.158914,0.101510,"The benchmark over the same days, dividends included."
+Ahead of benchmark,0.002536,0.002694,0.002950,The fund's return a year less the benchmark's.
+Volatility,0.175115,0.185299,0.178734,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.143605,-0.263357,-0.263357,The largest fall from a high within the period.
+Sharpe ratio,-0.459384,0.546031,0.255391,Return above cash for each unit of volatility.
+Sortino ratio,-0.622163,0.740229,0.341169,Return above cash for each unit of downward swings only.
+Treynor ratio,-0.080410,0.101216,0.045697,Return above cash for each unit of beta.
+Alpha a year,0.002572,0.002730,0.002997,Return beyond what its beta to the benchmark accounts for.
+Beta,1.000435,0.999637,0.998896,How far it moved for each 1% the benchmark moved.
+Tracking error,0.001269,0.002325,0.002776,"How far its daily returns strayed from the benchmark's, a year."
+Information ratio,1.998424,1.158710,1.062680,Its lead over the benchmark for each unit of tracking error.
+Up capture,1.008280,1.001571,1.001397,"Its yearly gain over the months the benchmark rose, as a share of the benchmark's."
+Down capture,0.997062,0.993569,0.991981,"Its yearly loss over the months the benchmark fell, as a share of the benchmark's."

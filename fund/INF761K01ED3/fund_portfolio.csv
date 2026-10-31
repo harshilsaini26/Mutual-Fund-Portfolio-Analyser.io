@@ -1,0 +1,44 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 98.2% of portfolio value | Unresolved: 1.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-31T00:17:53.796779+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,80.545948
+Units of Other Schemes,Other funds,12.101939
+TATA STEEL LIMITED,Shares,5.856735
+Canara Bank,Shares,5.822790
+HDFC Bank Ltd.,Shares,4.865747
+Vedanta Ltd.,Shares,4.624974
+VODAFONE IDEA LIMITED,Shares,4.094496
+Steel Authority of India Ltd.,Shares,4.081406
+Bank Of Baroda,Shares,4.018121
+Government Securities,Bonds and other debt,3.991759
+Kotak Mahindra Bank Ltd.,Shares,3.689326
+TREPS / Repo / Reverse Repo,Cash and equivalents,3.613673
+Reliance Industries Ltd,Shares,3.268447
+Samvardhana Motherson International Limited,Shares,2.991292
+JSW Steel Limited,Shares,2.902458
+Power Finance Corporation Ltd,Shares,2.826894
+Bajaj Finance Limited,Shares,2.728310
+Bharat Forge Ltd,Shares,2.434273
+State Bank Of India,Shares,2.143937
+AXIS Bank Ltd.,Shares,2.075325
+Unresolved Holdings,Shares,1.750773
+Aurobindo Pharma Ltd.,Shares,1.743461
+Hindustan Unilever Ltd.,Shares,1.679453
+Divi's Laboratories Ltd.,Shares,1.677648
+Ambuja Cements Ltd.,Shares,1.256046
+UPL Limited,Shares,1.122434
+Biocon Ltd.,Shares,1.086503
+Container Corporation Of India Ltd.,Shares,1.010037
+Computer Age Management Services Limited,Shares,0.899536
+Godrej Properties Limited,Shares,0.382240
+UltraTech Cement Ltd,Shares,0.098945
+Derivative Positions,Derivatives,-71.384926

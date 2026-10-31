@@ -1,0 +1,19 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 39.6% of portfolio value | Unresolved: 60.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 39.6% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 60.4% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-10-31T00:16:33.532111+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,60.445692
+Government Securities,Bonds and other debt,26.544420
+TREPS / Repo / Reverse Repo,Cash and equivalents,5.502868
+EMBASSY OFFICE PARKS REIT,"REITs, InvITs and other",4.711663
+Net Receivables / Payables,Cash and equivalents,1.507489
+Brookfield India Real Estate Trust,"REITs, InvITs and other",1.043273
+MINDSPACE BUSINESS PARKS REIT,"REITs, InvITs and other",0.244595

@@ -1,0 +1,19 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 18.2% of portfolio value | Unresolved: 81.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 18.2% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 81.8% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-10-31T00:17:18.592080+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,81.777269
+Government Securities,Bonds and other debt,16.935449
+Net Receivables / Payables,Cash and equivalents,1.001507
+Knowledge Realty Trust,"REITs, InvITs and other",0.247374
+EMBASSY OFFICE PARKS REIT,"REITs, InvITs and other",0.057531
+Derivative Positions,Derivatives,-0.019130

@@ -1,0 +1,67 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 82.6% of portfolio value | Unresolved: 17.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 82.6% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 17.4% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-31T00:19:01.699010+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,47.929455
+Unresolved Holdings,Bonds and other debt,17.376830
+Net Receivables / Payables,Cash and equivalents,9.469790
+AXIS Bank Ltd.,Shares,6.453005
+Cash & Bank Balance,Cash and equivalents,4.795378
+Bharti Airtel  Ltd.,Shares,4.496089
+Government Securities,Bonds and other debt,4.447338
+NTPC Limited,Shares,4.149692
+Kotak Mahindra Bank Ltd.,Shares,4.095584
+Hindustan Aeronautics Limited,Shares,3.876153
+Mahindra & Mahindra Ltd.,Shares,3.629596
+Titan Company Limited,Shares,3.368611
+Reliance Industries Ltd,Shares,2.850962
+VODAFONE IDEA LIMITED,Shares,2.231383
+RBL Bank Limited,Shares,2.012452
+UltraTech Cement Ltd,Shares,1.565161
+Jio Financial Services Limited,Shares,1.547233
+ICICI Bank Ltd.,Shares,1.519964
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,1.484500
+Tata Power Co. Ltd,Shares,1.450124
+Larsen & Toubro Limited,Shares,1.436874
+Meesho Limited,Shares,1.375838
+Cipla Ltd.,Shares,1.195800
+Bank Of Baroda,Shares,1.083798
+HDFC Bank Ltd.,Shares,1.004851
+Infosys Ltd,Shares,1.004833
+INDUS TOWERS LIMITED,Shares,0.996994
+State Bank Of India,Shares,0.774456
+Bajaj Finserv Limited,Shares,0.714044
+Britannia Industries Ltd.,Shares,0.690008
+AU Small Finance Bank Limited,Shares,0.631454
+HCL Technologies Ltd,Shares,0.615007
+Pine Labs Limited,Shares,0.613543
+Maruti Suzuki India  Ltd.,Shares,0.534256
+Bharat Electronics Ltd.,Shares,0.526988
+ITC Ltd,Shares,0.526095
+Bajaj Finance Limited,Shares,0.513970
+Ambuja Cements Ltd.,Shares,0.512917
+Hindustan Petroleum Corporation Ltd,Shares,0.506756
+Godrej Properties Limited,Shares,0.500917
+Cholamandalam Investment and Finance Company Ltd,Shares,0.491792
+Marico Limited,Shares,0.463184
+Sun Pharmaceutical Industries Ltd.,Shares,0.454148
+Bandhan Bank Limited,Shares,0.446845
+Hindustan Unilever Ltd.,Shares,0.442934
+SBI Life Insurance Company Limited,Shares,0.352165
+ICICI Lombard General Insurance Company Limited,Shares,0.227146
+Asian Paints Ltd.,Shares,0.214520
+Max Financial Services Limited,Shares,0.196199
+Yes Bank Ltd.,Shares,0.093073
+JSW Steel Limited,Shares,0.030215
+SEDEMAC MECHATRONICS LIMITED,Shares,0.008554
+Derivative Positions,Derivatives,-47.929474

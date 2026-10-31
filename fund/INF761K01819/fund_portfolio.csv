@@ -1,0 +1,40 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 60.8% of portfolio value | Unresolved: 39.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 60.8% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 39.2% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-31T00:17:54.785050+00:00
+holding,kind,weight_pct
+Unresolved Holdings,Bonds and other debt,39.223068
+TREPS / Repo / Reverse Repo,Cash and equivalents,21.458149
+Government Securities,Bonds and other debt,18.213603
+Net Receivables / Payables,Cash and equivalents,2.636289
+Glenmark Pharmaceuticals ltd,Shares,2.301975
+State Bank Of India,Shares,1.601038
+Hindustan Copper Ltd.,Shares,1.392015
+ICICI Bank Ltd.,Shares,1.202864
+NTPC Limited,Shares,1.101538
+Adani Ports and Special Economic Zone Ltd,Shares,1.050117
+Balrampur Chini Mills Ltd.,Shares,1.005521
+Bharat Electronics Ltd.,Shares,0.941965
+Bharti Airtel  Ltd.,Shares,0.932864
+POWER GRID CORPORATION OF INDIA LIMITED,Shares,0.908898
+Asian Paints Ltd.,Shares,0.820010
+Dr. Reddy's Laboratories Ltd.,Shares,0.748112
+Physical Commodity,Shares,0.737797
+S.J.S. Enterprises Limited,Shares,0.673331
+Larsen & Toubro Limited,Shares,0.570336
+Reliance Industries Ltd,Shares,0.522101
+Mahindra & Mahindra Ltd.,Shares,0.492219
+UltraTech Cement Ltd,Shares,0.481904
+Britannia Industries Ltd.,Shares,0.366320
+HDFC Bank Ltd.,Shares,0.214938
+Max Financial Services Limited,Shares,0.165034
+ZAGGLE PREPAID OCEAN SERVICES LIMITED,Shares,0.121803
+Laxmi Dental Limited,Shares,0.116191

@@ -1,0 +1,608 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'">
+  <meta name="referrer" content="no-referrer">
+  
+  <title>What would a SIP have become?</title><meta name="description" content="Enter an amount and a period, pick a kind of fund, and see what it would be worth today in every fund of that kind, at their real past prices. Descriptive, not advice.">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#134585" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+  
+  <link rel="manifest" href="/static/site.webmanifest">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <meta property="og:site_name" content="Look-through">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="What would a SIP have become?">
+  <meta property="og:description" content="Enter an amount and a period, pick a kind of fund, and see what it would be worth today in every fund of that kind, at their real past prices. Descriptive, not advice.">
+  <meta property="og:image" content="https://didmysipwork.vercel.app/static/share.png">
+  <meta name="twitter:card" content="summary_large_image">
+  
+  <script src="/static/settings.js"></script>
+  <link rel="stylesheet" href="/static/lenis.css">
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="preload" href="/funds.json" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/118269.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/118479.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/118531.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/118617.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/118632.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/118825.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/118870.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/119018.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/119133.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/119160.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/119250.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/119528.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/119598.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/120030.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/120152.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/120267.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/120392.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/120465.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/120490.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/120586.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/120656.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/138312.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/141248.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/146549.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/148353.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/148507.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/148980.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/150187.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/150440.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/150797.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/152783.csv.gz" as="fetch" crossorigin>
+  
+  <link rel="preload" href="/data/nav/153239.csv.gz" as="fetch" crossorigin>
+  
+
+</head>
+<body class="is-public" data-root=""
+      >
+<a class="skip-link" href="#content">Skip to content</a>
+
+
+
+
+
+
+
+
+<header class="topbar topbar--public">
+  <a class="brand" href="/"><svg class="icon brand__mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="7.5"/><path d="M16 16l5 5"/><path d="M7.5 13.5v-2M10.5 13.5v-6M13.5 13.5v-4"/></svg><span>Look-through</span></a><button type="button" class="topmenu__summary" popovertarget="topnav">Menu</button>
+  <nav class="topnav" id="topnav" popover aria-label="Main">
+    <a class="topnav__link" href="/funds/"
+       >Explore funds</a>
+    <a class="topnav__link" href="/compare/"
+       >Compare</a>
+    <a class="topnav__link" href="/sip/"
+       aria-current="page">What if</a>
+    <a class="topnav__link" href="/portfolio/"
+       >Your portfolio</a>
+    <a class="topnav__link" href="/learn/"
+       >Learn</a>
+    <a class="topnav__link" href="/#categories">Categories</a>
+    <a class="topnav__link" href="/#about">About the data</a>
+  </nav>
+<form class="search" action="/funds/"
+      method="get" role="search">
+  <label class="sr-only" for="q">Find a fund</label>
+  <svg class="icon search__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg>
+  <input id="q" type="search" autocomplete="off" spellcheck="false"
+         placeholder="Search funds"
+         data-index="/search.json">
+  <ul class="search__suggest" hidden data-lenis-prevent></ul>
+</form>
+  <button class="icon-button icon-button--labelled" type="button" data-settings-open aria-haspopup="dialog"
+        aria-controls="settings" aria-label="Display settings" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span class="icon-button__label">Display</span></button>
+</header><div class="public-note">
+  <p>Descriptive, not advice. Built 31 Oct 2026 from AMFI's data and fund
+  portfolios, most read from an aggregator · <a href="/#about">About this data</a></p>
+</div>
+<main id="content" tabindex="-1" class="content content--public">
+
+<section class="plain sip" data-sip data-root="">
+  <p class="eyebrow">Looking back</p>
+  <h1>What would a SIP have become?</h1>
+  <p class="lede">Enter an amount and a period. See what it would be worth today in real
+    funds, at their real past prices. This looks back; it says nothing of what comes next.</p>
+  <noscript><p class="sip__note">This page works out the figures in your browser, so it
+    needs JavaScript. Nothing you enter would be sent anywhere.</p></noscript>
+
+  <form class="card sip__entry" data-sip-form novalidate>
+    <h2 class="sr-only">Your money</h2>
+    <div class="sip__row">
+      <label class="pf__field" for="sip-amount">
+        <span>Amount <span class="pf__words" data-sip-words aria-live="polite"></span></span>
+        <span class="pf__affix"><span class="pf__prefix">₹</span>
+          <input id="sip-amount" type="text" inputmode="numeric" autocomplete="off"
+                 value="5,000" aria-describedby="sip-amount-error" disabled></span>
+      </label>
+      <fieldset class="sip__choice" data-sip-mode>
+        <legend class="sr-only">How it is put in</legend>
+        <label class="settings__chip"><input type="radio" name="mode" value="sip" checked disabled>Every month (SIP)</label>
+        <label class="settings__chip"><input type="radio" name="mode" value="once" disabled>Once</label>
+      </fieldset>
+    </div>
+    <p class="pf__error" id="sip-amount-error" data-sip-error="amount"></p>
+    <fieldset class="sip__choice" data-sip-period>
+      <legend>For</legend>
+      
+      <label class="settings__chip"><input type="radio" name="period" value="1" disabled>1 year</label>
+      
+      <label class="settings__chip"><input type="radio" name="period" value="3" disabled>3 years</label>
+      
+      <label class="settings__chip"><input type="radio" name="period" value="5" checked disabled>5 years</label>
+      
+      <label class="settings__chip"><input type="radio" name="period" value="10" disabled>10 years</label>
+      
+      <label class="settings__chip"><input type="radio" name="period" value="from" disabled>From a month…</label>
+      <label class="pf__field sip__from" for="sip-from" hidden>
+        <span data-sip-from-label>First instalment</span>
+        <input id="sip-from" type="month" aria-describedby="sip-from-error" disabled>
+      </label>
+    </fieldset><p class="sip__about" id="sip-period-note" hidden></p>
+    <p class="pf__error" id="sip-from-error" data-sip-error="from"></p>
+    <div class="sip__kind">
+      <label class="pf__field" for="sip-kind">Kind of fund
+        <select id="sip-kind" disabled>
+          
+          <optgroup label="Equity">
+            
+            <option value="equity/contra" data-about="Shares chosen against the market&#39;s current view; at least 65% in shares.">Contra (3)</option>
+            
+            <option value="equity/dividend_yield" data-about="Mostly shares that pay high dividends; at least 65% in shares.">Dividend yield (10)</option>
+            
+            <option value="equity/elss" data-about="At least 80% in shares, locked in for 3 years; eligible for tax deduction.">ELSS (tax saver) (43)</option>
+            
+            <option value="equity/flexi_cap" data-about="At least 65% in shares, of any size, in any mix.">Flexi cap (42)</option>
+            
+            <option value="equity/focused" data-about="At most 30 companies, at least 65% in shares.">Focused (28)</option>
+            
+            <option value="equity/large_mid_cap" data-about="At least 35% each in large and mid-sized companies.">Large and mid cap (33)</option>
+            
+            <option value="equity/large_cap" data-about="At least 80% in the 100 largest listed companies." selected>Large cap (32)</option>
+            
+            <option value="equity/mid_cap" data-about="At least 65% in companies ranked 101st to 250th by size.">Mid cap (30)</option>
+            
+            <option value="equity/multi_cap" data-about="At least 25% each in large, mid-sized and small companies.">Multi cap (31)</option>
+            
+            <option value="equity/sectoral" data-about="At least 80% in one sector, such as banks or technology.">Sectoral (17)</option>
+            
+            <option value="equity/small_cap" data-about="At least 65% in companies ranked 251st and below by size.">Small cap (30)</option>
+            
+            <option value="equity/thematic" data-about="At least 80% in one theme across sectors, such as consumption.">Thematic (53)</option>
+            
+            <option value="equity/value" data-about="Shares chosen for a low price against their value; at least 65% in shares.">Value (22)</option>
+            
+          </optgroup>
+          
+          <optgroup label="Hybrid">
+            
+            <option value="hybrid/aggressive" data-about="65% to 80% in shares, the rest in bonds.">Aggressive hybrid (29)</option>
+            
+            <option value="hybrid/arbitrage" data-about="Buys and sells the same shares in different markets for the price gap.">Arbitrage (33)</option>
+            
+            <option value="hybrid/balanced_advantage" data-about="Moves between shares and bonds as the fund&#39;s model directs.">Balanced advantage (dynamic asset allocation) (35)</option>
+            
+            <option value="hybrid/balanced" data-about="40% to 60% in shares and 40% to 60% in bonds.">Balanced hybrid (2)</option>
+            
+            <option value="hybrid/conservative" data-about="75% to 90% in bonds, 10% to 25% in shares.">Conservative hybrid (18)</option>
+            
+            <option value="hybrid/equity_savings" data-about="Shares, arbitrage and bonds together, at least 65% in shares with hedges.">Equity savings (25)</option>
+            
+            <option value="hybrid/multi_asset" data-about="At least 10% each in three asset classes, such as shares, bonds and gold.">Multi asset allocation (31)</option>
+            
+          </optgroup>
+          
+          <optgroup label="Debt">
+            
+            <option value="debt/banking_psu" data-about="At least 80% in bonds of banks, public sector firms and public finance bodies.">Banking and PSU (20)</option>
+            
+            <option value="debt/corporate_bond" data-about="At least 80% in the highest-rated company bonds.">Corporate bond (21)</option>
+            
+            <option value="debt/credit_risk" data-about="At least 65% in company bonds rated below the highest grades.">Credit risk (13)</option>
+            
+            <option value="debt/dynamic_bond" data-about="Bonds of any maturity, changed as rates move, under a heading AMFI has since renamed.">Dynamic bond (earlier AMFI heading) (2)</option>
+            
+            <option value="debt/dynamic_term" data-about="Bonds of any maturity, changed as rates move.">Dynamic term (21)</option>
+            
+            <option value="debt/fixed_term" data-about="Closed-end plans holding bonds that mature with the plan.">Fixed term plans (1)</option>
+            
+            <option value="debt/floating_rate" data-about="At least 65% in bonds whose interest resets with market rates.">Floating interest rates (12)</option>
+            
+            <option value="debt/gilt" data-about="At least 80% in government bonds, of any maturity.">Gilt (23)</option>
+            
+            <option value="debt/gilt_10y" data-about="At least 80% in government bonds, averaging 10 years to maturity.">Gilt, 10-year constant maturity (5)</option>
+            
+            <option value="debt/liquid" data-about="Debt and money-market papers maturing within 91 days.">Liquid (36)</option>
+            
+            <option value="debt/long_term" data-about="Bonds held for an average of more than 7 years.">Long term (11)</option>
+            
+            <option value="debt/low_duration" data-about="Bonds held for an average of 6 to 12 months, under a heading AMFI has since renamed.">Low duration (earlier AMFI heading) (1)</option>
+            
+            <option value="debt/medium_duration" data-about="Bonds held for an average of 3 to 4 years, under a heading AMFI has since renamed.">Medium duration (earlier AMFI heading) (1)</option>
+            
+            <option value="debt/medium_term" data-about="Bonds held for an average of about 3 to 4 years.">Medium term (12)</option>
+            
+            <option value="debt/medium_long_duration" data-about="Bonds held for an average of 4 to 7 years, under a heading AMFI has since renamed.">Medium to long duration (earlier AMFI heading) (1)</option>
+            
+            <option value="debt/medium_long_term" data-about="Bonds held for an average of about 4 to 7 years.">Medium to long term (13)</option>
+            
+            <option value="debt/money_market" data-about="Money-market papers maturing within a year.">Money market (24)</option>
+            
+            <option value="debt/overnight" data-about="Bonds and loans that mature the next day.">Overnight (35)</option>
+            
+            <option value="debt/short_duration" data-about="Bonds held for an average of 1 to 3 years, under a heading AMFI has since renamed.">Short duration (earlier AMFI heading) (3)</option>
+            
+            <option value="debt/short_term" data-about="Bonds held for an average of about 1 to 3 years.">Short term (20)</option>
+            
+            <option value="debt/ultra_short_duration" data-about="Bonds held for an average of 3 to 6 months, under a heading AMFI has since renamed.">Ultra short duration (earlier AMFI heading) (5)</option>
+            
+            <option value="debt/ultra_short_term" data-about="Short-dated bonds, held for months rather than years.">Ultra short term (21)</option>
+            
+            <option value="debt/ultra_short_to_short_term" data-about="Bonds between ultra short and short term.">Ultra short to short term (23)</option>
+            
+          </optgroup>
+          
+          <optgroup label="Index funds, ETFs and more">
+            
+            <option value="etf/debt" data-about="Traded on the stock exchange; track a bond or money-market index.">ETFs, debt (5)</option>
+            
+            <option value="etf/equity" data-about="Traded on the stock exchange like a share; track a share index.">ETFs, equity (11)</option>
+            
+            <option value="etf/gold" data-about="Traded on the stock exchange; hold physical gold.">Gold ETFs (6)</option>
+            
+            <option value="index/debt" data-about="Track a bond index, often one that matures on a set date.">Index funds, debt (20)</option>
+            
+            <option value="index/equity" data-about="Track a share index, such as the Nifty 50, rather than choosing shares.">Index funds, equity (52)</option>
+            
+            <option value="etf/silver" data-about="Traded on the stock exchange; hold physical silver.">Silver ETFs (3)</option>
+            
+          </optgroup>
+          
+          <optgroup label="Solution oriented">
+            
+            <option value="solution/children" data-about="For a child&#39;s goals: locked in for 5 years or until the child turns 18.">Children&#39;s (12)</option>
+            
+            <option value="solution/retirement" data-about="For retirement: locked in for 5 years or until retirement age.">Retirement (30)</option>
+            
+          </optgroup>
+          
+        </select>
+      </label>
+      <p class="sip__about" data-sip-about></p>
+    </div>
+    <details class="sip__more">
+      <summary>More options</summary>
+      <div class="sip__more-body">
+        <label class="pf__field" for="sip-day">SIP date
+          <select id="sip-day" disabled>
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
+          </select>
+        </label>
+        <div class="sip__add">
+          <label class="pf__field" for="sip-pick">Add a fund by name (up to three)</label>
+          <div class="field-search">
+            <svg class="icon field-search__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></svg>
+            <input id="sip-pick" class="pf__pick" autocomplete="off"
+                   placeholder="A fund's name, fund house or ISIN" disabled>
+          </div>
+          <div data-out="added"></div>
+        </div>
+      </div>
+    </details>
+  </form>
+  <p class="sip__status" id="sip-status" role="status"></p><p class="sip__note" id="sip-notes" role="note" hidden></p>
+  <p class="sip__progress" id="sip-progress" aria-hidden="true"></p>
+
+  <section class="sip__answer" aria-labelledby="sip-answer-h" data-out="answer-box">
+    <h2 id="sip-answer-h" class="sr-only" tabindex="-1">What it would be worth</h2>
+    <div data-out="answer" role="status"></div>
+  </section>
+
+  <section class="home-section" aria-labelledby="sip-path-h" data-sip-section hidden>
+    <div class="section-head"><h2 id="sip-path-h">What it was worth, month by month</h2></div>
+    <div data-out="path"></div>
+  </section>
+  <section class="home-section" aria-labelledby="sip-end-h" data-sip-section hidden>
+    <div class="section-head"><h2 id="sip-end-h">Where each fund ended</h2></div>
+    <div data-out="ends"></div>
+  </section><section class="home-section" aria-labelledby="sip-kinds-h" data-sip-kinds hidden>
+    <div class="section-head"><h2 id="sip-kinds-h">The same money in other kinds of fund</h2></div>
+    <div data-out="kinds"></div>
+  </section><section class="home-section sip__notes" aria-labelledby="sip-notes-h">
+    <div class="section-head"><h2 id="sip-notes-h">Notes</h2></div>
+    <ul class="sip__notes-list">
+      <li>Direct plans, growth option, at their published prices. Stamp duty on each
+        purchase is taken off, as fund houses take it. Nothing is sold, so no exit load or
+        tax is taken off.</li>
+      <li>Only funds open today are here. Funds wound up or merged before today are not in
+        the data, so the range may leave out some that did worst.</li>
+      <li>A Regular plan of the same fund has a higher expense ratio, so the same money in it
+        would be worth less. <a href="/learn/glossary/#regular_plan">Regular plan</a></li>
+      <li>This looks back. It says nothing of what comes next.</li>
+      <li data-out="no-index" hidden></li>
+    </ul>
+  </section>
+</section>
+
+</main>
+<footer class="colophon">
+  <div class="colophon__columns">
+    <nav aria-labelledby="foot-product">
+      <h2 id="foot-product">Product</h2>
+      <ul>
+        <li><a href="/funds/">Explore funds</a></li>
+        <li><a href="/compare/">Compare</a></li>
+        <li><a href="/sip/">What would a SIP have become?</a></li>
+        <li><a href="/portfolio/">Your portfolio</a></li>
+        <li><a href="/learn/">Learn</a></li>
+      </ul>
+    </nav>
+    <nav aria-labelledby="foot-data">
+      <h2 id="foot-data">Data</h2>
+      <ul>
+        <li><a href="/#about">Where every figure comes from</a></li>
+        <li><a href="/learn/reading-a-fund-page/">How a fund page is made</a></li>
+        <li>Built 31 Oct 2026, every night</li>
+        <li><a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io">The code, and the self-hosted app with your own ledger</a></li>
+      </ul>
+    </nav>
+    <nav aria-labelledby="foot-about">
+      <h2 id="foot-about">About</h2>
+      <ul>
+        <li><a href="/#privacy">Your data stays yours</a></li>
+        <li><a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io/issues">Report a problem</a></li>
+        <li><a href="https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io/blob/main/LICENSE">Licence</a></li>
+        <li>Descriptive, not advice</li>
+      </ul>
+    </nav>
+  </div>
+  
+  <p>
+    
+    Built from public sources; every figure names its source and date.
+    No cookies, no tracking, and nothing loads from anywhere but this site.
+    
+  </p>
+</footer>
+
+
+<dialog id="settings" class="settings" aria-labelledby="settings-h" data-lenis-prevent>
+  <div class="settings__head">
+    <h2 id="settings-h">Settings</h2>
+    <button type="button" class="icon-button" data-settings-close
+            aria-label="Close settings"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  
+  <fieldset class="settings__group" data-setting="theme">
+    <legend>Theme</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="device">
+        
+        <span>Device</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="light">
+        
+        <span>Light</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="dark">
+        
+        <span>Dark</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-theme" value="matrix">
+        
+        <span>Matrix</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="font">
+    <legend>Font</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="atkinson">
+        
+        <span>Atkinson Hyperlegible</span>
+        <span class="settings__sample settings__sample--atkinson" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="rubik">
+        
+        <span>Rubik</span>
+        <span class="settings__sample settings__sample--rubik" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-font" value="terminess">
+        
+        <span>Terminal (Terminess)</span>
+        <span class="settings__sample settings__sample--terminess" aria-hidden="true">Aa ₹1,23,456.78</span>
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="size">
+    <legend>Text size</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="small">
+        
+        <span>Small</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="standard">
+        
+        <span>Standard</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-size" value="large">
+        
+        <span>Large</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="density">
+    <legend>Density</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-density" value="comfortable">
+        
+        <span>Comfortable</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-density" value="compact">
+        
+        <span>Compact</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="motion">
+    <legend>Motion</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="device">
+        
+        <span>Device</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="on">
+        
+        <span>On</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-motion" value="off">
+        
+        <span>Off</span>
+        
+      </label>
+      
+    </div>
+    
+  </fieldset>
+  
+  <fieldset class="settings__group" data-setting="accent">
+    <legend>Accent</legend>
+    <div class="settings__chips">
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="navy">
+        <span class="settings__swatch settings__swatch--navy" aria-hidden="true"></span>
+        <span>Navy</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="violet">
+        <span class="settings__swatch settings__swatch--violet" aria-hidden="true"></span>
+        <span>Violet</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="raspberry">
+        <span class="settings__swatch settings__swatch--raspberry" aria-hidden="true"></span>
+        <span>Raspberry</span>
+        
+      </label>
+      
+      <label class="settings__chip">
+        <input type="radio" name="setting-accent" value="graphite">
+        <span class="settings__swatch settings__swatch--graphite" aria-hidden="true"></span>
+        <span>Graphite</span>
+        
+      </label>
+      
+    </div>
+    <p class="settings__hint" data-matrix-note hidden>Matrix is green by design.</p>
+  </fieldset>
+  
+  <p class="settings__note" data-settings-note hidden>This browser is not keeping site data,
+    so these settings apply to this page only; another page opens with the defaults.</p>
+  <button type="button" class="settings__reset" data-settings-reset>Reset to defaults</button><button type="button" class="settings__reset" data-recent-clear>Clear recently viewed</button>
+</dialog><script src="/static/vendor/lenis.v1.3.26.min.js" defer></script>
+<script src="/static/app.js" defer></script>
+<script src="/static/portfolio-math.js" defer></script>
+<script src="/static/kit.js" defer></script>
+<script src="/static/sip.js" defer></script>
+
+</body>
+</html>

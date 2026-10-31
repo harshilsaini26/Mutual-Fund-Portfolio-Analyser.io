@@ -1,0 +1,49 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-10-31
+# Data as of: 30 Sep 2026 (31 days old)
+# Coverage: 69.7% of portfolio value | Unresolved: 30.3% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 69.7% of your portfolio has current holdings data. The rest is shown as unclassified.
+#   - 30.3% of your exposure could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-10-31T00:18:25.506188+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,47.166094
+Unresolved Holdings,Bonds and other debt,30.280342
+HDFC Bank Ltd.,Shares,2.707635
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.839451
+ICICI Bank Ltd.,Shares,1.824676
+ITC Ltd,Shares,1.117761
+Mahindra & Mahindra Ltd.,Shares,1.081251
+NTPC Limited,Shares,0.993571
+Indigo Paints Limited,Shares,0.873661
+Alkem Laboratories Limited,Shares,0.832416
+INDUS TOWERS LIMITED,Shares,0.818782
+Kotak Mahindra Bank Ltd.,Shares,0.814675
+Cipla Ltd.,Shares,0.781303
+AXIS Bank Ltd.,Shares,0.759226
+Oil And Natural Gas Corporation Ltd,Shares,0.754377
+SBI Life Insurance Company Limited,Shares,0.715244
+HDFC LIFE INSURANCE COMPANY LIMITED,Shares,0.698929
+HDFC Asset Management Company Limited,Shares,0.691912
+Hero MotoCorp Limited,Shares,0.653577
+Maruti Suzuki India  Ltd.,Shares,0.630131
+Canara HSBC Life Insurance Company Limited,Shares,0.571488
+PETRONET LNG LTD.,Shares,0.492022
+Infosys Ltd,Shares,0.451919
+ICICI Lombard General Insurance Company Limited,Shares,0.437201
+Syngene International Limited,Shares,0.327673
+Knowledge Realty Trust,"REITs, InvITs and other",0.311643
+LIFE INSURANCE CORPORATION OF INDIA,Shares,0.258076
+Coromandel International Limited,Shares,0.240620
+ALEMBIC PHARMACEUTICALS LIMITED,Shares,0.225960
+La Opala RG Ltd.,Shares,0.192188
+OBEROI REALTY LIMITED,Shares,0.167487
+Cyient Limited,Shares,0.165148
+Indian Oil Corporation Ltd.,Shares,0.146665
+Hindustan Petroleum Corporation Ltd,Shares,0.137310
+Ipca Laboratories Ltd.,Shares,0.038392
+Net Receivables / Payables,Cash and equivalents,-0.198806
