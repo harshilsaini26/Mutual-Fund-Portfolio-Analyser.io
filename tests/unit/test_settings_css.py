@@ -88,14 +88,15 @@ def test_series_colours_are_not_gain_loss_or_benchmark_colours() -> None:
         r, g, b = (int(hex_[i:i + 2], 16) / 255 for i in (1, 3, 5))
         return colorsys.rgb_to_hsv(r, g, b)[0] * 360
 
-    for theme in ("light", "dark"):
+    for theme in PALETTES:
         t = _tokens(theme)
         meaning = [hue(t[k]) for k in ("gain", "loss", "bench")]
-        for n in range(1, 5):
-            h = hue(t[f"cat-{n}"])
+        # The fund's own line is the accent: it too stays clear of the meanings.
+        for name in ("cat-1", "cat-2", "cat-3", "cat-4", "accent"):
+            h = hue(t[name])
             for m in meaning:
                 gap = min(abs(h - m), 360 - abs(h - m))
-                assert gap >= 25, (theme, f"cat-{n}", round(gap))
+                assert gap >= 25, (theme, name, round(gap))
 
 
 def test_headings_stand_above_the_text() -> None:
@@ -246,7 +247,7 @@ def _tokens(theme: str) -> dict[str, str]:
     css = CSS.read_text(encoding="utf-8")
     hexes = r"--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6})\b"
     tokens = dict(re.findall(hexes, _block(css, ":root")))
-    if theme != "light":
+    if theme != "santorini":   # the bare :root's palette
         tokens |= dict(re.findall(hexes, _block(css, f':root[data-theme="{theme}"]')))
     return tokens
 
@@ -260,9 +261,12 @@ def _ratio(a: str, b: str) -> float:
     return (max(x, y) + 0.05) / (min(x, y) + 0.05)
 
 
-THEMES = ("light", "dark", "matrix")
-SURFACES = ("bg", "surface", "surface-2", "surface-3")
-TEXT = ("ink", "ink-soft", "ink-faint", "accent", "gain", "loss", "warn", "bench")
+PALETTES = ("santorini", "sky", "heritage", "crimson", "midnight")
+THEMES = (*PALETTES, "matrix")
+#: The landing hero (--hero-a) carries the same text as a card does.
+SURFACES = ("bg", "surface", "surface-2", "surface-3", "hero-a")
+TEXT = ("ink", "ink-soft", "ink-faint", "accent", "accent-strong", "gain", "loss",
+        "warn", "bench", "good", "fair", "weak")
 
 
 def test_text_tokens_meet_aa_on_every_surface() -> None:
@@ -274,6 +278,31 @@ def test_text_tokens_meet_aa_on_every_surface() -> None:
             for bg in SURFACES:
                 if fg in t and bg in t and _ratio(t[fg], t[bg]) < 4.5:
                     low.append(f"{theme} {fg} on {bg} {_ratio(t[fg], t[bg]):.2f}")
+    assert not low, low
+
+
+def test_text_on_coloured_fills_meets_aa() -> None:
+    """A button's label on the accent, a treemap's label on a series colour, a
+    heatmap's label on its cell: 4.5:1 each, in every theme."""
+    low = []
+    for theme in THEMES:
+        t = _tokens(theme)
+        pairs = [("on-accent", "accent"), ("on-accent", "accent-strong"),
+                 ("heat-ink-high", "heat-4")]
+        pairs += [("on-cat", f"cat-{n}") for n in range(1, 9)]
+        pairs += [("heat-ink-low", f"heat-{n}") for n in range(4)]
+        low += [f"{theme} {fg} on {bg} {_ratio(t[fg], t[bg]):.2f}"
+                for fg, bg in pairs if _ratio(t[fg], t[bg]) < 4.5]
+    assert not low, low
+
+
+def test_series_colours_show_at_3_to_1() -> None:
+    """WCAG 1.4.11: a chart's line or bar is a graphical object."""
+    low = []
+    for theme in THEMES:
+        t = _tokens(theme)
+        low += [f"{theme} {k}" for k in [f"cat-{n}" for n in range(1, 9)] + ["heat-4"]
+                if _ratio(t[k], t["surface"]) < 3.0]
     assert not low, low
 
 

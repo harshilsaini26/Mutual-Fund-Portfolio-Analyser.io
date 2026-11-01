@@ -739,7 +739,7 @@
   new MutationObserver(redrawAll).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme", "data-font", "data-size", "data-density",
-                      "data-motion", "data-accent"],
+                      "data-motion"],
   });
   init(document);
   watch(document);

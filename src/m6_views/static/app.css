@@ -14,11 +14,14 @@
  * styled into invisibility satisfies the letter of the gate and none of its point.
  *
  * Tokens. Every colour below is one of these, so a theme is a set of values, not
- * a stylesheet. Light is the design's first form (V1-80, after MF Zone and
- * Fundoo): navy on white, a sky-blue ring for focus. Dark applies when the reader
- * picks it (`theme.js` stamps `data-theme`). Navy is the brand, never a figure's
- * colour: green and orange are gain and loss, and §10.2 keeps a semantic hue out
- * of brand and category use.
+ * a stylesheet. Five palettes (2026-11-01) and Matrix: Santorini is the bare
+ * :root, so a page without scripts gets it; settings.js stamps `data-theme` for
+ * the rest, and "Device" picks Santorini or Midnight Neon. Each palette brings
+ * its own accent. A palette's colour too light for text on its ground is
+ * darkened, keeping its hue, and every pair is held to WCAG AA by
+ * tests/unit/test_settings_css.py. The accent is never a figure's colour: green
+ * and orange are gain and loss, and §10.2 keeps a semantic hue out of brand and
+ * category use.
  */
 
 /* Terminess Nerd Font (V1-81, everywhere): Terminus by Dimitar Zhekov, SIL OFL 1.1,
@@ -84,41 +87,41 @@
      choice), whose sentences stay in Atkinson Hyperlegible. */
   --font-prose: var(--font);
   color-scheme: light;
-  --bg: #f5f7fb;
+  --bg: #f7f4ec;
   --surface: #ffffff;
-  --surface-2: #f0f4fa;
-  --surface-3: #e4eaf4;
-  --line: #e2e8f0;
-  --line-strong: #c8d2e0;
+  --surface-2: #f3efe4;
+  --surface-3: #ebe5d6;
+  --line: #e5dfd1;
+  --line-strong: #cdc4b0;
   /* A field's outline, 3:1 on its surface (WCAG 1.4.11, V1-88). */
-  --field-line: #828c9c;
-  --ink: #0f1b2d;
-  --ink-soft: #46566c;
-  --ink-faint: #5b6a7f;
-  --accent: #134585;
-  --accent-strong: #0c3366;
-  --accent-soft: rgb(19 69 133 / 0.08);
+  --field-line: #857f70;
+  --ink: #0b2236;
+  --ink-soft: #3c4c5c;
+  --ink-faint: #536170;
+  --accent: #0067ad;
+  --accent-strong: #004f86;
+  --accent-soft: rgb(0 103 173 / 0.08);
   --on-accent: #ffffff;
-  --sky: #7dd3fc;
-  --hero-a: #eaf2ff;
-  --hero-b: #f7fbff;
-  --bench: #9b5a00;
-  --gain: #0e7853;
-  --loss: #bc3f0c;
-  --gain-soft: rgb(14 122 85 / 0.1);
-  --loss-soft: rgb(194 65 12 / 0.1);
-  --warn: #8a6100;
-  --warn-bg: #fdf6e3;
+  --sky: #f2c400;
+  --hero-a: #fdf3cc;
+  --hero-b: #f7f4ec;
+  --bench: #8a5000;
+  --gain: #0b6b49;
+  --loss: #a83709;
+  --gain-soft: rgb(11 107 73 / 0.1);
+  --loss-soft: rgb(168 55 9 / 0.1);
+  --warn: #7a5600;
+  --warn-bg: #fbf3dc;
   --warn-line: #e3c56f;
-  --good: #1f6f4a;
-  --fair: #8a6100;
-  --weak: #a1391d;
-  --synthetic: #9aa1ad;
-  /* Series (UI/UX critique G-14): the first four keep clear of the gain, loss and
-     benchmark hues, so no fund in a comparison reads as "the losing one". */
-  --cat-1: #134585;
-  --cat-2: #8e5aa6;
-  --cat-3: #1f7a99;
+  --good: #1b6342;
+  --fair: #7a5600;
+  --weak: #93331a;
+  --synthetic: #a6a294;
+  /* Series (UI/UX critique G-14): the first four, and the accent that draws
+     the fund's own line, keep clear of the gain, loss and benchmark hues. */
+  --cat-1: #0077c8;
+  --cat-2: #486b1f;
+  --cat-3: #8e5aa6;
   --cat-4: #a8396b;
   --cat-5: #5b6b7a;
   --cat-6: #4a5fc1;
@@ -126,16 +129,16 @@
   --cat-8: #2f7f86;
   --on-cat: #ffffff;
   --decal: rgb(255 255 255 / 0.5);
-  --sankey-right: #2f7f86;
-  --heat-0: #eef2f8;
-  --heat-1: #d6e2f4;
-  --heat-2: #a7bfe6;
-  --heat-3: #5a84c7;
-  --heat-4: #134585;
-  --heat-ink-low: #0f1b2d;
+  --sankey-right: #486b1f;
+  --heat-0: #eef4fa;
+  --heat-1: #d3e6f5;
+  --heat-2: #9fcbeb;
+  --heat-3: #7fb6e0;
+  --heat-4: #0067ad;
+  --heat-ink-low: #0b2236;
   --heat-ink-high: #ffffff;
-  --shadow: 0 1px 2px rgb(15 27 45 / 0.04), 0 8px 24px rgb(15 27 45 / 0.06);
-  --shadow-lift: 0 2px 4px rgb(15 27 45 / 0.05), 0 16px 40px rgb(19 69 133 / 0.12);
+  --shadow: 0 1px 2px rgb(11 34 54 / 0.04), 0 8px 24px rgb(11 34 54 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(11 34 54 / 0.05), 0 16px 40px rgb(0 103 173 / 0.12);
   --radius: 14px;
   --radius-sm: 10px;
   /* A proportional face by default (UI/UX critique G-01, 2026-10-04): the pixel
@@ -145,25 +148,200 @@
   --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
 }
 
-:root[data-theme="dark"] {
+/* Sky: Sky Blue and Hot Pink on White. Sky Blue is 3.4:1 on white, so text
+   and buttons take it darker; the pure shade rings and draws. */
+:root[data-theme="sky"] {
+  color-scheme: light;
+  --bg: #f4fbfe;
+  --surface: #fcffff;
+  --surface-2: #eef8fc;
+  --surface-3: #e2f1f8;
+  --line: #d9edf5;
+  --line-strong: #b5d6e4;
+  /* A field's outline, 3:1 on its surface (WCAG 1.4.11, V1-88). */
+  --field-line: #7d8a92;
+  --ink: #0c2433;
+  --ink-soft: #3b5260;
+  --ink-faint: #4f6472;
+  --accent: #006a93;
+  --accent-strong: #00506f;
+  --accent-soft: rgb(0 106 147 / 0.08);
+  --on-accent: #ffffff;
+  --sky: #0593c6;
+  --hero-a: #fde8f2;
+  --hero-b: #f4fbfe;
+  --bench: #9b5a00;
+  --gain: #0e7853;
+  --loss: #bc3f0c;
+  --gain-soft: rgb(14 120 83 / 0.1);
+  --loss-soft: rgb(188 63 12 / 0.1);
+  --warn: #8a6100;
+  --warn-bg: #fdf6e3;
+  --warn-line: #e3c56f;
+  --good: #1f6f4a;
+  --fair: #8a6100;
+  --weak: #a1391d;
+  --synthetic: #9aa1ad;
+  /* Series (UI/UX critique G-14): the first four, and the accent that draws
+     the fund's own line, keep clear of the gain, loss and benchmark hues. */
+  --cat-1: #037aa6;
+  --cat-2: #c42a76;
+  --cat-3: #5b3fc4;
+  --cat-4: #2f7f86;
+  --cat-5: #5b6b7a;
+  --cat-6: #8e5aa6;
+  --cat-7: #6e6a2c;
+  --cat-8: #1f6f9a;
+  --on-cat: #ffffff;
+  --decal: rgb(255 255 255 / 0.5);
+  --sankey-right: #c42a76;
+  --heat-0: #eef8fc;
+  --heat-1: #cdebf6;
+  --heat-2: #9ad6ec;
+  --heat-3: #6cc0e0;
+  --heat-4: #006a93;
+  --heat-ink-low: #0c2433;
+  --heat-ink-high: #ffffff;
+  --shadow: 0 1px 2px rgb(12 36 51 / 0.04), 0 8px 24px rgb(12 36 51 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(12 36 51 / 0.05), 0 16px 40px rgb(5 147 198 / 0.14);
+}
+
+/* Indian Heritage: Deep Maroon and Near-Black on Ivory, Gold behind the hero. */
+:root[data-theme="heritage"] {
+  color-scheme: light;
+  --bg: #f5e6d3;
+  --surface: #fdf7ef;
+  --surface-2: #f8ecdc;
+  --surface-3: #f0dfc8;
+  --line: #e8d5bd;
+  --line-strong: #d4bc9e;
+  /* A field's outline, 3:1 on its surface (WCAG 1.4.11, V1-88). */
+  --field-line: #85736a;
+  --ink: #2b2024;
+  --ink-soft: #55454a;
+  --ink-faint: #5f4d52;
+  --accent: #8b1e3f;
+  --accent-strong: #6c1631;
+  --accent-soft: rgb(139 30 63 / 0.08);
+  --on-accent: #fdf7ef;
+  --sky: #d4af37;
+  --hero-a: #f3dc9a;
+  --hero-b: #f5e6d3;
+  --bench: #7f4a00;
+  --gain: #0a6344;
+  --loss: #9c3208;
+  --gain-soft: rgb(10 99 68 / 0.1);
+  --loss-soft: rgb(156 50 8 / 0.1);
+  --warn: #6f4f00;
+  --warn-bg: #f8ecc9;
+  --warn-line: #d4af37;
+  --good: #185c3d;
+  --fair: #6f4f00;
+  --weak: #8a2f17;
+  --synthetic: #a8968c;
+  /* Series (UI/UX critique G-14): the first four, and the accent that draws
+     the fund's own line, keep clear of the gain, loss and benchmark hues. */
+  --cat-1: #8b1e3f;
+  --cat-2: #1f6f86;
+  --cat-3: #5b3fc4;
+  --cat-4: #9a4f8a;
+  --cat-5: #6b5a5e;
+  --cat-6: #8c5f5f;
+  --cat-7: #6e6a2c;
+  --cat-8: #4a5fc1;
+  --on-cat: #ffffff;
+  --decal: rgb(255 255 255 / 0.5);
+  --sankey-right: #1f6f86;
+  --heat-0: #f8ecdc;
+  --heat-1: #efd3c4;
+  --heat-2: #dba6aa;
+  --heat-3: #c98a90;
+  --heat-4: #8b1e3f;
+  --heat-ink-low: #2b2024;
+  --heat-ink-high: #fdf7ef;
+  --shadow: 0 1px 2px rgb(43 32 36 / 0.05), 0 8px 24px rgb(43 32 36 / 0.07);
+  --shadow-lift: 0 2px 4px rgb(43 32 36 / 0.06), 0 16px 40px rgb(139 30 63 / 0.14);
+}
+
+/* Crimson Depth: Soft Pearl on Obsidian Black, Warm Sand for links and buttons.
+   Crimson is 1.6:1 on black, so it tints the hero and the ring, never text. */
+:root[data-theme="crimson"] {
   color-scheme: dark;
-  --bg: #0b1220;
-  --surface: #111a2b;
-  --surface-2: #17223a;
-  --surface-3: #1f2c48;
-  --line: #22304a;
-  --line-strong: #33446a;
-  --field-line: #5e6d8b;
-  --ink: #e8edf5;
-  --ink-soft: #a6b1c4;
-  --ink-faint: #8894a8;
-  --accent: #8fb4ff;
-  --accent-strong: #b9d0ff;
-  --accent-soft: rgb(143 180 255 / 0.13);
-  --on-accent: #0b1220;
-  --sky: #7dd3fc;
-  --hero-a: #0f1d38;
-  --hero-b: #0b1220;
+  --bg: #161616;
+  --surface: #1d1b1a;
+  --surface-2: #252221;
+  --surface-3: #2e2a28;
+  --line: #2f2b29;
+  --line-strong: #45403c;
+  /* A field's outline, 3:1 on its surface (WCAG 1.4.11, V1-88). */
+  --field-line: #7d746c;
+  --ink: #f2f1ed;
+  --ink-soft: #cdc7bd;
+  --ink-faint: #aea59a;
+  --accent: #d9bf8c;
+  --accent-strong: #ecdcb9;
+  --accent-soft: rgb(217 191 140 / 0.12);
+  --on-accent: #161616;
+  --sky: #710014;
+  --hero-a: #2b0d12;
+  --hero-b: #161616;
+  --bench: #8fb8de;
+  --gain: #4cc38a;
+  --loss: #ff7b61;
+  --gain-soft: rgb(76 195 138 / 0.14);
+  --loss-soft: rgb(255 123 97 / 0.14);
+  --warn: #e9b949;
+  --warn-bg: rgb(233 185 73 / 0.09);
+  --warn-line: rgb(233 185 73 / 0.4);
+  --good: #5fcf98;
+  --fair: #e0b04a;
+  --weak: #ff8a6a;
+  --synthetic: #6b635d;
+  /* Series (UI/UX critique G-14): the first four, and the accent that draws
+     the fund's own line, keep clear of the gain, loss and benchmark hues. */
+  --cat-1: #f2f1ed;
+  --cat-2: #b7a6ff;
+  --cat-3: #e88aa8;
+  --cat-4: #c8c26a;
+  --cat-5: #a39a90;
+  --cat-6: #d9bf8c;
+  --cat-7: #5ec8e5;
+  --cat-8: #7fc8b0;
+  --on-cat: #161616;
+  --decal: rgb(22 22 22 / 0.45);
+  --sankey-right: #5ec8e5;
+  --heat-0: #252221;
+  --heat-1: #3d2328;
+  --heat-2: #5e2a33;
+  --heat-3: #8a3a47;
+  --heat-4: #e3b8a0;
+  --heat-ink-low: #f2f1ed;
+  --heat-ink-high: #161616;
+  --shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px rgb(0 0 0 / 0.32);
+  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 44px rgb(113 0 20 / 0.45);
+}
+
+/* Midnight Neon: Lavender and Cyan on Midnight Navy, Electric Violet in the glow. */
+:root[data-theme="midnight"] {
+  color-scheme: dark;
+  --bg: #0f172a;
+  --surface: #131c33;
+  --surface-2: #19233d;
+  --surface-3: #202b48;
+  --line: #243052;
+  --line-strong: #34406a;
+  /* A field's outline, 3:1 on its surface (WCAG 1.4.11, V1-88). */
+  --field-line: #66709a;
+  --ink: #ede9fe;
+  --ink-soft: #c3bde6;
+  --ink-faint: #a29dc6;
+  --accent: #a78bfa;
+  --accent-strong: #c4b5fd;
+  --accent-soft: rgb(167 139 250 / 0.13);
+  --on-accent: #0f172a;
+  --sky: #22d3ee;
+  --hero-a: #221a4c;
+  --hero-b: #0f172a;
   --bench: #f2b347;
   --gain: #4cc38a;
   --loss: #ff7b61;
@@ -175,27 +353,29 @@
   --good: #5fcf98;
   --fair: #e0b04a;
   --weak: #ff8a6a;
-  --synthetic: #6d7687;
-  --cat-1: #6fb3ea;
-  --cat-2: #c49bea;
-  --cat-3: #5ec8e5;
-  --cat-4: #f07ca8;
-  --cat-5: #93a4b8;
-  --cat-6: #8fa2ff;
-  --cat-7: #c8c26a;
-  --cat-8: #4fc3cb;
-  --on-cat: #0b1220;
-  --decal: rgb(11 14 20 / 0.45);
-  --sankey-right: #4fc3cb;
-  --heat-0: #17223a;
-  --heat-1: #213463;
-  --heat-2: #2f4d93;
-  --heat-3: #4f78cf;
-  --heat-4: #9cbcff;
-  --heat-ink-low: #e8edf5;
-  --heat-ink-high: #0b1220;
-  --shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px rgb(0 0 0 / 0.28);
-  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 44px rgb(0 0 0 / 0.4);
+  --synthetic: #5f6782;
+  /* Series (UI/UX critique G-14): the first four, and the accent that draws
+     the fund's own line, keep clear of the gain, loss and benchmark hues. */
+  --cat-1: #a78bfa;
+  --cat-2: #22d3ee;
+  --cat-3: #f07ca8;
+  --cat-4: #f0abfc;
+  --cat-5: #94a3b8;
+  --cat-6: #818cf8;
+  --cat-7: #e0a8ff;
+  --cat-8: #5eead4;
+  --on-cat: #0f172a;
+  --decal: rgb(15 23 42 / 0.45);
+  --sankey-right: #22d3ee;
+  --heat-0: #19233d;
+  --heat-1: #2a2a5e;
+  --heat-2: #3b3488;
+  --heat-3: #5b45c4;
+  --heat-4: #c4b5fd;
+  --heat-ink-low: #ede9fe;
+  --heat-ink-high: #0f172a;
+  --shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px rgb(0 0 0 / 0.3);
+  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 44px rgb(124 58 237 / 0.35);
 }
 
 /* Matrix (V1-81): green on black. Loss keeps its own hue, so gain and loss are
@@ -243,9 +423,10 @@
   --decal: rgb(0 0 0 / 0.5);
   --sankey-right: #3dffc5;
   --heat-0: #031405;
-  --heat-1: #06330d;
-  --heat-2: #0a6618;
-  --heat-3: #0fa326;
+  /* The green ink reads 4.5:1 on every cell but the brightest, which takes black. */
+  --heat-1: #052a0b;
+  --heat-2: #084d14;
+  --heat-3: #0a6c1a;
   --heat-4: #00ff41;
   --heat-ink-low: #33ff66;
   --heat-ink-high: #000000;
@@ -292,35 +473,6 @@ html { font-size: 100%; }
   --font: "Terminess Nerd Font", "Rupee", "Rubik", system-ui, sans-serif;
   --mono: "Terminess Nerd Font", ui-monospace, monospace;
   --font-prose: "Atkinson Hyperlegible", "Rupee", "Rubik", system-ui, sans-serif;
-}
-
-/* The reader's accent (V1-83): links, buttons and the fund's line in charts. Navy is
-   the bare :root's and the dark block's. Each clears 4.5:1 on its theme's surface
-   and stays apart from gain green and loss orange; Matrix ignores the choice, as
-   these blocks name only light and dark. */
-:root[data-theme="light"][data-accent="violet"] {
-  --accent: #5b3fc4; --accent-strong: #4a2fa8;
-  --accent-soft: rgb(91 63 196 / 0.08); --on-accent: #ffffff;
-}
-:root[data-theme="dark"][data-accent="violet"] {
-  --accent: #b7a6ff; --accent-strong: #d3c8ff;
-  --accent-soft: rgb(183 166 255 / 0.13); --on-accent: #0b1220;
-}
-:root[data-theme="light"][data-accent="raspberry"] {
-  --accent: #b0245e; --accent-strong: #8f1c4c;
-  --accent-soft: rgb(176 36 94 / 0.08); --on-accent: #ffffff;
-}
-:root[data-theme="dark"][data-accent="raspberry"] {
-  --accent: #ff8fbf; --accent-strong: #ffb8d6;
-  --accent-soft: rgb(255 143 191 / 0.13); --on-accent: #0b1220;
-}
-:root[data-theme="light"][data-accent="graphite"] {
-  --accent: #3b4656; --accent-strong: #262f3b;
-  --accent-soft: rgb(59 70 86 / 0.08); --on-accent: #ffffff;
-}
-:root[data-theme="dark"][data-accent="graphite"] {
-  --accent: #c3cbd8; --accent-strong: #e1e6ee;
-  --accent-soft: rgb(195 203 216 / 0.13); --on-accent: #0b1220;
 }
 
 body {
@@ -2040,15 +2192,16 @@ body, .topbar, .card, .view, .settings {
 .settings__sample--terminess { font-family: "Terminess Nerd Font", "Rubik", monospace; }
 .settings__sample--rubik { font-family: "Rubik", system-ui, sans-serif; }
 .settings__sample--atkinson { font-family: "Atkinson Hyperlegible", "Rubik", system-ui, sans-serif; }
-.settings__swatch { width: 12px; height: 12px; border-radius: 50%; }
-.settings__swatch--navy { background: #134585; }
-.settings__swatch--violet { background: #5b3fc4; }
-.settings__swatch--raspberry { background: #b0245e; }
-.settings__swatch--graphite { background: #3b4656; }
-:root[data-theme="dark"] .settings__swatch--navy { background: #8fb4ff; }
-:root[data-theme="dark"] .settings__swatch--violet { background: #b7a6ff; }
-:root[data-theme="dark"] .settings__swatch--raspberry { background: #ff8fbf; }
-:root[data-theme="dark"] .settings__swatch--graphite { background: #c3cbd8; }
+.settings__swatch {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 1px solid var(--line-strong); flex: none;
+}
+.settings__swatch--santorini { background: linear-gradient(135deg, #0077c8 0 34%, #f2c400 34% 66%, #486b1f 66%); }
+.settings__swatch--sky { background: linear-gradient(135deg, #0593c6 0 34%, #fcffff 34% 66%, #d63985 66%); }
+.settings__swatch--heritage { background: linear-gradient(135deg, #8b1e3f 0 34%, #d4af37 34% 66%, #f5e6d3 66%); }
+.settings__swatch--crimson { background: linear-gradient(135deg, #710014 0 34%, #b38f6f 34% 66%, #161616 66%); }
+.settings__swatch--midnight { background: linear-gradient(135deg, #0f172a 0 34%, #7c3aed 34% 66%, #22d3ee 66%); }
+.settings__swatch--matrix { background: linear-gradient(135deg, #000000 0 34%, #00ff41 34% 66%, #000000 66%); }
 .settings__hint, .settings__note { margin: 8px 0 0; font-size: var(--text-xs); color: var(--ink-soft); }
 .settings__reset {
   margin-top: 22px; padding: 0; border: 0; background: none; font: inherit;

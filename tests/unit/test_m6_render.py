@@ -720,10 +720,12 @@ def test_the_sidebar_marks_where_the_reader_is(client: TestClient) -> None:
     assert re.search(r'<dialog id="settings"[^>]*>', html)
     # Smooth scrolling is the browser's own (ponytail audit, 2026-11-01): no Lenis.
     assert "lenis" not in html.lower()
-    for key in ("theme", "font", "size", "density", "motion", "accent"):
+    for key in ("theme", "font", "size", "density", "motion"):
         assert f'data-setting="{key}"' in html, key
     assert html.count('name="setting-font"') == 3
-    assert html.count('name="setting-accent"') == 4
+    # Device, five palettes and Matrix; each palette is its own accent.
+    assert html.count('name="setting-theme"') == 7
+    assert 'data-setting="accent"' not in html
     # Without site data, settings cannot follow the reader to the next page.
     assert "apply to this page only" in html
 

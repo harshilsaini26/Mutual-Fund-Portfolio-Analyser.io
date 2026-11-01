@@ -1,4 +1,4 @@
-// settings.js: stored choices and the device into six attributes. DECISIONS V1-83.
+// settings.js: stored choices and the device into five attributes. DECISIONS V1-83.
 // Run: node --test "tests/js/*.test.mjs"
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -13,25 +13,30 @@ const memory = (init = {}) => { const m = new Map(Object.entries(init)); return 
   removeItem: (k) => m.delete(k), dump: () => Object.fromEntries(m) }; };
 const throwing = { getItem() { throw new Error("blocked"); }, setItem() { throw new Error("blocked"); }, removeItem() { throw new Error("blocked"); } };
 
-test("defaults follow the device", () => {
-  assert.deepEqual(S.resolve(null, LIGHT), { theme: "light", font: "atkinson", size: "standard", density: "comfortable", motion: "on", accent: "navy" });
-  assert.deepEqual(S.resolve(null, DARK_CALM), { theme: "dark", font: "atkinson", size: "standard", density: "comfortable", motion: "off", accent: "navy" });
+test("defaults follow the device: Santorini by day, Midnight Neon by night", () => {
+  assert.deepEqual(S.resolve(null, LIGHT), { theme: "santorini", font: "atkinson", size: "standard", density: "comfortable", motion: "on" });
+  assert.deepEqual(S.resolve(null, DARK_CALM), { theme: "midnight", font: "atkinson", size: "standard", density: "comfortable", motion: "off" });
 });
 test("each stored value is honoured", () => {
-  assert.deepEqual(S.resolve({ v: 1, theme: "matrix", font: "atkinson", size: "large", density: "compact", motion: "on", accent: "violet" }, DARK_CALM),
-    { theme: "matrix", font: "atkinson", size: "large", density: "compact", motion: "on", accent: "violet" });
+  assert.deepEqual(S.resolve({ v: 1, theme: "heritage", font: "atkinson", size: "large", density: "compact", motion: "on" }, DARK_CALM),
+    { theme: "heritage", font: "atkinson", size: "large", density: "compact", motion: "on" });
+  for (const theme of ["santorini", "sky", "heritage", "crimson", "midnight", "matrix"]) {
+    assert.equal(S.resolve({ v: 1, theme }, LIGHT).theme, theme);
+  }
 });
 test("unknown values fall back one by one", () => {
-  const r = S.resolve({ v: 1, font: "comic", size: "large", accent: 7 }, LIGHT);
-  assert.equal(r.font, "atkinson"); assert.equal(r.size, "large"); assert.equal(r.accent, "navy");
+  const r = S.resolve({ v: 1, font: "comic", size: "large" }, LIGHT);
+  assert.equal(r.font, "atkinson"); assert.equal(r.size, "large");
 });
 test("device changes are followed only while the choice is device", () => {
-  assert.equal(S.resolve({ v: 1, theme: "device" }, DARK_CALM).theme, "dark");
-  assert.equal(S.resolve({ v: 1, theme: "light" }, DARK_CALM).theme, "light");
+  assert.equal(S.resolve({ v: 1, theme: "device" }, DARK_CALM).theme, "midnight");
+  assert.equal(S.resolve({ v: 1, theme: "sky" }, DARK_CALM).theme, "sky");
   assert.equal(S.resolve({ v: 1, motion: "on" }, DARK_CALM).motion, "on");
 });
-test("Matrix keeps the stored accent for later", () => {
-  assert.equal(S.resolve({ v: 1, theme: "matrix", accent: "raspberry" }, LIGHT).accent, "raspberry");
+test("a retired theme or accent follows the device instead", () => {
+  assert.equal(S.resolve({ v: 1, theme: "light", accent: "violet" }, DARK_CALM).theme, "midnight");
+  assert.equal(S.resolve({ v: 1, theme: "dark" }, LIGHT).theme, "santorini");
+  assert.equal("accent" in S.resolve({ v: 1, accent: "violet" }, LIGHT), false);
 });
 test("a corrupted entry reads as nothing stored", () => {
   assert.deepEqual(S.read(memory({ settings: "{not json" })), { stored: null, ok: true });

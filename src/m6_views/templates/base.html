@@ -18,7 +18,7 @@
   the files whichever host serves them (Vercel since V1-92).
 
   `settings.js` runs in <head>, before anything is drawn, and sets the reader's
-  theme, font, text size, density, motion and accent as attributes on <html>
+  theme, font, text size, density and motion as attributes on <html>
   (DECISIONS V1-83), so nobody sees one look flash before another.
 #}
 {% import "icons.html" as icon %}
@@ -36,8 +36,8 @@
   {#- What a search result and a shared link show (UI/UX critique G-11). -#}
   <meta name="description" content="{% block description %}What Indian mutual funds own and how each has done beside the funds that do the same job, and what your own SIPs add up to. Descriptive, not advice; nothing you enter leaves your browser.{% endblock %}">
   <link rel="icon" href="{{ root }}/static/favicon.svg" type="image/svg+xml">
-  <meta name="theme-color" content="#134585" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f7f4ec" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
   {% if static %}
   <link rel="manifest" href="{{ root }}/static/site.webmanifest">
   <link rel="apple-touch-icon" href="{{ root }}/static/apple-touch-icon.png">
@@ -88,12 +88,13 @@
   Every change applies at once (app.js -> settings.js).
 #}
 {%- set rows = [
-  ("theme", "Theme", [("device", "Device"), ("light", "Light"), ("dark", "Dark"), ("matrix", "Matrix")]),
+  ("theme", "Theme", [("device", "Device"), ("santorini", "Santorini"), ("sky", "Sky"),
+                      ("heritage", "Heritage"), ("crimson", "Crimson"),
+                      ("midnight", "Midnight Neon"), ("matrix", "Matrix")]),
   ("font", "Font", [("atkinson", "Atkinson Hyperlegible"), ("rubik", "Rubik"), ("terminess", "Terminal (Terminess)")]),
   ("size", "Text size", [("small", "Small"), ("standard", "Standard"), ("large", "Large")]),
   ("density", "Density", [("comfortable", "Comfortable"), ("compact", "Compact")]),
   ("motion", "Motion", [("device", "Device"), ("on", "On"), ("off", "Off")]),
-  ("accent", "Accent", [("navy", "Navy"), ("violet", "Violet"), ("raspberry", "Raspberry"), ("graphite", "Graphite")]),
 ] %}
 <dialog id="settings" class="settings" aria-labelledby="settings-h">
   <div class="settings__head">
@@ -108,13 +109,12 @@
       {% for value, label in options %}
       <label class="settings__chip">
         <input type="radio" name="setting-{{ key }}" value="{{ value }}">
-        {% if key == "accent" %}<span class="settings__swatch settings__swatch--{{ value }}" aria-hidden="true"></span>{% endif %}
+        {% if key == "theme" and value != "device" %}<span class="settings__swatch settings__swatch--{{ value }}" aria-hidden="true"></span>{% endif %}
         <span>{{ label }}</span>
         {% if key == "font" %}<span class="settings__sample settings__sample--{{ value }}" aria-hidden="true">Aa ₹1,23,456.78</span>{% endif %}
       </label>
       {% endfor %}
     </div>
-    {% if key == "accent" %}<p class="settings__hint" data-matrix-note hidden>Matrix is green by design.</p>{% endif %}
   </fieldset>
   {% endfor %}
   <p class="settings__note" data-settings-note hidden>This browser is not keeping site data,

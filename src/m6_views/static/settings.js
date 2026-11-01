@@ -2,10 +2,13 @@
  * The reader's settings, applied before the page is drawn. DECISIONS V1-83.
  *
  * Loaded in <head> without `defer`, so nobody sees one theme flash before
- * another. Six attributes on <html> carry everything the CSS and the other
- * scripts read: data-theme, -font, -size, -density, -motion and -accent.
- * "Device" theme and motion follow the phone or computer, live. Storage can be
- * missing or refused (a private window); the settings then last for the visit.
+ * another. Five attributes on <html> carry everything the CSS and the other
+ * scripts read: data-theme, -font, -size, -density and -motion. A theme is a
+ * whole palette, its accent included (2026-11-01). "Device" theme and motion
+ * follow the phone or computer, live: Santorini by day, Midnight Neon by night.
+ * A retired theme (light, dark) left in storage reads as the default, and a
+ * retired accent is ignored. Storage can be missing or refused (a private
+ * window); the settings then last for the visit.
  * The panel that changes them is in app.js.
  */
 (function () {
@@ -14,15 +17,14 @@
   var KEY = "settings";
   var DEFAULTS = {
     theme: "device", font: "atkinson", size: "standard",
-    density: "comfortable", motion: "device", accent: "navy",
+    density: "comfortable", motion: "device",
   };
   var CHOICES = {
-    theme: ["device", "light", "dark", "matrix"],
+    theme: ["device", "santorini", "sky", "heritage", "crimson", "midnight", "matrix"],
     font: ["atkinson", "rubik", "terminess"],
     size: ["small", "standard", "large"],
     density: ["comfortable", "compact"],
     motion: ["device", "on", "off"],
-    accent: ["navy", "violet", "raspberry", "graphite"],
   };
   var FONTS = {
     terminess: "fonts/terminess-Regular.woff2",
@@ -35,17 +37,16 @@
     return CHOICES[key].indexOf(v) >= 0 ? v : DEFAULTS[key];
   }
 
-  // Stored choices and the device's preferences -> the six attribute values.
+  // Stored choices and the device's preferences -> the five attribute values.
   function resolve(stored, device) {
     var theme = pick(stored, "theme");
     var motion = pick(stored, "motion");
     return {
-      theme: theme === "device" ? (device.dark ? "dark" : "light") : theme,
+      theme: theme === "device" ? (device.dark ? "midnight" : "santorini") : theme,
       font: pick(stored, "font"),
       size: pick(stored, "size"),
       density: pick(stored, "density"),
       motion: motion === "device" ? (device.reducedMotion ? "off" : "on") : motion,
-      accent: pick(stored, "accent"),
     };
   }
 

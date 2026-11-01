@@ -374,7 +374,6 @@
   var panel = document.getElementById("settings");
   if (panel && window.Settings && panel.showModal) {
     var S = window.Settings;
-    var html = document.documentElement;
 
     var check = function () {
       var chosen = Object.assign({}, S.DEFAULTS, S.current().stored || {});
@@ -386,18 +385,9 @@
       panel.querySelector("[data-settings-note]").hidden = S.current().ok;
     };
 
-    // Matrix is one colour by design: the accent waits, kept, until it is left.
-    var matrix = function () {
-      var on = html.getAttribute("data-theme") === "matrix";
-      panel.querySelectorAll('input[name="setting-accent"]').forEach(function (input) {
-        input.disabled = on;
-      });
-      panel.querySelector("[data-matrix-note]").hidden = !on;
-    };
-
     document.querySelectorAll("[data-settings-open]").forEach(function (button) {
       button.hidden = false;
-      button.addEventListener("click", function () { check(); matrix(); panel.showModal(); });
+      button.addEventListener("click", function () { check(); panel.showModal(); });
     });
     panel.querySelector("[data-settings-close]").addEventListener("click", function () { panel.close(); });
     // A click on the backdrop lands on the dialog itself, and so does one on the
@@ -425,7 +415,6 @@
       try { window.localStorage.removeItem(RECENT); } catch (e) { /* nothing kept */ }
       forget.textContent = "Recently viewed cleared";
     });
-    new MutationObserver(matrix).observe(html, { attributes: true, attributeFilter: ["data-theme"] });
   }
 
   // --- phones: tucked detail and a top bar that steps aside (V1-84) ----------

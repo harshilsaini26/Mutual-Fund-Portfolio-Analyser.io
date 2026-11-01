@@ -1,9 +1,10 @@
-"""Three themes, four accents, three fonts, one set of tokens. DECISIONS V1-81, V1-83.
+"""Six themes, three fonts, one set of tokens. DECISIONS V1-81, V1-83.
 
-A token the light theme defines and the dark or Matrix theme forgets renders the
-light colour on a dark ground: unreadable, and nothing else would notice. An
-accent is a colour people read text in, so each one is held to WCAG AA on its
-theme's surface.
+Five palettes (2026-11-01) and Matrix. Each palette is a whole theme, its own
+accent included, so the separate accent setting and the plain Light and Dark
+themes are gone. A token Santorini (the bare :root) defines and another theme
+forgets renders Santorini's colour on that theme's ground: unreadable, and
+nothing else would notice. Contrast is held to WCAG AA in test_settings_css.
 """
 
 from __future__ import annotations
@@ -18,14 +19,18 @@ SHARED = {"--radius", "--radius-sm", "--font", "--mono", "--font-prose",
           "--text-xs", "--text-sm", "--text-md", "--text-base", "--text-lead",
           "--text-h3", "--text-h2", "--text-display", "--track-label", "--track-tight",
           "--lh-body", "--lh-tight", "--lh-display"}
-#: light (accent, strong), dark (accent, strong): the spec's values. Navy is the
-#: bare `:root` and the dark block, as before.
-ACCENTS = {
-    "violet": ("#5b3fc4", "#4a2fa8", "#b7a6ff", "#d3c8ff"),
-    "raspberry": ("#b0245e", "#8f1c4c", "#ff8fbf", "#ffb8d6"),
-    "graphite": ("#3b4656", "#262f3b", "#c3cbd8", "#e1e6ee"),
+#: Each palette's own colours, as the reader gave them, where the theme uses them
+#: unchanged (a shade too light for text on its ground is darkened, keeping its hue).
+PALETTES = {
+    "santorini": {"--bg": "#f7f4ec", "--cat-1": "#0077c8", "--cat-2": "#486b1f",
+                  "--sky": "#f2c400"},
+    "sky": {"--surface": "#fcffff", "--sky": "#0593c6"},
+    "heritage": {"--bg": "#f5e6d3", "--ink": "#2b2024", "--accent": "#8b1e3f",
+                 "--sky": "#d4af37"},
+    "crimson": {"--bg": "#161616", "--ink": "#f2f1ed", "--sky": "#710014"},
+    "midnight": {"--bg": "#0f172a", "--ink": "#ede9fe", "--accent": "#a78bfa",
+                 "--sky": "#22d3ee"},
 }
-SURFACE = {"light": "#ffffff", "dark": "#111a2b"}
 
 
 def _block(selector: str) -> str:
@@ -50,25 +55,24 @@ def _contrast(a: str, b: str) -> float:
 
 
 def test_every_theme_defines_every_colour() -> None:
-    light = _tokens_of(_block(":root")) - SHARED
-    for theme in ("dark", "matrix"):
-        assert _tokens_of(_block(f':root[data-theme="{theme}"]')) >= light, theme
+    base = _tokens_of(_block(":root")) - SHARED
+    for theme in ("sky", "heritage", "crimson", "midnight", "matrix"):
+        assert _tokens_of(_block(f':root[data-theme="{theme}"]')) >= base, theme
 
 
-def test_every_accent_defines_its_tokens_on_both_themes() -> None:
-    for name, (la, ls, da, ds) in ACCENTS.items():
-        for theme, accent, strong in (("light", la, ls), ("dark", da, ds)):
-            block = _block(f':root[data-theme="{theme}"][data-accent="{name}"]')
-            assert _tokens_of(block) >= {"--accent", "--accent-strong", "--accent-soft",
-                                         "--on-accent"}, (name, theme)
-            assert f"--accent: {accent};" in block
-            assert f"--accent-strong: {strong};" in block
+def test_each_palette_carries_its_own_colours() -> None:
+    for theme, colours in PALETTES.items():
+        selector = ":root" if theme == "santorini" else f':root[data-theme="{theme}"]'
+        block = _block(selector)
+        for token, value in colours.items():
+            assert f"{token}: {value};" in block, (theme, token)
 
 
-def test_every_accent_reads_on_its_surface() -> None:
-    for name, (la, _, da, _) in ACCENTS.items():
-        assert _contrast(la, SURFACE["light"]) >= 4.5, name
-        assert _contrast(da, SURFACE["dark"]) >= 4.5, name
+def test_the_old_themes_and_accents_are_gone() -> None:
+    css = CSS.read_text(encoding="utf-8")
+    assert "data-accent" not in css
+    for old in ("light", "dark"):
+        assert f'data-theme="{old}"' not in css, old
 
 
 def test_each_font_choice_sets_the_stacks() -> None:
