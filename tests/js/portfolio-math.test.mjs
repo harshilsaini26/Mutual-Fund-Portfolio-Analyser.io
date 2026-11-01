@@ -398,3 +398,11 @@ test("chosen slots are the rows; the next free place is offered once", () => {
   assert.equal(full.chosen.length, 3);
   assert.equal(full.next, null);
 });
+
+test("a row not filled in yet shows no error; one half-typed does (Impeccable critique, 2026-11-01)", () => {
+  const fund = { prices_from: "2020-01-01" };
+  assert.equal(M.shownError(fund, "purchase", { date: "", amount: "" }, "2026-10-01"), null);
+  assert.equal(M.shownError(fund, "sip", { amount: "", day: 1, start: "2026-10", stop: null }, "2026-10-01"), null);
+  assert.match(M.shownError(fund, "purchase", { date: "", amount: "5000" }, "2026-10-01"), /date/);
+  assert.match(M.shownError(fund, "sale", { date: "2021-01-01", amount: "" }, "2026-10-01"), /amount/);
+});

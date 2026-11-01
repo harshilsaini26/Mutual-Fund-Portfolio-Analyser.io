@@ -901,3 +901,14 @@ def test_every_field_hint_is_set_in_the_faint_ink() -> None:
     assert [sel.strip() for sel, _ in rules] == ["::placeholder"], rules
     assert re.search(r"color:\s*var\(--ink-faint\)", rules[0][1])
     assert re.search(r"opacity:\s*1\b", rules[0][1])
+
+
+def test_the_settings_actions_stand_apart() -> None:
+    """Impeccable critique, 2026-11-01: "Reset to defaultsClear recently viewed",
+    two inline buttons with nothing between them. Each on its own line, with a
+    24px target."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    rule = re.search(r"\.settings__reset\s*\{([^}]*)\}", css)
+    assert rule and re.search(r"display:\s*block", rule.group(1))
+    assert re.search(r"min-height:\s*24px", rule.group(1))
+    assert re.search(r"\.settings__reset \+ \.settings__reset\s*\{[^}]*margin-top", css)

@@ -121,8 +121,14 @@
       funds.slice(0, 3).map(function (f) { return f.id; }).join(",");
   }
 
+  // What a section says while its files load, rather than the one-fund prompt it
+  // showed before (Impeccable critique, 2026-11-01).
+  function loading(section, count) {
+    return "Loading the " + count + " funds' " + (section === "growth" ? "prices" : "holdings") + "…";
+  }
+
   var api = {
-    starters: starters, sipHash: sipHash,
+    starters: starters, sipHash: sipHash, loading: loading,
     parseHash: parseHash, writeHash: writeHash, sharedStart: sharedStart,
     growthSeries: growthSeries, highLow: highLow, commonHoldings: commonHoldings,
     shownFigure: shownFigure, nextFocus: nextFocus, MAX: MAX,
@@ -456,12 +462,23 @@
       });
       return;
     }
-    drawGrowth(funds, live);
+    var busy = ["growth", "overlap", "mix"].map(function (name) {
+      fill(out(name), note(loading(name, funds.length)));
+      out(name).setAttribute("aria-busy", "true");
+      return out(name);
+    });
+    // A newer choice of funds has set its own; only this one's may be cleared.
+    var done = function (boxes) {
+      return function () {
+        if (live()) boxes.forEach(function (b) { b.removeAttribute("aria-busy"); });
+      };
+    };
+    drawGrowth(funds, live).then(done(busy.slice(0, 1)), done(busy.slice(0, 1)));
     Promise.all(funds.map(function (f) { return K.lookFile(BASE, f.id); })).then(function (files) {
       if (!live()) return;
       drawOverlap(funds, files);
       drawMix(funds, files);
-    });
+    }).then(done(busy.slice(1)), done(busy.slice(1)));
   }
 
   // --- start -------------------------------------------------------------------------

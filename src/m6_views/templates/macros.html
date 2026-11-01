@@ -160,14 +160,15 @@
   whose points `render.spark_points` scaled. A tone is never shown by colour
   alone: the symbol (▲ ▼) and the words carry it too (§10.3).
 
-  A `None` renders as an em dash (§9.3) with a title saying why -- never a 0,
-  which would be a claim.
+  A `None` renders as an em dash (§9.3) with a line saying why -- never a 0,
+  which would be a claim. The line is on the page, not in a hover title that a
+  keyboard or a touch screen never shows (Impeccable critique, 2026-11-01).
 #}
 <div class="kpi__tile{% if tile.value is none %} kpi__tile--absent{% endif %}{% if tile.tone %} kpi__tile--{{ tile.tone }}{% endif %}">
   <dt>{{ tile.label }}{% if term_for.tile.get(tile.key) %}{{ term(term_for.tile[tile.key], tile.key) }}{% endif %}</dt>
-  <dd class="kpi__value"{% if tile.value is none %} title="{{ tile.context or why }}"{% endif %}>{{ tile | fmt_tile }}</dd>
-  {% if tile.context %}
-  <dd class="kpi__context">{% if tile.symbol %}<span class="kpi__symbol" aria-hidden="true">{{ tile.symbol }}</span>{% endif %}<span>{{ tile.context }}</span></dd>
+  <dd class="kpi__value">{{ tile | fmt_tile }}</dd>
+  {% if tile.context or tile.value is none %}
+  <dd class="kpi__context">{% if tile.symbol %}<span class="kpi__symbol" aria-hidden="true">{{ tile.symbol }}</span>{% endif %}<span>{{ tile.context or why }}</span></dd>
   {% endif %}
   {% if spark %}
   <dd class="kpi__spark"><svg viewBox="0 0 120 32" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polygon points="{{ spark.area }}"/><polyline points="{{ spark.line }}"/></svg></dd>

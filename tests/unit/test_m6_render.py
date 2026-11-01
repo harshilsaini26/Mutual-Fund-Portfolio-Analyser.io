@@ -417,6 +417,15 @@ def test_an_uncomputed_figure_is_an_em_dash_not_a_zero(
     html = page(client, "portfolio_summary")
     assert "kpi__tile--absent" in html
     assert "—" in html
+    # Why it is missing is on the page, not only in a hover title a keyboard or a
+    # touch screen never shows (Impeccable critique, 2026-11-01).
+    absent = re.findall(r'<div class="kpi__tile kpi__tile--absent[^"]*">(.*?)</div>',
+                        html, re.S)
+    assert absent
+    for tile in absent:
+        assert 'title="' not in tile
+        reason = r'<dd class="kpi__context">.*?<span>[^<]+</span>'
+        assert re.search(reason, tile, re.S), tile
 
 
 def test_indian_grouping_reaches_the_table(client: TestClient) -> None:

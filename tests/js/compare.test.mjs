@@ -93,3 +93,8 @@ test("the /sip/ link names the first ranked fund's kind", () => {
   assert.equal(C.sipHash([flexi, idx, { id: "G", category: "equity/mid_cap" }, { id: "H", category: "x/y" }]),
     "#c=equity/flexi_cap&f=F,I,G");
 });
+test("while two or more funds load, each section says so (Impeccable critique, 2026-11-01)", () => {
+  assert.equal(C.loading("growth", 2), "Loading the 2 funds' prices…");
+  assert.equal(C.loading("overlap", 3), "Loading the 3 funds' holdings…");
+  assert.equal(C.loading("mix", 4), "Loading the 4 funds' holdings…");
+});

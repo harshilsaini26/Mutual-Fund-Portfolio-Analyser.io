@@ -58,7 +58,7 @@
   // --- data ------------------------------------------------------------------
 
   // --- entry -----------------------------------------------------------------
-  function rowError(fund, kind, row) { return M.rowError(fund, kind, row, TODAY); }
+  function rowError(fund, kind, row) { return M.shownError(fund, kind, row, TODAY); }
 
   // Shows or clears one row's message in place, so editing a field never
   // rebuilds the form under the cursor.

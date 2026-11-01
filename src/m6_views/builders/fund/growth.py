@@ -93,13 +93,15 @@ class FundGrowthBuilder:
             else "."
         )
 
-        caveats: list[str] = []
+        # In the headline, not the folded notes: a reader of "All" sees the line
+        # begin years after the fund did (Impeccable critique, 2026-11-01).
         if late:
-            caveats.append(
-                f"Drawn from {format_date(path.start)}, the first day its benchmark "
-                f"has prices; the price per unit goes back to "
+            headline += (
+                f" It starts on {format_date(path.start)}, the first day its "
+                f"benchmark has prices; the price per unit goes back to "
                 f"{format_date(navs[0].nav_date)}."
             )
+        caveats: list[str] = []
         if key != "max" and path.start > start:
             caveats.append(
                 f"Prices on record begin on {format_date(path.start)}, after "

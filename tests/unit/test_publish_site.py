@@ -524,7 +524,10 @@ def test_the_growth_chart_starts_where_its_benchmark_does(
     begins = (TODAY - timedelta(days=200)).isoformat()
     assert growth["series"][0]["points"][0][0] == begins
     assert price["series"][0]["points"][0][0] == (TODAY - timedelta(days=300)).isoformat()
-    assert any("the first day its benchmark has prices" in c for c in env.caveats)
+    # Said in the headline, not only in the folded notes (Impeccable critique,
+    # 2026-11-01): a reader of "All" sees the line begin years after the fund.
+    assert "the first day its benchmark has prices" in env.payload["headline"]
+    assert not any("the first day its benchmark" in c for c in env.caveats)
     assert growth.get("log") is True   # a log scale on offer, for long records
 
 

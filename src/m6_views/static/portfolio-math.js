@@ -176,6 +176,12 @@
     return null;
   }
 
+  // What the page shows beside a row: nothing until something is typed in it, so a
+  // row just added is not already marked wrong (Impeccable critique, 2026-11-01).
+  function shownError(fund, kind, row, todayIso) {
+    return blank(kind, row) ? null : rowError(fund, kind, row, todayIso);
+  }
+
   // The purchases a holding's error-free rows make, and how many rows with an
   // error were left out (a row not yet filled in is not counted).
   function entriesOf(holding, fund, todayIso) {
@@ -782,7 +788,7 @@
     sipDates: sipDates, purchasesOf: purchasesOf, position: position, xirr: xirr,
     showsXirr: showsXirr, isSynthetic: isSynthetic, lookThrough: lookThrough,
     overlap: overlap, alternatives: alternatives, parsePortfolio: parsePortfolio,
-    localDay: localDay, rowError: rowError, entriesOf: entriesOf, altSlots: altSlots,
+    localDay: localDay, rowError: rowError, shownError: shownError, entriesOf: entriesOf, altSlots: altSlots,
     pricedBuys: pricedBuys, pricedSales: pricedSales, gzipText: gzipText, day: day, units: units,
     reference: reference, grouped: grouped, inWords: inWords,
   };
