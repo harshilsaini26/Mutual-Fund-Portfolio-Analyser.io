@@ -995,10 +995,14 @@ def test_the_public_menu_holds_every_link(site: Path) -> None:
 
 def test_the_top_bar_has_no_repository_link_and_the_footer_does(site: Path) -> None:
     html = _published(site)["front"]
+    # The repository's links, read as links: an href is compared whole, never
+    # searched for a host name (CodeQL py/incomplete-url-substring-sanitization).
+    repo = "https://github.com/harshilsaini26/Mutual-Fund-Portfolio-Analyser.io"
     bar = re.search(r'<header class="topbar topbar--public">(.*?)</header>', html, re.S)
-    assert bar and "github.com" not in bar.group(1)
+    assert bar and not [h for h in re.findall(r'href="([^"]+)"', bar.group(1))
+                        if h.startswith("https://")]
     foot = re.search(r"<footer[^>]*>(.*?)</footer>", html, re.S)
-    assert foot and "github.com" in foot.group(1)
+    assert foot and repo in re.findall(r'href="([^"]+)"', foot.group(1))
 
 
 def test_the_public_note_is_one_line(site: Path) -> None:

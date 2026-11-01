@@ -129,7 +129,8 @@
     return;
   }
 
-  var ROOT = document.body.getAttribute("data-root") || "";
+  // A path prefix only (as Kit.root): no scheme or markup can reach an href.
+  var ROOT = (document.body.getAttribute("data-root") || "").replace(/[^\w\-\/.~]/g, "");
 
   // The top bar's menu (V1-88) is a native popover: Esc and a tap outside close it
   // already. Choosing a link on this same page (Categories, About) and widening
@@ -149,7 +150,7 @@
     document.querySelectorAll("button.term").forEach(function (button) {
       var link = document.createElement("a");
       link.className = "term";
-      link.href = ROOT + "/learn/glossary/#" + button.getAttribute("data-key");
+      link.href = ROOT + "/learn/glossary/#" + encodeURIComponent(button.getAttribute("data-key") || "");
       link.setAttribute("aria-label", button.getAttribute("aria-label"));
       link.textContent = "?";
       button.replaceWith(link);
@@ -606,7 +607,7 @@
       if (key === "name") {
         var link = document.createElement("a");
         link.className = "fund-name";
-        link.href = ROOT + "/fund/" + r.id + "/";
+        link.href = ROOT + "/fund/" + encodeURIComponent(r.id) + "/";
         link.textContent = r.name;
         var house = document.createElement("span");
         house.className = "cell-sub";

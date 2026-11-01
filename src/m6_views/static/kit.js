@@ -11,13 +11,20 @@
   // empty list, and a stray "0" on a page of figures reads as one.
   function present(children) { return children.filter(function (c) { return !!c; }); }
 
+  // A page's link prefix (`data-root`): only the characters a path has, so no
+  // scheme (`javascript:`) or markup can reach an href built on it (CodeQL
+  // js/xss-through-dom). The server writes "" or "/folder"; anything else is cut.
+  function root(node) {
+    return String((node && node.getAttribute("data-root")) || "").replace(/[^\w\-\/.~]/g, "");
+  }
   function el(tag, attrs) {
     var node = document.createElement(tag);
     Object.keys(attrs || {}).forEach(function (k) {
       if (attrs[k] != null && attrs[k] !== false) node.setAttribute(k, attrs[k] === true ? "" : attrs[k]);
     });
     present(Array.prototype.slice.call(arguments, 2)).forEach(function (c) {
-      node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+      // A node is a node; anything else is text, never markup (CodeQL js/xss).
+      node.appendChild(c && c.nodeType ? c : document.createTextNode(String(c)));
     });
     return node;
   }
@@ -283,7 +290,7 @@
     return svg;
   }
 
-  var api = { present: present, el: el, fill: fill, table: table, match: match, picker: picker,
+  var api = { present: present, root: root, el: el, fill: fill, table: table, match: match, picker: picker,
               heat: heat,
               bar: bar, INR: INR, CLASS: CLASS,
               navSeries: navSeries, lookFile: lookFile, termButton: termButton,

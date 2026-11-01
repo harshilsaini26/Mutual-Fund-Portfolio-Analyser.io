@@ -137,7 +137,7 @@
   if (!page || !M || !K) return;
   var el = K.el, fill = K.fill, bar = K.bar, CLASS = K.CLASS, INR = K.INR;
 
-  var BASE = page.getAttribute("data-root") || "";
+  var BASE = K.root(page);
   var FUNDS = new Map();
   var ids = [];                 // the funds on show, in the address's order
   var generation = 0;           // the newest render; older ones do not draw

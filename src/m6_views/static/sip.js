@@ -146,7 +146,7 @@
   var host = document.querySelector("[data-sip], [data-portfolio]");
   if (!host || !M || !K) return;
   var el = K.el, fill = K.fill, INR = K.INR;
-  var BASE = host.getAttribute("data-root") || "";
+  var BASE = K.root(host);
 
   function rupees(paise) { return INR.format(Math.round(paise / 100)); }
   var pct = fallText;   // every percent this page prints is how far below

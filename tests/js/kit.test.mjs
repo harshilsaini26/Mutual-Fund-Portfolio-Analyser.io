@@ -167,3 +167,15 @@ test("nothing typed, nothing that matches, and a limit: what the picker shows", 
   assert.deepEqual(K.match(PICK, "axis"), []);
   assert.equal(K.match(PICK, "fund", 2).length, 2);
 });
+
+// A page's link prefix (`data-root`) is read as a path and nothing else (CodeQL
+// js/xss-through-dom): only the characters a path prefix has, so no scheme such as
+// `javascript:` can reach an href built on it.
+test("the root is a path prefix, never more", () => {
+  const at = (v) => ({ getAttribute: () => v });
+  assert.equal(K.root(at("/Repo")), "/Repo");
+  assert.equal(K.root(at("")), "");
+  assert.equal(K.root(at(null)), "");
+  assert.equal(K.root(at('javascript:alert(1)//')), "javascriptalert1//");
+  assert.equal(K.root(at('/x"><img src=x onerror=alert(1)>')), "/ximgsrcxonerroralert1");
+});

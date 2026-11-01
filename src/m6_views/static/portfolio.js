@@ -9,7 +9,7 @@
   var page = document.querySelector("[data-portfolio]");
   if (!page || !M || !window.Kit) return;
 
-  var BASE = page.getAttribute("data-root") || "";
+  var BASE = window.Kit.root(page);
   var KEY = "lookthrough.portfolio.v1";
   var TODAY = M.localDay(new Date());
   var ESTIMATE = "Worked out in your browser from published NAVs: an estimate of your holding, " +
