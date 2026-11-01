@@ -115,3 +115,22 @@ test("each family's count, and each category's within the family chosen", () => 
   assert.deepEqual(all.categories, { "equity/flexi_cap": 2, "debt/liquid": 1, "equity/small_cap": 1 });
   assert.deepEqual(A.exploreCounts(ROWS, "equity").categories, { "equity/flexi_cap": 2, "equity/small_cap": 1 });
 });
+
+test("the category picker is grouped: each family's ranked categories, then the unranked", () => {
+  // Impeccable critique, 2026-11-01: 58 options in one flat list, AMFI's older
+  // headings among them. Grouped by family in the site's order, by name within.
+  const rows = ROWS.concat([
+    { id: "E", family: "other", cat: "index/undivided", cat_name: "Index funds (earlier AMFI heading)", mixed: true, c: {} },
+    { id: "F", family: "equity", cat: "equity/sectoral_thematic", cat_name: "Sectoral or thematic (earlier AMFI heading)", mixed: true, c: {} },
+  ]);
+  const names = [["equity", "Equity"], ["debt", "Debt"], ["other", "Index funds and more"]];
+  assert.deepEqual(A.exploreGroups(rows, "", names), [
+    { label: "Equity", options: [["equity/flexi_cap", "Flexi cap", 2], ["equity/small_cap", "Small cap", 1]] },
+    { label: "Debt", options: [["debt/liquid", "Liquid", 1]] },
+    { label: "Not ranked: mixed or older AMFI headings", options: [
+      ["index/undivided", "Index funds (earlier AMFI heading)", 1],
+      ["equity/sectoral_thematic", "Sectoral or thematic (earlier AMFI heading)", 1]] },
+  ]);
+  assert.deepEqual(A.exploreGroups(rows, "debt", names), [
+    { label: "Debt", options: [["debt/liquid", "Liquid", 1]] }]);
+});

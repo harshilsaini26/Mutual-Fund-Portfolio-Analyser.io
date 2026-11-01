@@ -481,3 +481,18 @@ def test_what_could_not_be_matched_is_a_bar_of_its_own(tmp_path: Path) -> None:
     assert "10.00% of the fund is in holdings not matched to a company" in panel
     assert "<caption" in panel and ">Largest holdings</caption>" in panel
     assert ">55.00%</td>" in panel
+
+
+def test_each_rank_says_how_many_funds_it_counts_and_what_they_share() -> None:
+    """Impeccable critique, 2026-11-01: "16th of 36" beside "3rd of 46" for one
+    category read as a contradiction; each count is the funds with that figure."""
+    from src.m2_fund.peers import METRICS, Rank
+    from src.m6_views.builders.fund.peers import rank_basis
+
+    by = {m.key: m for m in METRICS}
+    three = Rank(by["return_3y"], Decimal("0.1"), 16, 36, 2)
+    assert rank_basis(three) == "of the 36 funds with three years of prices"
+    assert rank_basis(Rank(by["return_1y"], Decimal("0.1"), 3, 42, 1)) == (
+        "of the 42 funds with a year of prices")
+    assert rank_basis(Rank(by["ter"], Decimal("0.5"), 3, 46, 1)) == (
+        "of the 46 funds with an expense ratio on record")

@@ -172,7 +172,8 @@
           {#- Headings that mix funds doing different jobs, last and folded (H-03). -#}
           {% if family.mixed %}
           <li><details class="fundmap__mixed">
-            <summary>Mixed headings <span>{{ family.mixed | sum(attribute="count") }}</span></summary>
+            {%- set n = family.mixed | sum(attribute="count") %}
+            <summary>Not ranked: {{ n | fmt_count }} more fund{{ '' if n == 1 else 's' }} under mixed or older AMFI headings</summary>
             <p>AMFI headings that hold funds doing different jobs, so never ranked
               against each other.</p>
             <ul class="fundmap__cats">{% for c in family.mixed %}{{ map_category(c) }}{% endfor %}</ul>

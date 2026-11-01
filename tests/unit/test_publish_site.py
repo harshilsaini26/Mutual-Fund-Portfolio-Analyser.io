@@ -845,7 +845,7 @@ def test_the_leader_tables_live_on_the_funds_page(site: Path) -> None:
     engine = templates(root=BASE, static=True)
     page = engine.get_template("explorer.html").render({
         "catalogue": [], "health": {}, "qs": "", "active": "funds", "built": TODAY,
-        "categories": [], "category_options": [], "count": 0, **EXPLORE_EMPTY,
+        "categories": [], "category_groups": [], "count": 0, **EXPLORE_EMPTY,
         "families": [], "stats": {"houses": 0, "categories": 0, "prices_to": None},
         "leaders": [card]})
     fold = (r'<details class="leaders-fold">\s*<summary>Highest three-year returns'
@@ -1258,7 +1258,7 @@ def test_every_labelled_figure_with_a_glossary_entry_explains_itself() -> None:
     card = {"key": "equity/flexi_cap", "name": "Flexi cap", "count": 7, "funds": []}
     page = engine.get_template("explorer.html").render({
         "catalogue": [], "health": {}, "qs": "", "active": "funds", "built": TODAY,
-        "categories": [], "category_options": [], "count": 0, **EXPLORE_EMPTY,
+        "categories": [], "category_groups": [], "count": 0, **EXPLORE_EMPTY,
         "families": [], "stats": {"houses": 0, "categories": 0, "prices_to": None},
         "leaders": [card, {**card, "key": "equity/mid_cap", "name": "Mid cap"}]})
     fold = page[page.index('class="leaders-fold"'):page.index('id="funds"')]
@@ -1672,3 +1672,32 @@ def test_every_way_into_the_sip_page(site: Path) -> None:
             ("portfolio.js", "Holding no funds yet? See what a SIP would have become →")):
         script = (STATIC_DIR / name).read_text(encoding="utf-8")
         assert text in script and 'BASE + "/sip/' in script, name
+
+
+def test_explore_groups_its_categories_by_family_and_folds_the_unranked() -> None:
+    """Impeccable critique, 2026-11-01: Explore's category picker was one list of
+    58, AMFI's older headings among the rest. As app.js's exploreGroups: each
+    family's ranked categories by name, the unranked headings last, together."""
+    def row(amfi: str) -> dict[str, str]:
+        c = category_of(amfi)
+        return {"category": amfi, "category_key": c.key, "category_short": c.name,
+                "family": c.family}
+
+    rows = [row("Equity Scheme - Small Cap Fund"), row("Other Scheme - Index Funds"),
+            row("Equity Scheme - Flexi Cap Fund"), row("Debt Scheme - Liquid Fund"),
+            row("Equity Scheme - Sectoral/ Thematic"),
+            row("Equity Scheme - Flexi Cap Fund")]
+    groups = publish.category_groups(rows)
+    assert [g for g, _ in groups] == ["Equity", "Debt", publish.UNRANKED]
+    assert [n for _, n in groups[0][1]] == ["Flexi cap", "Small cap"]
+    assert [n for _, n in groups[2][1]] == [
+        "Index funds (earlier AMFI heading)",
+        "Sectoral or thematic (earlier AMFI heading)"]
+    cell = {"value": "", "label": DASH, "tone": None, "symbol": None}
+    blank = {"scheme_id": "x", "name": "x", "house": "", "size_value": "",
+             "size_label": "", "ter_value": "", "ter_label": "", "rank_value": "",
+             "rank_label": "", "rank_quarter": "", "returns": [cell] * 3}
+    record = {"vol3": None, "fall3": None, "sharpe3": None,
+              "labels": {"vol3": None, "fall3": None, "sharpe3": None}}
+    flags = [publish.explore_row({**blank, **r}, record).get("mixed") for r in rows[:2]]
+    assert flags == [None, True]

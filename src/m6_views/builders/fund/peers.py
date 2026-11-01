@@ -56,6 +56,20 @@ def rank_words(rank: Rank) -> str:
     return f"{format_ordinal(rank.rank)} of {rank.ranked}"
 
 
+#: What the funds a rank counts have in common, by the figure's window.
+HISTORY = {"1y": "a year of prices", "3y": "three years of prices",
+           "5y": "five years of prices"}
+
+
+def rank_basis(rank: Rank) -> str:
+    """"of the 36 funds with three years of prices": each rank counts only the
+    funds with its figure, so one category's totals differ (Impeccable
+    critique, 2026-11-01)."""
+    has = ("an expense ratio on record" if rank.metric.field == "ter"
+           else HISTORY[rank.metric.window])
+    return f"of the {rank.ranked} funds with {has}"
+
+
 def figure_words(rank: Rank) -> str:
     if rank.value is None:
         return DASH
@@ -192,7 +206,8 @@ class FundPeersBuilder:
                     {
                         "label": r.metric.label,
                         "value": rank_words(r) if r.rank is not None else DASH,
-                        "note": (f"{figure_words(r)}, {QUARTERS[r.quartile]}"
+                        "note": (f"{figure_words(r)}, the {QUARTERS[r.quartile]} "
+                                 f"{rank_basis(r)}"
                                  if r.quartile else rank_words(r)),
                     }
                     for r in found.ranks
@@ -226,4 +241,4 @@ class FundPeersBuilder:
         )
 
 
-__all__ = ["FundPeersBuilder", "figure_words", "rank_words"]
+__all__ = ["FundPeersBuilder", "figure_words", "rank_basis", "rank_words"]

@@ -94,7 +94,9 @@
       <label class="sr-only" for="filter-category">Category</label>
       <select id="filter-category" data-filter-category>
         <option value="">All categories</option>
-        {% for key, name in category_options %}<option value="{{ key }}">{{ name }}</option>{% endfor %}
+        {% for label, options in category_groups %}<optgroup label="{{ label }}">
+          {%- for key, name in options %}<option value="{{ key }}">{{ name }}</option>{% endfor %}</optgroup>
+        {% endfor %}
       </select>
       <label class="sr-only" for="filter-text">Narrow by name</label>
       <span class="table-card__search">

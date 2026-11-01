@@ -487,7 +487,7 @@
     var ok = list.filter(function (x) { return x.pos && x.pos.firstDate; });
     var box = out("summary");
     if (!ok.length) {
-      box.replaceChildren(el("p", { "class": "pf__note" }, list.length
+      fill(box, el("p", { "class": "pf__note" }, list.length
         ? "Nothing is valued yet; the funds table says why for each fund."
         : "Add a fund and a purchase to see what it is worth."),
         // Someone holding nothing yet can still look back (SPEC_SIP_WHAT_IF §4.8).

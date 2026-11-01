@@ -120,12 +120,36 @@
     return { families: families, categories: categories };
   }
 
+  // The category picker's groups: each family's ranked categories (in `names`'
+  // order, [key, label] pairs), by name, then every family's unranked headings in
+  // one group last. Options are [key, name, count] for the family chosen.
+  var UNRANKED = "Not ranked: mixed or older AMFI headings";
+  function exploreGroups(rows, family, names) {
+    var seen = {};
+    rows.forEach(function (r) {
+      if (family && r.family !== family) return;
+      var s = seen[r.cat] || (seen[r.cat] = [r.cat, r.cat_name, 0, r.family, !!r.mixed]);
+      s[2] += 1;
+    });
+    var all = Object.keys(seen).map(function (k) { return seen[k]; }).sort(function (a, b) {
+      return a[1].toLowerCase() < b[1].toLowerCase() ? -1 : 1;
+    });
+    var groups = names.map(function (n) {
+      return { label: n[1], options: all.filter(function (c) { return c[3] === n[0] && !c[4]; }) };
+    });
+    groups.push({ label: UNRANKED, options: all.filter(function (c) { return c[4]; }) });
+    return groups.filter(function (g) { return g.options.length; }).map(function (g) {
+      return { label: g.label, options: g.options.map(function (c) { return c.slice(0, 3); }) };
+    });
+  }
+
   if (typeof module === "object" && module.exports) {
     module.exports = { filterHash: filterHash, parseFilterHash: parseFilterHash,
                        isFilterHash: isFilterHash, initialFilters: initialFilters,
                        later: later, searchTarget: searchTarget, hintPlace: hintPlace,
                        termHost: termHost, sortKey: sortKey,
-                       exploreRows: exploreRows, exploreCounts: exploreCounts };
+                       exploreRows: exploreRows, exploreCounts: exploreCounts,
+                       exploreGroups: exploreGroups };
     return;
   }
 
@@ -635,17 +659,21 @@
         var n = o.value ? counts.families[o.value] || 0 : data.length;
         o.textContent = o.getAttribute("data-name") + " (" + n.toLocaleString("en-IN") + ")";
       });
-      var names = {};
-      data.forEach(function (r) { names[r.cat] = r.cat_name; });
-      var keys = Object.keys(counts.categories).sort(function (a, b) {
-        return names[a].toLowerCase() < names[b].toLowerCase() ? -1 : 1;
+      var names = Array.prototype.filter.call(family.options, function (o) { return o.value; })
+        .map(function (o) { return [o.value, o.getAttribute("data-name")]; });
+      var kept = category.value, total = 0, keys = [];
+      category.replaceChildren(new Option("", ""));
+      exploreGroups(data, family.value, names).forEach(function (g) {
+        var group = document.createElement("optgroup");
+        group.label = g.label;
+        g.options.forEach(function (c) {
+          total += c[2];
+          keys.push(c[0]);
+          group.appendChild(new Option(c[1] + " (" + c[2].toLocaleString("en-IN") + ")", c[0]));
+        });
+        category.appendChild(group);
       });
-      var kept = category.value, total = 0;
-      keys.forEach(function (k) { total += counts.categories[k]; });
-      category.replaceChildren(new Option("All categories (" + total.toLocaleString("en-IN") + ")", ""));
-      keys.forEach(function (k) {
-        category.appendChild(new Option(names[k] + " (" + counts.categories[k].toLocaleString("en-IN") + ")", k));
-      });
+      category.options[0].textContent = "All categories (" + total.toLocaleString("en-IN") + ")";
       category.value = keys.indexOf(kept) >= 0 ? kept : "";
     };
 

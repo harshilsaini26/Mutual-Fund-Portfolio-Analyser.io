@@ -889,3 +889,15 @@ def test_the_audits_last_findings_stay_fixed() -> None:
     for link in (r"\.pf__holding-head h3 a", r"\.measure-notes dt a"):
         assert re.search(link + r"\s*\{[^}]*min-height: 24px", css), link
     assert re.search(r"\.term \{[^}]*font-size: max\(0\.75em, var\(--text-xs\)\)", css)
+
+
+def test_every_field_hint_is_set_in_the_faint_ink() -> None:
+    """Impeccable audit, 2026-11-01: Explore's "Narrow by name" kept the browser's
+    grey placeholder, 3.7:1 on Midnight Neon. One rule for every field, in
+    --ink-faint (held to 4.5:1 on every surface above); `opacity: 1` because
+    Firefox fades placeholders."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    rules = re.findall(r"([^{}]*::placeholder[^{}]*)\{([^}]*)\}", css)
+    assert [sel.strip() for sel, _ in rules] == ["::placeholder"], rules
+    assert re.search(r"color:\s*var\(--ink-faint\)", rules[0][1])
+    assert re.search(r"opacity:\s*1\b", rules[0][1])

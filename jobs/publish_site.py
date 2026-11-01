@@ -403,7 +403,28 @@ def explore_row(row: dict[str, Any], record: dict[str, Any]) -> dict[str, Any]:
             **{key: [record[key] or "", labels[key] or DASH]
                for key in ("vol3", "fall3", "sharpe3")},
         },
+        # A heading of unlike funds (`ranked: false`): Explore's picker folds these
+        # into one group of their own.
+        **({} if category_of(row.get("category")).ranked else {"mixed": True}),
     }
+
+
+#: Explore's last category group, as app.js's UNRANKED.
+UNRANKED = "Not ranked: mixed or older AMFI headings"
+
+
+def category_groups(
+    rows: list[dict[str, Any]],
+) -> list[tuple[str, list[tuple[str, str]]]]:
+    """Explore's category picker without scripts, grouped as app.js's
+    exploreGroups: each family's ranked categories by name, then the unranked."""
+    seen = {(r["category_key"], r["category_short"], r["family"],
+             category_of(r.get("category")).ranked) for r in rows}
+    ordered = sorted(seen, key=lambda c: c[1].lower())
+    groups = [(name, [(k, n) for k, n, f, ranked in ordered if f == key and ranked])
+              for key, name, _ in FAMILIES]
+    groups.append((UNRANKED, [(k, n) for k, n, _, ranked in ordered if not ranked]))
+    return [g for g in groups if g[1]]
 
 
 def largest_first(explore: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -826,10 +847,7 @@ def build_site(
             **shell,
             "active": "funds",
             "categories": sorted(by_category.items()),
-            "category_options": sorted(
-                {(r["category_key"], r["category_short"]) for r in rows},
-                key=lambda kv: kv[1].lower(),
-            ),
+            "category_groups": category_groups(rows),
             "count": len(funds),
             "explore": explore[:EXPLORE_FIRST],
             "columns": EXPLORE_COLUMNS,

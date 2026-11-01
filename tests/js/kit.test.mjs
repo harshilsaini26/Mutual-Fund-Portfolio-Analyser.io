@@ -181,3 +181,19 @@ test("the root is a path prefix, never more", () => {
   assert.equal(K.root(at('javascript:alert(1)//')), "javascriptalert1//");
   assert.equal(K.root(at('/x"><img src=x onerror=alert(1)>')), "/ximgsrcxonerroralert1");
 });
+
+test("no page hands a maybe-false child straight to the DOM: fill() drops it", async () => {
+  // The DOM writes `false` as the text "false" (Portfolio's summary did, 2026-11-01).
+  const { readFileSync, readdirSync } = await import("node:fs");
+  const dir = new URL("../../src/m6_views/static/", import.meta.url);
+  const bad = [];
+  for (const name of readdirSync(dir).filter((f) => f.endsWith(".js"))) {
+    const src = readFileSync(new URL(name, dir), "utf8");
+    for (const m of src.matchAll(/\.(?:replaceChildren|append)\(/g)) {
+      let depth = 1, i = m.index + m[0].length;
+      while (depth && i < src.length) depth += { "(": 1, ")": -1 }[src[i++]] || 0;
+      if (/&&/.test(src.slice(m.index, i))) bad.push(name + ":" + src.slice(0, m.index).split("\n").length);
+    }
+  }
+  assert.deepEqual(bad, []);
+});

@@ -29,7 +29,7 @@ from src.m2_fund.windows import (
 from src.m6_views.aggregate import lttb_indices
 from src.m6_views.builder import Scope
 from src.m6_views.builders.fund.common import NO_FUND, FundQuality, withholds_index
-from src.m6_views.builders.fund.peers import QUARTERS, rank_words
+from src.m6_views.builders.fund.peers import QUARTERS, rank_basis, rank_words
 from src.m6_views.compose import ok_envelope
 from src.m6_views.deps import Deps
 from src.m6_views.envelope import ViewEnvelope
@@ -91,7 +91,8 @@ def _rank_tile(peers: PeerContext | None) -> dict[str, Any]:
     if three.rank is None or three.quartile is None:
         return _tile("rank_3y", label, None, "text", (three.reason or "").capitalize())
     return _tile("rank_3y", label, rank_words(three), "text",
-                 f"The {QUARTERS[three.quartile]} of {peers.category.name}")
+                 f"The {QUARTERS[three.quartile]} {rank_basis(three)} in "
+                 f"{peers.category.name}")
 
 
 def _nav(fw: FundWindows | None) -> dict[str, Any] | None:
