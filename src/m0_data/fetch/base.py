@@ -12,16 +12,17 @@ them. An orphan file on disk is harmless and a reconcile job finds it.
 from __future__ import annotations
 
 import hashlib
+import json
 import random
 import time
+import urllib.error
+import urllib.request
 import urllib.robotparser
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
-
-import httpx
+from urllib.parse import urljoin, urlparse
 
 #: Extension by content type, for the archive path. Unknown types keep `.bin`
 #: rather than guessing: the manifest records the real content_type anyway.
@@ -110,6 +111,92 @@ class DomainRateLimiter:
         return waited
 
 
+class HttpError(Exception):
+    """The network failed: no answer came back. A status is an answer, not this."""
+
+
+class HttpStatusError(HttpError):
+    """`raise_for_status` on a 4xx or 5xx; the answer is on `response`."""
+
+    def __init__(self, message: str, response: Response) -> None:
+        super().__init__(message)
+        self.response = response
+
+
+@dataclass
+class Response:
+    """One HTTP answer: what the fetch layer and its jobs read from it. Header
+    names are lower-cased, as every caller asks for them."""
+
+    status_code: int
+    content: bytes = b""
+    headers: dict[str, str] = field(default_factory=dict)
+    url: str = ""
+
+    def __post_init__(self) -> None:
+        self.headers = {k.lower(): v for k, v in self.headers.items()}
+
+    @property
+    def text(self) -> str:
+        kind = self.headers.get("content-type", "")
+        charset = (kind.split("charset=")[1].split(";")[0].strip()
+                   if "charset=" in kind else "utf-8")
+        return self.content.decode(charset, "replace")
+
+    def json(self) -> Any:
+        return json.loads(self.content)
+
+    def raise_for_status(self) -> None:
+        if self.status_code >= 400:
+            raise HttpStatusError(f"HTTP {self.status_code} for {self.url}", self)
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Hand a redirect back as an answer: `_follow` checks each hop (§2.3)."""
+
+    def redirect_request(self, *args: Any) -> None:
+        return None
+
+
+class _Http:
+    """The standard library's HTTP, shaped as the fetch layer calls it (it was
+    httpx until the ponytail audit, 2026-11-01). A status, 3xx to 5xx, comes back
+    as a `Response`; only a failure to get an answer raises `HttpError`."""
+
+    _direct = urllib.request.build_opener(_NoRedirect)
+    _following = urllib.request.build_opener()
+
+    def request(self, method: str, url: str, *, headers: dict[str, str] | None = None,
+                json: Any = None, timeout: float | None = None,
+                follow_redirects: bool = False) -> Response:
+        heads = dict(headers or {})
+        data = None
+        if json is not None:
+            data = _json_bytes(json)
+            heads.setdefault("Content-Type", "application/json")
+        request = urllib.request.Request(url, data=data, headers=heads, method=method)
+        opener = self._following if follow_redirects else self._direct
+        try:
+            with opener.open(request, timeout=timeout) as answer:
+                return Response(answer.status, answer.read(),
+                                dict(answer.headers.items()), answer.url)
+        except urllib.error.HTTPError as status:   # a status is an answer
+            return Response(status.code, status.read(), dict(status.headers.items()), url)
+        except (urllib.error.URLError, OSError) as exc:
+            raise HttpError(f"{method} {url}: {exc}") from exc
+
+    def get(self, url: str, *, timeout: float | None = None, **kw: Any) -> Response:
+        return self.request("GET", url, timeout=timeout, follow_redirects=True, **kw)
+
+
+def _json_bytes(body: Any) -> bytes:
+    return json.dumps(body).encode("utf-8")
+
+
+#: The client every fetch uses unless a test hands in its own.
+HTTP = _Http()
+
+
 class RobotsCache:
     """robots.txt per domain, cached. MODULE_0.md §2.3 calls this mandatory.
 
@@ -129,7 +216,7 @@ class RobotsCache:
         if cached is None or (time.monotonic() - cached[0]) > self.ttl:
             parser = urllib.robotparser.RobotFileParser()
             try:
-                getter = client or httpx
+                getter = client or HTTP
                 response = getter.get(f"{origin}/robots.txt", timeout=15)
                 parser.parse(response.text.splitlines())
             except Exception:
@@ -231,7 +318,7 @@ def conditional_get(
     from_email: str | None = None,
     client: Any = None,
     sleep: Any = time.sleep,
-) -> httpx.Response:
+) -> Response:
     """One polite request, with the stored validators. §2.3.
 
     `method` and `json_body` are here rather than in a second function because
@@ -264,8 +351,9 @@ def conditional_get(
     if last_modified:
         headers["If-Modified-Since"] = last_modified
 
-    getter = client or httpx
-    timeout = httpx.Timeout(timeout_read, connect=timeout_connect)
+    getter = client or HTTP
+    # One deadline for the socket: urllib has no separate connect timeout.
+    timeout = max(timeout_read, timeout_connect)
     last_error: Exception | None = None
     for attempt in range(retries + 1):
         asked = 0.0
@@ -300,14 +388,14 @@ _MAX_HOPS = 5
 
 def _follow(
     getter: Any, method: str, url: str, headers: dict[str, str], json_body: Any,
-    timeout: httpx.Timeout, limiter: DomainRateLimiter | None,
+    timeout: float, limiter: DomainRateLimiter | None,
     robots: RobotsCache | None, user_agent: str, client: Any, sleep: Any,
-) -> httpx.Response:
+) -> Response:
     start = url
     for _ in range(_MAX_HOPS + 1):
         if limiter is not None:
             limiter.acquire(url, sleep=sleep)
-        response: httpx.Response = getter.request(
+        response: Response = getter.request(
             method, url, headers=headers, json=json_body, timeout=timeout,
             follow_redirects=False,
         )
@@ -315,7 +403,7 @@ def _follow(
                     if response.status_code in _REDIRECTS else None)
         if not location:
             return response
-        url = str(httpx.URL(url).join(location))
+        url = urljoin(url, location)
         if response.status_code == 303:
             method, json_body = "GET", None
         if robots is not None and not robots.allows(url, user_agent, client):

@@ -49,7 +49,6 @@
   <meta name="twitter:card" content="summary_large_image">
   {% endif %}
   <script src="{{ root }}/static/settings.js"></script>
-  <link rel="stylesheet" href="{{ root }}/static/lenis.css">
   <link rel="stylesheet" href="{{ root }}/static/app.css">
   {%- block head_extra %}{% endblock %}
 </head>
@@ -71,7 +70,7 @@
   <input id="q" {% if not static %}name="q" {% endif %}type="search" autocomplete="off" spellcheck="false"
          placeholder="Search funds"
          {% if static %}data-index="{{ root }}/search.json"{% else %}data-suggest="/api/search"{% endif %}>
-  <ul class="search__suggest" hidden data-lenis-prevent></ul>
+  <ul class="search__suggest" hidden></ul>
 </form>
 {%- endmacro %}
 
@@ -96,7 +95,7 @@
   ("motion", "Motion", [("device", "Device"), ("on", "On"), ("off", "Off")]),
   ("accent", "Accent", [("navy", "Navy"), ("violet", "Violet"), ("raspberry", "Raspberry"), ("graphite", "Graphite")]),
 ] %}
-<dialog id="settings" class="settings" aria-labelledby="settings-h" data-lenis-prevent>
+<dialog id="settings" class="settings" aria-labelledby="settings-h">
   <div class="settings__head">
     <h2 id="settings-h">Settings</h2>
     <button type="button" class="icon-button" data-settings-close
@@ -263,8 +262,6 @@
 </div>
 {% endif %}
 {{ settings_panel() }}
-{#- In this order: app.js starts Lenis, and deferred scripts run as listed. -#}
-<script src="{{ root }}/static/vendor/lenis.v1.3.26.min.js" defer></script>
 <script src="{{ root }}/static/app.js" defer></script>
 {% block scripts %}{% endblock %}
 </body>

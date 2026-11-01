@@ -9,12 +9,8 @@ own review, not something to bolt on when the bind address changes.
 with the exception's class and message — never a 500, never a stack trace.
 
 **Connections are opened with `check_same_thread=False` and every use takes
-`DB_LOCK`.** The first reasoning was that `async def` routes run on the event
-loop's single thread and so satisfy the default check. They do not: the loop
-runs in whatever thread started it, never the one that opened the database. The
-first API test failed with a `ProgrammingError` swallowed into an `error`
-envelope — which is how a wrong assumption hides when the error path is
-well-behaved.
+`DB_LOCK`.** The server answers each request on its own thread (`jobs/serve.py`),
+never the one that opened the database.
 
 So the opt-out is explicit at the call site and the safety it removes is put
 back with a lock. sqlite3's check exists because concurrent use corrupts cursor
@@ -30,14 +26,10 @@ from datetime import date
 from typing import Any
 from urllib.parse import quote
 
-from fastapi import FastAPI, Query, Request, Response
-from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
-from starlette.middleware.trustedhost import TrustedHostMiddleware
-
 from src.common.types import UserId
 from src.m0_data.providers.warehouse import WarehouseMarketDataProvider
 from src.m6_views.api.pages import SEARCH_MAX_CHARS, STATIC, make_router
+from src.m6_views.api.web import App, Query, Reply, Router, json_reply
 from src.m6_views.builder import Scope
 from src.m6_views.builders import (  # noqa: F401  — import registers the builders
     portfolio,
@@ -154,55 +146,20 @@ def search_funds(warehouse: sqlite3.Connection, query: str) -> list[dict[str, An
     ]
 
 
-def create_app(
-    ledger: sqlite3.Connection, warehouse: sqlite3.Connection
-) -> FastAPI:
-    """A factory, so tests drive the same app over temporary databases."""
-    app = FastAPI(title="MF look-through", docs_url="/api/docs")
-    app.mount("/static", StaticFiles(directory=str(STATIC)), name="static")
+def create_app(ledger: sqlite3.Connection, warehouse: sqlite3.Connection) -> App:
+    """A factory, so tests drive the same app over temporary databases. A WSGI
+    application (`web.App`): `jobs/serve.py` serves it, tests call it in-process.
 
-    @app.middleware("http")
-    async def security_headers(request: Request, call_next: Any) -> Response:
-        """Defence in depth for a page built from downloaded files.
-
-        Issuer names reach the browser from AMC disclosures fetched over the
-        internet. `render.embeddable_json` escapes them so they cannot close a
-        script element; this is the second lock on the same door, and it is the
-        one that still holds if the first regresses.
-
-        The policy can afford to be strict because the page has no inline
-        script, no inline style, no external font and no image host: ECharts
-        is vendored under `/static`, so `'self'` covers everything the
-        page loads. `form-action 'self'` lets the search box submit to this
-        server and nowhere else. `frame-ancestors 'none'` matters even on
-        loopback — a page in another tab must not be able to frame the
-        portfolio and read it.
-
-        **Caching.** A page or API response holds the decrypted portfolio, so
-        it is `no-store`: nothing of it is written to the browser's disk cache.
-        Static files are `no-cache`: kept, but revalidated by ETag on every
-        load. Without a header the browser guesses freshness from
-        Last-Modified, and served a stylesheet two releases old after an update.
-        """
-        response: Response = await call_next(request)
-        response.headers.setdefault(
-            "Cache-Control",
-            "no-cache" if request.url.path.startswith("/static/") else "no-store",
-        )
-        response.headers.setdefault(
-            "Content-Security-Policy",
-            "default-src 'self'; script-src 'self'; style-src 'self'; "
-            "img-src 'self' data:; connect-src 'self'; font-src 'self'; "
-            "base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
-        )
-        response.headers.setdefault("X-Content-Type-Options", "nosniff")
-        response.headers.setdefault("Referrer-Policy", "no-referrer")
-        response.headers.setdefault("X-Frame-Options", "DENY")
-        return response
-
-    # Added last, so it runs first: a rebound request is refused before any
-    # route or database is touched.
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOSTS)
+    The header policy is `web.SECURITY_HEADERS`, on every answer, errors
+    included. Issuer names reach the browser from AMC disclosures fetched over
+    the internet; `render.embeddable_json` escapes them, and the CSP is the
+    second lock on the same door. A page or API answer holds the decrypted
+    portfolio, so it is `no-store`; a static file is `no-cache`, revalidated by
+    its ETag (an unset header let the browser keep a stylesheet two releases
+    old). The Host check runs before any route or database: binding to loopback
+    keeps other machines out, not a rebound web page.
+    """
+    api = Router()
 
     def _scope(user_id: str, as_of: date | None, scope_id: str | None) -> Scope:
         # A fund is analysed as of today; a portfolio as of its newest
@@ -216,100 +173,70 @@ def create_app(
             scope_id=scope_id,
         )
 
-    @app.get("/api/views")
-    async def list_views() -> list[dict[str, Any]]:
-        """§15.1. The catalogue, in landing order."""
-        return catalogue()
+    def _view_params(q: Query) -> tuple[Scope, dict[str, Any]]:
+        params: dict[str, Any] = {}
+        if (top_n := q.int("top_n")) is not None:
+            params["top_n"] = top_n
+        if (scope := q.text("scope")) is not None:
+            params["scope"] = scope
+        user = q.text("user_id", "USER-01") or "USER-01"
+        return _scope(user, q.date("as_of"), q.text("scope_id")), params
 
-    @app.get("/api/health")
-    async def health() -> dict[str, Any]:
+    @api.get("/api/views")
+    def list_views(q: Query) -> Reply:
+        """§15.1. The catalogue, in landing order."""
+        return json_reply(catalogue())
+
+    @api.get("/api/health")
+    def health(q: Query) -> Reply:
         """§15.3: report freshness so the UI can say "last updated" honestly
         rather than implying the data is live."""
-        return health_snapshot(ledger, warehouse)
+        return json_reply(health_snapshot(ledger, warehouse))
 
-    @app.get("/api/search")
-    async def search(
-        q: str = Query("", max_length=SEARCH_MAX_CHARS),
-    ) -> list[dict[str, Any]]:
+    @api.get("/api/search")
+    def search(q: Query) -> Reply:
         """The masthead's suggestions: at most ten funds, one row each."""
-        return search_funds(warehouse, q) if q.strip() else []
+        text = q.text("q", "", max_length=SEARCH_MAX_CHARS) or ""
+        return json_reply(search_funds(warehouse, text) if text.strip() else [])
 
-    @app.get("/api/views/{view_id}")
-    async def get_view(
-        view_id: str,
-        user_id: str = Query("USER-01"),
-        as_of: date | None = None,
-        scope_id: str | None = Query(None),
-        top_n: int | None = Query(None),
-        scope: str | None = Query(None),
-    ) -> JSONResponse:
-        if view_id not in VIEW_REGISTRY:
-            return JSONResponse(
-                status_code=404,
-                content={
-                    "error": "unknown_view",
-                    "detail": f"No view {view_id!r}. See /api/views.",
-                    "available": sorted(VIEW_REGISTRY),
-                },
-            )
-        params: dict[str, Any] = {}
-        if top_n is not None:
-            params["top_n"] = top_n
-        if scope is not None:
-            params["scope"] = scope
-        envelope = build_view(
-            view_id, _scope(user_id, as_of, scope_id), params, ledger, warehouse
-        )
-        return JSONResponse(content=serialise(envelope))
-
-    @app.get("/api/export/{view_id}.csv")
-    async def export_csv(
-        view_id: str,
-        user_id: str = Query("USER-01"),
-        as_of: date | None = None,
-        scope_id: str | None = Query(None),
-        top_n: int | None = Query(None),
-        scope: str | None = Query(None),
-        full: int = Query(0),
-    ) -> Response:
+    @api.get("/api/export/{view_id}.csv")
+    def export_csv(q: Query, view_id: str) -> Reply:
         """§13. Every view exports — §2.5 calls it a trust feature and an
         escape hatch, signalling the data is not trapped in this UI."""
         if view_id not in VIEW_REGISTRY:
-            return JSONResponse(
-                status_code=404, content={"error": "unknown_view"}
-            )
-        params: dict[str, Any] = {}
-        if scope is not None:
-            params["scope"] = scope
+            return json_reply({"error": "unknown_view"}, 404)
+        scope, params = _view_params(q)
+        full = bool(q.int("full", 0))
         # §13.2's exception: `full=1` bypasses `top_n` so the escape hatch
         # returns every row, and the header and filename both say it did.
-        params["top_n"] = 10**9 if full else (top_n if top_n is not None else 40)
-        envelope = build_view(
-            view_id, _scope(user_id, as_of, scope_id), params, ledger, warehouse
-        )
-        body = to_csv(envelope, full=bool(full))
-        return Response(
-            content=body.encode(ENCODING),
-            media_type="text/csv; charset=utf-8",
-            headers={
-                "Content-Disposition": (
-                    f'attachment; filename="'
-                    f'{filename_for(envelope, full=bool(full))}"'
-                )
-            },
-        )
+        params["top_n"] = 10**9 if full else params.get("top_n", 40)
+        envelope = build_view(view_id, scope, params, ledger, warehouse)
+        return Reply(200, to_csv(envelope, full=full).encode(ENCODING),
+                     "text/csv; charset=utf-8",
+                     {"Content-Disposition":
+                      f'attachment; filename="{filename_for(envelope, full=full)}"'})
 
-    # The HTML surface, over the same envelopes the JSON routes return. Mounted
-    # last so `/api/*` always wins: a view named `views` could otherwise be
+    @api.get("/api/views/{view_id}")
+    def get_view(q: Query, view_id: str) -> Reply:
+        if view_id not in VIEW_REGISTRY:
+            return json_reply({
+                "error": "unknown_view",
+                "detail": f"No view {view_id!r}. See /api/views.",
+                "available": sorted(VIEW_REGISTRY),
+            }, 404)
+        scope, params = _view_params(q)
+        envelope = build_view(view_id, scope, params, ledger, warehouse)
+        return json_reply(serialise(envelope))
+
+    # The HTML surface, over the same envelopes the JSON routes return. After the
+    # API, so `/api/*` always wins: a view named `views` could otherwise be
     # shadowed by the page router's `/view/{view_id}`.
-    app.include_router(
-        make_router(
-            ledger, warehouse, build_view, health_snapshot,
-            lambda q: search_funds(warehouse, q),
-            lambda user_id: latest_lookthrough(ledger, user_id),
-        )
+    pages = make_router(
+        ledger, warehouse, build_view, health_snapshot,
+        lambda q: search_funds(warehouse, q),
+        lambda user_id: latest_lookthrough(ledger, user_id),
     )
-    return app
+    return App([api, pages], STATIC, ALLOWED_HOSTS)
 
 
 __all__ = [

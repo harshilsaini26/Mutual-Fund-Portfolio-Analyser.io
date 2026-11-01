@@ -47,7 +47,7 @@
       <input id="q-hero" type="search" autocomplete="off" spellcheck="false"
              placeholder="Search {{ count | fmt_count }} fund{{ '' if count == 1 else 's' }} by name"
              data-index="{{ root }}/search.json">
-      <ul class="search__suggest" hidden data-lenis-prevent></ul>
+      <ul class="search__suggest" hidden></ul>
     </form>
     <a class="lp-door__more" href="{{ root }}/funds/">or explore all {{ count | fmt_count }}</a>
   </li>

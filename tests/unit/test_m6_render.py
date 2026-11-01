@@ -28,7 +28,6 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 from src.common.types import IssuerId, SchemeId, UserId
 from src.m1_ledger.db import apply_ledger_schema, connect_ledger
 from src.m2_fund.stats import rebuild_fund_stats
@@ -51,6 +50,7 @@ from src.m6_views.registry import VIEW_DEFS, VIEW_REGISTRY
 from src.m6_views.render import CHART_TEMPLATES
 
 from tests.conftest import migrated
+from tests.helpers import TestClient
 
 USER = "USER-01"
 #: The fixture fund's price history, in days, and its shape: a steady climb
@@ -717,9 +717,9 @@ def test_the_sidebar_marks_where_the_reader_is(client: TestClient) -> None:
     assert re.search(r'href="/view/fund_list[^"]*"\s+aria-current="page"', html)
     assert "/static/settings.js" in html and "/static/theme.js" not in html
     assert "data-theme-toggle" not in html and "data-settings-open" in html
-    dialog = re.search(r'<dialog id="settings"[^>]*>', html)
-    # The wheel stays in the panel.
-    assert dialog and "data-lenis-prevent" in dialog.group(0)
+    assert re.search(r'<dialog id="settings"[^>]*>', html)
+    # Smooth scrolling is the browser's own (ponytail audit, 2026-11-01): no Lenis.
+    assert "lenis" not in html.lower()
     for key in ("theme", "font", "size", "density", "motion", "accent"):
         assert f'data-setting="{key}"' in html, key
     assert html.count('name="setting-font"') == 3

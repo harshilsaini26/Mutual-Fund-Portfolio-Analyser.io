@@ -1608,6 +1608,24 @@ def test_a_period_out_of_reach_says_why_to_every_reader(site: Path) -> None:
     assert ".title = " not in script
 
 
+def test_smooth_scrolling_is_the_browsers_own() -> None:
+    """Ponytail audit, 2026-11-01: Lenis (18.7 KB on every page) did what CSS does.
+    Smooth scrolling to an anchor only while motion is on, and a panel or list that
+    scrolls keeps the wheel to itself (`overscroll-behavior`)."""
+    vendor = STATIC_DIR / "vendor"
+    assert not list(vendor.glob("lenis*")) and not (STATIC_DIR / "lenis.css").exists()
+    assert not any("lenis" in name for name in publish.STATIC_FILES)
+    assert "lenis" not in (vendor / "SHA256SUMS").read_text(encoding="utf-8").lower()
+    assert "lenis" not in (STATIC_DIR / "app.js").read_text(encoding="utf-8").lower()
+    for page in (STATIC_DIR.parent / "templates").rglob("*.html"):
+        assert "lenis" not in page.read_text(encoding="utf-8").lower(), page.name
+    css = re.sub(r"/\*.*?\*/", "", (STATIC_DIR / "app.css").read_text(encoding="utf-8"),
+                 flags=re.S)
+    assert re.search(r':root\[data-motion="on"\]\s*\{\s*scroll-behavior:\s*smooth', css)
+    contain = r"\.settings,\s*\.search__suggest\s*\{\s*overscroll-behavior:\s*contain"
+    assert re.search(contain, css)
+
+
 def test_the_sip_page_always_carries_its_notes(site: Path) -> None:
     """§4.6.5: four notes, never folded."""
     page = _flat((site / "sip" / "index.html").read_text(encoding="utf-8"))

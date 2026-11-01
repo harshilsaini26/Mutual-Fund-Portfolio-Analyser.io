@@ -13,10 +13,10 @@ import re
 from decimal import Decimal
 from pathlib import Path
 
-from fastapi.testclient import TestClient
 from src.m6_views.format import format_inr
 from src.m6_views.registry import FUND_PAGE, SECTION_LABELS
 
+from tests.helpers import TestClient
 from tests.unit.test_m6_render import QS, client  # noqa: F401  (fixture)
 
 

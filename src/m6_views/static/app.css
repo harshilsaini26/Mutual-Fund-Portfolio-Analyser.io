@@ -403,12 +403,6 @@ h1, h2, h3 { text-wrap: balance; }
 }
 .topbar .search { margin-right: auto; }
 .topbar--public .brand { padding: 0 8px 0 0; }
-.topbar__link {
-  display: inline-flex; align-items: center; gap: 6px;
-  color: var(--ink-soft); text-decoration: none; font-size: var(--text-sm); white-space: nowrap;
-}
-.topbar__link .icon { width: 14px; height: 14px; }
-.topbar__link:hover { color: var(--ink); }
 .icon-button.topbar__menu { display: none; }
 
 .icon-button {
@@ -989,9 +983,6 @@ p.chart-table { font-size: var(--text-sm); color: var(--ink-faint); }
   color: var(--ink); text-decoration: none;
 }
 .family:hover { border-color: var(--accent); color: var(--ink); }
-.family__count { font-size: var(--text-h2); font-weight: 700; letter-spacing: var(--track-tight); font-variant-numeric: tabular-nums; }
-.family__name { font-weight: 650; }
-.family__hint { font-size: var(--text-xs); color: var(--ink-soft); }
 
 .table-card { padding: 0; overflow: clip; }  /* rounds the corners without becoming a scroll box */
 .table-card__tools {
@@ -1156,7 +1147,7 @@ select:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:fo
   .sidenav__link { justify-content: flex-start; padding: 8px 10px; }
   .icon-button.topbar__menu { display: inline-grid; }
   .topbar { padding: 10px 16px; gap: 8px; }
-  .topbar .chip, .topbar__link span { display: none; }
+  .topbar .chip { display: none; }
   .content { padding: 18px 16px; }
   .public-note, .colophon { padding-left: 16px; padding-right: 16px; }
   .echarts--several { grid-template-columns: minmax(0, 1fr); }
@@ -1187,7 +1178,6 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 .topnav__link[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
 .topbar--public { background: color-mix(in srgb, var(--surface) 88%, transparent); }
 .topbar--public .search { max-width: 360px; min-width: 180px; }
-@media (max-width: 980px) { .topbar--public .topbar__link span { display: none; } }
 .public-note { background: var(--surface-2); color: var(--ink-faint); font-size: var(--text-xs); }
 
 .button {
@@ -1676,6 +1666,12 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
   .fundmap__families::after { display: none; }
 }
 .leader__table th button { font-size: var(--text-xs); }
+
+/* Smooth scrolling is the browser's own, and only while motion is on (Lenis did it in
+   18.7 KB until the ponytail audit, 2026-11-01). A panel or list that scrolls keeps
+   the wheel to itself rather than handing it to the page at its end. */
+:root[data-motion="on"] { scroll-behavior: smooth; }
+.settings, .search__suggest { overscroll-behavior: contain; }
 
 /* Motion (V1-83): one attribute, set by settings.js from the reader's choice or,
    until they choose, the device's reduced-motion setting. Off stops everything at

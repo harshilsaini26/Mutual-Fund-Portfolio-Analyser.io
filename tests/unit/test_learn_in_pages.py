@@ -9,9 +9,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from fastapi.testclient import TestClient
 from src.m6_views.learn import TERMS_FOR, load
 
+from tests.helpers import TestClient
 from tests.unit.test_m6_render import QS, client  # noqa: F401  (fixture)
 from tests.unit.test_publish_site import (  # noqa: F401  (fixtures)
     DIRECT,

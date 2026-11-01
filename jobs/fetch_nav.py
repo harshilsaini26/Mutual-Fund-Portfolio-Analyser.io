@@ -25,7 +25,6 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
-import httpx
 from src.common.decimals import connect
 from src.m0_data.config import raw_root, source, warehouse_path
 from src.m0_data.derive.nav_adj import build_all_nav_adj
@@ -33,6 +32,7 @@ from src.m0_data.derive.scheme_family import derive_scheme_families
 from src.m0_data.fetch.base import (
     DomainRateLimiter,
     FetchCandidate,
+    Response,
     RobotsCache,
     archive,
     conditional_get,
@@ -205,7 +205,7 @@ def _enrich(conn: sqlite3.Connection, summary: dict[str, object]) -> bool:
 
 def _get(
     cfg: dict[str, Any], etag: str | None = None, last_modified: str | None = None
-) -> httpx.Response:
+) -> Response:
     """One polite GET for either AMFI source: the same agent, `From:`, rate
     limit, robots and retries, so a politeness fix is made once."""
     return conditional_get(

@@ -28,8 +28,10 @@ import threading
 import webbrowser
 from collections.abc import Callable
 from pathlib import Path
+from socketserver import ThreadingMixIn
+from typing import Any
+from wsgiref.simple_server import WSGIRequestHandler, WSGIServer, make_server
 
-import uvicorn
 from src.common.decimals import connect
 from src.m0_data.config import warehouse_path
 from src.m0_data.schema.apply import apply_migrations
@@ -64,6 +66,18 @@ def open_ledger(
     return ledger, True
 
 
+class _Server(ThreadingMixIn, WSGIServer):
+    """The standard library's WSGI server, a thread a request (`app.DB_LOCK`
+    serialises the databases). uvicorn served it until the ponytail audit."""
+
+    daemon_threads = True
+
+
+class _Quiet(WSGIRequestHandler):
+    def log_message(self, *args: Any) -> None:   # no line per request
+        pass
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=BIND_PORT)
@@ -89,7 +103,12 @@ def main() -> None:
     if not args.no_browser:
         # After a moment, so the server is listening when the page asks.
         threading.Timer(1.5, webbrowser.open, [url]).start()
-    uvicorn.run(create_app(ledger, warehouse), host=BIND_HOST, port=args.port)
+    with make_server(BIND_HOST, args.port, create_app(ledger, warehouse),
+                     server_class=_Server, handler_class=_Quiet) as server:
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            print("  Stopped.")
 
 
 if __name__ == "__main__":

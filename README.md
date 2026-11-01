@@ -27,13 +27,13 @@ Every fund's page is also published, free and rebuilt every night, at
 <https://didmysipwork.vercel.app/>. Nothing you enter
 there leaves your browser.
 
-![A 20-second tour of the public site: the front page, a fund page, Explore funds, Compare, Your portfolio](video/tour.gif)
+![A 20-second tour of the public site: the front page, a fund page, Explore funds, Compare, Your portfolio](docs/media/tour.gif)
 
 | The front page | A fund page |
 | --- | --- |
-| ![The front page: what every fund owns and how it has done, with three ways in](video/public/shots/home.png) | ![A fund page: returns, falls, costs and holdings against its category](video/public/shots/fund.png) |
+| ![The front page: what every fund owns and how it has done, with three ways in](docs/media/home.png) | ![A fund page: returns, falls, costs and holdings against its category](docs/media/fund.png) |
 | **Compare** | **Your portfolio** |
-| ![Compare: up to four funds side by side](video/public/shots/compare.png) | ![Your portfolio: what your funds add up to, company by company](video/public/shots/portfolio.png) |
+| ![Compare: up to four funds side by side](docs/media/compare.png) | ![Your portfolio: what your funds add up to, company by company](docs/media/portfolio.png) |
 
 ---
 
@@ -503,12 +503,12 @@ src/m2_fund/          returns, risk, benchmark analytics        fund x-ray
 src/m3_lookthrough/   exposure, overlap, concentration          look-through
 src/m6_views/         pages, charts, export, local API          what you see
 migrations/           numbered, forward-only schema changes
-video/                the README's tour and screenshots (Remotion), made by hand
+docs/media/           the README's tour and screenshots
 ```
 
 The pages are server-rendered and complete without JavaScript. The front page's motion
 is plain CSS, scroll-linked where the browser supports it and off with the reader's
-motion setting; the only vendored scripts are ECharts and Lenis, checked against
+motion setting; the only vendored script is ECharts, checked against
 `src/m6_views/static/vendor/SHA256SUMS`, so neither CI nor the nightly build needs Node.
 
 Dependencies run one way, and modules talk through typed interfaces rather than reaching

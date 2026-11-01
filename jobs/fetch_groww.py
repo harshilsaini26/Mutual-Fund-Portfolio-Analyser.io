@@ -38,13 +38,13 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-import httpx
 import yaml
 from src.common.decimals import connect
 from src.m0_data.config import REPO_ROOT, raw_root, source, warehouse_path
 from src.m0_data.fetch.base import (
     DomainRateLimiter,
     FetchCandidate,
+    HttpStatusError,
     RobotsCache,
     archive,
     conditional_get,
@@ -430,7 +430,7 @@ def after_failure(previous: Seen | None, exc: Exception, today: date) -> Seen | 
     `RECHECK`, as before. A failure of the network keeps what the page said (its
     ISIN and benchmark), so the fund stays live and is read again next night; a
     page never read stays unread (None), to be tried as new."""
-    gone = isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code in _GONE
+    gone = isinstance(exc, HttpStatusError) and exc.response.status_code in _GONE
     if isinstance(exc, ParseFailed) or gone:
         return Seen("", "", today)
     return previous

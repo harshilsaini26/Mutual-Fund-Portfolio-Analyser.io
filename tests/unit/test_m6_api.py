@@ -22,7 +22,6 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 from src.common.types import IssuerId, SchemeId, UserId
 from src.m1_ledger.db import apply_ledger_schema, connect_ledger
 from src.m3_lookthrough.engine import IssuerWeight, Position, compute_lookthrough
@@ -31,6 +30,7 @@ from src.m6_views.api.app import BIND_HOST, create_app
 from src.m6_views.registry import VIEW_DEFS, VIEW_REGISTRY
 
 from tests.conftest import migrated
+from tests.helpers import TestClient
 
 USER = "USER-01"
 AS_OF = date(2026, 9, 4)

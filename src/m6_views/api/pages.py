@@ -23,18 +23,17 @@ defaults are §9's.
 
 from __future__ import annotations
 
-import html
 import sqlite3
 from collections.abc import Callable
 from datetime import date
+from html import escape as _escape
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Query, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from jinja2 import Environment, FileSystemLoader
 
 from src.common.types import UserId
+from src.m6_views.api.web import Query, Reply, Router, html
 from src.m6_views.builder import Scope
 from src.m6_views.envelope import ViewEnvelope
 from src.m6_views.learn import GROUPS, TERMS_FOR, link_terms
@@ -91,7 +90,7 @@ def chart_scripts(envelopes: list[ViewEnvelope], root: str = "") -> str:
     return ECHART_SCRIPTS.format(root=root) if needs_echarts(envelopes) else ""
 
 
-def templates(root: str = "", static: bool = False) -> Jinja2Templates:
+def templates(root: str = "", static: bool = False) -> Environment:
     """Jinja with §9's formatters bound as filters.
 
     Registering them here rather than calling them in the templates is what
@@ -104,13 +103,14 @@ def templates(root: str = "", static: bool = False) -> Jinja2Templates:
     one. `static` is that copy: no server behind it, so no portfolio, no search
     API and no fragments (DECISIONS V1-72).
     """
-    engine = Jinja2Templates(directory=str(TEMPLATES))
-    engine.env.filters.update(FILTERS)
+    engine = Environment(loader=FileSystemLoader(str(TEMPLATES)),
+                         autoescape=True)
+    engine.filters.update(FILTERS)
     # The explanations and guides (V1-87): checked when loaded, so a bad entry
     # stops the server and the build rather than reaching a page.
     learn = load_learn()
-    engine.env.filters["link_terms"] = lambda text: link_terms(text, learn, root)
-    engine.env.globals.update(
+    engine.filters["link_terms"] = lambda text: link_terms(text, learn, root)
+    engine.globals.update(
         learn=learn,
         learn_groups=GROUPS,
         term_for=TERMS_FOR,
@@ -184,7 +184,7 @@ def make_router(
     health: Any,
     search: Any,
     latest: Callable[[str], date | None] = lambda user_id: None,
-) -> APIRouter:
+) -> Router:
     """`build` is `app.build_view` and `health` is `app.health_snapshot`, both
     passed in rather than imported.
 
@@ -194,8 +194,11 @@ def make_router(
     one-way import: `pages` importing back from `app` is a cycle, since `app`
     imports this module to mount the router.
     """
-    router = APIRouter()
+    router = Router()
     engine = templates()
+
+    def page(name: str, context: dict[str, Any]) -> Reply:
+        return html(engine.get_template(name).render(context))
 
     def _scope(
         user_id: str, as_of: date | None, scope_id: str | None = None
@@ -222,151 +225,103 @@ def make_router(
             "active": active,
         }
 
-    @router.get("/", response_class=HTMLResponse)
-    async def landing(
-        request: Request,
-        user_id: str = Query("USER-01"),
-        as_of: date | None = None,
-    ) -> Any:
+    def _user(q: Query) -> str:
+        return q.text("user_id", "USER-01") or "USER-01"
+
+    @router.get("/")
+    def landing(q: Query) -> Reply:
         # No look-through stored and no date asked for: nothing to chart yet, so
         # the page is the setup checklist and a way into any fund (V1-74).
+        user_id, as_of = _user(q), q.date("as_of")
         has_portfolio = as_of is not None or latest(user_id) is not None
         scope = _scope(user_id, as_of)
         envelopes: list[ViewEnvelope] = [
             build(view_id, scope, {}, ledger, warehouse) for view_id in LANDING
         ] if has_portfolio else []
-        return engine.TemplateResponse(
-            request,
-            "landing.html",
-            {
-                **_shell(user_id, as_of, active="overview"),
-                "has_portfolio": has_portfolio,
-                "user_id": user_id,
-                "as_of_shown": scope.as_of,
-                "landing_ids": LANDING,
-                "panels": [safe_chart_context(env, scope) for env in envelopes],
-                "chart_scripts": chart_scripts(envelopes),
-            },
-        )
+        return page("landing.html", {
+            **_shell(user_id, as_of, active="overview"),
+            "has_portfolio": has_portfolio,
+            "user_id": user_id,
+            "as_of_shown": scope.as_of,
+            "landing_ids": LANDING,
+            "panels": [safe_chart_context(env, scope) for env in envelopes],
+            "chart_scripts": chart_scripts(envelopes),
+        })
 
-    @router.get("/fund/{scheme_id}", response_class=HTMLResponse)
-    async def fund_page(
-        request: Request,
-        scheme_id: str,
-        user_id: str = Query("USER-01"),
-        as_of: date | None = None,
-        window: str | None = Query(None),
-    ) -> Any:
+    @router.get("/fund/{scheme_id}")
+    def fund_page(q: Query, scheme_id: str) -> Reply:
         """One fund, every picture of it. `registry.FUND_PAGE`, top to bottom."""
+        user_id, as_of = _user(q), q.date("as_of")
         scope = _scope(user_id, as_of, scheme_id)
-        return engine.TemplateResponse(
-            request,
-            "fund.html",
-            {
-                **_shell(user_id, as_of, active=""),
-                **fund_context(
-                    lambda v, s, p: build(v, s, p, ledger, warehouse), scope, window
-                ),
-            },
-        )
+        return page("fund.html", {
+            **_shell(user_id, as_of, active=""),
+            **fund_context(
+                lambda v, s, p: build(v, s, p, ledger, warehouse), scope, q.text("window")
+            ),
+        })
 
-    @router.get("/fragment/{view_id}", response_class=HTMLResponse)
-    async def fragment(
-        request: Request,
-        view_id: str,
-        user_id: str = Query("USER-01"),
-        as_of: date | None = None,
-        scope_id: str | None = Query(None),
-        window: str | None = Query(None),
-    ) -> Any:
+    @router.get("/fragment/{view_id}")
+    def fragment(q: Query, view_id: str) -> Reply:
         """One panel, for a period tab to swap in place. Same builder, macro and
         partial as a full page, so the swapped panel cannot differ from it."""
         if view_id not in VIEW_REGISTRY:
-            return HTMLResponse(status_code=404, content="")
-        scope = _scope(user_id, as_of, scope_id)
+            return html("", 404)
+        scope = _scope(_user(q), q.date("as_of"), q.text("scope_id"))
+        window = q.text("window")
         env = build(view_id, scope, {"window": window} if window else {},
                     ledger, warehouse)
-        return engine.TemplateResponse(
-            request, "fragment.html", safe_chart_context(env, scope)
-        )
+        return page("fragment.html", safe_chart_context(env, scope))
 
-    @router.get("/search", response_class=HTMLResponse)
-    async def search_page(
-        request: Request,
-        q: str = Query("", max_length=SEARCH_MAX_CHARS),
-        user_id: str = Query("USER-01"),
-    ) -> Any:
-        return engine.TemplateResponse(
-            request,
-            "search.html",
-            {
-                **_shell(user_id, None, active="search"),
-                "query": q,
-                "hits": search(q) if q.strip() else [],
-            },
-        )
+    @router.get("/search")
+    def search_page(q: Query) -> Reply:
+        text = q.text("q", "", max_length=SEARCH_MAX_CHARS) or ""
+        return page("search.html", {
+            **_shell(_user(q), None, active="search"),
+            "query": text,
+            "hits": search(text) if text.strip() else [],
+        })
 
-    @router.get("/learn/", response_class=HTMLResponse)
-    async def learn_index(request: Request) -> Any:
-        return engine.TemplateResponse(
-            request, "learn.html", _shell("USER-01", None, active="learn"))
+    @router.get("/learn/")
+    def learn_index(q: Query) -> Reply:
+        return page("learn.html", _shell("USER-01", None, active="learn"))
 
-    @router.get("/learn/glossary/", response_class=HTMLResponse)
-    async def learn_glossary(request: Request) -> Any:
-        return engine.TemplateResponse(
-            request, "learn_glossary.html", _shell("USER-01", None, active="learn"))
+    @router.get("/learn/glossary/")
+    def learn_glossary(q: Query) -> Reply:
+        return page("learn_glossary.html", _shell("USER-01", None, active="learn"))
 
-    @router.get("/learn/{slug}/", response_class=HTMLResponse)
-    async def learn_guide(request: Request, slug: str) -> Any:
+    @router.get("/learn/{slug}/")
+    def learn_guide(q: Query, slug: str) -> Reply:
         try:
             guide = load_learn().guide(slug)
         except KeyError:
-            return HTMLResponse(status_code=404, content="<p>No such guide.</p>")
-        return engine.TemplateResponse(
-            request, "learn_guide.html",
-            {**_shell("USER-01", None, active="learn"), "guide": guide})
+            return html("<p>No such guide.</p>", 404)
+        return page("learn_guide.html",
+                    {**_shell("USER-01", None, active="learn"), "guide": guide})
 
-    @router.get("/view/{view_id}", response_class=HTMLResponse)
-    async def one_view(
-        request: Request,
-        view_id: str,
-        user_id: str = Query("USER-01"),
-        as_of: date | None = None,
-        top_n: int | None = Query(None),
-        scope: str | None = Query(None),
-        scope_id: str | None = Query(None),
-    ) -> Any:
+    @router.get("/view/{view_id}")
+    def one_view(q: Query, view_id: str) -> Reply:
         if view_id not in VIEW_REGISTRY:
-            return HTMLResponse(
-                status_code=404,
-                # escaped: `view_id` is a path parameter and this is the one
-                # response in M6 built as raw HTML rather than rendered by
-                # Jinja, whose autoescaping would have covered it. Reflected
-                # XSS otherwise -- `!r` quotes the string, it does not escape
-                # it (CodeQL #2).
-                content=(
-                    f"<p>No view {html.escape(repr(view_id))}. "
-                    f"Known views: {', '.join(sorted(VIEW_DEFS))}.</p>"
-                ),
-            )
+            # escaped: `view_id` is a path parameter and this is the one
+            # response in M6 built as raw HTML rather than rendered by Jinja,
+            # whose autoescaping would have covered it. Reflected XSS otherwise
+            # -- `!r` quotes the string, it does not escape it (CodeQL #2).
+            return html(f"<p>No view {_escape(repr(view_id))}. "
+                        f"Known views: {', '.join(sorted(VIEW_DEFS))}.</p>", 404)
+        user_id, as_of = _user(q), q.date("as_of")
         params: dict[str, Any] = {}
-        if top_n is not None:
+        if (top_n := q.int("top_n")) is not None:
             params["top_n"] = top_n
-        if scope is not None:
-            params["scope"] = scope
+        if (pool := q.text("scope")) is not None:
+            params["scope"] = pool
         # Named apart from the `scope` query parameter, which is the exposure
         # pool ("equity", "all") and not an analysis scope at all.
-        view_scope = _scope(user_id, as_of, scope_id)
+        view_scope = _scope(user_id, as_of, q.text("scope_id"))
         env = build(view_id, view_scope, params, ledger, warehouse)
-        return engine.TemplateResponse(
-            request,
-            "page.html",
-            {
-                **_shell(user_id, as_of, active=view_id),
-                **safe_chart_context(env, view_scope),
-                "chart_scripts": chart_scripts([env]),
-            },
-        )
+        return page("page.html", {
+            **_shell(user_id, as_of, active=view_id),
+            **safe_chart_context(env, view_scope),
+            "chart_scripts": chart_scripts([env]),
+        })
 
     return router
 

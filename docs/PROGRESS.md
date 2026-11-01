@@ -282,6 +282,23 @@ address (V1-92; GitHub Pages served it until 2026-10-03). Measured on the first 
   the site pays, about 1 s under the slowdown (the same on `/compare/` and `/learn/`).
   Not yet measured on the live site, where `funds.json` is 1.47 MB raw and NAV files
   are larger (about 19 KB each): re-measure after the first build that carries it.
+- **Leaner** (V1-107, 2026-11-01, a ponytail audit). The codebase was lean where it
+  counts: every module, top-level function and static file in use, 4 of 492 CSS classes
+  dead. The weight was in what it carried:
+  - **Gone:**
+    - **The Remotion video project.** The README's GIF and four screenshots moved to
+      `docs/media/`.
+    - **Lenis smooth scrolling (18.7 KB on every page).** The browser's own
+      `scroll-behavior` replaces it, still only while motion is on, and
+      `overscroll-behavior` keeps panels' scrolling to themselves.
+    - **httpx.** The fetch layer runs on `urllib`; `fetch/base.py`'s `HTTP` and
+      `Response` are tested against a real local server.
+    - **FastAPI and uvicorn.** The local app is a small WSGI app, `m6_views/api/web.py`,
+      served by `wsgiref`, with the same routes, Host check, header policy and 422 on a
+      bad parameter.
+    - **Smaller cuts:** `scripts/import_nav_xlsx.py` (its own docstring asked to be
+      deleted) and the dead CSS.
+  - **Dependencies:** 15 fewer pinned packages (43 to 28), and no web framework.
 - **One Vercel deployment kept** (V1-106, 2026-11-01): Vercel deploys every nightly
   push to gh-pages, a full copy of the site (about 250 MB), and a month of them filled
   the Hobby plan's 10 GB. After each build the workflow waits for that night's commit to

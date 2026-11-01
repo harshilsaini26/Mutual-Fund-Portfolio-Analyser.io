@@ -83,7 +83,7 @@ class AmcDiscovery(Protocol):
     amc_id: str
 
     def request(self) -> dict[str, Any]:
-        """The HTTP call to make, as kwargs a caller can hand to httpx."""
+        """The HTTP call to make, as kwargs a caller can hand to `conditional_get`."""
         ...
 
     def parse_listing(self, payload: bytes) -> list[DiscoveredFile]:

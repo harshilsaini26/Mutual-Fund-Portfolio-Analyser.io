@@ -8,8 +8,12 @@ built, so they live with the tests rather than on the classes (DECISIONS V1-73).
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import dataclass
 from decimal import Decimal
+from typing import Any
+from urllib.parse import unquote, urlsplit
+from wsgiref.util import setup_testing_defaults
 
 from src.common.types import SchemeId
 from src.m1_ledger.cas.parse import CasContext
@@ -98,3 +102,43 @@ def opening_balance(ctx: CasContext, folio: str, isin: str) -> Decimal | None:
         if b.folio == folio and b.scheme_raw_isin == isin and b.kind == "opening"
     ]
     return found[0].units if found else None
+
+
+class TestClient:
+    """The local app, called in-process over WSGI, as FastAPI's test client was
+    until the ponytail audit (2026-11-01) put the app on the standard library."""
+
+    __test__ = False   # not a test class, whatever its name
+
+    def __init__(self, app: Any, base_url: str = "http://127.0.0.1:8765") -> None:
+        self.app, self.host = app, urlsplit(base_url).netloc
+
+    def get(self, url: str, headers: dict[str, str] | None = None) -> Answer:
+        path, _, query = url.partition("?")
+        environ: dict[str, Any] = {}
+        setup_testing_defaults(environ)
+        environ.update(REQUEST_METHOD="GET", PATH_INFO=unquote(path), QUERY_STRING=query,
+                       HTTP_HOST=self.host)
+        for name, value in (headers or {}).items():
+            environ["HTTP_" + name.upper().replace("-", "_")] = value
+        got: dict[str, Any] = {}
+
+        def start_response(status: str, heads: list[tuple[str, str]]) -> None:
+            got["status"], got["headers"] = int(status.split()[0]), heads
+
+        body = b"".join(self.app(environ, start_response))
+        return Answer(got["status"], {k.lower(): v for k, v in got["headers"]}, body)
+
+
+@dataclass
+class Answer:
+    status_code: int
+    headers: dict[str, str]
+    content: bytes
+
+    @property
+    def text(self) -> str:
+        return self.content.decode("utf-8")
+
+    def json(self) -> Any:
+        return json.loads(self.content)

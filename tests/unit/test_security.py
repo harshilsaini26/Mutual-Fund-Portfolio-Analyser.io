@@ -27,7 +27,6 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from fastapi.testclient import TestClient
 from src.common.decimals import connect
 from src.common.types import IssuerId, SchemeId, UserId
 from src.m1_ledger.db import apply_ledger_schema, connect_ledger
@@ -36,6 +35,7 @@ from src.m3_lookthrough.persist import save_lookthrough
 from src.m6_views.api.app import create_app
 
 from tests.conftest import migrated
+from tests.helpers import TestClient
 
 USER = "USER-01"
 AS_OF = date(2026, 9, 4)
@@ -340,7 +340,7 @@ def test_every_third_party_import_is_declared() -> None:
         for spec in group:
             declared.add(re.split(r"[<>=~!\[ ]", spec, maxsplit=1)[0].lower())
 
-    for package in ("pdfplumber", "openpyxl", "httpx", "fastapi", "jinja2"):
+    for package in ("pdfplumber", "openpyxl", "jinja2"):
         assert package in declared, f"{package} is imported but not declared"
 
 
@@ -376,9 +376,10 @@ def _normalise(name: str) -> str:
 
 def test_the_lock_pins_what_pyproject_cannot() -> None:
     """`pyproject.toml` can only pin the packages it names, and the one that
-    broke CI was **starlette** — which it never names, because starlette
-    arrives underneath FastAPI. Pinning the direct dependencies and stopping
-    there would have left the actual cause free to move again."""
+    broke CI was **starlette**, which it never named, because starlette arrived
+    underneath FastAPI. Pinning the direct dependencies and stopping there
+    leaves what arrives underneath them free to move: here, et-xmlfile under
+    openpyxl and markupsafe under jinja2."""
     root = Path(__file__).resolve().parents[2]
     lock = (root / "requirements.lock").read_text(encoding="utf-8")
 
@@ -396,7 +397,8 @@ def test_the_lock_pins_what_pyproject_cannot() -> None:
         name = _normalise(spec.split("==")[0])
         assert name in pinned, f"{name} is declared but missing from the lock"
 
-    assert "starlette" in pinned, "the package that caused this is unpinned again"
+    for underneath in ("et-xmlfile", "markupsafe"):
+        assert underneath in pinned, f"{underneath} is unpinned"
     assert len(pinned) > len(declared), (
         "a lock that covers only the declared dependencies is not a lock"
     )

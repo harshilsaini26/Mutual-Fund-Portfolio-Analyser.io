@@ -45,7 +45,7 @@ def listing(amc_id: str, cfg: dict[str, Any], client: Any = None) -> list[Discov
     spec = adapter.request()
 
     # Through `conditional_get`, not around it. The first version called
-    # `httpx.request` directly and so skipped the robots.txt check, the retry
+    # the HTTP client directly and so skipped the robots.txt check, the retry
     # loop and the jittered backoff on the FIRST request this job makes to an
     # AMC -- while `download()` twenty lines below honoured all three. A
     # discovery call is not exempt from §2.3 because it asks for a list rather

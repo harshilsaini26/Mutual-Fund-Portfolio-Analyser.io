@@ -35,13 +35,12 @@ dependencies = [
     # bomb in one is the attack. Without this pin the guard depended on
     # whichever environment happened to be active (security audit 2026-09-23).
     "defusedxml==0.7.1",
-    "httpx==0.28.1",
-    # M6's API. Loopback-bound and single-user (MODULE_6 §15.3) — this is a
-    # local server for one person, not a deployment.
-    "fastapi==0.141.1",
-    "uvicorn==0.52.4",
+    # No HTTP client and no web framework: the fetch layer and the local app run
+    # on the standard library (urllib, wsgiref) since the ponytail audit
+    # (2026-11-01), which dropped httpx, FastAPI, uvicorn and twelve packages
+    # under them.
     # M6's HTML surface. Server-rendered rather than React — DECISIONS V1-23,
-    # which overrides PLAN.md §9.10. d3 is vendored under
+    # which overrides PLAN.md §9.10. Its scripts (ECharts) are vendored under
     # src/m6_views/static/vendor/, so there is no JS toolchain and no CDN call.
     "jinja2==3.1.6",
     # The public build draws each fund's share image, the site's card and the

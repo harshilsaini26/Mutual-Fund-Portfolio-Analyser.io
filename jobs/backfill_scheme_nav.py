@@ -34,7 +34,6 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-import httpx
 from src.common.decimals import connect
 from src.m0_data.config import raw_root, source, warehouse_path
 from src.m0_data.derive.nav_adj import build_all_nav_adj
@@ -42,6 +41,7 @@ from src.m0_data.derive.scheme_family import disclosed_scheme_ids
 from src.m0_data.fetch.base import (
     DomainRateLimiter,
     FetchCandidate,
+    HttpError,
     RobotsCache,
     archive,
     conditional_get,
@@ -202,7 +202,7 @@ def run(
         for n, scheme_id in enumerate(scheme_ids, start=1):
             try:
                 summaries.append(_one(conn, scheme_id, cfg, limiter, robots))
-            except (httpx.HTTPError, MfapiParseError, ValueError) as exc:
+            except (HttpError, MfapiParseError, ValueError) as exc:
                 # This fund's failure is this fund's: record it and carry on.
                 conn.rollback()
                 summaries.append(

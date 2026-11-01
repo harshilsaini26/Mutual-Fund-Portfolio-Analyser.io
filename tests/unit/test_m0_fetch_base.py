@@ -7,36 +7,37 @@ robots.txt answers per host. Nothing is contacted.
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import urlparse
 
-import httpx
 import pytest
 from src.m0_data.fetch.base import (
     DomainRateLimiter,
     FetchError,
+    Response,
     RobotsCache,
     conditional_get,
 )
 
 
 class _Client:
-    def __init__(self, answers: dict[str, list[httpx.Response]],
+    def __init__(self, answers: dict[str, list[Response]],
                  robots: dict[str, str] | None = None) -> None:
         self.answers = answers
         self.robots = robots or {}
         self.calls: list[str] = []
 
-    def request(self, method: str, url: str, **kw: Any) -> httpx.Response:
+    def request(self, method: str, url: str, **kw: Any) -> Response:
         assert kw.get("follow_redirects") is False, "every hop is checked here"
         self.calls.append(url)
         return self.answers[url].pop(0)
 
-    def get(self, url: str, **kw: Any) -> httpx.Response:
-        host = httpx.URL(url).host
-        return httpx.Response(200, text=self.robots.get(host, ""))
+    def get(self, url: str, **kw: Any) -> Response:
+        host = urlparse(url).hostname or ""
+        return Response(200, self.robots.get(host, "").encode())
 
 
-def _response(status: int, url: str, **headers: str) -> httpx.Response:
-    return httpx.Response(status, headers=headers, request=httpx.Request("GET", url))
+def _response(status: int, url: str, **headers: str) -> Response:
+    return Response(status, headers=headers, url=url)
 
 
 def test_a_throttled_request_waits_and_tries_again() -> None:

@@ -818,30 +818,6 @@
     store(RECENT, JSON.stringify(seen.slice(0, 6)));
   }
 
-  // --- smooth scrolling (Lenis, DECISIONS V1-80) ---------------------------------
-  //
-  // Only where motion is welcome; anchors still jump to their target, and a box
-  // that scrolls on its own -- the /funds/ table, the app's sidebar, a panel's
-  // table -- keeps the wheel (`allowNestedScroll`; Lenis's default hands every
-  // wheel to the page, which left the fund table unscrollable).
-
-  // Started and stopped by the reader's Motion setting (`data-motion`, V1-83),
-  // live: turning motion off hands scrolling straight back to the browser.
-  var lenis = null;
-  function motion() {
-    var on = document.documentElement.getAttribute("data-motion") === "on";
-    if (on && !lenis && window.Lenis) {
-      lenis = new window.Lenis({ autoRaf: true, anchors: true, allowNestedScroll: true });
-    } else if (!on && lenis) {
-      lenis.destroy();
-      lenis = null;
-    }
-  }
-  motion();
-  new MutationObserver(motion).observe(document.documentElement, {
-    attributes: true, attributeFilter: ["data-motion"],
-  });
-
   document.querySelectorAll("[data-recent]").forEach(function (box) {
     var funds = recent();
     var list = box.querySelector("ul");

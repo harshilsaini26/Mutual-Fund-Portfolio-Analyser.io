@@ -14,11 +14,10 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-import httpx
 import pytest
 from jobs import backfill_scheme_nav as job
 from src.common.decimals import connect
-from src.m0_data.fetch.base import RobotsCache
+from src.m0_data.fetch.base import HttpStatusError, Response, RobotsCache
 
 from tests.conftest import migrated
 
@@ -67,11 +66,8 @@ class _Response:
 
     def raise_for_status(self) -> None:
         if self.status_code >= 400:
-            request = httpx.Request("GET", "https://example.invalid/")
-            raise httpx.HTTPStatusError(
-                f"{self.status_code} for the fake url", request=request,
-                response=httpx.Response(self.status_code, request=request),
-            )
+            raise HttpStatusError(f"{self.status_code} for the fake url",
+                                  Response(self.status_code))
 
 
 @pytest.fixture
@@ -106,7 +102,7 @@ def warehouse(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 def test_a_failing_fund_does_not_stop_the_run(warehouse: Path) -> None:
     summaries = job.run(["INF000000MIS", "INF179K01UT0", "INF000000BAD"])
     by_id = {str(s["scheme_id"]): s for s in summaries}
-    assert "HTTPStatusError" in str(by_id["INF000000MIS"]["error"])
+    assert "HttpStatusError" in str(by_id["INF000000MIS"]["error"])
     assert "MfapiParseError" in str(by_id["INF000000BAD"]["error"])
     assert int(str(by_id["INF179K01UT0"]["added"])) > 0
 

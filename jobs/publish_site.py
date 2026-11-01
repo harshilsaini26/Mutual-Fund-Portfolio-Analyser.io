@@ -93,8 +93,8 @@ MIN_PRICES = 250
 PUBLIC_USER = UserId("PUBLIC")
 #: What the public pages load.
 STATIC_FILES = (
-    "app.css", "app.js", "charts.js", "settings.js", "sections.js", "lenis.css",
-    "vendor/echarts.v6.1.0.min.js", "vendor/lenis.v1.3.26.min.js",
+    "app.css", "app.js", "charts.js", "settings.js", "sections.js",
+    "vendor/echarts.v6.1.0.min.js",
     "fonts/rubik-latin-wght-normal.woff2",
     "fonts/terminess-Regular.woff2", "fonts/terminess-Bold.woff2",
     "portfolio-math.js", "kit.js", "portfolio.js", "compare.js", "sip.js",
@@ -722,7 +722,7 @@ def build_site(
     market = deps.market
     assert isinstance(market, PublicMarket)
     engine = templates(root=base, static=True)
-    engine.env.globals["site_url"] = site_url   # for a shared link's preview (G-11)
+    engine.globals["site_url"] = site_url   # for a shared link's preview (G-11)
     shell = {"catalogue": [], "health": {}, "qs": "", "active": "", "built": today}
     funds = funds_to_publish(warehouse)
     firsts = {

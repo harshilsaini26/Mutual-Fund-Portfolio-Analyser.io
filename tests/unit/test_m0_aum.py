@@ -516,7 +516,7 @@ class TestPublishedWalksYears:
 
 @dataclass(frozen=True)
 class _Response:
-    """What `conditional_get` touches on an httpx response.
+    """What `conditional_get` touches on a response.
 
     `status_code` matters: the retry loop returns only below 500, so a stub
     without one fails inside the loop rather than in the code under test.
