@@ -76,6 +76,8 @@ function fakeDocument() {
     setAttribute(k, v) { this.attributes[k] = String(v); },
     getAttribute(k) { return k in this.attributes ? this.attributes[k] : null; },
     appendChild(c) { this.childNodes.push(c); return c; },
+    // As the DOM's: a string goes in as a text node.
+    append(...cs) { cs.forEach((c) => this.childNodes.push(typeof c === "string" ? { nodeType: 3, textContent: c } : c)); },
     get textContent() { return this.childNodes.map((c) => c.textContent).join(""); },
   });
   return { createElement: node, createTextNode: (t) => ({ nodeType: 3, textContent: t }) };

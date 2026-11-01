@@ -22,10 +22,8 @@
     Object.keys(attrs || {}).forEach(function (k) {
       if (attrs[k] != null && attrs[k] !== false) node.setAttribute(k, attrs[k] === true ? "" : attrs[k]);
     });
-    present(Array.prototype.slice.call(arguments, 2)).forEach(function (c) {
-      // A node is a node; anything else is text, never markup (CodeQL js/xss).
-      node.appendChild(c && c.nodeType ? c : document.createTextNode(String(c)));
-    });
+    // `append` inserts a string as text, never markup (CodeQL js/xss).
+    node.append.apply(node, present(Array.prototype.slice.call(arguments, 2)));
     return node;
   }
   function fill(box) {
