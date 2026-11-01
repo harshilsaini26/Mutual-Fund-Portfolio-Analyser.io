@@ -15,11 +15,15 @@ The token is read from VERCEL_TOKEN in the environment, never from an argument (
 the shell's history and the process list would keep it), and is sent only to
 api.vercel.com. VERCEL_PROJECT and VERCEL_TEAM_ID may stand in for --project and --team.
 
-Nothing is deleted when the live deployment cannot be found, or when the new build
-failed or did not become live in time: the site stays as it is, and so does the bill.
+The live deployment is the one the production alias points at. Where the project's
+aliases name none (the first real run, site #52, found that), it is the newest ready
+production deployment: gh-pages is the production branch, so each push deploys there.
+Nothing is deleted when neither can be found, or when the new build failed or did not
+become live in time: the site stays as it is, and so does the bill.
 Endpoints from Vercel's REST API reference, read 2026-11-01: GET /v9/projects/{idOrName}
 (`alias[].environment`, `alias[].deployment.id`), GET /v7/deployments (`uid`,
-`readyState`, `pagination.next`, the `sha` filter), DELETE /v13/deployments/{id}.
+`readyState`, `target`, `pagination.next`, the `sha` filter), DELETE
+/v13/deployments/{id}.
 """
 
 from __future__ import annotations
@@ -32,7 +36,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
 from typing import Any
 
@@ -48,10 +52,28 @@ class PruneError(RuntimeError):
     """Why nothing was deleted."""
 
 
-def live_ids(project: dict[str, Any]) -> set[str]:
-    """The deployments the production alias (every production domain) points at."""
-    return {a["deployment"]["id"] for a in project.get("alias") or []
-            if a.get("environment") == "production" and a.get("deployment")}
+def live_ids(project: dict[str, Any],
+             deployments: Iterable[dict[str, Any]] = ()) -> set[str]:
+    """The deployments the production alias (every production domain) points at;
+    without one, the newest ready production deployment of `deployments` (newest
+    first, as Vercel lists them)."""
+    aliased = {a["deployment"]["id"] for a in project.get("alias") or []
+               if a.get("environment") == "production" and a.get("deployment")}
+    if aliased:
+        return aliased
+    newest = next((d["uid"] for d in deployments if d.get("target") == "production"
+                   and d.get("readyState") == "READY"), None)
+    return {newest} if newest else set()
+
+
+def _aliases(project: dict[str, Any]) -> str:
+    """What the project's aliases said, for the message when nothing is live."""
+    def one(a: dict[str, Any]) -> str:
+        held = a.get("deployment")
+        to = f"deployment {held['id']}" if held else "no deployment"
+        return f"{a.get('domain')} ({a.get('environment')}, {to})"
+    seen = [one(a) for a in project.get("alias") or []]
+    return "; ".join(seen) or "none"
 
 
 def doomed(deployments: list[dict[str, Any]], keep: set[str]) -> list[dict[str, Any]]:
@@ -62,9 +84,11 @@ def doomed(deployments: list[dict[str, Any]], keep: set[str]) -> list[dict[str, 
 
 def plan(deployments: list[dict[str, Any]],
          project: dict[str, Any]) -> list[dict[str, Any]]:
-    keep = live_ids(project)
+    keep = live_ids(project, deployments)
     if not keep:
-        raise PruneError("no deployment holds the production alias; nothing deleted")
+        raise PruneError("no live deployment: no production alias names one and no "
+                         "production deployment is ready; nothing deleted. Aliases: "
+                         + _aliases(project))
     return doomed(deployments, keep)
 
 
@@ -95,7 +119,8 @@ def wait_until_live(call: Call, project: str, sha: str, sleep: Callable[[float],
             raise PruneError(
                 f"the deployment of {sha[:7]} ended {state}; nothing deleted")
         if state == "READY" and newest is not None and newest["uid"] in live_ids(
-                call("GET", f"/v9/projects/{urllib.parse.quote(project)}", {})):
+                call("GET", f"/v9/projects/{urllib.parse.quote(project)}", {}),
+                [newest]):
             return str(newest["uid"])
         if waited >= timeout:
             raise PruneError(f"the deployment of {sha[:7]} was not live after "

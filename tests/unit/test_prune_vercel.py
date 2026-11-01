@@ -7,8 +7,10 @@ nothing until the new build is the live one.
 
 What this does not prove: that Vercel's real responses have the fields used here. They
 were read from Vercel's REST API reference on 2026-11-01 (GET /v7/deployments `uid`,
-`readyState`, `pagination.next`; GET /v9/projects/{idOrName} `alias[].environment`,
-`alias[].deployment.id`; DELETE /v13/deployments/{id}); the first real run is the check.
+`readyState`, `target`, `pagination.next`; GET /v9/projects/{idOrName}
+`alias[].environment`, `alias[].deployment.id`; DELETE /v13/deployments/{id}). The first
+real run (site #52) found no production alias with a deployment on the project, so the
+newest ready production deployment now stands in for it.
 """
 
 from __future__ import annotations
@@ -47,9 +49,26 @@ def test_everything_but_the_kept_and_the_unfinished_goes() -> None:
     assert gone == ["dpl_old", "dpl_err", "dpl_prev"]
 
 
-def test_with_no_live_deployment_nothing_is_deleted() -> None:
-    with pytest.raises(P.PruneError, match="no deployment holds the production alias"):
-        P.plan([dep("dpl_a"), dep("dpl_b")], {"alias": []})
+def test_without_a_production_alias_the_newest_ready_production_deployment_is_live(
+) -> None:
+    """Site #52: the project's aliases named no deployment. The production branch
+    (gh-pages) deploys to production, so the newest one that is ready is live."""
+    deps = [dep("dpl_new", "BUILDING", created=9), dep("dpl_b", created=8),
+            dep("dpl_prev", target=None, created=7), dep("dpl_a", created=6)]
+    projects: list[dict[str, Any]] = [{"alias": []}, {}, {"alias": [
+            {"domain": "didmysipwork.vercel.app", "environment": "production",
+             "deployment": None}]}]
+    for project in projects:
+        assert P.live_ids(project, deps) == {"dpl_b"}
+        assert [d["uid"] for d in P.plan(deps, project)] == ["dpl_prev", "dpl_a"]
+
+
+def test_with_no_live_deployment_nothing_is_deleted_and_it_says_what_it_saw() -> None:
+    project = {"alias": [{"domain": "didmysipwork.vercel.app",
+                          "environment": "production", "deployment": None}]}
+    with pytest.raises(P.PruneError, match="no live deployment") as err:
+        P.plan([dep("dpl_a", "ERROR"), dep("dpl_p", target=None)], project)
+    assert "didmysipwork.vercel.app (production, no deployment)" in str(err.value)
 
 
 class FakeVercel:
@@ -121,6 +140,18 @@ def test_after_a_build_it_waits_for_that_commit_to_be_live_first() -> None:
     P.prune(api, "site", delete=True, sha="abc", sleep=wait, timeout=60, every=1)
     assert sorted(api.deleted) == ["dpl_live", "dpl_old"]
     assert len(ticks) == 2
+
+
+def test_after_a_build_with_no_alias_a_ready_production_deployment_is_live() -> None:
+    new = {**dep("dpl_new", "BUILDING", created=10), "sha": "abc"}
+    api = FakeVercel([new, dep("dpl_live", created=5), dep("dpl_old", created=1)],
+                     {"alias": []})
+
+    def wait(_: float) -> None:
+        new["readyState"] = "READY"
+
+    P.prune(api, "site", delete=True, sha="abc", sleep=wait, timeout=60, every=1)
+    assert sorted(api.deleted) == ["dpl_live", "dpl_old"]
 
 
 @pytest.mark.parametrize("state", ["ERROR", "CANCELED"])
