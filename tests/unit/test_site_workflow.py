@@ -42,8 +42,41 @@ def test_every_action_is_pinned_to_a_commit() -> None:
 
 
 def test_the_checkouts_keep_no_credentials() -> None:
-    steps = _workflow()["jobs"]["build"]["steps"]
-    checkouts = [
-        s for s in steps if str(s.get("uses", "")).startswith("actions/checkout")
-    ]
-    assert checkouts and all(s["with"]["persist-credentials"] is False for s in checkouts)
+    for job in _workflow()["jobs"].values():
+        checkouts = [
+            s for s in job["steps"]
+            if str(s.get("uses", "")).startswith("actions/checkout")
+        ]
+        assert checkouts
+        assert all(s["with"]["persist-credentials"] is False for s in checkouts)
+
+
+def _step(job: str, name: str) -> dict[str, Any]:
+    steps: list[dict[str, Any]] = _workflow()["jobs"][job]["steps"]
+    return next(s for s in steps if s.get("name") == name)
+
+
+def test_older_vercel_deployments_go_only_once_tonights_is_live() -> None:
+    """Vercel keeps a full copy of the site for every push: a month of them filled the
+    Hobby plan's 10 GB (jobs/prune_vercel.py). The step runs after the publish, waits
+    for that commit (--sha), never fails the build, and has its token from secrets."""
+    steps = [s.get("name") for s in _workflow()["jobs"]["build"]["steps"]]
+    prune = _step("build", "Delete older Vercel deployments")
+    assert (steps.index("Delete older Vercel deployments")
+            > steps.index("Build and publish"))
+    assert prune.get("continue-on-error") is True
+    assert prune["env"]["VERCEL_TOKEN"] == "${{ secrets.VERCEL_TOKEN }}"
+    assert "python -m jobs.prune_vercel --sha" in prune["run"]
+    assert "--delete" in prune["run"]
+    assert "echo $VERCEL_TOKEN" not in prune["run"]
+
+
+def test_a_run_by_hand_can_delete_older_deployments_without_building() -> None:
+    workflow = _workflow()
+    triggers: dict[str, Any] = workflow.get(True) or workflow.get("on") or {}
+    only = triggers["workflow_dispatch"]["inputs"]["prune_only"]
+    assert only["type"] == "boolean" and only["default"] is False
+    assert workflow["jobs"]["build"]["if"] == "${{ !inputs.prune_only }}"
+    assert workflow["jobs"]["prune"]["if"] == "${{ inputs.prune_only }}"
+    run = _step("prune", "Delete every Vercel deployment but the live one")["run"]
+    assert "python -m jobs.prune_vercel --delete" in run and "--sha" not in run

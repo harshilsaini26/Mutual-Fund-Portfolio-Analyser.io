@@ -9,9 +9,14 @@
 # pinned to commits, not tags. The token reaches git only through SITE_PUSH_URL
 # (GitHub masks it in the log); the checkouts keep no credentials.
 #
-# One setting is yours: Settings -> Secrets and variables -> Actions ->
-# Variables -> MF_CONTACT_EMAIL, the address every request carries in its From:
-# header (MODULE_0 §2.3). The build stops with a message if it is missing.
+# Settings that are yours, under Settings -> Secrets and variables -> Actions:
+# - Variables -> MF_CONTACT_EMAIL, the address every request carries in its From:
+#   header (MODULE_0 §2.3). The build stops with a message if it is missing.
+# - Secrets -> VERCEL_TOKEN (Vercel: Account Settings -> Tokens) and Variables ->
+#   VERCEL_PROJECT (the project's name), plus VERCEL_TEAM_ID if it is on a team.
+#   Vercel keeps a full copy of the site for every push, and a month of them filled
+#   the Hobby plan's 10 GB; with these set, every older copy is deleted once
+#   tonight's is live (jobs/prune_vercel.py). Without them that step only says so.
 
 name: site
 
@@ -19,6 +24,11 @@ on:
   schedule:
     - cron: "30 20 * * *"   # 02:00 IST, after AMFI publishes the day's prices
   workflow_dispatch:
+    inputs:
+      prune_only:
+        description: "Only delete older Vercel deployments, keeping the live one (no build)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -29,6 +39,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ !inputs.prune_only }}
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
@@ -61,3 +72,42 @@ jobs:
           # Links from the root: Vercel serves the gh-pages branch at its own
           # address (V1-92), not under /<repository>/ as GitHub Pages did.
           python -m jobs.build_site --store previous --out site --base "" --push
+
+      # Once tonight's copy is live on Vercel, every other one goes. The site is
+      # already published, so nothing here can fail the build.
+      - name: Delete older Vercel deployments
+        continue-on-error: true
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT: ${{ vars.VERCEL_PROJECT }}
+          VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT" ]; then
+            echo "::notice::VERCEL_TOKEN or VERCEL_PROJECT is not set, so older Vercel deployments were kept."
+            exit 0
+          fi
+          sha=$(gh api "repos/${{ github.repository }}/branches/gh-pages" --jq .commit.sha)
+          python -m jobs.prune_vercel --sha "$sha" --delete
+
+  # Run by hand with "prune_only": keep the live deployment, delete every other one,
+  # and build nothing.
+  prune:
+    if: ${{ inputs.prune_only }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Delete every Vercel deployment but the live one
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT: ${{ vars.VERCEL_PROJECT }}
+          VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
+        run: python -m jobs.prune_vercel --delete

@@ -282,6 +282,14 @@ address (V1-92; GitHub Pages served it until 2026-10-03). Measured on the first 
   the site pays, about 1 s under the slowdown (the same on `/compare/` and `/learn/`).
   Not yet measured on the live site, where `funds.json` is 1.47 MB raw and NAV files
   are larger (about 19 KB each): re-measure after the first build that carries it.
+- **One Vercel deployment kept** (V1-106, 2026-11-01): Vercel deploys every nightly
+  push to gh-pages, a full copy of the site (about 250 MB), and a month of them filled
+  the Hobby plan's 10 GB. After each build the workflow waits for that night's commit to
+  be the live deployment, then deletes every other one (`jobs/prune_vercel.py`). It
+  never deletes when the live one cannot be found or the new build failed. Running the
+  workflow by hand with "prune_only" deletes all but the live one without building.
+  Needs the secret VERCEL_TOKEN and the variable VERCEL_PROJECT; without them the step
+  only says so.
 - **Design pass on the SIP work** (V1-105, 2026-10-11). A design critique, then
   Apple's design principles, applied to /sip/, the overview and Your portfolio's "In
   hindsight":
