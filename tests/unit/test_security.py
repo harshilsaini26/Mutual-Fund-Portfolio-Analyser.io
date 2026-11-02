@@ -260,7 +260,7 @@ def test_every_response_carries_a_content_security_policy(
         ("/api/views/portfolio_summary", "no-store"),
         ("/api/search?q=acme", "no-store"),
         ("/static/app.css", "no-cache"),
-        ("/static/vendor/echarts.v6.1.0.min.js", "no-cache"),
+        ("/static/vendor/echarts.v6.1.0.site.min.js", "no-cache"),
     ],
 )
 def test_the_portfolio_never_reaches_the_disk_cache(
@@ -278,8 +278,8 @@ def test_the_csp_still_allows_the_vendored_echarts(tmp_path: Path) -> None:
     a policy that breaks the flagship chart would be reverted within a day."""
     client = _client(tmp_path, "Acme Ltd.")
     html = client.get(f"/view/lookthrough_sankey{QS}").text
-    assert '<script src="/static/vendor/echarts.v6.1.0.min.js"></script>' in html
-    assert client.get("/static/vendor/echarts.v6.1.0.min.js").status_code == 200
+    assert '<script src="/static/vendor/echarts.v6.1.0.site.min.js"></script>' in html
+    assert client.get("/static/vendor/echarts.v6.1.0.site.min.js").status_code == 200
 
 
 # --- vendored third-party code ------------------------------------------------

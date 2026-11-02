@@ -40,11 +40,11 @@ def test_the_fund_page_shows_every_picture_and_loads_echarts_not_d3(
     html = client.get(f"/fund/S1{QS}").text
     for view_id in FUND_PAGE:
         assert f'data-view-id="{view_id}"' in html, view_id
-    assert '<script src="/static/vendor/echarts.v6.1.0.min.js"></script>' in html
+    assert '<script src="/static/vendor/echarts.v6.1.0.site.min.js"></script>' in html
     assert '<script src="/static/charts.js"></script>' in html
     assert "/static/vendor/d3" not in html
     assert "<title>Fund One</title>" in html
-    assert client.get("/static/vendor/echarts.v6.1.0.min.js").status_code == 200
+    assert client.get("/static/vendor/echarts.v6.1.0.site.min.js").status_code == 200
 
 
 def test_a_tooltip_says_what_the_export_says(client: TestClient) -> None:  # noqa: F811

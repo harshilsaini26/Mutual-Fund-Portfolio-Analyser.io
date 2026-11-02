@@ -94,7 +94,7 @@ PUBLIC_USER = UserId("PUBLIC")
 #: What the public pages load.
 STATIC_FILES = (
     "app.css", "app.js", "charts.js", "settings.js", "sections.js",
-    "vendor/echarts.v6.1.0.min.js",
+    "vendor/echarts.v6.1.0.site.min.js",
     "fonts/rubik-latin-wght-normal.woff2",
     "fonts/terminess-Regular.woff2", "fonts/terminess-Bold.woff2",
     "portfolio-math.js", "kit.js", "portfolio.js", "compare.js", "sip.js",

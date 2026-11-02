@@ -533,7 +533,7 @@ def test_the_sankey_draws_with_the_vendored_echarts(client: TestClient) -> None:
     # substring and passed while Jinja was escaping the whole block into
     # `&lt;script&gt;`, so d3 never loaded and the diagram never drew — a test
     # that passes on the text of a tag it cannot execute is not testing loading.
-    assert '<script src="/static/vendor/echarts.v6.1.0.min.js"></script>' in html
+    assert '<script src="/static/vendor/echarts.v6.1.0.site.min.js"></script>' in html
     assert '<script src="/static/charts.js"></script>' in html
     drawn = r'data-chart="echart"[^>]*>(?:(?!</figure>).)*"kind": "sankey"'
     assert re.search(drawn, html, re.S)

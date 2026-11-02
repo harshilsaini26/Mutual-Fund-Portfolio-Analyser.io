@@ -6,9 +6,18 @@
 # tests/unit/test_security.py fails if a file stops matching.
 #
 # Sources, pinned:
-#   echarts.v6.1.0.min.js     package/dist/echarts.min.js from
-#                             https://registry.npmjs.org/echarts/-/echarts-6.1.0.tgz
-#                             (tarball checked against the registry's sha512 integrity)
+#   echarts.v6.1.0.site.min.js  ECharts 6.1.0 (npm, echarts@6.1.0) built with
+#                               esbuild@0.25.0 from echarts.site.entry.js: only
+#                               the six chart types, the components and the SVG
+#                               renderer charts.js uses (Impeccable critique,
+#                               2026-11-01: 1.12 MB, 368 KB compressed, became
+#                               716 KB, 243 KB). Licence header kept. Rebuild:
+#                                 npm install --save-exact echarts@6.1.0 esbuild@0.25.0
+#                                 esbuild echarts.site.entry.js --bundle --minify
+#                                   --format=iife --target=es2017 --legal-comments=none
+#                                   (with the Apache header of npm's dist file as banner)
+#   echarts.site.entry.js       the entry above; never served by the public site.
 #
 # Verify by hand with:  sha256sum -c SHA256SUMS
-b66b25aeb4df84e33199dc21694014d336d222cbd9deb0e5a7c14bd6aa0d0fd0  echarts.v6.1.0.min.js
+a6e8a48c18c1be0092a550be1ba227327726e1dbc01168419b12089c8093da1b  echarts.v6.1.0.site.min.js
+c329a0320abd2172576a888a2c5c3b032af9b79ec122cd36abeb93aa38966ac2  echarts.site.entry.js

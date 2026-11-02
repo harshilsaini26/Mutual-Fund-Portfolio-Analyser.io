@@ -178,7 +178,7 @@
   }
   function withCharts(draw, failed) {
     if (!chartsReady) {
-      chartsReady = script(BASE + "/static/vendor/echarts.v6.1.0.min.js")
+      chartsReady = script(BASE + "/static/vendor/echarts.v6.1.0.site.min.js")
         .then(function () { return script(BASE + "/static/charts.js"); });
     }
     chartsReady.then(draw, function () { chartsReady = null; if (failed) failed(); });
