@@ -442,6 +442,8 @@
 /* Every field's hint, in every theme: the browser's own grey failed AA on dark
    grounds. Firefox fades placeholders, so opacity is set back. */
 ::placeholder { color: var(--ink-faint); opacity: 1; }
+/* Every fold-out is a 24px target at least (WCAG 2.5.8); some ask for more below. */
+summary { min-height: 24px; }
 
 /* A jump lands below the pinned top bar and, on a fund page, the section
    navigator (V1-84): scripts measure both into --bar-h and --nav-h; these are

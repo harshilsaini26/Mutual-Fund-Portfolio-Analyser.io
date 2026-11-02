@@ -439,7 +439,9 @@
         nodeClick: false,
         breadcrumb: { show: false },
         width: "100%", height: "100%", top: 0, left: 0,
-        label: { show: true, color: p.onCat, overflow: "truncate", fontSize: textSize() * 11 / 12,
+        // A name wraps by word; only what the tile's height cannot hold is cut.
+        label: { show: true, color: p.onCat, overflow: "break", lineOverflow: "truncate",
+                 fontSize: textSize() * 11 / 12,
                  formatter: function (d) { return d.name + "\n" + d.data.caption; } },
         itemStyle: { borderColor: p.bg, borderWidth: 2, gapWidth: 2, borderRadius: 4 },
         data: c.cells.map(function (cell) {

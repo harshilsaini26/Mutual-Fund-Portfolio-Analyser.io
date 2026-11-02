@@ -79,11 +79,12 @@
     `quiet` is for a panel whose own heading says more than its question -- the
     fund page's header, whose heading is the fund's name. The question stays in
     the markup for a screen reader (§2.3: every view states it); it is only not
-    drawn twice.
+    drawn twice, and is not a heading, so the page's first heading is its h1
+    (Impeccable critique, 2026-11-01).
   #}
   <header class="view__header{% if quiet %} view__header--quiet{% endif %}">
     {% if quiet %}
-    <h2 id="q-{{ env.view_id }}" class="sr-only">{{ env.question }}</h2>
+    <p id="q-{{ env.view_id }}" class="sr-only">{{ env.question }}</p>
     {% else %}
     <div>
       <p class="view__eyebrow">{{ icon.i(view_icons.get(env.view_id, "list")) }}{{ view_names.get(env.view_id, "") }}{% if term_for.view.get(env.view_id) %}{{ term(term_for.view[env.view_id], "view") }}{% endif %}</p>
@@ -153,7 +154,7 @@
 {%- endmacro %}
 
 
-{% macro kpi_tile(tile, spark=None, why="Not computed yet — this figure comes from a module that has not run.") -%}
+{% macro kpi_tile(tile, spark=None, why="Not worked out yet: the data it needs has not been loaded.") -%}
 {#
   One KPI tile (DECISIONS V1-74): a label, the figure (formatted by `fmt_tile`,
   §16.4), an optional context line with its symbol, and an optional sparkline

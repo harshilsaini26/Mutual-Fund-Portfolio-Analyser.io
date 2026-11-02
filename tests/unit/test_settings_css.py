@@ -912,3 +912,11 @@ def test_the_settings_actions_stand_apart() -> None:
     assert rule and re.search(r"display:\s*block", rule.group(1))
     assert re.search(r"min-height:\s*24px", rule.group(1))
     assert re.search(r"\.settings__reset \+ \.settings__reset\s*\{[^}]*margin-top", css)
+
+
+def test_every_fold_out_is_a_24px_target() -> None:
+    """Impeccable critique, 2026-11-01: "About this data" was 19px tall and the
+    notes and "As a table" summaries 22px (WCAG 2.5.8 asks 24px). One rule for
+    every <summary>, before the ones that ask for more."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    assert re.search(r"(?m)^summary\s*\{[^}]*min-height:\s*24px", css)

@@ -29,3 +29,15 @@ def test_a_name_already_in_mixed_case_is_left_alone() -> None:
     for name in ("360 ONE Balanced Hybrid Fund", "Parag Parikh Flexi Cap Fund",
                  "Aditya Birla Sun Life CRISIL-IBX Gilt Index Fund"):
         assert display_name(name) == name
+
+
+def test_a_dangling_dash_is_dropped() -> None:
+    """Impeccable critique, 2026-11-01: AMFI's fund-level names keep the dash its
+    plan suffix followed ("ICICI Prudential Liquid Fund -")."""
+    liquid = "ICICI Prudential Liquid Fund"
+    assert display_name(liquid + " -") == liquid
+    assert display_name("ICICI Prudential Nifty50 Equal Weight Index Fund-") == (
+        "ICICI Prudential Nifty50 Equal Weight Index Fund")
+    assert display_name("ICICI PRUDENTIAL LIQUID FUND -") == liquid
+    assert display_name("Aditya Birla Sun Life CRISIL-IBX Gilt Index Fund") == (
+        "Aditya Birla Sun Life CRISIL-IBX Gilt Index Fund")

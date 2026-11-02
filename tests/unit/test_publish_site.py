@@ -1254,9 +1254,10 @@ def test_push_publishes_and_leaves_nothing_writing_into_its_repository(
 
 
 def test_every_labelled_figure_with_a_glossary_entry_explains_itself() -> None:
-    """V1-91: the NAV box and the leader tables' Size and year columns gain the
-    `?` (and so the hover explanation) their glossary entries already have; the
-    explanation's id is unique although the six leader tables repeat."""
+    """V1-91: the NAV box and the leader tables gain the `?` their glossary
+    entries already have; the explanation's id is unique although the six leader
+    tables repeat. Since the Impeccable critique (2026-11-01) the tables share one,
+    on the fold's note, rather than four per table: a dozen identical tab stops."""
     engine = templates(root=BASE, static=True)
     card = {"key": "equity/flexi_cap", "name": "Flexi cap", "count": 7, "funds": []}
     page = engine.get_template("explorer.html").render({
@@ -1266,7 +1267,7 @@ def test_every_labelled_figure_with_a_glossary_entry_explains_itself() -> None:
         "leaders": [card, {**card, "key": "equity/mid_cap", "name": "Mid cap"}]})
     fold = page[page.index('class="leaders-fold"'):page.index('id="funds"')]
     keys = re.findall(r'class="term" popovertarget="[^"]+" data-key="([^"]+)"', fold)
-    assert keys.count("aum") == 2 and keys.count("annualised_return") == 6, keys
+    assert keys == ["annualised_return"], keys
     ids = re.findall(r'\bid="([^"]+)"', page)
     assert len(ids) == len(set(ids)), sorted(i for i in ids if ids.count(i) > 1)
 
@@ -1704,3 +1705,16 @@ def test_explore_groups_its_categories_by_family_and_folds_the_unranked() -> Non
               "labels": {"vol3": None, "fall3": None, "sharpe3": None}}
     flags = [publish.explore_row({**blank, **r}, record).get("mixed") for r in rows[:2]]
     assert flags == [None, True]
+
+
+def test_explores_category_cards_explain_a_term_once_not_in_every_column() -> None:
+    """Impeccable critique, 2026-11-01: each card's table repeated four "?"
+    buttons ("What is Annualised return?" three times), a dozen tab stops before
+    the first fund. The cards' shared note carries the one explanation."""
+    source = (Path(publish.__file__).resolve().parents[1] / "src" / "m6_views"
+              / "templates" / "explorer.html").read_text(encoding="utf-8")
+    cards = source[source.index("{% if leaders %}"):source.index("{% endif %}",
+                                                                source.index("</details>"))]
+    assert cards.count("vc.term(") == 1
+    note = r'leaders-fold__note">Annualised\{\{ vc\.term\("annualised_return"'
+    assert re.search(note, cards)

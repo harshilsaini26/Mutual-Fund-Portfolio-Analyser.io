@@ -426,6 +426,7 @@ def test_an_uncomputed_figure_is_an_em_dash_not_a_zero(
         assert 'title="' not in tile
         reason = r'<dd class="kpi__context">.*?<span>[^<]+</span>'
         assert re.search(reason, tile, re.S), tile
+        assert "module" not in tile   # the reader's words, not the code's
 
 
 def test_indian_grouping_reaches_the_table(client: TestClient) -> None:
@@ -459,7 +460,7 @@ def test_the_unresolved_node_is_labelled_and_patterned(
     """§10.3 and Appendix A. Missing mass stays visible, and is distinguishable
     without colour."""
     html = page(client, "lookthrough_sankey")
-    assert "Unresolved Holdings" in html or "__UNRESOLVED__" in html
+    assert "Not matched to a company" in html or "__UNRESOLVED__" in html
 
 
 def test_an_unreconciled_row_carries_a_symbol_not_only_a_tint(

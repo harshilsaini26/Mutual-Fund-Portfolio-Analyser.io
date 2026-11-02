@@ -127,8 +127,8 @@ class FundXrayBuilder:
                 "rows": rows,
                 "definition": (
                     f"{scheme}: NAV adjusted for distributions,"
-                    f" {len(fw.navs):,} points from {fw.navs[0].nav_date}"
-                    f" to {fw.navs[-1].nav_date}. Benchmark:"
+                    f" {len(fw.navs):,} points from {format_date(fw.navs[0].nav_date)}"
+                    f" to {format_date(fw.navs[-1].nav_date)}. Benchmark:"
                     f" {fw.benchmark_id or 'none on record'}."
                     + (f" Launched {format_date(fw.inception)}." if fw.inception else "")
                 ),

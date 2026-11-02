@@ -197,3 +197,12 @@ test("no page hands a maybe-false child straight to the DOM: fill() drops it", a
   }
   assert.deepEqual(bad, []);
 });
+
+test("a treemap tile wraps a holding's name rather than cutting it mid-word", async () => {
+  // Impeccable critique, 2026-11-01: "Knowledg…", "EMBASSY O…". charts.js runs
+  // only in a browser, so this reads its treemap label setting.
+  const { readFileSync } = await import("node:fs");
+  const src = readFileSync(new URL("../../src/m6_views/static/charts.js", import.meta.url), "utf8");
+  const tree = src.slice(src.indexOf("treemap: function"), src.indexOf("scatter: function"));
+  assert.match(tree, /label: \{[^}]*overflow: "break", lineOverflow: "truncate"/);
+});

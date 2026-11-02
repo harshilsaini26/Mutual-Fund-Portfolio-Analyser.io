@@ -38,7 +38,9 @@ _SMALL = {"OF", "AND", "THE", "IN", "FOR", "TO", "ON", "AT", "BY", "A", "AN"}
 def display_name(name: str) -> str:
     """A fund's name as the site shows it: AMFI's spelling, unless it is all in
     capitals ("BANDHAN LARGE CAP FUND"), which is recased with its acronyms and
-    small words kept. Display only; matching keeps AMFI's (design review)."""
+    small words kept, and without a dash left dangling at its end ("Liquid Fund
+    -"). Display only; matching keeps AMFI's (design review)."""
+    name = re.sub(r"\s*[-\u2013]+\s*$", "", name)   # a hyphen or an en dash
     if any(ch.islower() for ch in name):
         return name
 

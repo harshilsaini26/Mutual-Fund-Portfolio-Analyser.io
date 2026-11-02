@@ -496,3 +496,20 @@ def test_each_rank_says_how_many_funds_it_counts_and_what_they_share() -> None:
         "of the 42 funds with a year of prices")
     assert rank_basis(Rank(by["ter"], Decimal("0.5"), 3, 46, 1)) == (
         "of the 46 funds with an expense ratio on record")
+
+
+def test_the_fund_page_opens_on_its_h1(client: TestClient) -> None:  # noqa: F811
+    """Impeccable critique, 2026-11-01: the header's hidden question was an h2
+    read before the fund's name. It still names the panel, but as no heading."""
+    html = client.get(f"/fund/S1{QS}").text
+    main = html[html.index("<main"):]
+    assert re.findall(r"<h([1-6])\b", main)[0] == "1"
+    assert re.search(r'<p id="q-fund_header" class="sr-only">', html)
+
+
+def test_every_fund_page_date_is_written_one_way(client: TestClient) -> None:  # noqa: F811
+    """Impeccable critique, 2026-11-01: the x-ray's provenance line said "points
+    from 2013-05-28" where every other date reads "28 May 2013" (§9.4)."""
+    html = client.get(f"/fund/S1{QS}").text
+    text = re.sub(r"<script.*?</script>|<[^>]+>", " ", html, flags=re.S)
+    assert not re.findall(r"\b20\d\d-\d\d-\d\d\b", text)

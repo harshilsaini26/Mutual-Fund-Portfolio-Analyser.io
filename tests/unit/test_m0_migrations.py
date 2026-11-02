@@ -406,3 +406,14 @@ class TestAnAppliedMigrationIsMarkedWithIt:
             }
         assert M013.name in marked, "013 ran; it must not be a candidate to re-run"
         assert f"{NEXT}_broken.sql" not in marked
+
+
+def test_the_unmatched_node_is_named_in_plain_words(tmp_path: Path) -> None:
+    """Impeccable critique, 2026-11-01: "Unresolved Holdings 23.0%" sat in a
+    fund's holdings as if it were a company. Migration 018 renames it."""
+    db = tmp_path / "named.db"
+    apply_migrations(str(db))
+    with _open(db) as conn:
+        (name,) = conn.execute("SELECT canonical_name FROM issuer"
+                               " WHERE issuer_id = '__UNRESOLVED__'").fetchone()
+    assert name == "Not matched to a company"
