@@ -165,16 +165,21 @@ def test_performance_sets_each_measure_beside_its_benchmark(
     env = client.get(f"/api/views/fund_performance{QS}&scope_id=S1").json()
     assert env["state"] == "ok", env.get("state_reason")
     rows = {r["measure"]: r for r in env["payload"]["rows"]}
-    for measure in ("Sharpe ratio", "Treynor ratio", "Alpha a year", "Beta",
-                    "Information ratio", "Up capture", "Down capture"):
-        assert measure in rows, measure
+    # Five plain measures; the ratios are under Every figure (Impeccable
+    # critique, 2026-11-01: fourteen rows of them were heavy for a first look).
+    assert list(rows) == ["Return a year", "Benchmark a year", "Ahead of benchmark",
+                          "Volatility", "Deepest fall"]
     three = rows["Return a year"]["3y"], rows["Benchmark a year"]["3y"]
     assert all(v is not None for v in three)
     lead = Decimal(rows["Ahead of benchmark"]["3y"])
     assert lead == Decimal(three[0]) - Decimal(three[1])
-    assert rows["Beta"]["3y"] is not None
-    html = client.get(f"/fund/S1{QS}").text
-    assert "What it says" in html and "Return above cash for each unit of beta." in html
+    assert "Every figure" in env["payload"]["definition"]
+    xray = client.get(f"/api/views/fund_xray_header{QS}&scope_id=S1").json()
+    keys = {c["key"] for c in xray["payload"]["columns"]}
+    assert {"sharpe", "sortino", "treynor", "alpha_ann", "beta", "tracking_error",
+            "information_ratio", "up_capture", "down_capture"} <= keys
+    three_x = next(r for r in xray["payload"]["rows"] if r["window_key"] == "3y")
+    assert three_x["beta"] is not None
 
 
 def test_a_capture_ratio_says_how_few_months_it_rests_on(
@@ -182,9 +187,9 @@ def test_a_capture_ratio_says_how_few_months_it_rests_on(
 ) -> None:
     """External audit, 2026-10-04: a one-year capture ratio rests on about six
     rising and six falling months, and the page should say so."""
-    env = client.get(f"/api/views/fund_performance{QS}&scope_id=S1").json()
-    rows = {r["measure"]: r for r in env["payload"]["rows"]}
-    assert rows["Up capture"]["1y"] is not None
+    env = client.get(f"/api/views/fund_xray_header{QS}&scope_id=S1").json()
+    one = next(r for r in env["payload"]["rows"] if r["window_key"] == "1y")
+    assert one["up_capture"] is not None
     caveats = env["quality"]["caveats"]
     note = next((c for c in caveats if "capture" in c), "")
     assert re.search(r"Over 1 year .* \d+ rising and \d+ falling months", note), caveats
@@ -236,7 +241,7 @@ def test_without_a_benchmark_its_rows_are_left_out(
     warehouse.close()
     env = client.get(f"/api/views/fund_performance{QS}&scope_id=S1").json()
     measures = {r["measure"] for r in env["payload"]["rows"]}
-    assert {"Return a year", "Volatility", "Sharpe ratio"} <= measures
+    assert {"Return a year", "Volatility", "Deepest fall"} <= measures
     assert not measures & {"Benchmark a year", "Ahead of benchmark", "Beta", "Up capture"}
     assert env["question"] == "How has it done for the risk taken?"
     caveats = env["quality"]["caveats"]
@@ -368,8 +373,8 @@ def test_performance_reads_on_a_phone(client: TestClient) -> None:  # noqa: F811
     assert 'data-label="3 years"' in panel and 'data-label="What it says"' in panel
     tuck = re.search(r'<details class="tuck" open><summary>What each measure says'
                      r'</summary>(.*?)</details>', panel, re.S)
-    assert tuck and tuck.group(1).count("<dt>") == 14
-    assert "Return above cash for each unit of beta." in tuck.group(1)
+    assert tuck and tuck.group(1).count("<dt>") == 5   # the ratios: Every figure
+    assert "The largest fall from a high within the period." in tuck.group(1)
 
 
 def test_the_ranks_list_is_one_tap_away(client: TestClient) -> None:  # noqa: F811
@@ -513,3 +518,18 @@ def test_every_fund_page_date_is_written_one_way(client: TestClient) -> None:  #
     html = client.get(f"/fund/S1{QS}").text
     text = re.sub(r"<script.*?</script>|<[^>]+>", " ", html, flags=re.S)
     assert not re.findall(r"\b20\d\d-\d\d-\d\d\b", text)
+
+
+def test_a_return_tile_carries_its_own_sign_apart_from_its_benchmark() -> None:
+    """Impeccable critique, 2026-11-01: -5.9% beside a green ▲ (it beat its
+    benchmark). The figure's colour follows its sign; the tone, the benchmark."""
+    from decimal import Decimal
+
+    from src.m6_views.builders.fund.header import _tile
+
+    beat = _tile("return_1y", "Return, 1 year", Decimal("-0.059"), "return_ann",
+                 "2.1 points a year ahead of its benchmark", "ahead")
+    assert (beat["sign"], beat["tone"]) == ("loss", "ahead")
+    assert _tile("return_3y", "", Decimal("0.12"), "return_ann", None)["sign"] == "gain"
+    assert _tile("return_3y", "", Decimal("0"), "return_ann", None)["sign"] is None
+    assert _tile("size", "", Decimal("100"), "inr", None)["sign"] is None

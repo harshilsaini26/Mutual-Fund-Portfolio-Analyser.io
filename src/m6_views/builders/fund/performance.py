@@ -35,7 +35,11 @@ from src.m6_views.states import empty_envelope
 VIEW_ID = "fund_performance"
 PERIODS = {"1y": "1 year", "3y": "3 years", "5y": "5 years"}
 
-#: (row, label, kind, what it says). `kind` formats the row's cells.
+#: (row, label, kind, what it says). `kind` formats the row's cells. Five plain
+#: measures; the ratios (Sharpe, Sortino, Treynor, alpha, beta, tracking error,
+#: information ratio, capture) are under Every figure, `fund_xray_header`, for
+#: every period (Impeccable critique, 2026-11-01: fourteen rows were heavy for a
+#: first look at a fund).
 MEASURES = (
     ("return_ann", "Return a year", "fraction",
      "Annualised, with dividends reinvested."),
@@ -47,33 +51,11 @@ MEASURES = (
      "How widely its daily price swings, scaled to a year."),
     ("max_dd", "Deepest fall", "fraction",
      "The largest fall from a high within the period."),
-    ("sharpe", "Sharpe ratio", "ratio",
-     "Return above cash for each unit of volatility."),
-    ("sortino", "Sortino ratio", "ratio",
-     "Return above cash for each unit of downward swings only."),
-    ("treynor", "Treynor ratio", "fraction",
-     "Return above cash for each unit of beta."),
-    ("alpha_ann", "Alpha a year", "fraction",
-     "Return beyond what its beta to the benchmark accounts for."),
-    ("beta", "Beta", "ratio",
-     "How far it moved for each 1% the benchmark moved."),
-    ("tracking_error", "Tracking error", "fraction",
-     "How far its daily returns strayed from the benchmark's, a year."),
-    ("information_ratio", "Information ratio", "ratio",
-     "Its lead over the benchmark for each unit of tracking error."),
-    ("up_capture", "Up capture", "fraction",
-     "Its yearly gain over the months the benchmark rose, as a share of the "
-     "benchmark's."),
-    ("down_capture", "Down capture", "fraction",
-     "Its yearly loss over the months the benchmark fell, as a share of the "
-     "benchmark's."),
 )
 
 NO_BENCHMARK_QUESTION = "How has it done for the risk taken?"
 #: The measures that need a benchmark: left out when the fund has none.
-BENCHMARK_MEASURES = {"bench_return_ann", "lead", "treynor", "alpha_ann", "beta",
-                      "tracking_error", "information_ratio", "up_capture",
-                      "down_capture"}
+BENCHMARK_MEASURES = {"bench_return_ann", "lead"}
 
 NO_YIELD = (
     "Average maturity and yield to maturity are not shown: fund houses publish "
@@ -156,20 +138,6 @@ class FundPerformanceBuilder:
         category = category_of(facts.category) if facts and facts.category else None
         if category and "debt" in (category.family, category.key.split("/")[-1]):
             caveats.append(NO_YIELD)
-        # Capture is monthly (§8.4): a short window has few months to rest on,
-        # and under six either way there is no ratio at all.
-        caveats.extend(
-            (f"Over {PERIODS[k]} the capture ratios rest on {cw.up_months} rising "
-             f"and {cw.down_months} falling months of the benchmark; that few "
-             f"makes them rough.")
-            if cw.up_capture is not None and cw.down_capture is not None
-            else (f"Over {PERIODS[k]} the benchmark had {cw.up_months} rising and "
-                  f"{cw.down_months} falling months; a capture ratio needs six "
-                  f"each way, so a blank one is left blank.")
-            for k, cw in shown.items()
-            if cw.up_months is not None and cw.down_months is not None
-            and min(cw.up_months, cw.down_months) < 12
-        )
 
         rf = w.risk_free_pct
         return ok_envelope(
@@ -181,7 +149,10 @@ class FundPerformanceBuilder:
                 # nothing, so the table is not sortable (UI/UX critique G-18).
                 "sortable": False,
                 "definition": (
-                    "Cash is the 91-day Treasury bill rate, averaged over each period"
+                    "Sharpe, Sortino, Treynor, alpha, beta, tracking error, the "
+                    "information ratio and capture, for every period, are under "
+                    "Every figure at the foot of the page. Cash is the 91-day "
+                    "Treasury bill rate, averaged over each period"
                     + (f" ({rf:.2f}% a year over {PERIODS[lead_key]})."
                        if rf is not None else ".")
                 ),

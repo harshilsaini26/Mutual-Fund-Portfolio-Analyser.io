@@ -68,14 +68,15 @@ def test_every_question_mark_is_a_24px_target() -> None:
         r"\.section-head > h2\s*\{[^}]*max-width:\s*calc\(100% - \d+px\)", css)
 
 
-def test_in_matrix_a_loss_is_not_green() -> None:
-    """UI/UX critique G-13 (2026-10-04): Matrix sets all text green, so a tile's
-    falling figure read as a gain beside its small red ▼. There the figure itself
-    takes the gain or loss colour (the sign and arrow stay, so colour is never
-    the only carrier)."""
-    css = CSS.read_text(encoding="utf-8")
-    assert re.search(r':root\[data-theme="matrix"\] \.kpi__tile--behind \.kpi__value'
-                     r'[^{]*\{[^}]*color:\s*var\(--loss\)', css)
+def test_a_figure_takes_the_colour_of_its_own_sign() -> None:
+    """UI/UX critique G-13 (2026-10-04) made Matrix colour a tile's figure by its
+    benchmark: a -5.9% that beat its index showed green. Since the Impeccable
+    critique (2026-11-01) a figure is coloured by its own sign in every theme
+    (`ret--gain`/`ret--loss`, set by the builder); the benchmark's ▲/▼ stays on
+    the line beneath. No rule colours a figure by ahead or behind."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    assert not re.search(r"kpi__tile--(ahead|behind) \.kpi__value", css)
+    assert re.search(r"\.ret--loss\s*\{[^}]*color:\s*var\(--loss\)", css)
 
 
 def test_series_colours_are_not_gain_loss_or_benchmark_colours() -> None:
@@ -920,3 +921,21 @@ def test_every_fold_out_is_a_24px_target() -> None:
     every <summary>, before the ones that ask for more."""
     css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
     assert re.search(r"(?m)^summary\s*\{[^}]*min-height:\s*24px", css)
+
+
+def test_the_landing_pictures_hold_no_boxes_inside_their_box() -> None:
+    """Impeccable critique, 2026-11-01: the portfolio pair and the data flow were
+    bordered cards inside the bordered picture panel. Inside a panel, a hairline
+    divides; nothing is boxed twice."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    for sel in (".lp-pair__card", ".lp-flow__box"):
+        rule = re.search(r"(?m)^" + re.escape(sel) + r"\s*\{([^}]*)\}", css)
+        assert rule, sel
+        assert not re.search(r"\bborder(-radius)?:|\bbackground:", rule.group(1)), sel
+
+
+def test_a_paragraph_does_not_end_on_one_word() -> None:
+    """Impeccable critique, 2026-11-01: "Settings.", "rest." and "site." alone on
+    their last lines; `pretty` was set on the headline only."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    assert re.search(r"(?m)^p\s*\{[^}]*text-wrap:\s*pretty", css)

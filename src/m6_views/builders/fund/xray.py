@@ -22,6 +22,7 @@ from src.m6_views.builders.fund.common import (
     INDEX_WITHHELD,
     withholds_index,
 )
+from src.m6_views.builders.fund.performance import PERIODS
 from src.m6_views.compose import ok_envelope
 from src.m6_views.deps import Deps
 from src.m6_views.envelope import ViewEnvelope
@@ -41,11 +42,13 @@ COLUMNS = [
     ("confidence", "Confidence", "text"),
     ("sharpe", "Sharpe", "ratio"),
     ("sortino", "Sortino", "ratio"),
+    ("treynor", "Treynor", "fraction"),
     ("risk_free_pct", "Risk-free", "pct"),
     ("bench_return_ann", "Benchmark", "return_ann"),
     ("beta", "Beta", "ratio"),
     ("tracking_error", "Tracking error", "fraction"),
     ("alpha_ann", "Alpha p.a.", "fraction"),
+    ("information_ratio", "Information ratio", "ratio"),
     ("up_capture", "Up capture", "ratio"),
     ("down_capture", "Down capture", "ratio"),
     ("interpolated_pct", "Filled NAV", "pct"),
@@ -115,6 +118,21 @@ class FundXrayBuilder:
                 "reads low."
             )
 
+        # Capture is monthly (§8.4): a short window has few months to rest on,
+        # and under six either way there is no ratio at all. Said here since the
+        # capture ratios moved from Performance (Impeccable critique, 2026-11-01).
+        caveats.extend(
+            (f"Over {PERIODS[k]} the capture ratios rest on {cw.up_months} rising "
+             f"and {cw.down_months} falling months of the benchmark; that few "
+             f"makes them rough.")
+            if cw.up_capture is not None and cw.down_capture is not None
+            else (f"Over {PERIODS[k]} the benchmark had {cw.up_months} rising and "
+                  f"{cw.down_months} falling months; a capture ratio needs six "
+                  f"each way, so a blank one is left blank.")
+            for k, cw in fw.windows.items()
+            if cw and k in PERIODS and cw.up_months is not None
+            and cw.down_months is not None and min(cw.up_months, cw.down_months) < 12
+        )
         rows = [_row(key, w) for key, w in fw.windows.items()]
         return ok_envelope(
             view_id=VIEW_ID,

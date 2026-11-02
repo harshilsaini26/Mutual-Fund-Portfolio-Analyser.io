@@ -182,6 +182,14 @@
     return blank(kind, row) ? null : rowError(fund, kind, row, todayIso);
   }
 
+  // A fund just added, and a SIP row just added: a SIP first, on a site that asks
+  // "Did my SIP work?", with its start month left blank rather than this month,
+  // whose price is not published yet (Impeccable critique, 2026-11-01).
+  function newSip() { return { amount: "", day: 1, start: "", stop: null }; }
+  function newHolding(id) {
+    return { id: id, purchases: [], sips: [newSip()], sales: [], alts: [null, null, null] };
+  }
+
   // The purchases a holding's error-free rows make, and how many rows with an
   // error were left out (a row not yet filled in is not counted).
   function entriesOf(holding, fund, todayIso) {
@@ -791,6 +799,7 @@
     localDay: localDay, rowError: rowError, shownError: shownError, entriesOf: entriesOf, altSlots: altSlots,
     pricedBuys: pricedBuys, pricedSales: pricedSales, gzipText: gzipText, day: day, units: units,
     reference: reference, grouped: grouped, inWords: inWords,
+    newSip: newSip, newHolding: newHolding,
   };
   if (typeof module === "object" && module.exports) module.exports = api;
   else globalThis.PortfolioMath = api;

@@ -318,10 +318,10 @@
   --heat-ink-low: #f2f1ed;
   --heat-ink-high: #161616;
   --shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px rgb(0 0 0 / 0.32);
-  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 44px rgb(113 0 20 / 0.45);
+  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 44px rgb(0 0 0 / 0.5);
 }
 
-/* Midnight Neon: Lavender and Cyan on Midnight Navy, Electric Violet in the glow. */
+/* Midnight Neon: Lavender and Cyan on Midnight Navy, Electric Violet in the swatch. */
 :root[data-theme="midnight"] {
   color-scheme: dark;
   --bg: #0f172a;
@@ -375,7 +375,7 @@
   --heat-ink-low: #ede9fe;
   --heat-ink-high: #0f172a;
   --shadow: 0 1px 0 rgb(255 255 255 / 0.03) inset, 0 10px 30px rgb(0 0 0 / 0.3);
-  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 44px rgb(124 58 237 / 0.35);
+  --shadow-lift: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 44px rgb(0 0 0 / 0.45);
 }
 
 /* Matrix (V1-81): green on black. Loss keeps its own hue, so gain and loss are
@@ -444,6 +444,8 @@
 ::placeholder { color: var(--ink-faint); opacity: 1; }
 /* Every fold-out is a 24px target at least (WCAG 2.5.8); some ask for more below. */
 summary { min-height: 24px; }
+/* No paragraph ends on a word alone on its line. */
+p { text-wrap: pretty; }
 
 /* A jump lands below the pinned top bar and, on a fund page, the section
    navigator (V1-84): scripts measure both into --bar-h and --nav-h; these are
@@ -799,11 +801,10 @@ a.badge:hover { color: var(--ink); border-color: var(--ink-faint); }
 .kpi__symbol { font-size: var(--text-xs); }
 .kpi__tile--ahead .kpi__symbol { color: var(--gain); }
 .kpi__tile--behind .kpi__symbol { color: var(--loss); }
-/* Matrix sets all text green, so there the figure itself carries its tone; the
-   sign and arrow stay beside it (UI/UX critique G-13). */
-:root[data-theme="matrix"] .kpi__tile--behind .kpi__value,
+/* A figure takes its own sign's colour (`ret--gain`/`ret--loss`, from the builder);
+   its benchmark's verdict is the ▲/▼ on the line beneath (Impeccable critique,
+   2026-11-01). Matrix's text is all green, so there a loss is what stands out. */
 :root[data-theme="matrix"] .ret--loss { color: var(--loss); }
-:root[data-theme="matrix"] .kpi__tile--ahead .kpi__value { color: var(--gain); }
 .kpi__spark { margin-top: 6px; }
 .kpi__spark svg { display: block; width: 100%; height: 34px; overflow: visible; }
 .kpi__spark polyline {
@@ -976,10 +977,9 @@ p.chart-table { font-size: var(--text-sm); color: var(--ink-faint); }
 }
 .page-head h1 { margin: 0; font-size: var(--text-h2); font-weight: 700; letter-spacing: var(--track-tight); }
 .page-head p { margin: 4px 0 0; color: var(--ink-soft); }
-.eyebrow {
-  margin: 0; font-size: var(--text-xs); font-weight: 600; letter-spacing: var(--track-label);
-  text-transform: uppercase; color: var(--accent);
-}
+/* Learn's way back to its index (Impeccable critique, 2026-11-01: no label sits
+   above a heading; a breadcrumb is a link, in the sentence's own case). */
+.crumbs { margin: 0 0 6px; font-size: var(--text-sm); color: var(--ink-soft); }
 
 /* --- the home dashboard ------------------------------------------------------------- */
 
@@ -1369,7 +1369,6 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 .lp-hero__text { grid-area: text; }
 .lp-hero__grid > .lp-doors { grid-area: doors; margin: 0; }
 .lp-fund { grid-area: fund; }
-.lp-hero .eyebrow { color: var(--accent); }
 .lp-hero__title {
   margin: 12px 0 14px; max-width: 18ch; text-wrap: balance;
   font-size: var(--text-display); font-weight: 600; line-height: var(--lh-display);
@@ -1482,10 +1481,10 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 
 /* See your portfolio: two funds and what they hold in common. */
 .lp-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-.lp-pair__card {
-  min-width: 0; padding: 14px 16px;
-  background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm);
-}
+/* Inside the picture's panel a hairline divides the two funds; neither is a box
+   of its own (Impeccable critique, 2026-11-01). */
+.lp-pair__card { min-width: 0; }
+.lp-pair__card + .lp-pair__card { padding-left: 14px; border-left: 1px solid var(--line); }
 .lp-pair__card h3 { margin: 0; font-size: var(--text-md); }
 .lp-pair__card h3 a { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
 .lp-pair__cat { margin: 2px 0 10px; font-size: var(--text-xs); color: var(--ink-faint); }
@@ -1504,10 +1503,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 
 /* Your data stays yours: public data comes in; nothing goes back. */
 .lp-flow { display: grid; grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr); gap: 12px; align-items: center; }
-.lp-flow__box {
-  padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm);
-  background: var(--bg); font-size: var(--text-sm); color: var(--ink-soft);
-}
+.lp-flow__box { font-size: var(--text-sm); color: var(--ink-soft); }
 .lp-flow__box strong { display: block; color: var(--ink); }
 .lp-flow__arrows { display: block; width: 120px; height: 80px; }
 .lp-flow__arrows path { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }

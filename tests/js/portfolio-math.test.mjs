@@ -406,3 +406,12 @@ test("a row not filled in yet shows no error; one half-typed does (Impeccable cr
   assert.match(M.shownError(fund, "purchase", { date: "", amount: "5000" }, "2026-10-01"), /date/);
   assert.match(M.shownError(fund, "sale", { date: "2021-01-01", amount: "" }, "2026-10-01"), /amount/);
 });
+
+test("a fund just added starts with one SIP row, its start month left to the visitor", () => {
+  // Impeccable critique, 2026-11-01: on a site asking "Did my SIP work?" a new
+  // fund started with a lump-sum row, and a SIP's start defaulted to this month,
+  // whose price is not published yet.
+  assert.deepEqual(M.newHolding("INF000T01011"), {
+    id: "INF000T01011", purchases: [], sips: [M.newSip()], sales: [], alts: [null, null, null] });
+  assert.deepEqual(M.newSip(), { amount: "", day: 1, start: "", stop: null });
+});

@@ -80,3 +80,15 @@ def test_each_font_choice_sets_the_stacks() -> None:
     # Terminess, once the default, is the opt-in "Terminal".
     assert '"Terminess Nerd Font"' in _block(':root[data-font="terminess"]')
     assert '"Rubik"' in _block(':root[data-font="rubik"]')
+
+
+def test_a_dark_palettes_raised_card_casts_a_shadow_not_a_glow() -> None:
+    """Impeccable critique, 2026-11-01: Midnight Neon lifted its cards on a
+    violet glow, the stock look of a dark dashboard. On a dark ground a lift is a
+    dark shadow; Matrix's green glow is that theme's whole idea, and stays."""
+    for theme in ("crimson", "midnight"):
+        block = _block(f':root[data-theme="{theme}"]')
+        lift = re.search(r"--shadow-lift:\s*([^;]+);", block)
+        assert lift, theme
+        colours = re.findall(r"rgb\((\d+) (\d+) (\d+)", lift.group(1))
+        assert all(c in {("0", "0", "0"), ("255", "255", "255")} for c in colours), theme

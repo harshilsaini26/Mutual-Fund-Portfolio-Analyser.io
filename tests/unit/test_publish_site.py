@@ -685,9 +685,11 @@ PRIVACY = (
     "Like any web host, Vercel keeps ordinary request logs (the address and the page"
     " asked for), never what you type into a page.",
 )
-SECTIONS = (("lookup", "Look up a fund"), ("categories", "Understand funds"),
-            ("portfolio", "See your portfolio"), ("privacy", "Your data stays yours"),
-            ("about", "About the data"))
+#: Each landing section and the start of its own heading (no label above it since
+#: the Impeccable critique, 2026-11-01).
+SECTIONS = (("lookup", "Every fund, set against"), ("categories", "How mutual funds"),
+            ("portfolio", "What your funds add up to"),
+            ("privacy", "Nothing you enter leaves"), ("about", "Where every figure"))
 
 
 def _flat(html: str) -> str:
@@ -727,10 +729,10 @@ def test_the_front_page_is_a_way_in_not_a_list(site: Path) -> None:
             " become.") in _flat(hero)
     at = [index.index(f'id="{key}"') for key, _ in SECTIONS]
     assert at == sorted(at)
-    for (key, eyebrow), here, after in zip(SECTIONS, at, [*at[1:], len(index)],
+    for (key, heading), here, after in zip(SECTIONS, at, [*at[1:], len(index)],
                                            strict=True):
         part = index[here:after]
-        assert eyebrow in part and "<h2" in part, key
+        assert re.search(r"<h2[^>]*>" + re.escape(heading), part), key
     assert "Chapter" not in index and "data-island" not in index
     assert "Flexi cap <span>2</span>" in index
     assert "At least 65% in shares, of any size, in any mix." in index
@@ -989,7 +991,8 @@ def test_the_public_menu_holds_every_link(site: Path) -> None:
                     html, re.S)
     assert nav
     links = re.findall(r'class="topnav__link"[^>]*>([^<]+)<', nav.group(1))
-    assert [x.strip() for x in links] == ["Explore funds", "Compare", "What if",
+    # Each name says what its page is called (Impeccable critique, 2026-11-01).
+    assert [x.strip() for x in links] == ["Explore funds", "Compare", "What a SIP became",
                                          "Your portfolio", "Learn", "Categories",
                                          "About the data"]
     current = re.search(r'aria-current="page"[^>]*>([^<]+)<', nav.group(1))
@@ -1513,7 +1516,7 @@ def test_the_sip_page_is_published_and_linked(site: Path) -> None:
     hrefs = re.findall(r'href="([^"]+)"', nav)
     at = hrefs.index(f"{BASE}/sip/")
     assert hrefs[at - 1] == f"{BASE}/compare/" and hrefs[at + 1] == f"{BASE}/portfolio/"
-    assert 'aria-current="page">What if</a>' in re.sub(r"\s+", " ", nav)
+    assert 'aria-current="page">What a SIP became</a>' in re.sub(r"\s+", " ", nav)
     foot = page[page.index('class="colophon__columns"'):]
     assert f'href="{BASE}/sip/"' in foot[:foot.index("</nav>")]
 
@@ -1718,3 +1721,26 @@ def test_explores_category_cards_explain_a_term_once_not_in_every_column() -> No
     assert cards.count("vc.term(") == 1
     note = r'leaders-fold__note">Annualised\{\{ vc\.term\("annualised_return"'
     assert re.search(note, cards)
+
+
+def test_your_portfolio_is_called_that_where_it_is_reached(site: Path) -> None:
+    """Impeccable critique, 2026-11-01: the menu's "Your portfolio" led to a page
+    headed "What your funds are worth, and what they own"."""
+    page = (site / "portfolio" / "index.html").read_text(encoding="utf-8")
+    h1 = re.search(r"<h1[^>]*>(.*?)</h1>", page, re.S)
+    assert h1 and h1.group(1).strip().startswith("Your portfolio")
+
+
+def test_no_heading_wears_a_label_above_it() -> None:
+    """Impeccable critique, 2026-11-01: a small capitalised label over every
+    page's heading (17 of them) is a template's habit; each heading says what
+    its page is. Learn's way back is a breadcrumb, not a label."""
+    root = Path(publish.__file__).resolve().parents[1] / "src" / "m6_views"
+    worn = [p.name for p in (root / "templates").rglob("*.html")
+            if 'class="eyebrow"' in p.read_text(encoding="utf-8")]
+    assert worn == []
+    css = (root / "static" / "app.css").read_text(encoding="utf-8")
+    assert not re.search(r"(?m)^\.eyebrow\b", css)
+    for name in ("learn_glossary.html", "learn_guide.html"):
+        page = (root / "templates" / name).read_text(encoding="utf-8")
+        assert re.search(r'<nav class="crumbs" aria-label="Breadcrumb">', page), name

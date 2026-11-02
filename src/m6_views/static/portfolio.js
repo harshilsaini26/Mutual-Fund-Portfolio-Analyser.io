@@ -243,8 +243,10 @@
     page.querySelector('[data-action="save"]').classList.toggle("button--quiet", !dirty);
   }
   // The form's fold says how many funds it holds, and is open while there are none.
+  // Save waits until there is something to save; Load stays for a returning visitor.
   function folded() {
     var n = state.funds.length;
+    page.querySelector('[data-action="save"]').hidden = !n;
     page.querySelector("[data-edit-label]").textContent = "Your funds and what you put in" +
       (n ? " (" + n + (n === 1 ? " fund)" : " funds)") : "");
     if (!n) editFold.open = true;
@@ -276,7 +278,7 @@
       return;
     }
     if (state.funds.some(function (h) { return h.id === fund.id; })) { say(fund.name + " is already in your portfolio."); return; }
-    state.funds.push({ id: fund.id, purchases: [{ date: "", amount: "" }], sips: [], sales: [], alts: [null, null, null] });
+    state.funds.push(M.newHolding(fund.id));
     say("");
     changed();
   }
@@ -328,7 +330,7 @@
     var row = b.closest("[data-row]");
     switch (b.dataset.action) {
       case "add-lump": h.purchases.push({ date: "", amount: "" }); break;
-      case "add-sip": h.sips.push({ amount: "", day: 1, start: TODAY.slice(0, 7), stop: null }); break;
+      case "add-sip": h.sips.push(M.newSip()); break;
       case "add-sale": (h.sales = h.sales || []).push({ date: "", amount: "" }); break;
       case "remove-row": listOf(h, row.dataset.kind).splice(Number(row.dataset.row), 1); break;
       case "remove-fund": arm(h.id); return;

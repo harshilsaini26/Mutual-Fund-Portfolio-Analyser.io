@@ -71,10 +71,17 @@ def _spark(navs: list[NavPoint], start: date) -> list[Decimal]:
 def _tile(key: str, label: str, value: Any, kind: str, context: str | None,
           tone: str | None = None) -> dict[str, Any]:
     """One KPI tile. The figure is formatted by `fmt_tile`; the context line is
-    a sentence written here. A tone always travels with its symbol (§10.3)."""
+    a sentence written here. A tone always travels with its symbol (§10.3).
+
+    `sign` colours a return by its own sign; `tone` is its benchmark's verdict,
+    shown on the context line only, so a -5.9% that beat its index is not green
+    (Impeccable critique, 2026-11-01)."""
+    sign = None
+    if kind == "return_ann" and value is not None and value != 0:
+        sign = "gain" if value > 0 else "loss"
     return {
         "key": key, "label": label, "value": value, "kind": kind,
-        "context": context, "tone": tone,
+        "context": context, "tone": tone, "sign": sign,
         "symbol": {"ahead": "▲", "behind": "▼"}.get(tone or ""),
         "spark": [],
     }

@@ -14,7 +14,7 @@
 {%- set ns = namespace(at=0) -%}
 {%- for g in learn.guides %}{% if g.slug == guide.slug %}{% set ns.at = loop.index0 %}{% endif %}{% endfor -%}
 <article class="plain learn learn--guide">
-  <p class="eyebrow"><a href="{{ root }}/learn/">Learn</a> · {{ guide.group }}</p>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ root }}/learn/">Learn</a> › {{ guide.group }}</nav>
   <h1>{{ guide.title }}</h1>
   <p class="lede">{{ guide.summary }}</p>
   {{ vc.learn_note() }}
