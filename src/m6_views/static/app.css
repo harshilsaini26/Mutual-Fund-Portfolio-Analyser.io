@@ -83,6 +83,9 @@
   --lh-body: 1.55;
   --lh-tight: 1.2;
   --lh-display: 1.05;
+  /* Reading widths below are in ch, the width of a "0"; the reading face's letters
+     run about two-thirds of that, so 48ch holds some 72 characters a line
+     (Impeccable critique, 2026-11-02, when "72ch" held ~110). */
   /* Running prose: the reader's face, except under Terminess (the "Terminal"
      choice), whose sentences stay in Atkinson Hyperlegible. */
   --font-prose: var(--font);
@@ -765,7 +768,7 @@ a.badge:hover { color: var(--ink); border-color: var(--ink-faint); }
 
 .placeholder { padding: 28px 20px; }
 .placeholder__state { margin: 0 0 4px; font-weight: 650; font-size: var(--text-base); }
-.placeholder__reason { margin: 0; color: var(--ink-soft); max-width: 66ch; }
+.placeholder__reason { margin: 0; color: var(--ink-soft); max-width: 44ch; }
 .placeholder--error .placeholder__state { color: var(--loss); }
 .chart-error { margin: 10px 0 0; color: var(--loss); font-size: var(--text-sm); }
 
@@ -824,7 +827,7 @@ a.badge:hover { color: var(--ink); border-color: var(--ink-faint); }
 .tiles--absent .kpi__value { font-size: var(--text-base); }
 .tiles--inline { margin-top: 16px; }
 .tiles--inline .kpi__value { font-size: var(--text-h3); }
-.definition { margin: 14px 0 0; font-size: var(--text-sm); color: var(--ink-soft); max-width: 72ch; }
+.definition { margin: 14px 0 0; font-size: var(--text-sm); color: var(--ink-soft); max-width: 48ch; }
 
 /* --- tables ---------------------------------------------------------------------- */
 
@@ -928,7 +931,7 @@ p.chart-table { font-size: var(--text-sm); color: var(--ink-faint); }
 
 /* --- interactive charts ------------------------------------------------------------- */
 
-.headline { margin: 0 0 14px; font-size: var(--text-md); color: var(--ink-soft); max-width: 82ch; text-wrap: pretty; }
+.headline { margin: 0 0 14px; font-size: var(--text-md); color: var(--ink-soft); max-width: 55ch; text-wrap: pretty; }
 .tabs {
   display: inline-flex; gap: 2px; margin: 0 0 12px; padding: 3px;
   background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
@@ -1015,7 +1018,7 @@ p.chart-table { font-size: var(--text-sm); color: var(--ink-faint); }
 .welcome > * { grid-column: 1 / -1; min-width: 0; }
 .welcome__intro { padding: 8px 0 4px; }
 .welcome__intro h1 { margin: 8px 0 8px; font-size: var(--text-h2); font-weight: 750; letter-spacing: var(--track-tight); }
-.welcome__intro p.lede { margin: 0; max-width: 70ch; font-size: var(--text-base); color: var(--ink-soft); }
+.welcome__intro p.lede { margin: 0; max-width: 47ch; font-size: var(--text-base); color: var(--ink-soft); }
 .checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
 .checklist__item { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 14px; }
 .checklist__mark {
@@ -1111,7 +1114,7 @@ p.chart-table { font-size: var(--text-sm); color: var(--ink-faint); }
   margin: 14px 0 14px; max-width: 18ch;
   font-size: var(--text-display); font-weight: 750; line-height: var(--lh-display); letter-spacing: var(--track-tight);
 }
-.hero__lede { margin: 0 0 26px; max-width: 62ch; font-size: var(--text-base); color: var(--ink-soft); }
+.hero__lede { margin: 0 0 26px; max-width: 41ch; font-size: var(--text-base); color: var(--ink-soft); }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 0 0 12px; }
 .stat {
   display: flex; flex-direction: column-reverse; gap: 2px; margin: 0;
@@ -1251,7 +1254,7 @@ table[data-hide~="sharpe3"] [data-col="sharpe3"] { display: none; }
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
 }
 .search-results li + li { border-top: 1px solid var(--line); }
-.plain .lede { color: var(--ink-soft); max-width: 68ch; }
+.plain .lede { color: var(--ink-soft); max-width: 45ch; }
 
 /* --- accessibility --------------------------------------------------------------------------- */
 
@@ -1306,7 +1309,7 @@ select:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:fo
   .content { padding: 18px 16px; }
   .public-note, .colophon { padding-left: 16px; padding-right: 16px; }
   .echarts--several { grid-template-columns: minmax(0, 1fr); }
-  .fundcard__name { font-size: var(--text-h3); }
+  /* The name keeps its 28px: at 22 it sat one step above the panels' 18px headings. */
   .hero { padding-top: 24px; }
   .kpi__value { font-size: var(--text-h3); }
   .kpi__tile { padding: 10px 2px 4px; }
@@ -1373,7 +1376,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
   font-size: var(--text-display); font-weight: 600; line-height: var(--lh-display);
   letter-spacing: var(--track-tight); color: var(--ink);
 }
-.lp-hero__lede { margin: 0 0 20px; max-width: 52ch; font-size: var(--text-lead); color: var(--ink-soft); }
+.lp-hero__lede { margin: 0 0 20px; max-width: 35ch; font-size: var(--text-lead); color: var(--ink-soft); }
 .lp-pill {
   display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 4px 14px;
   border-radius: 999px; background: var(--surface); border: 1px solid var(--line);
@@ -1448,7 +1451,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
   margin: 8px 0 12px; text-wrap: balance;
   font-size: var(--text-h2); line-height: var(--lh-tight); letter-spacing: var(--track-tight);
 }
-.lp-text p { max-width: 58ch; color: var(--ink-soft); }
+.lp-text p { max-width: 39ch; color: var(--ink-soft); }
 .lp-links { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 18px; }
 .lp-pic {
   min-width: 0; margin: 0; padding: 24px;
@@ -1617,7 +1620,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 .home-section { margin-top: 48px; }
 .home-section .section-head { margin-bottom: 18px; }
 .home-section .section-head h2 { font-size: var(--text-h3); font-weight: 600; }
-.home-section .section-head p { max-width: 70ch; font-size: var(--text-md); }
+.home-section .section-head p { max-width: 47ch; font-size: var(--text-md); }
 .recent.card { max-width: 880px; margin: 22px auto 0; }
 
 /* Category cards: five highest three-year returns each. */
@@ -1656,9 +1659,9 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
   cursor: pointer; width: fit-content; font-weight: 600; color: var(--accent);
 }
 .leaders-fold[open] > summary { margin-bottom: 12px; }
-.leaders-fold__note { max-width: 70ch; color: var(--ink-soft); font-size: var(--text-sm); }
+.leaders-fold__note { max-width: 47ch; color: var(--ink-soft); font-size: var(--text-sm); }
 .page-head h1 { margin: 6px 0 6px; font-size: var(--text-h2); font-weight: 600; }
-.page-head__lede { max-width: 70ch; }
+.page-head__lede { max-width: 47ch; }
 .table-note { margin: 10px 2px 0; font-size: var(--text-sm); color: var(--ink-faint); }
 
 /* --- the fund page, in Fundoo's rhythm ------------------------------------------------- */
@@ -1674,7 +1677,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 /* The page's first sentence, under the name: how the fund has done, before any
    figure (Impeccable critique, 2026-11-02). */
 .fundcard__summary {
-  margin: 14px 0 18px; max-width: 64ch; font-family: var(--font-prose);
+  margin: 14px 0 18px; max-width: 43ch; font-family: var(--font-prose);
   font-size: var(--text-lead); line-height: var(--lh-body); color: var(--ink);
 }
 .facts--grid {
@@ -1840,7 +1843,7 @@ body, .topbar, .card, .view, .settings {
 /* Empty, out of the flow but still announced when filled, as `.pf__error` is:
    it left a blank band under Compare's search box (design review). */
 .pf__status:empty, .cmp__status:empty { position: absolute; }
-.pf__note, .pf__hint, .pf__estimate, .cmp__note { color: var(--ink-soft); font-size: var(--text-sm); max-width: 72ch; }
+.pf__note, .pf__hint, .pf__estimate, .cmp__note { color: var(--ink-soft); font-size: var(--text-sm); max-width: 48ch; }
 .pf__entry, .cmp__entry { display: grid; gap: 10px; margin-bottom: 28px; }
 .pf__label, .cmp__label { font-weight: 650; }
 .pf__holding { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 12px; }
@@ -1898,16 +1901,16 @@ body, .topbar, .card, .view, .settings {
    sentence and its strip close together; a placeholder until the card is worked out. */
 .pf__alt > h3 { margin: 0 0 4px; }
 .pf__alt > h4 { margin: 14px 0 0; }
-.pf__against-lead { margin: 0; max-width: 72ch; font-size: var(--text-lead); line-height: 1.55; color: var(--ink); }
-.pf__waiting { height: 3.2em; max-width: 72ch; border-radius: 8px; background: var(--surface-2); }
+.pf__against-lead { margin: 0; max-width: 48ch; font-size: var(--text-lead); line-height: 1.55; color: var(--ink); }
+.pf__waiting { height: 3.2em; max-width: 48ch; border-radius: 8px; background: var(--surface-2); }
 .pf__another { justify-self: start; }
-.pf__alts-intro { flex: 1 1 32rem; max-width: 62ch; display: grid; gap: 8px; }
+.pf__alts-intro { flex: 1 1 32rem; max-width: 41ch; display: grid; gap: 8px; }
 .pf__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
 
 /* The answer first (UI/UX critique P-01, P-02, P-09): the reference sentence, the
    return's period on a line of its own, and the form folded away above. */
-.pf__verdict { margin: 0 0 8px; max-width: 72ch; font-size: var(--text-lead); line-height: 1.5; color: var(--ink); }
-.pf__refs { margin: 0 0 16px; padding-left: 1.2em; max-width: 72ch; font-size: var(--text-sm); color: var(--ink-soft); }
+.pf__verdict { margin: 0 0 8px; max-width: 48ch; font-size: var(--text-lead); line-height: 1.5; color: var(--ink); }
+.pf__refs { margin: 0 0 16px; padding-left: 1.2em; max-width: 48ch; font-size: var(--text-sm); color: var(--ink-soft); }
 .pf__refs li + li { margin-top: 2px; }
 .pf__per { display: block; font-size: var(--text-sm); font-weight: 500; color: var(--ink-soft); }
 .pf__edit { margin-bottom: 28px; }
@@ -1989,7 +1992,7 @@ body, .topbar, .card, .view, .settings {
 .cmp__starters { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .cmp__starters li { display: grid; gap: 2px; font-size: var(--text-sm); }
 .cmp__starters a { display: inline-flex; align-items: center; min-height: 24px; font-weight: 650; }
-.cmp__lead { font-size: var(--text-base); max-width: 72ch; }
+.cmp__lead { font-size: var(--text-base); max-width: 48ch; }
 .cmp__table thead th {
   text-transform: none; letter-spacing: 0; white-space: normal; vertical-align: bottom;
   font-size: var(--text-sm); color: var(--ink); min-width: 11em;
@@ -2043,19 +2046,19 @@ body, .topbar, .card, .view, .settings {
 .sip__status, .sip__progress { min-height: 1.4em; margin: 0 0 6px; font-size: var(--text-sm); color: var(--ink-soft); }
 .sip__answer { margin: 8px 0 12px; transition: opacity 0.2s; }
 .sip__answer--busy { opacity: 0.55; }
-.sip__lead { margin: 0 0 12px; max-width: 72ch; font-size: var(--text-lead); line-height: 1.55; color: var(--ink); }
-.sip__index, .sip__along { max-width: 72ch; margin: 12px 0; }
+.sip__lead { margin: 0 0 12px; max-width: 48ch; font-size: var(--text-lead); line-height: 1.55; color: var(--ink); }
+.sip__index, .sip__along { max-width: 48ch; margin: 12px 0; }
 .sip__tiles { margin: 14px 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 /* The range strip under the answer (design critique, 2026-10-11): the same mark as each
    overview row and each Portfolio card, so one reading serves all three. */
-.sip__strip { max-width: 72ch; margin: 4px 0 12px; }
+.sip__strip { max-width: 48ch; margin: 4px 0 12px; }
 .sip__strip .sip__key { margin: 6px 0 0; }
 .sip__behind { display: inline-block; margin: 0 0 10px; padding: 3px 10px; border-radius: 999px;
   background: var(--surface-2); font-size: var(--text-sm); color: var(--ink-soft); }
-.sip__unranged { margin: 6px 0 0; max-width: 72ch; font-size: var(--text-sm); color: var(--ink-soft); }
+.sip__unranged { margin: 6px 0 0; max-width: 48ch; font-size: var(--text-sm); color: var(--ink-soft); }
 .sip__lines { margin: 8px 0; padding-left: 1.2em; font-size: var(--text-sm); }
-.sip__note { max-width: 72ch; font-size: var(--text-sm); color: var(--ink-soft); }
-.sip__notes-list { display: grid; gap: 6px; max-width: 72ch; margin: 0; padding-left: 1.2em; font-size: var(--text-sm); color: var(--ink-soft); }
+.sip__note { max-width: 48ch; font-size: var(--text-sm); color: var(--ink-soft); }
+.sip__notes-list { display: grid; gap: 6px; max-width: 48ch; margin: 0; padding-left: 1.2em; font-size: var(--text-sm); color: var(--ink-soft); }
 .sip__out { display: grid; gap: 8px; margin: 10px 0 0; padding-left: 1.2em; font-size: var(--text-sm); }
 /* The same money in other kinds of fund (§5.1): every bar on one ₹ axis. */
 .sip__family { margin: 18px 0 0; }
@@ -2290,7 +2293,7 @@ details.tuck > summary { cursor: pointer; color: var(--accent); font-size: var(-
 @media (max-width: 360px) { .fundcard .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* Learn (V1-87): guides in a reading column, cards by group, the glossary A to Z. */
 .learn__note {
-  max-width: 68ch; margin: 14px 0 24px; padding: 10px 14px; border-radius: var(--radius-sm);
+  max-width: 45ch; margin: 14px 0 24px; padding: 10px 14px; border-radius: var(--radius-sm);
   background: var(--surface-2); color: var(--ink-soft); font-size: var(--text-md);
 }
 .learn__group h2 { margin: 28px 0 12px; }
@@ -2305,12 +2308,12 @@ details.tuck > summary { cursor: pointer; color: var(--accent); font-size: var(-
 .learn__card a:hover h3 { color: var(--accent); }
 .learn__card h3 { margin: 0 0 6px; font-size: var(--text-base); }
 .learn__card p { margin: 0; color: var(--ink-soft); font-size: var(--text-md); }
-.learn--guide p, .learn--guide h2, .learn--guide .learn__sources { max-width: 68ch; }
+.learn--guide p, .learn--guide h2, .learn--guide .learn__sources { max-width: 45ch; }
 .learn--guide h2 { margin: 28px 0 8px; font-size: var(--text-lead); }
 .learn--guide p { line-height: var(--lh-body); }
 /* A guide's contents, screenshots, terms and neighbours (UI/UX critique L-03, L-04). */
 .learn__toc {
-  max-width: 68ch; margin: 20px 0 8px; padding: 14px 18px;
+  max-width: 45ch; margin: 20px 0 8px; padding: 14px 18px;
   border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
 }
 .learn--guide .learn__toc-title {
@@ -2325,7 +2328,7 @@ details.tuck > summary { cursor: pointer; color: var(--accent); font-size: var(-
   border: 1px solid var(--line); border-radius: var(--radius);
 }
 .learn__callouts {
-  display: grid; gap: 2px; max-width: 68ch; margin: 10px 0 0; padding-left: 1.4em;
+  display: grid; gap: 2px; max-width: 45ch; margin: 10px 0 0; padding-left: 1.4em;
   font-size: var(--text-sm); color: var(--ink-soft);
 }
 .learn__related { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
@@ -2358,7 +2361,7 @@ details.tuck > summary { cursor: pointer; color: var(--accent); font-size: var(-
 .learn__term:target { border-color: var(--accent); }
 .learn__term dt { font-weight: 650; font-size: var(--text-base); }
 .learn__term dd { margin: 4px 0 0; }
-.learn__term dd > p { margin: 4px 0; max-width: 68ch; }
+.learn__term dd > p { margin: 4px 0; max-width: 45ch; }
 .learn__related { font-size: var(--text-md); color: var(--ink-soft); }
 
 /* A term explained in place (V1-87): a small `?` and the native popover it opens,

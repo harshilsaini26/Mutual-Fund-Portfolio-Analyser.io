@@ -954,3 +954,20 @@ def test_a_panels_figures_are_not_boxes_inside_its_box() -> None:
         boxed = r"\bbackground:|\bborder-radius:|\bborder:"
         assert not re.search(boxed, rule.group(1)), sel
     assert "view__eyebrow" not in css
+
+
+def test_a_paragraph_runs_to_a_readable_measure() -> None:
+    """Impeccable critique, 2026-11-02: `ch` is the width of a "0", and the reading
+    face's letters run about two-thirds of that, so "72ch" held ~110 characters a
+    line. Prose widths are cut by that ratio: none above 56ch (~85 characters),
+    most 44-48ch (65-75)."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    wide = [int(n) for n in re.findall(r"max-width:\s*(\d+)ch", css) if int(n) > 56]
+    assert wide == [], wide
+
+
+def test_on_a_phone_the_funds_name_still_outranks_its_panels() -> None:
+    """Impeccable critique, 2026-11-02: on a phone the steps ran 14, 16, 18 and 22px,
+    too flat to read as a hierarchy; the fund's name keeps its 28px there."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    assert not re.search(r"\.fundcard__name\s*\{\s*font-size:\s*var\(--text-h3\)", css)

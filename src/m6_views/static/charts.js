@@ -388,7 +388,7 @@
           // A label that would run into another is left off (F-09); the tooltip
           // and the table still carry it.
           labelLayout: { hideOverlap: true },
-          label: { show: true, color: p.ink, fontSize: textSize() * 11 / 12,
+          label: { show: true, color: p.ink, fontSize: textSize(),
                    formatter: function (d) { return d.data.caption; } },
         };
       });
@@ -441,7 +441,7 @@
         width: "100%", height: "100%", top: 0, left: 0,
         // A name wraps by word; only what the tile's height cannot hold is cut.
         label: { show: true, color: p.onCat, overflow: "break", lineOverflow: "truncate",
-                 fontSize: textSize() * 11 / 12,
+                 fontSize: textSize(),
                  formatter: function (d) { return d.name + "\n" + d.data.caption; } },
         itemStyle: { borderColor: p.bg, borderWidth: 2, gapWidth: 2, borderRadius: 4 },
         data: c.cells.map(function (cell) {

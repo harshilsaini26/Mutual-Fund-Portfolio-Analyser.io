@@ -205,6 +205,8 @@ test("a treemap tile wraps a holding's name rather than cutting it mid-word", as
   const src = readFileSync(new URL("../../src/m6_views/static/charts.js", import.meta.url), "utf8");
   const tree = src.slice(src.indexOf("treemap: function"), src.indexOf("scatter: function"));
   assert.match(tree, /label: \{[^}]*overflow: "break", lineOverflow: "truncate"/);
+  // At the charts' own text size, not under it (2026-11-02: 11px on a phone).
+  assert.match(tree, /fontSize: textSize\(\),/);
 });
 
 test("a holdings note names its source and dates it as every other page does", async () => {
@@ -218,4 +220,12 @@ test("a holdings note names its source and dates it as every other page does", a
     assert.match(note, /day\(/, name);
     assert.match(note, /Groww's page/, name);
   }
+});
+
+test("each fund the picker offers names its plan, so Enter cannot take the wrong one unseen", () => {
+  // Impeccable critique, 2026-11-02: Direct plans were unlabelled beside "(Regular)",
+  // and Enter takes the highlighted first match.
+  assert.equal(K.optionMeta({ house: "PPFAS", category_name: "Flexi cap" }), "Direct plan · PPFAS · Flexi cap");
+  assert.equal(K.optionMeta({ plan: "regular", house: "PPFAS", category_name: "Flexi cap" }), "Regular plan · PPFAS · Flexi cap");
+  assert.equal(K.optionMeta({ house: null, category_name: "Liquid" }), "Direct plan · Liquid");
 });

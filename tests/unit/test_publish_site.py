@@ -1746,3 +1746,18 @@ def test_no_heading_wears_a_label_above_it() -> None:
     for name in ("learn_glossary.html", "learn_guide.html"):
         page = (root / "templates" / name).read_text(encoding="utf-8")
         assert re.search(r'<nav class="crumbs" aria-label="Breadcrumb">', page), name
+
+
+def test_the_sip_amounts_spoken_name_holds_still_as_it_is_typed(site: Path) -> None:
+    """Impeccable critique, 2026-11-02: the field was read as "Amount ₹5 thousand ₹",
+    and changed with every key: the words in rupees and the ₹ were in its label.
+    Its name is "Amount, in rupees"; the words describe it and are not live."""
+    page = (site / "sip" / "index.html").read_text(encoding="utf-8")
+    field = re.search(r'<input id="sip-amount"[^>]*>', page)
+    assert field and 'aria-label="Amount, in rupees"' in field.group(0)
+    described = 'aria-describedby="sip-amount-words sip-amount-error"'
+    assert described in field.group(0)
+    words = re.search(r'<span[^>]*data-sip-words[^>]*>', page)
+    assert words and 'id="sip-amount-words"' in words.group(0)
+    assert "aria-live" not in words.group(0)
+    assert '<span class="pf__prefix" aria-hidden="true">₹</span>' in page

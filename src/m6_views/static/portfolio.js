@@ -92,7 +92,7 @@
     return el("label", { "class": "pf__field", "for": id },
       words == null ? label : el("span", null, label,
         el("span", { "class": "pf__words", "data-words": true, "aria-hidden": "true" }, words)),
-      prefix ? el("span", { "class": "pf__affix" }, el("span", { "class": "pf__prefix" }, prefix), input) : input);
+      prefix ? el("span", { "class": "pf__affix" }, el("span", { "class": "pf__prefix", "aria-hidden": "true" }, prefix), input) : input);
   }
 
   // An amount (UI/UX critique P-03): in Indian grouping once typed, and in words

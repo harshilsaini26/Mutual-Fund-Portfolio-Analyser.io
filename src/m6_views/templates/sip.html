@@ -31,10 +31,13 @@
     <h2 class="sr-only">Your money</h2>
     <div class="sip__row">
       <label class="pf__field" for="sip-amount">
-        <span>Amount <span class="pf__words" data-sip-words aria-live="polite"></span></span>
-        <span class="pf__affix"><span class="pf__prefix">₹</span>
+        {#- A name that holds still as it is typed (Impeccable critique, 2026-11-02):
+            the amount in words describes the field rather than naming it. -#}
+        <span>Amount <span class="pf__words" id="sip-amount-words" data-sip-words></span></span>
+        <span class="pf__affix"><span class="pf__prefix" aria-hidden="true">₹</span>
           <input id="sip-amount" type="text" inputmode="numeric" autocomplete="off"
-                 value="5,000" aria-describedby="sip-amount-error" disabled></span>
+                 value="5,000" aria-label="Amount, in rupees"
+                 aria-describedby="sip-amount-words sip-amount-error" disabled></span>
       </label>
       <fieldset class="sip__choice" data-sip-mode>
         <legend class="sr-only">How it is put in</legend>

@@ -99,6 +99,12 @@
   // move through it, Enter or a click picks, Esc closes it. `funds()` gives the
   // funds to search; `pick(fund)` takes the one chosen.
   var pickers = 0;
+  // An option's second line: its plan first, so a Direct and a Regular plan of one
+  // fund never look alike (Impeccable critique, 2026-11-02), then house and category.
+  function optionMeta(f) {
+    return present([f.plan === "regular" ? "Regular plan" : "Direct plan", f.house, f.category_name]).join(" · ");
+  }
+
   function picker(input, funds, pick) {
     var id = "pick-" + (++pickers);
     var list = el("ul", { "class": "search__suggest picker", role: "listbox", id: id,
@@ -130,7 +136,7 @@
       fill.apply(null, [list].concat(hits.length ? hits.map(function (f, i) {
         return el("li", { role: "option", id: id + "-" + i, "data-i": i },
           el("span", { "class": "search__name" }, f.name),
-          el("span", { "class": "search__meta" }, present([f.house, f.category_name]).join(" · ")));
+          el("span", { "class": "search__meta" }, optionMeta(f)));
       }) : [el("li", { "class": "picker__none", role: "option", "aria-disabled": "true" },
                 "No fund's name, fund house or ISIN matches that")]));
       list.hidden = false;
@@ -288,7 +294,7 @@
     return svg;
   }
 
-  var api = { present: present, root: root, el: el, fill: fill, table: table, match: match, picker: picker,
+  var api = { present: present, root: root, el: el, fill: fill, optionMeta: optionMeta, table: table, match: match, picker: picker,
               heat: heat,
               bar: bar, INR: INR, CLASS: CLASS,
               navSeries: navSeries, lookFile: lookFile, termButton: termButton,
