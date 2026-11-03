@@ -692,12 +692,9 @@ main.content.content--bleed { max-width: none; padding: 0; }
   display: flex; align-items: flex-start; justify-content: space-between;
   gap: 16px; padding: 18px 20px 10px;
 }
-.view__eyebrow {
-  display: flex; align-items: center; gap: 6px; margin: 0 0 4px;
-  font-size: var(--text-xs); font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase;
-  color: var(--ink-faint);
-}
-.view__eyebrow .icon { width: 14px; height: 14px; }
+/* The panel's question and, beside it, its "?" (no label above it since the
+   Impeccable critique, 2026-11-02). */
+.view__title { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 4px; }
 .view__header h2 { margin: 0; font-size: var(--text-h3); font-weight: 650; letter-spacing: var(--track-tight); }
 .view__chart { flex: 1; padding: 6px 20px 20px; overflow-x: auto; }
 
@@ -777,12 +774,12 @@ a.badge:hover { color: var(--ink); border-color: var(--ink-faint); }
   display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px; margin: 0;
 }
+/* Inside the panel's card a hairline divides the figures; none is a box of its own
+   (Impeccable critique, 2026-11-02). */
 .kpi__tile {
   display: flex; flex-direction: column; gap: 3px; min-width: 0;
-  padding: 14px 16px;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  padding: 12px 2px 4px;
+  border-top: 1px solid var(--line);
 }
 .kpi__tile dt {
   font-size: var(--text-xs); font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase;
@@ -813,7 +810,7 @@ a.badge:hover { color: var(--ink); border-color: var(--ink-faint); }
 }
 .kpi__spark polygon { fill: var(--accent-soft); stroke: none; }
 /* An absent figure is muted AND dashed — colour alone would not carry it. */
-.kpi__tile--absent { background: transparent; border-style: dashed; }
+.kpi__tile--absent { border-top-style: dashed; }   /* low confidence: muted, dashed (§7.2) */
 .kpi__tile--absent .kpi__value { color: var(--ink-faint); }
 .kpi__absent-note {
   margin: 18px 0 8px;
@@ -821,7 +818,7 @@ a.badge:hover { color: var(--ink); border-color: var(--ink-faint); }
   color: var(--ink-faint);
 }
 .tiles--absent { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-.tiles--absent .kpi__tile { padding: 10px 12px; }
+.tiles--absent .kpi__tile { padding: 8px 2px 4px; }
 .tiles--absent .kpi__value { font-size: var(--text-base); }
 .tiles--inline { margin-top: 16px; }
 .tiles--inline .kpi__value { font-size: var(--text-h3); }
@@ -856,7 +853,7 @@ thead th {
 }
 tbody tr:hover > * { background: var(--surface-2); }
 tbody tr:last-child > * { border-bottom: 0; }
-.col--inr, .col--inr_signed, .col--pct, .col--units, .col--nav, .col--fraction,
+.col--inr, .col--inr_signed, .col--pct, .col--units, .col--nav, .col--fraction, .col--fall,
 .col--return_ann, .col--ratio, .col--metric, .col--count, .col--row, .num {
   text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap;
 }
@@ -1310,7 +1307,7 @@ select:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:fo
   .fundcard__name { font-size: var(--text-h3); }
   .hero { padding-top: 24px; }
   .kpi__value { font-size: var(--text-h3); }
-  .kpi__tile { padding: 12px; }
+  .kpi__tile { padding: 10px 2px 4px; }
 }
 
 /* A phone in portrait: the public bar keeps the mark and drops the name. */
@@ -1664,12 +1661,6 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 
 /* --- the fund page, in Fundoo's rhythm ------------------------------------------------- */
 
-/* Each panel's label is its section's heading: navy capitals over a hairline. */
-.fund-page .view__eyebrow {
-  padding-bottom: 8px; margin-bottom: 8px; border-bottom: 2px solid var(--accent);
-  width: fit-content; color: var(--accent); font-size: var(--text-xs); letter-spacing: var(--track-label);
-}
-.fund-page .view__eyebrow .icon { color: var(--accent); }
 .fund-page .view { box-shadow: var(--shadow); }
 
 .fundcard__top {
@@ -1678,10 +1669,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 }
 .fundcard__id { min-width: 0; flex: 1 1 420px; }
 .fundcard__name { padding-right: 0; font-weight: 600; color: var(--ink); }
-.fundcard__nav {
-  flex: none; text-align: right;
-  padding: 12px 18px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line);
-}
+.fundcard__nav { flex: none; text-align: right; padding: 4px 0; }
 .fundcard__nav p { margin: 0; }
 .fundcard__nav-label { font-size: var(--text-xs); color: var(--ink-faint); }
 .fundcard__nav-value {
@@ -1701,7 +1689,7 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 
 /* Returns compared to peers: lowest to highest, and this fund's mark. */
 .ranges { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 22px; margin: 6px 0 18px; }
-.range { padding: 14px 16px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+.range { padding: 12px 2px 8px; border-top: 1px solid var(--line); }
 .range__head { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin: 0 0 10px; }
 .range__period { font-size: var(--text-xs); font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-faint); }
 .range__value { font-size: var(--text-h3); font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
@@ -2272,7 +2260,7 @@ details.tuck > summary { cursor: pointer; color: var(--accent); font-size: var(-
   .fundcard { gap: 14px; }
   .facts--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .facts--grid div { padding: 8px 10px; }
-  .fundcard .kpi__tile { padding: 10px 12px; }
+  .fundcard .kpi__tile { padding: 10px 2px 4px; }
   .fundcard .kpi__spark svg { height: 22px; }
   /* Peers: the range bars closer together. */
   .ranges { gap: 8px; margin-bottom: 12px; }
@@ -2284,7 +2272,6 @@ details.tuck > summary { cursor: pointer; color: var(--accent); font-size: var(-
   /* Every panel's own furniture, tighter: its question, notes and footer. */
   .view__header { padding-top: 10px; padding-bottom: 4px; gap: 8px; }
   .view__header h2 { font-size: var(--text-lead); }
-  .view__eyebrow { margin-bottom: 2px; }
   .caveats { margin: 0 12px 8px; padding: 6px 10px; }
   .view__footer { padding: 6px 12px; font-size: var(--text-xs); }
   .view__footer dl { gap: 2px 14px; }
@@ -2294,7 +2281,7 @@ details.tuck > summary { cursor: pointer; color: var(--accent); font-size: var(-
   .range__value { font-size: var(--text-lead); }
   /* The header card's tiles three to a row, with smaller figures and labels. */
   .fundcard .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .fundcard .kpi__tile { padding: 8px 10px; }
+  .fundcard .kpi__tile { padding: 8px 2px 4px; }
   .fundcard .kpi__tile dt { font-size: var(--text-xs); letter-spacing: var(--track-label); }
   .fundcard .kpi__value { font-size: var(--text-lead); overflow-wrap: anywhere; }
   .fundcard__chips { gap: 6px; margin-top: 8px; }

@@ -542,3 +542,52 @@ def test_the_expense_ratio_tile_says_what_the_total_holds(client: TestClient) ->
     tile = next(t for t in env["payload"]["tiles"] if t["key"] == "ter")
     assert "trading costs and levies" in tile["context"]
     assert "own charge 0.45%" in tile["context"]
+
+
+def test_a_fall_is_written_one_way_everywhere(client: TestClient) -> None:  # noqa: F811
+    """Impeccable critique, 2026-11-02: falls were "-10.6%" in Performance and
+    Every figure but "13.3%" in Peers and Compare. A fall is unsigned, as
+    format_fraction says: the word "fall" carries the direction."""
+    from src.m6_views.render import fmt_tile
+
+    assert fmt_tile({"value": "-0.106", "kind": "fall"}) == "10.6%"
+    perf = client.get(f"/api/views/fund_performance{QS}&scope_id=S1").json()
+    assert next(r for r in perf["payload"]["rows"]
+                if r["measure"] == "Deepest fall")["kind"] == "fall"
+    xray = client.get(f"/api/views/fund_xray_header{QS}&scope_id=S1").json()
+    worst = next(c for c in xray["payload"]["columns"] if c["key"] == "max_dd")
+    assert worst["kind"] == "fall"
+    falls = client.get(f"/api/views/fund_drawdown{QS}&scope_id=S1").json()
+    kinds = {c["kind"] for c in falls["payload"]["columns"] if c["key"] != "date"}
+    assert kinds == {"fall"}
+
+
+def test_the_holdings_mix_keeps_a_negative_class_so_it_sums_to_100() -> None:
+    """Impeccable critique, 2026-11-02: the headline listed only classes above zero,
+    so a fund short 1.9% in derivatives read as 101.9% of itself."""
+    from decimal import Decimal
+
+    from src.m6_views.builders.fund.portfolio import mix_phrase
+
+    mix = mix_phrase([("equity", Decimal("97.2")), ("cash", Decimal("4.7")),
+                      ("derivatives", Decimal("-1.9")), ("debt", Decimal("0"))])
+    assert "-1.9%" in mix and "0.0%" not in mix
+    assert mix.count("%") == 3
+
+
+def test_no_sentence_ends_in_a_doubled_stop(client: TestClient) -> None:  # noqa: F811
+    """Impeccable critique, 2026-11-02: the range bars' screen-reader sentence
+    ended "+7.4% p.a.." after a figure that already closes with a stop."""
+    html = client.get(f"/fund/S1{QS}").text
+    assert "p.a.." not in html
+
+
+def test_a_panel_has_one_heading_and_no_label_above_it(client: TestClient) -> None:  # noqa: F811
+    """Impeccable critique, 2026-11-02: every fund-page panel wore a small capital
+    label above its h2 (seven of them); the panels' names are the section chips.
+    A panel's "?" sits beside its heading instead."""
+    html = client.get(f"/fund/S1{QS}").text
+    assert "view__eyebrow" not in html
+    head = re.search(r'<header class="view__header[^"]*">(.*?)</header>',
+                     html[html.index('data-view-id="fund_consistency"'):], re.S)
+    assert head and re.search(r"</h2>\s*<button[^>]*class=\"term\"", head.group(1)), head

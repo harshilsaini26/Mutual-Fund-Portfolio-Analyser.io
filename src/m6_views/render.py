@@ -30,6 +30,7 @@ from src.m6_views.envelope import ViewEnvelope
 from src.m6_views.format import (
     DASH,
     format_date,
+    format_fraction,
     format_inr,
     format_pct,
     format_staleness,
@@ -121,6 +122,10 @@ def _fmt_value(tile: dict[str, Any], compact: bool) -> str:
     # gives a return, fall or swing (UI/UX critique G-20); a cost keeps two (ter).
     if kind == "fraction":
         return format_pct(Decimal(str(value)) * 100, precision=1)
+    # A fall, unsigned: "fall" carries the direction, as on every other page
+    # (Impeccable critique, 2026-11-02: "-10.6%" here, "13.3%" in Peers).
+    if kind == "fall":
+        return format_fraction(Decimal(str(value)))
     if kind == "ratio":
         return f"{Decimal(str(value)):.2f}"
     if kind == "metric":

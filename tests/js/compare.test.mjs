@@ -98,3 +98,7 @@ test("while two or more funds load, each section says so (Impeccable critique, 2
   assert.equal(C.loading("overlap", 3), "Loading the 3 funds' holdings…");
   assert.equal(C.loading("mix", 4), "Loading the 4 funds' holdings…");
 });
+test("two funds are both, more are all (Impeccable critique, 2026-11-02: \"all 2 funds\")", () => {
+  assert.equal(C.allOf(2), "both funds");
+  assert.equal(C.allOf(3), "all 3 funds");
+});

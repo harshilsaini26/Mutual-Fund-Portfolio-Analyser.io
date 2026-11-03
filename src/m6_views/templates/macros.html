@@ -86,9 +86,10 @@
     {% if quiet %}
     <p id="q-{{ env.view_id }}" class="sr-only">{{ env.question }}</p>
     {% else %}
-    <div>
-      <p class="view__eyebrow">{{ icon.i(view_icons.get(env.view_id, "list")) }}{{ view_names.get(env.view_id, "") }}{% if term_for.view.get(env.view_id) %}{{ term(term_for.view[env.view_id], "view") }}{% endif %}</p>
-      <h2 id="q-{{ env.view_id }}">{{ env.question }}</h2>
+    {#- No label above the heading (Impeccable critique, 2026-11-02); the panel's
+        name is its section chip, and its "?" sits beside the question. -#}
+    <div class="view__title">
+      <h2 id="q-{{ env.view_id }}">{{ env.question }}</h2>{% if term_for.view.get(env.view_id) %}{{ term(term_for.view[env.view_id], "view") }}{% endif %}
     </div>
     {% endif %}
     {{ confidence_badge(env.confidence) }}

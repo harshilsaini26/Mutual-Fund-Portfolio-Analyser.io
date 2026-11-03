@@ -941,3 +941,16 @@ def test_a_paragraph_does_not_end_on_one_word() -> None:
     their last lines; `pretty` was set on the headline only."""
     css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
     assert re.search(r"(?m)^p\s*\{[^}]*text-wrap:\s*pretty", css)
+
+
+def test_a_panels_figures_are_not_boxes_inside_its_box() -> None:
+    """Impeccable critique, 2026-11-02: the fund page's figure tiles, range bars and
+    NAV box were bordered, filled, rounded cards inside the panel's card. Inside a
+    panel a hairline divides; the panel alone is the box. No panel label is left."""
+    css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.S)
+    for sel in (".kpi__tile", ".range", ".fundcard__nav"):
+        rule = re.search(r"(?m)^" + re.escape(sel) + r"\s*\{([^}]*)\}", css)
+        assert rule, sel
+        boxed = r"\bbackground:|\bborder-radius:|\bborder:"
+        assert not re.search(boxed, rule.group(1)), sel
+    assert "view__eyebrow" not in css

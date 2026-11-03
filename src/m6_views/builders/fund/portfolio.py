@@ -55,6 +55,14 @@ def _pct(v: Any) -> str:
     return format_pct(v, precision=2)
 
 
+
+def mix_phrase(by_class: list[tuple[str, Decimal]]) -> str:
+    """"97.2% shares, 4.7% cash and -1.9% derivatives": every class but an empty
+    one, a negative one included, so the mix sums to 100 (Impeccable critique,
+    2026-11-02: a fund short 1.9% in derivatives read as 101.9% of itself)."""
+    return ", ".join(f"{format_pct(v)} {CLASS_PHRASES.get(k, k)}"
+                     for k, v in by_class if v != 0)
+
 @register
 class FundPortfolioBuilder:
     view_id = VIEW_ID
@@ -126,11 +134,7 @@ class FundPortfolioBuilder:
             charts.append({"kind": "hbar", "title": "Shares by sector", "bars": bars,
                            "wide": True})
 
-        mix = ", ".join(
-            f"{format_pct(v)} {CLASS_PHRASES.get(k, k)}"
-            for k, v in fund.by_class
-            if v > 0
-        )
+        mix = mix_phrase(fund.by_class)
         # An aggregator's copy says so where it is always read (V1-79), not
         # only in the notes, which start closed.
         source = "shown on Groww's page" if tier == "aggregator" else "disclosed"

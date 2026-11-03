@@ -568,7 +568,7 @@ def test_an_aggregators_holdings_are_published_and_say_whose_they_are(
     # and never badged "current, complete, and resolved".
     assert "holdings in the portfolio shown on Groww&#39;s page for" in page
     owns = page[page.index("What does this fund own?"):]
-    assert 'badge--medium' in owns[:600]
+    assert 'badge--medium' in owns[:owns.index("</header>")]   # the panel's own header
     assert "Groww&#39;s page" not in _page(site, DIRECT)
 
 

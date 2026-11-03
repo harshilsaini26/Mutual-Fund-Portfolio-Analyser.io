@@ -100,9 +100,9 @@ class FundDrawdownBuilder:
                 "columns": [
                     {"key": "date", "label": "Date", "kind": "date"},
                     {"key": "fund_below_high", "label": "Fund below its high",
-                     "kind": "fraction"},
+                     "kind": "fall"},
                     {"key": "benchmark_below_high", "label": "Benchmark below its high",
-                     "kind": "fraction"},
+                     "kind": "fall"},
                 ],
                 "rows": rows,
             },

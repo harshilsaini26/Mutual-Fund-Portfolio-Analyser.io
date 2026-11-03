@@ -38,7 +38,7 @@ COLUMNS = [
     ("return_ann", "Return", "return_ann"),
     ("return_cum", "Cumulative", "fraction"),
     ("volatility_ann", "Volatility", "fraction"),
-    ("max_dd", "Max drawdown", "fraction"),
+    ("max_dd", "Max drawdown", "fall"),
     ("confidence", "Confidence", "text"),
     ("sharpe", "Sharpe", "ratio"),
     ("sortino", "Sortino", "ratio"),

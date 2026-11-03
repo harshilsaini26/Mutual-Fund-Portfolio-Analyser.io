@@ -54,7 +54,7 @@
     </svg>
     <p class="range__ends"><span>Lowest {{ r.low_label }}</span><span>Highest {{ r.high_label }}</span></p>
     <p class="sr-only">Over {{ r.label }}, the {{ r.ranked }} ranked funds in its category returned
-      from {{ r.low_label }} to {{ r.high_label }}; this fund returned {{ r.value_label }}.</p>
+      from {{ r.low_label }} to {{ r.high_label }}; this fund returned {{ r.value_label }}{{ '' if r.value_label.endswith('.') else '.' }}</p>
   </div>
   {% endfor %}
 </div>

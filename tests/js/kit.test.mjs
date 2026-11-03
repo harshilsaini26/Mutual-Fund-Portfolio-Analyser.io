@@ -206,3 +206,16 @@ test("a treemap tile wraps a holding's name rather than cutting it mid-word", as
   const tree = src.slice(src.indexOf("treemap: function"), src.indexOf("scatter: function"));
   assert.match(tree, /label: \{[^}]*overflow: "break", lineOverflow: "truncate"/);
 });
+
+test("a holdings note names its source and dates it as every other page does", async () => {
+  // Impeccable critique, 2026-11-02: Portfolio said "disclosed 2026-08-31", and
+  // Compare and Portfolio said "an aggregator's page" where the fund page names Groww.
+  const { readFileSync } = await import("node:fs");
+  for (const name of ["compare.js", "portfolio.js"]) {
+    const src = readFileSync(new URL("../../src/m6_views/static/" + name, import.meta.url), "utf8");
+    const note = src.split("\n").find((l) => l.includes('"disclosed "') || l.includes("': disclosed '") || l.includes('": disclosed "'));
+    assert.ok(note, name);
+    assert.match(note, /day\(/, name);
+    assert.match(note, /Groww's page/, name);
+  }
+});

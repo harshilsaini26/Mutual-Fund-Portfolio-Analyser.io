@@ -590,7 +590,7 @@
       if (lt.coverage.unresolvedPaise) notes.push(pct(lt.coverage.unresolvedPaise * 100 / lt.total) + " is in holdings the disclosures name in ways this site could not match to a company.");
       lt.coverage.funds.forEach(function (f) {
         var fund = FUNDS.get(f.id);
-        notes.push((fund ? fund.name : f.id) + ": disclosed " + f.asOf + (f.aggregator ? ", read from an aggregator's page" : "") + ".");
+        notes.push((fund ? fund.name : f.id) + ": disclosed " + M.day(f.asOf) + (f.aggregator ? ", read from Groww's page, an aggregator" : "") + ".");
       });
 
       fill(box,

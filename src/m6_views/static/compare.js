@@ -127,8 +127,11 @@
     return "Loading the " + count + " funds' " + (section === "growth" ? "prices" : "holdings") + "…";
   }
 
+  // "both funds" for two, "all 3 funds" for more (Impeccable critique, 2026-11-02).
+  function allOf(count) { return count === 2 ? "both funds" : "all " + count + " funds"; }
+
   var api = {
-    starters: starters, sipHash: sipHash, loading: loading,
+    starters: starters, sipHash: sipHash, loading: loading, allOf: allOf,
     parseHash: parseHash, writeHash: writeHash, sharedStart: sharedStart,
     growthSeries: growthSeries, highLow: highLow, commonHoldings: commonHoldings,
     shownFigure: shownFigure, nextFocus: nextFocus, MAX: MAX,
@@ -346,7 +349,7 @@
           el("div", { "class": "echart__canvas", "data-index": "0", role: "img", "aria-label": headline })),
         data);
       fill.apply(null, [box, el("p", { "class": "cmp__lead" }, headline), container,
-        note("From " + day(start) + ", the first date all " + lines.length + " funds have prices."),
+        note("From " + day(start) + ", the first date " + allOf(lines.length) + " have prices."),
         // The same funds as a monthly SIP, on /sip/ (SPEC_SIP_WHAT_IF §4.8).
         el("p", { "class": "cmp__note" }, el("a", { href: BASE + "/sip/" + sipHash(funds) },
           "The same funds as a monthly SIP →"))].concat(notes));
@@ -360,7 +363,7 @@
     var ul = el("ul", { "class": "cmp__note" });
     funds.forEach(function (f, i) {
       ul.appendChild(el("li", null, f.name + ": " + (files[i]
-        ? "disclosed " + day(files[i].as_of) + (files[i].aggregator ? ", read from an aggregator's page" : "") + "."
+        ? "disclosed " + day(files[i].as_of) + (files[i].aggregator ? ", read from Groww's page, an aggregator" : "") + "."
         : "no holdings disclosed here.")));
     });
     return ul;

@@ -49,7 +49,7 @@ MEASURES = (
      "The fund's return a year less the benchmark's."),
     ("volatility_ann", "Volatility", "fraction",
      "How widely its daily price swings, scaled to a year."),
-    ("max_dd", "Deepest fall", "fraction",
+    ("max_dd", "Deepest fall", "fall",
      "The largest fall from a high within the period."),
 )
 
