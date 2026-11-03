@@ -437,15 +437,17 @@ def test_prose_uses_the_prose_face() -> None:
 
 
 def test_wide_screens_show_the_links_inline() -> None:
-    """Wide: the nav sits inline, the Menu button gone (a menu still open when the
+    """Wide, from 1400px (Impeccable critique, 2026-11-02: from 1180px the seven
+    links left a search box ~60px wide, and the bar ran 86px past the screen):
+    the nav sits inline, the Menu button gone (a menu still open when the
     window widens is closed by app.js; see test_widening_closes_an_open_menu).
     Narrow: the nav is a popover panel under the bar."""
     css = CSS.read_text(encoding="utf-8")
-    wide = _block(css, "@media (min-width: 1180px)")
+    wide = _block(css, "@media screen and (min-width: 1400px)")
     assert re.search(r"\.topmenu__summary\s*\{[^}]*display:\s*none", wide)
     inline = r"\.topnav\[popover\]\s*\{[^}]*display:\s*flex[^}]*position:\s*static"
     assert re.search(inline, wide)
-    narrow = _block(css, "@media (max-width: 1179px)")
+    narrow = _block(css, "@media (max-width: 1399px)")
     assert re.search(r"\.topnav\[popover\]\s*\{[^}]*position:\s*fixed", narrow)
     assert not re.search(r"(?m)^\s*\.topnav\s*\{\s*display:\s*none", css)
 
@@ -453,7 +455,7 @@ def test_wide_screens_show_the_links_inline() -> None:
 def test_the_menu_panel_opens_under_the_menu_button() -> None:
     """The button sits at the bar's left after the brand, so the panel opens from
     the left edge, not under Settings at the far right."""
-    narrow = _block(CSS.read_text(encoding="utf-8"), "@media (max-width: 1179px)")
+    narrow = _block(CSS.read_text(encoding="utf-8"), "@media (max-width: 1399px)")
     panel = re.search(r"\.topnav\[popover\]\s*\{([^}]*)\}", narrow)
     assert panel and re.search(r"(?<![-\w])left:\s*12px", panel.group(1))
     assert "inset" not in panel.group(1)
@@ -461,9 +463,9 @@ def test_the_menu_panel_opens_under_the_menu_button() -> None:
 
 def test_widening_closes_an_open_menu() -> None:
     """An open popover lives in the top layer, where no media query can put it back
-    in the bar; app.js closes it at 1180px, first thing, before any page code."""
+    in the bar; app.js closes it at 1400px, first thing, before any page code."""
     script = (CSS.parent / "app.js").read_text(encoding="utf-8")
-    close = script.index('window.matchMedia("(min-width: 1180px)")')
+    close = script.index('window.matchMedia("(min-width: 1400px)")')
     assert "shut()" in script[close:close + 160]
     assert close < script.index("// A browser without popovers")
 

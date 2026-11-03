@@ -22,6 +22,7 @@ refs:
   amfi_nav: &amfi_nav {source: amfi, url: "https://www.amfiindia.com/investor/knowledge-center-info?zoneName=NetAssetValueNAV", checked: 2026-10-02}
   amfi_direct: &amfi_direct {source: amfi, url: "https://www.amfiindia.com/investor/knowledge-center-info?zoneName=DirectPlan", checked: 2026-10-02}
   amfi_ter: &amfi_ter {source: amfi, url: "https://www.amfiindia.com/investor/knowledge-center-info?zoneName=expenseRatio", checked: 2026-10-02}
+  amfi_ter_parts: &amfi_ter_parts {source: amfi, url: "https://www.amfiindia.com/ter-of-mf-schemes", checked: 2026-11-03}
   amfi_tax: &amfi_tax {source: amfi, url: "https://www.amfiindia.com/investor/knowledge-center-info?zoneName=TaxRegimeForMutualFunds", checked: 2026-10-02}
   amfi_aaum: &amfi_aaum {source: amfi, url: "https://www.amfiindia.com/aum-data/average-aum", checked: 2026-10-02}
   mfsh_direct: &mfsh_direct {source: amfi, url: "https://www.mutualfundssahihai.com/en/what-direct-plan-regular-plan", checked: 2026-10-02}
@@ -134,12 +135,12 @@ terms:
   expense_ratio:
     title: Expense ratio (TER)
     short: >-
-      The total expense ratio: a fund's yearly running cost, as a share of its
-      assets. It covers management, administration, distribution and similar costs.
-      It is not billed separately; a small part is taken from the fund's assets each
-      day, so the published NAV is already net of it. SEBI sets the most a fund may
-      charge.
-    sources: [*sebi_faq, *amfi_ter, *v_ter]
+      A fund's yearly cost, as a share of its assets: its own charge, the base
+      expense ratio (management, distribution and the like), plus the brokerage,
+      transaction costs and statutory levies it pays to trade. It is taken from the
+      assets each day, so the published NAV is already net of it. SEBI sets the most
+      a fund may charge.
+    sources: [*sebi_faq, *amfi_ter, *amfi_ter_parts, *v_ter]
     related: [direct_plan, regular_plan]
   aum:
     title: Fund size (AUM)
@@ -559,9 +560,13 @@ guides:
       - heading: On this site
         paragraphs:
           - >-
-            Each fund page shows the expense ratio from AMFI's monthly list, and the
-            Peers section sets it beside those of the category. The guide to Direct and
-            Regular plans explains why the same scheme has two ratios.
+            Each fund page shows the total expense ratio from AMFI's monthly list and,
+            beside it, the fund's own charge, the base expense ratio. AMFI's total adds
+            the brokerage, transaction costs and statutory levies a fund pays to trade,
+            so a fund that trades constantly, such as an arbitrage fund, can show a
+            total several times its own charge. The Peers section ranks the total within
+            the category, where funds trade alike. The guide to Direct and Regular plans
+            explains why the same scheme has two ratios.
     sources: [*sebi_faq, *amfi_ter, *v_ter]
 
   - slug: risk-and-return

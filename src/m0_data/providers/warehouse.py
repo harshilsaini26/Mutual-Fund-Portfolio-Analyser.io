@@ -396,6 +396,7 @@ class WarehouseMarketDataProvider:
             aum_basis=aum["basis"] if aum else None,
             ter=ter.total if ter else None,
             ter_as_of=ter.valid_from if ter else None,
+            ter_base=ter.base if ter else None,
         )
 
     def live_funds(self) -> list[Fund]:
@@ -560,6 +561,9 @@ class SchemeFacts:
     #: Total TER, percent a year, and the day it was published for (V1-78).
     ter: Decimal | None = None
     ter_as_of: date | None = None
+    #: Of the total, the fund's own charge (base expense ratio); the rest is the
+    #: brokerage, transaction costs and levies AMFI lists with it.
+    ter_base: Decimal | None = None
 
 
 @dataclass(frozen=True)

@@ -185,9 +185,15 @@ def _tiles(fw: FundWindows | None, facts: Any,
         f"Quarterly average to {format_date(facts.aum_as_of)}"
         if facts.aum_inr is not None else "Not on record",
     ))
+    # AMFI's total includes trading costs and levies, so the fund's own charge is
+    # said beside it (Impeccable critique, 2026-11-02: an arbitrage fund's 2.30%
+    # was 0.32% of its own).
+    own = (f"; own charge {format_pct(facts.ter_base, precision=2)}"
+           if facts.ter_base is not None else "")
     tiles.append(_tile(
         "ter", "Expense ratio", facts.ter, "ter",
-        f"Total, a year; AMFI, {format_date(facts.ter_as_of)}"
+        f"Total a year, with trading costs and levies{own}; AMFI, "
+        f"{format_date(facts.ter_as_of)}"
         if facts.ter is not None else "Not on record",
     ))
     return tiles

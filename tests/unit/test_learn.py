@@ -291,3 +291,19 @@ def test_a_guide_names_the_terms_it_links_to_once_each() -> None:
     guide = load().guide("reading-a-fund-page")
     assert guide.terms[:3] == ("nav", "annualised_return", "benchmark")
     assert len(guide.terms) == len(set(guide.terms))
+
+
+def test_the_expense_ratio_says_what_amfis_total_holds() -> None:
+    """Impeccable critique, 2026-11-02: the entry said "management, administration,
+    distribution" while the figure is AMFI's revised Total TER, which adds the
+    brokerage, transaction costs and statutory levies a fund pays to trade. An
+    arbitrage fund's 2.30% (0.32% its own charge) read as three times a flexi cap's."""
+    raw = yaml.safe_load(LEARN_YAML.read_text(encoding="utf-8"))
+    entry = " ".join(raw["terms"]["expense_ratio"]["short"].split())
+    parts = ("brokerage", "transaction costs", "statutory levies", "base expense ratio")
+    for part in parts:
+        assert part in entry, part
+    guide = next(g for g in raw["guides"] if g["slug"] == "what-a-fund-costs")
+    text = " ".join(" ".join(p.split())
+                    for s in guide["sections"] for p in s["paragraphs"])
+    assert "statutory levies" in text and "arbitrage" in text

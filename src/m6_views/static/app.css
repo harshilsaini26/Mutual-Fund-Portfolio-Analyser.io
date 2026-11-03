@@ -2437,17 +2437,20 @@ th .term::after, .term::after { content: none; }   /* not a sort button (th butt
 }
 .skip-link:focus { top: 8px; }
 
-/* The top bar's links (V1-88): inline on wide screens, behind "Menu" below 1180px.
+/* The top bar's links (V1-88): inline on wide screens, behind "Menu" below 1400px
+   (Impeccable critique, 2026-11-02: from 1180px the seven links left the search box
+   about 60px and pushed the bar past the screen's edge; large text in Rubik
+   needs about 1380px).
    One <nav popover>: a closed popover is hidden by the browser, but .topnav's own
    display would win, so a narrow screen hides it explicitly until it is open. */
-@media (min-width: 1180px) {
+@media screen and (min-width: 1400px) {
   .topmenu__summary { display: none; }
   .topnav[popover] {
     display: flex; position: static; inset: auto; width: auto; height: auto;
     margin: 0; padding: 0; border: 0; background: none; color: inherit; overflow: visible;
   }
 }
-@media (max-width: 1179px) {
+@media (max-width: 1399px) {
   .topmenu__summary {
     display: inline-flex; align-items: center; min-height: 36px; padding: 6px 12px;
     border: 1px solid var(--field-line); border-radius: 8px; background: var(--surface);

@@ -158,12 +158,12 @@
 
   // The top bar's menu (V1-88) is a native popover: Esc and a tap outside close it
   // already. Choosing a link on this same page (Categories, About) and widening
-  // past 1180px, where the links sit inline, close it too.
+  // past 1400px, where the links sit inline, close it too.
   var topnav = document.getElementById("topnav");
   if (topnav && topnav.hidePopover) {
     var shut = function () { if (topnav.matches(":popover-open")) topnav.hidePopover(); };
     topnav.addEventListener("click", function (e) { if (e.target.closest("a")) shut(); });
-    window.matchMedia("(min-width: 1180px)").addEventListener("change", function (e) {
+    window.matchMedia("(min-width: 1400px)").addEventListener("change", function (e) {
       if (e.matches) shut();
     });
   }

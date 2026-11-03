@@ -533,3 +533,12 @@ def test_a_return_tile_carries_its_own_sign_apart_from_its_benchmark() -> None:
     assert _tile("return_3y", "", Decimal("0.12"), "return_ann", None)["sign"] == "gain"
     assert _tile("return_3y", "", Decimal("0"), "return_ann", None)["sign"] is None
     assert _tile("size", "", Decimal("100"), "inr", None)["sign"] is None
+
+
+def test_the_expense_ratio_tile_says_what_the_total_holds(client: TestClient) -> None:  # noqa: F811
+    """Impeccable critique, 2026-11-02: the tile said "Total, a year". AMFI's
+    total includes trading costs and levies; the fund's own charge is beside it."""
+    env = client.get(f"/api/views/fund_header{QS}&scope_id=S1").json()
+    tile = next(t for t in env["payload"]["tiles"] if t["key"] == "ter")
+    assert "trading costs and levies" in tile["context"]
+    assert "own charge 0.45%" in tile["context"]

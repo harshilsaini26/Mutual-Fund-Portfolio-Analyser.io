@@ -982,7 +982,7 @@ def test_every_page_starts_with_a_skip_link(site: Path) -> None:
 
 
 def test_the_public_menu_holds_every_link(site: Path) -> None:
-    """One nav, shown inline on wide screens and as a native popover below 1180px,
+    """One nav, shown inline on wide screens and as a native popover below 1400px,
     opened by a "Menu" button (V1-88): no script needed to open or close it."""
     html = _published(site)["funds"]
     menu = r'<button[^>]*class="topmenu__summary"[^>]*popovertarget="topnav"[^>]*>\s*Menu'
@@ -992,7 +992,7 @@ def test_the_public_menu_holds_every_link(site: Path) -> None:
     assert nav
     links = re.findall(r'class="topnav__link"[^>]*>([^<]+)<', nav.group(1))
     # Each name says what its page is called (Impeccable critique, 2026-11-01).
-    assert [x.strip() for x in links] == ["Explore funds", "Compare", "What a SIP became",
+    assert [x.strip() for x in links] == ["Explore funds", "Compare", "SIP look-back",
                                          "Your portfolio", "Learn", "Categories",
                                          "About the data"]
     current = re.search(r'aria-current="page"[^>]*>([^<]+)<', nav.group(1))
@@ -1516,7 +1516,7 @@ def test_the_sip_page_is_published_and_linked(site: Path) -> None:
     hrefs = re.findall(r'href="([^"]+)"', nav)
     at = hrefs.index(f"{BASE}/sip/")
     assert hrefs[at - 1] == f"{BASE}/compare/" and hrefs[at + 1] == f"{BASE}/portfolio/"
-    assert 'aria-current="page">What a SIP became</a>' in re.sub(r"\s+", " ", nav)
+    assert 'aria-current="page">SIP look-back</a>' in re.sub(r"\s+", " ", nav)
     foot = page[page.index('class="colophon__columns"'):]
     assert f'href="{BASE}/sip/"' in foot[:foot.index("</nav>")]
 
