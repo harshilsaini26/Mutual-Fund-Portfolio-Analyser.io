@@ -724,7 +724,9 @@ a.badge:hover { color: var(--ink); border-color: var(--ink-faint); }
    screen reader, and only the badge shows, on its own line at the right. In the
    flow, not laid over the corner: "Confidence: medium" ran over the NAV box when
    the card only kept a guessed gap for it. */
-.view__header--quiet { justify-content: flex-end; padding: 14px 20px 0; }
+/* Its question is for a screen reader and its badge closes the panel, so a quiet
+   header takes no room. */
+.view__header--quiet { padding: 0; }
 
 /* --- caveats: never quiet --------------------------------------------------------- */
 
@@ -1669,14 +1671,12 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 }
 .fundcard__id { min-width: 0; flex: 1 1 420px; }
 .fundcard__name { padding-right: 0; font-weight: 600; color: var(--ink); }
-.fundcard__nav { flex: none; text-align: right; padding: 4px 0; }
-.fundcard__nav p { margin: 0; }
-.fundcard__nav-label { font-size: var(--text-xs); color: var(--ink-faint); }
-.fundcard__nav-value {
-  font-size: var(--text-h2); font-weight: 600; letter-spacing: var(--track-tight); color: var(--accent);
-  font-variant-numeric: tabular-nums;
+/* The page's first sentence, under the name: how the fund has done, before any
+   figure (Impeccable critique, 2026-11-02). */
+.fundcard__summary {
+  margin: 14px 0 18px; max-width: 64ch; font-family: var(--font-prose);
+  font-size: var(--text-lead); line-height: var(--lh-body); color: var(--ink);
 }
-.fundcard__nav-change { font-size: var(--text-sm); font-weight: 500; font-variant-numeric: tabular-nums; }
 .facts--grid {
   grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0;
   padding: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
@@ -1724,8 +1724,6 @@ body { font-size: var(--text-base); overflow-x: clip; }  /* a last guard: the pa
 }
 @media (max-width: 720px) {
   .leaders, .ranges { grid-template-columns: minmax(0, 1fr); }
-  .fundcard__nav { text-align: left; }
-  .fundcard__nav-value { font-size: var(--text-h3); }
 }
 @media (max-width: 420px) {
   .facts--grid { grid-template-columns: minmax(0, 1fr); }

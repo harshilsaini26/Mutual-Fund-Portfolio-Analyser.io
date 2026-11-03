@@ -35,6 +35,7 @@ from src.m6_views.deps import Deps
 from src.m6_views.envelope import ViewEnvelope
 from src.m6_views.format import (
     format_date,
+    format_ordinal,
     format_pct,
     format_points,
     format_return,
@@ -121,6 +122,45 @@ def _nav(fw: FundWindows | None) -> dict[str, Any] | None:
         "tone": tone,
         "symbol": {"gain": "▲", "loss": "▼"}.get(tone or ""),
     }
+
+
+#: How the summary names a period.
+SAID_PERIOD = {"3y": "three years", "1y": "one year"}
+
+
+def _summary(fw: FundWindows | None, peers: PeerContext | None) -> str | None:
+    """The page's first sentence (Impeccable critique, 2026-11-02: the card led
+    with a badge and the NAV, a price first-timers misread as a verdict): over three
+    years, or one where that is all there is, the return, its distance from the
+    benchmark and the category rank, each only where it is known."""
+    if fw is None:
+        return None
+    found = [(k, w) for k in ("3y", "1y")
+             if (w := fw.windows.get(k)) is not None and spans(w.obs_days, k)]
+    if not found:
+        return None
+    key, w = found[0]
+    said = (f"Over {SAID_PERIOD[key]} it returned "
+            f"{format_return(w.return_ann, False)} a year")
+    if w.lead_ann is not None:
+        where = ("ahead of" if w.lead_ann > 0 else "behind" if w.lead_ann < 0 else None)
+        said += (f", {format_points(w.lead_ann)} a year {where} its benchmark" if where
+                 else ", level with its benchmark")
+    rank = next((r for r in peers.ranks if r.metric.key == f"return_{key}"),
+                None) if peers else None
+    if rank is not None and rank.rank is not None:
+        said += (f"; it ranks {format_ordinal(rank.rank)} {rank_basis(rank)} in "
+                 f"{peers.category.name}" if peers else "")
+    return said + "."
+
+
+def _nav_words(nav: dict[str, Any] | None) -> str | None:
+    """"₹56.1234 on 31 Oct 2026, +0.21% on the day", as AMFI gives it (four places)."""
+    if nav is None:
+        return None
+    price = f"{Decimal(nav['value']['value']):,.4f}".rstrip("0").rstrip(".")
+    day = f", {nav['change']} on the day" if nav["change"] else ""
+    return f"₹{price} on {nav['date']}{day}"
 
 
 def _tiles(fw: FundWindows | None, facts: Any,
@@ -243,6 +283,8 @@ class FundHeaderBuilder:
                 ))
 
         plan = " · ".join(p.title() for p in (facts.plan, facts.option) if p)
+        nav = _nav(fw)
+        peers = peer_context(self.market, scheme)
         rows: list[dict[str, Any]] = [
             {"label": label, "value": value}
             for label, value in (
@@ -261,13 +303,17 @@ class FundHeaderBuilder:
                  else None if withholds_index(self.market) else "None on record"),
                 ("Prices on record",
                  f"{format_date(first)} to {format_date(last)}" if first else "None"),
+                # A fact, not the card's headline (Impeccable critique, 2026-11-02).
+                ("NAV", _nav_words(nav)),
             )
             if value
         ]
         # What a reader looks for first and no source this site loads carries:
-        # said, not left out (F-13). Never filled in from anywhere else.
-        rows += [{"label": label, "value": NOT_LOADED, "absent": True}
-                 for label in ("Riskometer", "Fund manager", "Exit load", "Minimum SIP")]
+        # said, not left out (F-13), in one line rather than four cells. Never
+        # filled in from anywhere else.
+        rows.append({"label": NOT_LOADED,
+                     "value": "Riskometer, fund manager, exit load, minimum SIP",
+                     "absent": True})
         return ok_envelope(
             view_id=VIEW_ID,
             scope=scope,
@@ -277,8 +323,9 @@ class FundHeaderBuilder:
                 # once (V1-88).
                 "subtitle": plan,
                 "scheme_id": str(scheme),
-                "nav": _nav(fw),
-                "tiles": _tiles(fw, facts, peer_context(self.market, scheme)),
+                "summary": _summary(fw, peers),
+                "nav": nav,
+                "tiles": _tiles(fw, facts, peers),
                 "findings": findings,
                 "columns": [
                     {"key": "label", "label": "Fact", "kind": "text"},

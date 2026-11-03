@@ -92,7 +92,10 @@
       <h2 id="q-{{ env.view_id }}">{{ env.question }}</h2>{% if term_for.view.get(env.view_id) %}{{ term(term_for.view[env.view_id], "view") }}{% endif %}
     </div>
     {% endif %}
-    {{ confidence_badge(env.confidence) }}
+    {#- A quiet panel (the fund page's card) closes with its badge rather than
+        opening with it, so the fund's name comes first (Impeccable critique,
+        2026-11-02). -#}
+    {% if not quiet %}{{ confidence_badge(env.confidence) }}{% endif %}
   </header>
 
   {% if env.state.value != 'ok' %}
@@ -114,7 +117,7 @@
       disclosure, in every state.
     #}
     <p class="view__source">
-      Data as of
+      {% if quiet %}{{ confidence_badge(env.confidence) }} {% endif %}Data as of
       {% if env.state.value == 'ok' %}{{ env.data_as_of | fmt_date }}
       <span class="staleness">({{ env.staleness_days | fmt_staleness }})</span>
       {%- else %}&mdash;{% endif %}

@@ -53,7 +53,7 @@ TERMS_FOR: dict[str, dict[str, str]] = {
         "fund_size": "aum", "ter": "expense_ratio",
     },
     "fact": {"Category": "sebi_categories", "Plan": "direct_plan", "Fund size": "aum",
-             "Benchmark": "benchmark"},
+             "Benchmark": "benchmark", "NAV": "nav"},
     "view": {
         "fund_growth": "nav", "fund_returns": "annualised_return",
         "fund_peers": "category_rank", "fund_drawdown": "max_drawdown",

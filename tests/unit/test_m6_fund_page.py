@@ -430,15 +430,15 @@ def test_each_fact_is_said_once_and_what_is_not_held_is_said(
 ) -> None:
     """F-04: fund size was a fact and a tile. F-13: the riskometer, manager, exit
     load and minimum SIP are what a reader looks for first; no source this site
-    loads carries them, and the page says so rather than leaving them out."""
+    loads carries them, and the page says so rather than leaving them out. Since
+    the Impeccable critique (2026-11-02) in one line, not four cells."""
     head = _header(client.get(f"/fund/S1{QS}").text)
     facts = head[head.index('<dl class="facts facts--grid">'):]
     facts = facts[:facts.index("</dl>")]
     assert "Fund size" not in facts and "Fund size" in head
-    for label in ("Riskometer", "Fund manager", "Exit load", "Minimum SIP"):
-        row = re.search(
-            rf"<dt>{label}</dt>\s*<dd class=\"facts__absent\">([^<]*)</dd>", facts)
-        assert row and row.group(1) == "Not in the data this site loads", label
+    row = re.search(r"<dt>Not in the data this site loads</dt>\s*"
+                    r"<dd class=\"facts__absent\">([^<]*)</dd>", facts)
+    assert row and row.group(1) == "Riskometer, fund manager, exit load, minimum SIP"
 
 
 def test_the_peers_picture_names_its_axes_and_its_bubbles(
@@ -591,3 +591,18 @@ def test_a_panel_has_one_heading_and_no_label_above_it(client: TestClient) -> No
     head = re.search(r'<header class="view__header[^"]*">(.*?)</header>',
                      html[html.index('data-view-id="fund_consistency"'):], re.S)
     assert head and re.search(r"</h2>\s*<button[^>]*class=\"term\"", head.group(1)), head
+
+
+def test_the_fund_page_opens_with_its_name_and_one_sentence(client: TestClient) -> None:  # noqa: F811
+    """Impeccable critique, 2026-11-02: the card led with a confidence badge, then
+    the NAV in large accent type, a price first-timers misread as a verdict. Now:
+    the name, one sentence on how it has done, then the figures; the badge closes
+    the panel and NAV is a fact."""
+    env = client.get(f"/api/views/fund_header{QS}&scope_id=S1").json()
+    summary = env["payload"]["summary"]
+    assert re.match(r"Over (three years|one year) it returned [+-]\d", summary), summary
+    assert "benchmark" in summary and "of the" in summary
+    assert any(r["label"] == "NAV" for r in env["payload"]["facts"])
+    head = _header(client.get(f"/fund/S1{QS}").text)
+    h1, said = head.index("<h1"), head.index('class="fundcard__summary"')
+    assert h1 < said < head.index('<dl class="tiles"') < head.index('class="badge')

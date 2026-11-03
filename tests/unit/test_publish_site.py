@@ -1275,11 +1275,13 @@ def test_every_labelled_figure_with_a_glossary_entry_explains_itself() -> None:
     assert len(ids) == len(set(ids)), sorted(i for i in ids if ids.count(i) > 1)
 
 
-def test_the_nav_box_explains_nav(site: Path) -> None:
+def test_the_nav_fact_explains_nav(site: Path) -> None:
+    """NAV is a fact now, not the card's headline figure (Impeccable critique,
+    2026-11-02): it still carries its "?"."""
     html = _page(site, DIRECT)
-    box = html[html.index('class="fundcard__nav"'):]
-    box = box[:box.index("</div>")]
-    assert 'data-key="nav"' in box
+    assert 'class="fundcard__nav"' not in html
+    fact = re.search(r"<dt>NAV[^<]*(.*?)</dt>", html, re.S)
+    assert fact and 'data-key="nav"' in fact.group(1)
 
 
 def test_the_site_tells_vercel_how_to_serve_it(site: Path) -> None:
