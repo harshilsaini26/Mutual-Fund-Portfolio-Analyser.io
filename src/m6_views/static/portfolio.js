@@ -279,7 +279,7 @@
     }
     if (state.funds.some(function (h) { return h.id === fund.id; })) { say(fund.name + " is already in your portfolio."); return; }
     state.funds.push(M.newHolding(fund.id));
-    say("");
+    say(nameOf(fund.id) + " added.");   // as Compare says it (design critique, 2026-11-04)
     changed();
   }
 

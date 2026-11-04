@@ -178,7 +178,7 @@ def test_performance_sets_each_measure_beside_its_benchmark(
     keys = {c["key"] for c in xray["payload"]["columns"]}
     assert {"sharpe", "sortino", "treynor", "alpha_ann", "beta", "tracking_error",
             "information_ratio", "up_capture", "down_capture"} <= keys
-    three_x = next(r for r in xray["payload"]["rows"] if r["window_key"] == "3y")
+    three_x = next(r for r in xray["payload"]["rows"] if r["window_key"] == "3 years")
     assert three_x["beta"] is not None
 
 
@@ -188,7 +188,7 @@ def test_a_capture_ratio_says_how_few_months_it_rests_on(
     """External audit, 2026-10-04: a one-year capture ratio rests on about six
     rising and six falling months, and the page should say so."""
     env = client.get(f"/api/views/fund_xray_header{QS}&scope_id=S1").json()
-    one = next(r for r in env["payload"]["rows"] if r["window_key"] == "1y")
+    one = next(r for r in env["payload"]["rows"] if r["window_key"] == "1 year")
     assert one["up_capture"] is not None
     caveats = env["quality"]["caveats"]
     note = next((c for c in caveats if "capture" in c), "")
@@ -252,9 +252,11 @@ def test_without_a_benchmark_its_rows_are_left_out(
 
 def test_the_worst_fall_names_its_period(client: TestClient) -> None:  # noqa: F811
     """Beside a 3- or 5-year deepest fall, "Worst fall" alone reads as the same
-    measure; it is the deepest since the first price, and says so (V1-94)."""
+    measure; it is the deepest since the first price, and says so (V1-94). One
+    name for the measure everywhere (design critique, 2026-11-04)."""
     html = client.get(f"/fund/S1{QS}").text
-    assert re.search(r"Worst fall since (19|20)\d\d<", html)
+    assert re.search(r"Deepest fall since (19|20)\d\d<", html)
+    assert "Worst fall" not in html
 
 
 def test_a_return_reads_to_one_place_everywhere(client: TestClient) -> None:  # noqa: F811
@@ -486,6 +488,9 @@ def test_what_could_not_be_matched_is_a_bar_of_its_own(tmp_path: Path) -> None:
     assert "10.00% of the fund is in holdings not matched to a company" in panel
     assert "<caption" in panel and ">Largest holdings</caption>" in panel
     assert ">55.00%</td>" in panel
+    # Design critique, 2026-11-04: "Its 4 largest holdings" under "5 holdings",
+    # when the four were every holding matched to a company.
+    assert "The 2 holdings matched to a company</h3>" in panel
 
 
 def test_each_rank_says_how_many_funds_it_counts_and_what_they_share() -> None:
@@ -557,6 +562,14 @@ def test_a_fall_is_written_one_way_everywhere(client: TestClient) -> None:  # no
     xray = client.get(f"/api/views/fund_xray_header{QS}&scope_id=S1").json()
     worst = next(c for c in xray["payload"]["columns"] if c["key"] == "max_dd")
     assert worst["kind"] == "fall"
+    # Design critique, 2026-11-04: the page's top tile still read "-31.2%", and
+    # Every figure called the same measure "Max drawdown"; its windows read
+    # "since_first_nav", a key rather than a word.
+    assert worst["label"] == "Deepest fall"
+    assert "since_first_nav" not in {r["window_key"] for r in xray["payload"]["rows"]}
+    header = client.get(f"/api/views/fund_header{QS}&scope_id=S1").json()
+    tile = next(t for t in header["payload"]["tiles"] if t["key"] == "worst_fall")
+    assert tile["kind"] == "fall"
     falls = client.get(f"/api/views/fund_drawdown{QS}&scope_id=S1").json()
     kinds = {c["kind"] for c in falls["payload"]["columns"] if c["key"] != "date"}
     assert kinds == {"fall"}
@@ -606,3 +619,37 @@ def test_the_fund_page_opens_with_its_name_and_one_sentence(client: TestClient) 
     head = _header(client.get(f"/fund/S1{QS}").text)
     h1, said = head.index("<h1"), head.index('class="fundcard__summary"')
     assert h1 < said < head.index('<dl class="tiles"') < head.index('class="badge')
+
+
+def test_a_lead_that_rounds_to_nothing_is_level_with_its_benchmark() -> None:
+    """Design critique, 2026-11-04: a Nifty 50 index fund read "▲ 0.0 points a
+    year ahead of its benchmark". A gap the page shows as nothing has no side."""
+    from decimal import Decimal
+
+    from src.m6_views.builders.fund.header import side
+
+    assert side(Decimal("0.0004")) is None
+    assert side(Decimal("-0.0004")) is None
+    assert side(Decimal("0.0006")) == "ahead"
+    assert side(Decimal("-0.0391")) == "behind"
+
+
+def test_a_fund_without_a_rank_gets_one_reason_for_it() -> None:
+    """Design critique, 2026-11-04: an index fund's Peers panel said "too few have
+    the history to rank it yet" while its rank tile said its heading "holds funds
+    that do different jobs". One reason, the true one, in both."""
+    from decimal import Decimal
+
+    from src.m0_data.categories import category_of
+    from src.m2_fund.peers import METRICS, MIXED, PeerContext, Rank
+    from src.m6_views.builders.fund.peers import unranked_headline
+
+    mixed = category_of("Other Scheme - Index Funds")
+    three = next(m for m in METRICS if m.key == "return_3y")
+    found = PeerContext("S1", mixed, 281,
+                        [Rank(three, Decimal("0.1"), None, 200, None, MIXED)], [])
+    said = unranked_headline(found, found.ranks[0])
+    assert "do different jobs" in said and "history" not in said
+    young = PeerContext("S1", category_of("Equity Scheme - Flexi Cap Fund"), 40,
+                        [Rank(three, None, None, 38, None, "too little history")], [])
+    assert "too little price history" in unranked_headline(young, young.ranks[0])

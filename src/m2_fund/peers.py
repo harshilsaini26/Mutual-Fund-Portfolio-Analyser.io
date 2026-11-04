@@ -19,17 +19,26 @@ they were silent or wrong:
 - every rank carries how many were ranked of how many are in the category
   (§11.2 rule 3);
 - wound-up funds are not included -- nothing records them yet -- so §11.2 rule 2
-  (survivorship) is unmet, and each page says so.
+  (survivorship) is unmet, and each page says so;
+- an index fund's peers are the funds that track the same index, read from the
+  name after the fund house's ("UTI Nifty 50 Index Fund"), whichever heading AMFI
+  filed them under, when there are `MIN_PEERS` of them (design critique,
+  2026-11-04: 456 of 550 index funds had no rank, most under AMFI's undivided
+  heading, so no page said which Nifty 50 fund did best).
 """
 
 from __future__ import annotations
 
+import re
+from collections import Counter
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from functools import cache
 from typing import Any
 
 from src.m0_data.categories import Category, category_of
+from src.m0_data.universe import Fund
 
 #: Below this many ranked funds a rank says more about the gaps than the fund.
 MIN_PEERS = 5
@@ -58,7 +67,7 @@ METRICS = (
     Metric("return_5y", "Return, 5 years", "5y", "return_ann", True),
     Metric("volatility_3y", "Volatility, 3 years", "3y", "volatility_ann", False),
     # A negative depth: -0.12 is a smaller fall than -0.35, and ranks first.
-    Metric("worst_fall_3y", "Worst fall, 3 years", "3y", "max_dd", True),
+    Metric("worst_fall_3y", "Deepest fall, 3 years", "3y", "max_dd", True),
     Metric("sharpe_3y", "Return for the risk, 3 years (Sharpe)", "3y", "sharpe", True),
     # Not a window: the newest total TER on record, percent a year.
     Metric("ter", "Expense ratio (TER)", "", "ter", False),
@@ -111,6 +120,39 @@ def quartile(rank: int, ranked: int) -> int:
     return (rank * 4 + ranked - 1) // ranked
 
 
+@cache
+def tracked_index(fund: Fund) -> tuple[str, str] | None:
+    """(key, name) of the index an index fund tracks: its name after the fund
+    house's, without "Index Fund" ("Nifty 50"), and that with only its letters
+    and digits, lower-cased, to match spellings ("NIFTY50"). None for other funds."""
+    if not category_of(fund.category).key.startswith("index/"):
+        return None
+    words, house = fund.name.split(), fund.amc_id.split("_")
+    i = 0
+    while i < min(len(words), len(house)) and words[i].lower() == house[i]:
+        i += 1
+    name = re.sub(r"\b(index|fund)\b", " ", " ".join(words[i:]), flags=re.I)
+    name = re.sub(r"\s+", " ", re.sub(r"[()]|\s-(?=\s|$)", " ", name)).strip(" -")
+    key = re.sub(r"[^a-z0-9]", "", name.lower())
+    return (key, name) if key else None
+
+
+def _peers(fund: Fund, funds: list[Fund]) -> tuple[Category, list[Fund]]:
+    """Its category and the funds in it: for an index fund with enough others
+    tracking its index, those funds; otherwise its canonical category's."""
+    tracks = tracked_index(fund)
+    if tracks is not None:
+        same = [f for f in funds if (t := tracked_index(f)) and t[0] == tracks[0]]
+        if len(same) >= MIN_PEERS:
+            # The group's commonest spelling, so every page names it alike.
+            spelt = Counter(t[1] for f in same if (t := tracked_index(f)))
+            name = max(sorted(spelt), key=lambda n: spelt[n])
+            return Category(key=f"index/tracks/{tracks[0]}",
+                            name=f"{name} index funds", family="other"), same
+    category = category_of(fund.category)
+    return category, [f for f in funds if category_of(f.category).key == category.key]
+
+
 def peer_context(market: Any, scheme_id: str) -> PeerContext | None:
     """This fund's category, its ranks in it, and its category's points.
 
@@ -121,10 +163,8 @@ def peer_context(market: Any, scheme_id: str) -> PeerContext | None:
     fund = next((f for f in funds if f.scheme_id == scheme_id), None)
     if fund is None:
         return None
-    category = category_of(fund.category)
-    members = {
-        f.scheme_id: f for f in funds if category_of(f.category).key == category.key
-    }
+    category, same = _peers(fund, funds)
+    members = {f.scheme_id: f for f in same}
     stats = {(s.scheme_id, s.window_key): s
              for s in market.window_stats(sorted(members))}
     ters = {sid: t.total for sid, t in market.ters(sorted(members), date.max).items()}
@@ -167,4 +207,5 @@ def peer_context(market: Any, scheme_id: str) -> PeerContext | None:
 
 
 __all__ = ["METRICS", "MIN_PEERS", "SURVIVORSHIP_CAVEAT", "Metric", "PeerContext",
-           "Point", "Rank", "competition_rank", "peer_context", "quartile"]
+           "Point", "Rank", "competition_rank", "peer_context", "quartile",
+           "tracked_index"]

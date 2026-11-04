@@ -69,6 +69,15 @@ def _spark(navs: list[NavPoint], start: date) -> list[Decimal]:
     return [values[i] for i in lttb_indices(values, SPARK_POINTS)]
 
 
+def side(lead: Decimal) -> str | None:
+    """"ahead" or "behind" its benchmark, or None when the gap rounds to the
+    "0.0 points" the page would show (design critique, 2026-11-04: an index fund
+    read "▲ 0.0 points a year ahead")."""
+    if round(lead * 100, 1) == 0:
+        return None
+    return "ahead" if lead > 0 else "behind"
+
+
 def _tile(key: str, label: str, value: Any, kind: str, context: str | None,
           tone: str | None = None) -> dict[str, Any]:
     """One KPI tile. The figure is formatted by `fmt_tile`; the context line is
@@ -143,7 +152,7 @@ def _summary(fw: FundWindows | None, peers: PeerContext | None) -> str | None:
     said = (f"Over {SAID_PERIOD[key]} it returned "
             f"{format_return(w.return_ann, False)} a year")
     if w.lead_ann is not None:
-        where = ("ahead of" if w.lead_ann > 0 else "behind" if w.lead_ann < 0 else None)
+        where = {"ahead": "ahead of", "behind": "behind"}.get(side(w.lead_ann) or "")
         said += (f", {format_points(w.lead_ann)} a year {where} its benchmark" if where
                  else ", level with its benchmark")
     rank = next((r for r in peers.ranks if r.metric.key == f"return_{key}"),
@@ -184,7 +193,7 @@ def _tiles(fw: FundWindows | None, facts: Any,
             continue
         context, tone = None, None
         if w.bench_return_ann is not None and w.lead_ann is not None:
-            tone = "ahead" if w.lead_ann > 0 else "behind" if w.lead_ann < 0 else None
+            tone = side(w.lead_ann)
             where = {"ahead": "ahead of", "behind": "behind"}.get(tone or "")
             context = (
                 (f"{format_points(w.lead_ann)} a year {where} its benchmark"
@@ -205,8 +214,8 @@ def _tiles(fw: FundWindows | None, facts: Any,
         tiles.append(_tile(
             # Named with its start: beside a 3- or 5-year deepest fall, "Worst
             # fall" alone reads as the same measure (V1-94).
-            "worst_fall", f"Worst fall since {fw.navs[0].nav_date.year}", dd.depth,
-            "fraction",
+            "worst_fall", f"Deepest fall since {fw.navs[0].nav_date.year}", dd.depth,
+            "fall",   # unsigned, as everywhere else (design critique, 2026-11-04)
             f"{format_date(dd.peak)} to {format_date(dd.trough)}; "
             + (f"back at its high {dd.recovery_days:,} days after the low"
                if dd.recovery_days is not None else "not yet back at that high"),

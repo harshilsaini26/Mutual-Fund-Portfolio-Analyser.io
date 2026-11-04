@@ -41,3 +41,13 @@ def test_a_dangling_dash_is_dropped() -> None:
     assert display_name("ICICI PRUDENTIAL LIQUID FUND -") == liquid
     assert display_name("Aditya Birla Sun Life CRISIL-IBX Gilt Index Fund") == (
         "Aditya Birla Sun Life CRISIL-IBX Gilt Index Fund")
+
+
+def test_a_holdings_name_is_recased_and_its_double_spaces_closed() -> None:
+    """Design critique, 2026-11-04: holdings came through as fund houses' files
+    spell them, "POWER GRID CORPORATION OF INDIA LIMITED" and "Bharti Airtel  Ltd."."""
+    assert display_name("POWER GRID CORPORATION OF INDIA LIMITED") == (
+        "Power Grid Corporation of India Limited")
+    assert display_name("Bharti Airtel  Ltd.") == "Bharti Airtel Ltd."
+    assert display_name("HDFC  Charity Fund for Cancer Cure") == (
+        "HDFC Charity Fund for Cancer Cure")

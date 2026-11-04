@@ -12,7 +12,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.m2_fund.peers import SURVIVORSHIP_CAVEAT, Point, Rank, peer_context
+from src.m2_fund.peers import (
+    MIXED,
+    SURVIVORSHIP_CAVEAT,
+    PeerContext,
+    Point,
+    Rank,
+    peer_context,
+)
 from src.m6_views.builder import Scope
 from src.m6_views.builders.fund.common import NO_FUND, FundQuality
 from src.m6_views.compose import ok_envelope
@@ -37,8 +44,8 @@ QUARTERS = {1: "first quarter", 2: "second quarter", 3: "third quarter",
 RANK_ORDER = (
     "Rank 1 is the highest return, the lowest volatility, the smallest fall, the "
     "highest return for the risk and the lowest expense ratio. Each counts only the "
-    "category's funds with that figure -- a year of prices for one-year figures, "
-    "three or five years for those, an expense ratio on record for the cost -- so "
+    "category's funds with that figure (a year of prices for one-year figures, "
+    "three or five years for those, an expense ratio on record for the cost), so "
     "the totals differ."
 )
 #: How the headline names a period, and the history that period needs.
@@ -82,6 +89,18 @@ def figure_words(rank: Rank) -> str:
     return format_fraction(rank.value)
 
 
+def unranked_headline(found: PeerContext, lead: Rank) -> str:
+    """Why a fund has no rank, the reason its rank tile gives too (design
+    critique, 2026-11-04: an index fund was given two different ones)."""
+    n, name = found.in_category, found.category.name
+    if not found.category.ranked:
+        return f"{n} funds share its heading, {name}; it is {MIXED}."
+    if lead.value is None:
+        return (f"{n} funds share its category, {name}; it has too little price "
+                f"history to rank yet.")
+    return f"{n} funds share its category, {name}; {lead.reason}, too few to rank."
+
+
 @register
 class FundPeersBuilder:
     view_id = VIEW_ID
@@ -119,10 +138,7 @@ class FundPeersBuilder:
                 f"{QUARTERS[lead.quartile or 4]}."
             )
         else:
-            headline = (
-                f"{found.in_category} funds share its category, {category}; too "
-                f"few have the history to rank it yet."
-            )
+            headline = unranked_headline(found, lead)
 
         # The picture and the table under it are the same points: every fund in
         # the category with three years of prices, this one marked in words too.
@@ -241,4 +257,5 @@ class FundPeersBuilder:
         )
 
 
-__all__ = ["FundPeersBuilder", "figure_words", "rank_basis", "rank_words"]
+__all__ = ["FundPeersBuilder", "figure_words", "rank_basis", "rank_words",
+           "unranked_headline"]

@@ -355,3 +355,23 @@ def test_the_concentration_view_returns_a_curve_and_its_summary(deps: Deps) -> N
     assert env.payload["curve"][0]["issuer_share"] == Decimal(0)
     assert env.payload["curve"][-1]["exposure_share"] == Decimal(1)
     assert env.payload["hhi"] is not None
+
+
+def test_a_funds_own_holdings_are_not_called_your_portfolio() -> None:
+    """Design critique, 2026-11-04: a liquid fund's page read "16.6% of your
+    portfolio has current holdings data" and "83.4% of your exposure could not be
+    identified": the fund's holdings now carry a coverage figure (audit,
+    2026-10-04), which the wording took for the reader's portfolio."""
+    from decimal import Decimal
+
+    from src.m6_views.builders.fund.common import FundQuality
+    from src.m6_views.caveats import assemble_caveats
+
+    said = assemble_caveats(
+        quality=FundQuality(10, "medium", coverage_pct=Decimal("16.6"),
+                            unresolved_pct=Decimal("83.4")),
+        fund=True,
+    )
+    assert not any("your" in c for c in said), said
+    assert any("83.4% of this fund's portfolio could not be identified" in c
+               for c in said)

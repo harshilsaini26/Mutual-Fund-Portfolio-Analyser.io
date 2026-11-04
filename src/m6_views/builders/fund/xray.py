@@ -38,7 +38,7 @@ COLUMNS = [
     ("return_ann", "Return", "return_ann"),
     ("return_cum", "Cumulative", "fraction"),
     ("volatility_ann", "Volatility", "fraction"),
-    ("max_dd", "Max drawdown", "fall"),
+    ("max_dd", "Deepest fall", "fall"),   # its name everywhere else
     ("confidence", "Confidence", "text"),
     ("sharpe", "Sharpe", "ratio"),
     ("sortino", "Sortino", "ratio"),
@@ -64,11 +64,13 @@ class _Quality:
     unresolved_pct: None = None
 
 
-def _row(key: str, w: ReturnWindow | None) -> dict[str, Any]:
+def _row(key: str, w: ReturnWindow | None, since: str) -> dict[str, Any]:
     """Every column present, None where the window has no figure, so a short
-    history shows as dashes rather than as a missing row."""
+    history shows as dashes rather than as a missing row. The window is named as
+    Returns names it, "3 years" or "Since 01 Jan 2013", not by its key (design
+    critique, 2026-11-04: "since_first_nav")."""
     row: dict[str, Any] = {k: getattr(w, k, None) for k, _, _ in COLUMNS}
-    row["window_key"] = key
+    row["window_key"] = {**PERIODS, "since_first_nav": since}.get(key, key)
     row["max_dd"] = w.drawdown.depth if w else None
     return row
 
@@ -133,7 +135,8 @@ class FundXrayBuilder:
             if cw and k in PERIODS and cw.up_months is not None
             and cw.down_months is not None and min(cw.up_months, cw.down_months) < 12
         )
-        rows = [_row(key, w) for key, w in fw.windows.items()]
+        since = f"Since {format_date(fw.navs[0].nav_date)}"
+        rows = [_row(key, w, since) for key, w in fw.windows.items()]
         return ok_envelope(
             view_id=VIEW_ID,
             scope=scope,

@@ -76,6 +76,7 @@ def assemble_caveats(
     truncated: bool = False,
     extra: list[str] | None = None,
     holdings_as_of: object = None,
+    fund: bool = False,
 ) -> list[str]:
     """§6. The sentences this view must show, in §6.1's order.
 
@@ -99,7 +100,10 @@ def assemble_caveats(
             out.append(
                 f"{dated}{staleness} days old. Funds disclose monthly."
             )
-        if quality.coverage_pct is not None and quality.coverage_pct < COVERAGE_WARN_PCT:
+        # A fund's own holdings (`fund`): the unresolved sentence below says it,
+        # and "your portfolio" is not the fund's (design critique, 2026-11-04).
+        if (not fund and quality.coverage_pct is not None
+                and quality.coverage_pct < COVERAGE_WARN_PCT):
             out.append(
                 f"{format_pct(quality.coverage_pct)} of your portfolio has "
                 f"current holdings data. The rest is shown as unclassified."
@@ -108,10 +112,8 @@ def assemble_caveats(
             quality.unresolved_pct is not None
             and quality.unresolved_pct > UNRESOLVED_WARN_PCT
         ):
-            # A fund has no coverage figure (None): its unresolved share is of
-            # its own portfolio, not of the reader's.
-            whose = ("this fund's portfolio" if quality.coverage_pct is None
-                     else "your exposure")
+            # A fund's unresolved share is of its own portfolio, not the reader's.
+            whose = "this fund's portfolio" if fund else "your exposure"
             out.append(
                 f"{format_pct(quality.unresolved_pct)} of {whose} could "
                 f"not be identified to a company; it is shown as a separate "

@@ -91,6 +91,7 @@ def ok_envelope(
             truncated=truncated,
             extra=extra_caveats,
             holdings_as_of=data_as_of,
+            fund=scope.scope_type == "scheme",
         ),
         state=ViewState.OK,
         state_reason=None,

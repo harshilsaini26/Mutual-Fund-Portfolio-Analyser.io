@@ -203,6 +203,10 @@ class FundPortfolioBuilder:
                 # Each with the tiles' own figure, to two places (G-20).
                 "top": [{**_row(h, name(h.issuer_id)), "label": _pct(h.weight)} for h in
                         sorted(positive, key=lambda h: h.weight, reverse=True)[:TOP]],
+                # Every one it has, when that is fewer: "Its 4 largest holdings"
+                # under "5 holdings" read as one missing (design critique,
+                # 2026-11-04); the fifth was the share not matched to a company.
+                "top_title": _top_title(len(positive), unresolved is not None),
             },
             # "High" is a current fund house's file, nearly all of it placed:
             # the badge's own words are "current, complete, and resolved".
@@ -222,6 +226,17 @@ class FundPortfolioBuilder:
             params=params,
             extra_caveats=caveats,
         )
+
+
+def _top_title(named: int, unmatched: bool) -> str:
+    """The largest-holdings table's heading: every one it has, when that is fewer
+    than `TOP` ("Its 4 largest holdings" under "5 holdings" read as one missing;
+    the fifth was the share not matched to a company; design critique, 2026-11-04)."""
+    if named > TOP:
+        return f"Its {TOP} largest holdings"
+    some = "one holding" if named == 1 else f"{named} holdings"
+    return f"The {some} matched to a company" if unmatched else (
+        "Its one holding" if named == 1 else f"All {named} of its holdings")
 
 
 def _row(h: IssuerWeight, label: str) -> dict[str, Any]:

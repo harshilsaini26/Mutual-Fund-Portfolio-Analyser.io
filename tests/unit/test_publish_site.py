@@ -322,7 +322,8 @@ def test_compare_lines_each_funds_column_up_on_one_edge() -> None:
     body = script[script.index("function table(caption, head, rows)"):]
     body = body[:body.index("\n  }\n")]
     assert "numeric: head.map(function (h, i) { return i > 0; })" in body
-    assert 'fill(box, table("Key facts and returns"' in script
+    facts = 'table("Key facts and returns", [""].concat(funds.map(heading)), rows)'
+    assert facts in script
     css = (static / "app.css").read_text(encoding="utf-8")
     assert re.search(r"\.cmp__table thead th \+ th\s*\{[^}]*text-align:\s*right", css)
 
@@ -982,7 +983,7 @@ def test_every_page_starts_with_a_skip_link(site: Path) -> None:
 
 
 def test_the_public_menu_holds_every_link(site: Path) -> None:
-    """One nav, shown inline on wide screens and as a native popover below 1400px,
+    """One nav, shown inline on wide screens and as a native popover below 1180px,
     opened by a "Menu" button (V1-88): no script needed to open or close it."""
     html = _published(site)["funds"]
     menu = r'<button[^>]*class="topmenu__summary"[^>]*popovertarget="topnav"[^>]*>\s*Menu'
@@ -992,9 +993,10 @@ def test_the_public_menu_holds_every_link(site: Path) -> None:
     assert nav
     links = re.findall(r'class="topnav__link"[^>]*>([^<]+)<', nav.group(1))
     # Each name says what its page is called (Impeccable critique, 2026-11-01).
+    # Categories and About the data are in the footer (design critique, 2026-11-04).
     assert [x.strip() for x in links] == ["Explore funds", "Compare", "SIP look-back",
-                                         "Your portfolio", "Learn", "Categories",
-                                         "About the data"]
+                                         "Your portfolio", "Learn"]
+    assert f'href="{BASE}/#categories">Every category<' in html
     current = re.search(r'aria-current="page"[^>]*>([^<]+)<', nav.group(1))
     assert current and current.group(1).strip() == "Explore funds"
 

@@ -158,3 +158,23 @@ def test_a_gap_between_two_returns_is_in_points() -> None:
     assert format_points(Decimal("-0.0391")) == "3.9 points"
     assert format_points(Decimal("0.012")) == "1.2 points"
     assert format_points(None) == "—"
+
+
+def test_a_figure_that_rounds_to_nothing_carries_no_sign() -> None:
+    """Design critique, 2026-11-04: an index fund read "Ahead of benchmark -0.0%"
+    and "-0.0% p.a.". Rounded to nothing, a figure has no direction to show."""
+    assert format_pct(D("-0.04")) == "0.0%"
+    assert format_pct(D("-0.04"), signed=True) == "+0.0%"
+    assert format_return(D("-0.0004"), annualised=True) == "+0.0% p.a."
+    assert format_pct(D("-0.06")) == "-0.1%"
+
+
+def test_a_fall_too_small_to_show_says_so_rather_than_nothing() -> None:
+    """Design critique, 2026-11-04: a liquid fund's falls read "0.0% 0.0% 0.0%",
+    which says it never fell. It fell, by less than the precision shows."""
+    from src.m6_views.format import format_fraction
+
+    assert format_fraction(D("-0.0002")) == "under 0.1%"
+    assert format_fraction(D("0")) == "0.0%"
+    assert format_fraction(D("-0.0021")) == "0.2%"
+    assert format_fraction(D("-0.00002"), precision=2) == "under 0.01%"

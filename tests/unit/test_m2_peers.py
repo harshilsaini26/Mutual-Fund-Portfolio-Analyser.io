@@ -129,6 +129,33 @@ def test_a_heading_that_mixes_unlike_funds_ranks_none_of_them() -> None:
         assert rank.reason and "do different jobs" in rank.reason
 
 
+def test_an_index_fund_is_ranked_among_the_funds_that_track_its_index() -> None:
+    """Design critique, 2026-11-04: 456 of 550 index funds had no rank, most under
+    AMFI's older undivided heading, so a reader could not see which Nifty 50 fund
+    did best. Funds that track the same index do the same job, whichever heading
+    AMFI filed them under; the index is in the name, after the fund house's."""
+    names = [("uti", "UTI Nifty 50 Index Fund", "Other Scheme - Index Funds"),
+             ("hdfc", "HDFC NIFTY50 Index Fund", "Index Funds - Equity Funds"),
+             ("icici_prudential", "ICICI Prudential Nifty 50 Index Fund",
+              "Other Scheme - Index Funds"),
+             ("sbi", "SBI Nifty 50 Index Fund", "Other Scheme - Index Funds"),
+             ("axis", "Axis Nifty 50 Index Fund - ", "Index Funds - Equity Funds"),
+             ("uti", "UTI Nifty Next 50 Index Fund", "Other Scheme - Index Funds"),
+             ("dsp", "DSP Nifty Next 50 Index Fund", "Other Scheme - Index Funds")]
+    funds = [Fund(f"F{i}", None, name, cat, "direct", "growth", amc)
+             for i, (amc, name, cat) in enumerate(names)]
+    stats = [_stat(f.scheme_id, "3y", f"0.{10 + i}") for i, f in enumerate(funds)]
+    found = peer_context(_Market(funds, stats), "F0")
+    assert found is not None
+    assert found.category.name == "Nifty 50 index funds" and found.category.ranked
+    assert found.in_category == 5   # the Next 50 funds track another index
+    three = next(r for r in found.ranks if r.metric.key == "return_3y")
+    assert (three.rank, three.ranked) == (5, 5)
+    # Too few for a group of their own: AMFI's heading, unranked, as before.
+    alone = peer_context(_Market(funds, stats), "F5")
+    assert alone is not None and not alone.category.ranked
+
+
 def test_a_fund_that_is_not_live_has_no_peer_group() -> None:
     assert peer_context(_Market([_fund("F0", FLEXI_NEW)], []), "GONE") is None
 

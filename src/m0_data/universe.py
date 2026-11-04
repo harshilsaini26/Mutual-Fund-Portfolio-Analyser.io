@@ -9,7 +9,11 @@ term and interval series) that nothing new can be bought in.
 **Direct plan only.** MODULE_2 §11.2 never ranks Direct and Regular together, and
 a Direct plan is the one an investor choosing today would buy. Within it, the
 Growth option before IDCW: IDCW returns are derived from the Growth series
-(`derive/nav_adj.py`), so one share class per fund is the honest count.
+(`derive/nav_adj.py`), so one share class per fund is the honest count. A fund
+whose Direct plan is listed only as IDCW is left out: AMFI misfiles some Growth
+plans ("Regular Plan;Direct" for HSBC Liquid's, blank for Navi Liquid's), and an
+IDCW NAV that pays its income out is no return to rank (design critique,
+2026-11-04: both sat at +0.0% a year at the foot of the liquid category).
 
 One function for the history backfill, the peer groups and the public site, so
 the three can never cover different funds (DECISIONS V1-75).
@@ -39,8 +43,11 @@ def display_name(name: str) -> str:
     """A fund's name as the site shows it: AMFI's spelling, unless it is all in
     capitals ("BANDHAN LARGE CAP FUND"), which is recased with its acronyms and
     small words kept, and without a dash left dangling at its end ("Liquid Fund
-    -"). Display only; matching keeps AMFI's (design review)."""
+    -"), nor a run of spaces ("Bharti Airtel  Ltd."). Display only; matching
+    keeps AMFI's (design review). Holdings' names too (design critique,
+    2026-11-04: "POWER GRID CORPORATION OF INDIA LIMITED")."""
     name = re.sub(r"\s*[-\u2013]+\s*$", "", name)   # a hyphen or an en dash
+    name = " ".join(name.split())
     if any(ch.islower() for ch in name):
         return name
 
@@ -76,7 +83,8 @@ def live_funds(conn: sqlite3.Connection) -> list[Fund]:
     rows = conn.execute(
         "SELECT scheme_id, amfi_code, scheme_name, fund_name, plan, option,"
         " sebi_category, amc_id, scheme_family FROM scheme"
-        " WHERE plan = 'direct' AND last_seen >= date(?, ?)",
+        " WHERE plan = 'direct' AND option NOT IN ('idcw_payout', 'idcw_reinvest')"
+        " AND last_seen >= date(?, ?)",
         (str(latest), f"-{LIVE_WINDOW_DAYS} days"),
     )
     for sid, code, scheme_name, fund_name, plan, option, category, amc, family in rows:

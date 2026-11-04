@@ -188,6 +188,16 @@ def test_issuer_names_come_from_zone_a(provider) -> None:  # type: ignore[no-unt
     assert provider.issuer_name(IssuerId("ACME")) == "Acme Industries Ltd."
 
 
+def test_an_issuer_named_in_capitals_is_shown_recased(provider) -> None:  # type: ignore[no-untyped-def]
+    """Design critique, 2026-11-04: "POWER GRID CORPORATION OF INDIA LIMITED" and
+    "Bharti Airtel  Ltd." as fund houses' files spell them; shown as fund names are."""
+    provider._warehouse.execute(
+        "INSERT INTO issuer (issuer_id, canonical_name) VALUES ('PGCIL', ?)",
+        ("POWER GRID CORPORATION OF INDIA  LIMITED",))
+    assert provider.issuer_name(IssuerId("PGCIL")) == (
+        "Power Grid Corporation of India Limited")
+
+
 def test_an_unknown_issuer_falls_back_to_its_id(provider) -> None:  # type: ignore[no-untyped-def]
     """The id is never wrong. A blank label in a Sankey is a node nobody can
     identify, which is worse than an ugly one."""

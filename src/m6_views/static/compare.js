@@ -92,6 +92,19 @@
       .sort(function (a, b) { return b.total - a.total || (a.name < b.name ? -1 : 1); });
   }
 
+  // The categories, when the funds come from more than one: their returns and
+  // risks are not like for like, so no row is tagged highest or lowest (design
+  // critique, 2026-11-04: a Liquid fund was "highest here" beside flexi caps).
+  function unlike(funds) {
+    var names = [];
+    funds.forEach(function (f) { if (names.indexOf(f.category_name) < 0) names.push(f.category_name); });
+    return names.length > 1 ? names : null;
+  }
+
+  // A company's share of a fund, and "under 0.1%" rather than a "0.0%" that
+  // reads as not held at all (design critique, 2026-11-04).
+  function share(w) { return w > 0 && w < 0.05 ? "under 0.1%" : w.toFixed(1) + "%"; }
+
   // After a fund at `index` is removed: the column now in its place, else the new
   // last one, else none (the picker).
   function nextFocus(idsAfter, index) {
@@ -134,7 +147,7 @@
     starters: starters, sipHash: sipHash, loading: loading, allOf: allOf,
     parseHash: parseHash, writeHash: writeHash, sharedStart: sharedStart,
     growthSeries: growthSeries, highLow: highLow, commonHoldings: commonHoldings,
-    shownFigure: shownFigure, nextFocus: nextFocus, MAX: MAX,
+    shownFigure: shownFigure, nextFocus: nextFocus, unlike: unlike, share: share, MAX: MAX,
   };
   if (typeof module === "object" && module.exports) { module.exports = api; return; }
   window.Compare = api;
@@ -266,15 +279,18 @@
 
   function facts(funds) {
     var box = out("facts");
+    var kinds = unlike(funds);
     var rows = ROWS.map(function (row) {
-      var tags = row[2] ? highLow(funds.map(row[2])) : [];
+      var tags = row[2] && !kinds ? highLow(funds.map(row[2])) : [];
       // Every value on the column's right edge, text and rank too (design review).
       return [[row[0], row[3] && K.termButton(row[3], "cmp")]].concat(funds.map(function (f, i) {
         var text = row[1](f);
         return [text == null ? "—" : text, tags[i] && el("span", { "class": "cmp-tag" }, tags[i] + " here")];
       }));
     });
-    fill(box, table("Key facts and returns", [""].concat(funds.map(heading)), rows),
+    fill(box, kinds && el("p", { "class": "cmp__lead" }, "These funds do different jobs: " +
+        names(kinds) + ". Their returns and risks are not like for like, so none is marked highest or lowest."),
+      table("Key facts and returns", [""].concat(funds.map(heading)), rows),
       funds.length === 1 && note("Add another fund to compare."));
   }
 
@@ -391,7 +407,7 @@
     var byId = {};
     funds.forEach(function (f, i) { byId[f.id] = files[i]; });
     var common = commonHoldings(byId, funds.map(function (f) { return f.id; })).map(function (r) {
-      return [r.name].concat(r.weights.map(function (w) { return w == null ? "—" : pct(w); }));
+      return [r.name].concat(r.weights.map(function (w) { return w == null ? "—" : share(w); }));
     });
     fill.apply(null, [box, shared,
       note("The share of two funds' portfolios in the same companies: 100% would be identical funds, 0% nothing in common."),

@@ -42,6 +42,7 @@ from src.common.types import (
     WeightBasis,
 )
 from src.m0_data.derive.scheme_family import disclosure_scheme_for
+from src.m0_data.universe import display_name
 from src.m3_lookthrough.composition import (
     CompositionRow,
     FundComposition,
@@ -112,14 +113,15 @@ class SqliteLookThroughProvider:
         """Zone A's display name, falling back to the id — which is never wrong.
 
         Cached per instance because the Sankey asks for every issuer it renders
-        and the answer cannot change inside one request.
+        and the answer cannot change inside one request. Recased as fund names
+        are when the file spelt it in capitals (design critique, 2026-11-04).
         """
         key = str(issuer_id)
         if key not in self._names:
             row = self._warehouse.execute(
                 "SELECT canonical_name FROM issuer WHERE issuer_id = ?", (key,)
             ).fetchone()
-            self._names[key] = (row[0] if row and row[0] else key)
+            self._names[key] = display_name(row[0]) if row and row[0] else key
         return self._names[key]
 
     # --- §4.2 exposures and contributions ----------------------------------

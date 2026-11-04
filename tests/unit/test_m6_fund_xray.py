@@ -76,7 +76,9 @@ def test_every_window_is_a_row_measured_against_its_benchmark(deps: Deps) -> Non
     env = build(deps, "S1")
     assert env.state == ViewState.OK, env.state_reason
     rows = env.payload["rows"]
-    assert [r["window_key"] for r in rows] == ["1y", "3y", "5y", "since_first_nav"]
+    # Named as Returns names them (design critique, 2026-11-04).
+    keys = [r["window_key"] for r in rows]
+    assert keys[:3] == ["1 year", "3 years", "5 years"] and keys[3].startswith("Since ")
     assert all(r["beta"] is not None and r["alpha_ann"] is not None for r in rows)
     assert INDEX in env.payload["definition"]
     # Look-through properties, not a fund's: "not applicable", never 100%.

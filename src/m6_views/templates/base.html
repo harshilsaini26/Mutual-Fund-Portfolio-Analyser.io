@@ -108,7 +108,9 @@
     <div class="settings__chips">
       {% for value, label in options %}
       <label class="settings__chip">
-        <input type="radio" name="setting-{{ key }}" value="{{ value }}">
+        {#- Named outright: some readers took the value, "santorini" (design
+            critique, 2026-11-04). -#}
+        <input type="radio" name="setting-{{ key }}" value="{{ value }}" aria-label="{{ label }}">
         {% if key == "theme" and value != "device" %}<span class="settings__swatch settings__swatch--{{ value }}" aria-hidden="true"></span>{% endif %}
         <span>{{ label }}</span>
         {% if key == "font" %}<span class="settings__sample settings__sample--{{ value }}" aria-hidden="true">Aa ₹1,23,456.78</span>{% endif %}
@@ -142,8 +144,9 @@
        {% if active == 'portfolio' %}aria-current="page"{% endif %}>Your portfolio</a>
     <a class="topnav__link" href="{{ root }}/learn/"
        {% if active == 'learn' %}aria-current="page"{% endif %}>Learn</a>
-    <a class="topnav__link" href="{{ root }}/#categories">Categories</a>
-    <a class="topnav__link" href="{{ root }}/#about">About the data</a>
+    {#- Categories and About the data are the front page's own sections, in the
+        footer: here they hid the five pages behind Menu on most laptops (design
+        critique, 2026-11-04). -#}
   </nav>
   {#- The home page's own search is its hero's: one box on its first screen (G-08). -#}
   {% block topbar_search %}{{ search_box() }}{% endblock %}
@@ -226,6 +229,7 @@
         <li><a href="{{ root }}/sip/">What would a SIP have become?</a></li>
         <li><a href="{{ root }}/portfolio/">Your portfolio</a></li>
         <li><a href="{{ root }}/learn/">Learn</a></li>
+        <li><a href="{{ root }}/#categories">Every category</a></li>
       </ul>
     </nav>
     <nav aria-labelledby="foot-data">

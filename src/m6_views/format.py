@@ -98,7 +98,14 @@ def format_pct(
     """
     if v is None:
         return DASH
+    v = _unsigned_zero(v, precision)
     return f"{v:+.{precision}f}%" if signed else f"{v:.{precision}f}%"
+
+
+def _unsigned_zero(v: Decimal, precision: int) -> Decimal:
+    """A figure that rounds to nothing has no direction: "0.0%", never "-0.0%"
+    (design critique, 2026-11-04: "Ahead of benchmark -0.0%")."""
+    return abs(v) if round(v, precision) == 0 else v
 
 
 def format_return(v: Decimal | None, annualised: bool) -> str:
@@ -111,7 +118,7 @@ def format_return(v: Decimal | None, annualised: bool) -> str:
     """
     if v is None:
         return DASH
-    return f"{v * 100:+.1f}%" + (" p.a." if annualised else "")
+    return f"{_unsigned_zero(v * 100, 1):+.1f}%" + (" p.a." if annualised else "")
 
 
 def format_fraction(v: Decimal | None, precision: int = 1) -> str:
@@ -119,10 +126,16 @@ def format_fraction(v: Decimal | None, precision: int = 1) -> str:
 
     Unsigned by design. A drawdown is always a fall, and printing "-41.8%"
     beside the word "fell" says the fall twice.
+
+    A fall too small for the precision is "under 0.1%", not "0.0%", which would
+    say it never fell (design critique, 2026-11-04: a liquid fund's falls).
     """
     if v is None:
         return DASH
-    return f"{abs(v) * 100:.{precision}f}%"
+    pct = abs(v) * 100
+    if pct and round(pct, precision) == 0:
+        return f"under {Decimal(1).scaleb(-precision)}%"
+    return f"{pct:.{precision}f}%"
 
 
 def format_points(v: Decimal | None) -> str:

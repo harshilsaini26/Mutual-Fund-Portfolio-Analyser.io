@@ -87,8 +87,17 @@
   function ticks(kind) {
     if (kind === "inr") return function (v) { return INR.format(v); };
     if (kind === "inr_short") return short;
-    if (kind === "fraction") return function (v) { return Math.round(v * 100) + "%"; };
+    if (kind === "fraction") return percent;
     return function (v) { return String(v); };
+  }
+
+  // A tick at the fewest decimals that keep it exact: 10% on an equity fund's
+  // axis, 0.1% and 0.25% on a liquid fund's, where whole percents all read "0%"
+  // (design critique 3).
+  function percent(v) {
+    var x = v * 100, d = 0;
+    while (d < 2 && Math.abs(Number(x.toFixed(d)) - x) > 1e-9) d++;
+    return x.toFixed(d) + "%";
   }
 
   function number(text) { return text === null ? null : parseFloat(text); }

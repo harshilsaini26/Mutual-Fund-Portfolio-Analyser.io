@@ -87,7 +87,7 @@
 </div>
 {% if env.payload.top %}
 {#- The largest holdings in the page, not only in the file (UI/UX critique F-12). -#}
-<h3 class="panel-sub">Its {{ env.payload.top | length }} largest holdings</h3>
+<h3 class="panel-sub">{{ env.payload.top_title }}</h3>
 <div class="table-wrap" role="region" aria-labelledby="tbl-{{ env.view_id }}-top">
 <table class="table--stack">
   <caption class="sr-only" id="tbl-{{ env.view_id }}-top">Largest holdings</caption>

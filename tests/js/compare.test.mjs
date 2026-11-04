@@ -102,3 +102,16 @@ test("two funds are both, more are all (Impeccable critique, 2026-11-02: \"all 2
   assert.equal(C.allOf(2), "both funds");
   assert.equal(C.allOf(3), "all 3 funds");
 });
+test("unlike names the categories when the funds do different jobs", () => {
+  // Design critique, 2026-11-04: a Liquid fund beside two flexi caps was tagged
+  // "highest here" for its Sharpe ratio and "lowest here" for its fall.
+  const flexi = { category: "equity/flexi_cap", category_name: "Flexi cap" };
+  const liquid = { category: "debt/liquid", category_name: "Liquid" };
+  assert.deepEqual(C.unlike([flexi, flexi, liquid]), ["Flexi cap", "Liquid"]);
+  assert.equal(C.unlike([flexi, flexi]), null);
+});
+test("a shared holding too small to show says so rather than 0.0%", () => {
+  assert.equal(C.share(0.03), "under 0.1%");
+  assert.equal(C.share(2.34), "2.3%");
+  assert.equal(C.share(0), "0.0%");
+});
