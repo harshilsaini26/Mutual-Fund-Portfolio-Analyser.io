@@ -1,0 +1,41 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 92.3% of portfolio value | Unresolved: 7.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 7.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:37:05.577995+00:00
+holding,kind,weight_pct
+ICICI Bank Ltd.,Shares,9.765474
+Not matched to a company,Shares,7.723296
+Bajaj Finance Limited,Shares,6.400593
+Asian Paints Ltd.,Shares,5.587036
+Bajaj Auto Limited,Shares,5.533806
+Tech Mahindra Limited,Shares,5.524399
+Nestle India Ltd.,Shares,5.386300
+AU Small Finance Bank Limited,Shares,5.314433
+Hero MotoCorp Limited,Shares,5.303676
+Coforge Limited,Shares,5.276950
+Marico Limited,Shares,4.609864
+Hindustan Aeronautics Limited,Shares,3.361801
+Cholamandalam Investment and Finance Company Ltd,Shares,3.352759
+Federal Bank Ltd.,Shares,3.326587
+Pidilite Industries Ltd.,Shares,3.320606
+Titan Company Limited,Shares,2.860817
+Oracle Financial Services Software Limited,Shares,2.622252
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.617418
+Mahindra & Mahindra Financial Services Limited,Shares,2.569889
+Aurobindo Pharma Ltd.,Shares,2.441574
+Eicher Motors Ltd.,Shares,2.282921
+HDFC Bank Ltd.,Shares,1.859735
+NMDC Ltd,Shares,0.954534
+Petronet Lng Ltd.,Shares,0.781859
+Oberoi Realty Limited,Shares,0.640352
+L&T Finance Limited,Shares,0.430851
+GlaxoSmithkline Pharmaceuticals Ltd.,Shares,0.386080
+Reliance Industries Ltd,Shares,0.014503
+Net Receivables / Payables,Cash and equivalents,-0.250365

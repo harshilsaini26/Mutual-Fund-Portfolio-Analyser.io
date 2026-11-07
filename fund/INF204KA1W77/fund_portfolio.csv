@@ -1,0 +1,68 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 89.8% of portfolio value | Unresolved: 10.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 10.2% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:35:47.246348+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,39.192177
+Government Securities,Bonds and other debt,10.864648
+Not matched to a company,Bonds and other debt,10.162812
+ICICI Bank Ltd.,Shares,8.288401
+HDFC Bank Ltd.,Shares,7.319524
+Mahindra & Mahindra Ltd.,Shares,5.992120
+Reliance Industries Ltd,Shares,5.254282
+Kotak Mahindra Bank Ltd.,Shares,5.142632
+Bharti Airtel Ltd.,Shares,4.767930
+Ashok Leyland Ltd.,Shares,3.366020
+Brookfield India Real Estate Trust,"REITs, InvITs and other",3.280701
+AXIS Bank Ltd.,Shares,3.160211
+Mindspace Business Parks Reit,"REITs, InvITs and other",3.142007
+Nexus Select Trust,"REITs, InvITs and other",2.697018
+Knowledge Realty Trust,"REITs, InvITs and other",2.096826
+ITC Ltd,Shares,1.866284
+NTPC Limited,Shares,1.564233
+Tata Steel Limited,Shares,1.497923
+Sun Pharmaceutical Industries Ltd.,Shares,1.441070
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.428576
+State Bank Of India,Shares,1.369157
+Infosys Ltd,Shares,1.266830
+Larsen & Toubro Limited,Shares,1.161776
+Cummins India Ltd.,Shares,0.895245
+Coal India Limited,Shares,0.781942
+Max Financial Services Limited,Shares,0.738013
+Maruti Suzuki India Ltd.,Shares,0.731806
+Pidilite Industries Ltd.,Shares,0.639675
+Vedanta Aluminium Metal Limited,Shares,0.637902
+Power Finance Corporation Ltd,Shares,0.612189
+SBI Life Insurance Company Limited,Shares,0.569738
+Grasim Industries Ltd,Shares,0.569294
+AU Small Finance Bank Limited,Shares,0.542897
+Bajaj Finance Limited,Shares,0.515545
+JSW Energy Limited,Shares,0.465207
+ITC Hotels Limited,Shares,0.427229
+HDFC Life Insurance Company Limited,Shares,0.420109
+Tata Consultancy Services Ltd.,Shares,0.413218
+Net Receivables / Payables,Cash and equivalents,0.412492
+Vedanta Ltd.,Shares,0.400133
+HCL Technologies Ltd,Shares,0.330477
+Hindustan Unilever Ltd.,Shares,0.328167
+Tech Mahindra Limited,Shares,0.327576
+Asian Paints Ltd.,Shares,0.322766
+Bharat Electronics Ltd.,Shares,0.312986
+Titan Company Limited,Shares,0.308110
+IndusInd Bank Ltd.,Shares,0.242189
+JSW Steel Limited,Shares,0.227317
+Oil And Natural Gas Corporation Ltd,Shares,0.182004
+Persistent Systems Limited,Shares,0.129571
+Ambuja Cements Ltd.,Shares,0.066324
+Varun Beverages Limited,Shares,0.059190
+Bank Of Baroda,Shares,0.009055
+Cash & Bank Balance,Cash and equivalents,0.008840
+Derivative Positions,Derivatives,-38.950364

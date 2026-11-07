@@ -1,0 +1,27 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 88.9% of portfolio value | Unresolved: 11.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 11.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:36:32.905509+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,21.772735
+TREPS / Repo / Reverse Repo,Cash and equivalents,15.996255
+Not matched to a company,Shares,11.061427
+Bharti Airtel Ltd.,Shares,8.884615
+Sonata Software Ltd.,Shares,8.879967
+Aequs Limited,Shares,8.224192
+Black Box Limited,Shares,7.576849
+HCL Technologies Ltd,Shares,6.576013
+Indus Towers Limited,Shares,6.568075
+Hfcl Limited,Shares,6.276404
+Mphasis Limited,Shares,5.160809
+Digitide Solutions Limited,Shares,4.988711
+Government Securities,Bonds and other debt,4.086430
+Persistent Systems Limited,Shares,2.821935
+Net Receivables / Payables,Cash and equivalents,-18.874417

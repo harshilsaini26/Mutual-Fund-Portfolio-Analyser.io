@@ -1,0 +1,44 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 82.5% of portfolio value | Unresolved: 17.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 17.5% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:37:12.726219+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,17.461165
+Bharti Airtel Ltd.,Shares,8.289881
+ITC Ltd,Shares,8.059321
+Mahindra & Mahindra Ltd.,Shares,7.058958
+TVS Motor Company Ltd.,Shares,4.608572
+Varun Beverages Limited,Shares,4.097769
+InterGlobe Aviation Limited,Shares,4.003405
+Bajaj Auto Limited,Shares,3.924757
+Titan Company Limited,Shares,3.712967
+S.J.S. Enterprises Limited,Shares,2.970105
+Avenue Supermarts Limited,Shares,2.627675
+United Spirits Limited,Shares,2.434265
+One 97 Communications Limited,Shares,2.408447
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.375070
+ICICI Bank Ltd.,Shares,2.260330
+Fortis Healthcare Ltd,Shares,2.223328
+Sapphire Foods India Limited,Shares,2.114151
+Berger Paints India Ltd,Shares,2.107743
+Jubilant Foodworks Limited,Shares,2.099423
+Nestle India Ltd.,Shares,2.005464
+Asian Paints Ltd.,Shares,1.642730
+Tata Motors Limited,Shares,1.619426
+Bikaji Foods International Limited,Shares,1.596017
+Page Industries Ltd.,Shares,1.573502
+Margin / Deposits,Cash and equivalents,1.410067
+Safari Industries (India) Ltd.,Shares,1.359609
+PB Fintech Limited,Shares,1.237850
+LG Electronics India Limited,Shares,1.122698
+Poonawalla Fincorp Limited,Shares,1.031161
+Derivative Positions,Derivatives,0.947447
+Hyundai Motor India Limited,Shares,0.944300
+Net Receivables / Payables,Cash and equivalents,-1.327603

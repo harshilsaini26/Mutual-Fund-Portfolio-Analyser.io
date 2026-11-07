@@ -1,0 +1,26 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 97.0% of portfolio value | Unresolved: 3.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 3.0% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:36:32.056529+00:00
+holding,kind,weight_pct
+TREPS / Repo / Reverse Repo,Cash and equivalents,14.852148
+Derivative Positions,Derivatives,12.383454
+Bharat Heavy Electricals Ltd.,Shares,9.969174
+Life Insurance Corporation of India,Shares,9.962881
+Adani Green Energy Limited,Shares,9.765774
+Lic Housing Finance Ltd.,Shares,9.746595
+PTC India Ltd,Shares,9.301837
+Container Corporation Of India Ltd.,Shares,9.252467
+Cochin Shipyard Limited,Shares,8.145891
+Power Finance Corporation Ltd,Shares,6.357044
+Government Securities,Bonds and other debt,5.089646
+Coal India Limited,Shares,4.872336
+Not matched to a company,Bonds and other debt,2.969591
+Net Receivables / Payables,Cash and equivalents,-12.668838

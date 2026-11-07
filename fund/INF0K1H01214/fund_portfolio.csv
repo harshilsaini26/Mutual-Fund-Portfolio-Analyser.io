@@ -1,0 +1,33 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 95.9% of portfolio value | Unresolved: 4.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 4.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:36:39.169125+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,89.350824
+Cash & Bank Balance,Cash and equivalents,10.970990
+Bharti Airtel Ltd.,Shares,9.316873
+HDFC Bank Ltd.,Shares,7.802491
+Reliance Industries Ltd,Shares,7.082640
+One 97 Communications Limited,Shares,7.024513
+InterGlobe Aviation Limited,Shares,4.892292
+Titan Company Limited,Shares,4.326035
+Vodafone Idea Limited,Shares,4.275607
+Not matched to a company,Shares,4.056957
+Kotak Mahindra Bank Ltd.,Shares,3.852550
+AXIS Bank Ltd.,Shares,3.834457
+Mahindra & Mahindra Ltd.,Shares,3.633900
+Eicher Motors Ltd.,Shares,3.578083
+ITC Ltd,Shares,3.489545
+Bajaj Finance Limited,Shares,3.046856
+ICICI Bank Ltd.,Shares,2.849378
+Hindalco Industries Ltd.,Shares,2.030211
+HDFC Life Insurance Company Limited,Shares,1.765752
+Derivative Positions,Derivatives,-77.179954

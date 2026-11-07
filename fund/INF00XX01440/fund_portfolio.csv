@@ -1,0 +1,46 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 97.1% of portfolio value | Unresolved: 2.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 2.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:34:18.647026+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,65.610615
+Units of Other Schemes,Other funds,14.815718
+Net Receivables / Payables,Cash and equivalents,11.477233
+One 97 Communications Limited,Shares,8.829638
+TREPS / Repo / Reverse Repo,Cash and equivalents,8.369764
+HDFC Bank Ltd.,Shares,5.690822
+Cummins India Ltd.,Shares,4.557352
+Power Finance Corporation Ltd,Shares,4.443388
+Adani Ports and Special Economic Zone Ltd,Shares,3.561474
+Bharti Airtel Ltd.,Shares,3.221896
+Varun Beverages Limited,Shares,3.062068
+Not matched to a company,Shares,2.938683
+AU Small Finance Bank Limited,Shares,2.340291
+IndusInd Bank Ltd.,Shares,2.143710
+RBL Bank Limited,Shares,1.977550
+Godfrey Phillips India Ltd.,Shares,1.928134
+ICICI Lombard General Insurance Company Limited,Shares,1.915163
+National Aluminium Co. Ltd.,Shares,1.776953
+Hindustan Petroleum Corporation Ltd,Shares,1.643377
+Aditya Birla Capital Ltd,Shares,1.639825
+Persistent Systems Limited,Shares,1.528486
+HDFC Life Insurance Company Limited,Shares,1.505013
+Hindustan Zinc Ltd.,Shares,1.498991
+Ambuja Cements Ltd.,Shares,1.455443
+Canara Bank,Shares,1.369429
+Bank of India,Shares,1.255001
+Kalyan Jewellers India Limited,Shares,1.037882
+Max Financial Services Limited,Shares,1.017961
+Amber Enterprises India Limited,Shares,0.927314
+Larsen & Toubro Limited,Shares,0.812886
+ITC Ltd,Shares,0.699848
+Punjab National Bank,Shares,0.558705
+Derivative Positions,Derivatives,-65.610613

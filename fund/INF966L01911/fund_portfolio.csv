@@ -1,0 +1,38 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 88.6% of portfolio value | Unresolved: 11.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 11.4% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:36:27.834791+00:00
+holding,kind,weight_pct
+TREPS / Repo / Reverse Repo,Cash and equivalents,23.915730
+Derivative Positions,Derivatives,15.461539
+Not matched to a company,Shares,11.436848
+Samvardhana Motherson International Limited,Shares,9.284033
+Adani Enterprises Ltd.,Shares,8.050675
+Adani Power Limited,Shares,8.012836
+Aurobindo Pharma Ltd.,Shares,6.872450
+ICICI Prudential Asset Management Company Limited,Shares,6.382128
+Adani Green Energy Limited,Shares,3.669222
+Tata Power Co. Ltd,Shares,2.884903
+Bharti Airtel Ltd.,Shares,2.769072
+Zydus Lifesciences Limited,Shares,2.753317
+Nippon Life India Asset Management Limited,Shares,2.429124
+Government Securities,Bonds and other debt,2.177595
+JSW Infrastructure Limited,Shares,1.947957
+LG Electronics India Limited,Shares,1.391956
+Sona BLW Precision Forgings Limited,Shares,1.320998
+Indus Towers Limited,Shares,1.180458
+Bharat Heavy Electricals Ltd.,Shares,1.072878
+Lic Housing Finance Ltd.,Shares,0.755827
+Lloyds Metals and Energy Limited,Shares,0.656652
+Aditya Birla Lifestyle Brands Limited,Shares,0.416134
+Tata Communications Limited,Shares,0.297988
+IRB Infrastructure Developers Limited,Shares,0.276342
+Colgate-Palmolive (India) Ltd.,Shares,0.241239
+Net Receivables / Payables,Cash and equivalents,-15.657901

@@ -1,0 +1,23 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 14.9% of portfolio value | Unresolved: 85.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 85.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-11-07T00:37:06.935834+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,85.137189
+TREPS / Repo / Reverse Repo,Cash and equivalents,6.907254
+Margin / Deposits,Cash and equivalents,1.887841
+Union Bank of India,Bonds and other debt,1.851810
+Cholamandalam Investment and Finance Company Ltd,Bonds and other debt,1.481431
+Net Receivables / Payables,Cash and equivalents,0.967773
+Motilal Oswal Financial Services Limited,Bonds and other debt,0.754775
+Torrent Power Limited,Bonds and other debt,0.750233
+Government Securities,Bonds and other debt,0.644538
+Godrej Industries Ltd.,Bonds and other debt,0.372292
+Derivative Positions,Derivatives,-0.755136

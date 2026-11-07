@@ -1,0 +1,63 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 93.5% of portfolio value | Unresolved: 6.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 6.5% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:33:33.066114+00:00
+holding,kind,weight_pct
+HDFC Bank Ltd.,Shares,13.837519
+ICICI Bank Ltd.,Shares,13.460473
+Kotak Mahindra Bank Ltd.,Shares,9.355022
+AXIS Bank Ltd.,Shares,8.876141
+Not matched to a company,Shares,6.532102
+State Bank Of India,Shares,5.227487
+SBI Life Insurance Company Limited,Shares,3.154877
+ICICI Lombard General Insurance Company Limited,Shares,2.771896
+Bajaj Finserv Limited,Shares,2.626712
+HDFC Life Insurance Company Limited,Shares,2.626223
+Lic Housing Finance Ltd.,Shares,2.193543
+Anand Rathi Wealth Limited,Shares,1.771815
+Hdb Financial Services Limited,Shares,1.657217
+BSE Ltd.,Shares,1.617060
+Can Fin Homes Ltd.,Shares,1.587483
+Max Financial Services Limited,Shares,1.565731
+PNB Housing Finance Limited,Shares,1.552372
+Margin / Deposits,Cash and equivalents,1.474768
+Bajaj Finance Limited,Shares,1.455149
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.436134
+Life Insurance Corporation of India,Shares,1.427058
+AAVAS Financiers Limited,Shares,1.323698
+Go Digit General Insurance Limited,Shares,1.303099
+Government Securities,Bonds and other debt,1.186586
+UTI Asset Management Company Limited,Shares,0.990145
+Aptus Value Housing Finance India Limited,Shares,0.975073
+Central Bank of India,Shares,0.925344
+Angel One Limited,Shares,0.916024
+Cholamandalam Investment and Finance Company Ltd,Shares,0.892591
+Repco Home Finance Limited,Shares,0.808121
+Multi Commodity Exchange of India Ltd,Shares,0.799905
+Medi Assist Healthcare Services Limited,Shares,0.787835
+ICICI Prudential Life Insurance Company Limited,Shares,0.655820
+Star Health and Allied Insurance Company Limited,Shares,0.473966
+Bajaj Holdings & Investment Limited,Shares,0.423955
+CreditAccess Grameen Ltd.,Shares,0.414916
+Bajaj Housing Finance Limited,Shares,0.384668
+CSB Bank Limited,Shares,0.363248
+General Insurance Corporation of India,Shares,0.285526
+CARE Ratings Limited,Shares,0.280271
+Muthoot Finance Limited,Shares,0.258461
+MAS Financial Services Limited,Shares,0.236489
+ICRA Limited,Shares,0.197888
+CMS Info Systems Limited,Shares,0.192956
+Canara HSBC Life Insurance Company Limited,Shares,0.087444
+Canara Robeco Asset Management Company Limited,Shares,0.075721
+Bank of India,Shares,0.024349
+Bandhan Bank Limited,Shares,0.000820
+Derivative Positions,Derivatives,-0.710135
+Net Receivables / Payables,Cash and equivalents,-0.761566

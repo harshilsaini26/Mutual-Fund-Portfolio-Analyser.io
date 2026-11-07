@@ -1,0 +1,52 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 100.0% of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:35:06.063658+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,67.704210
+Units of Other Schemes,Other funds,25.243623
+TREPS / Repo / Reverse Repo,Cash and equivalents,7.333139
+ICICI Bank Ltd.,Shares,5.985936
+HDFC Bank Ltd.,Shares,5.525480
+Bajaj Finance Limited,Shares,4.812404
+AXIS Bank Ltd.,Shares,4.679080
+Hindalco Industries Ltd.,Shares,4.217460
+Tata Power Co. Ltd,Shares,4.086898
+Kotak Mahindra Bank Ltd.,Shares,3.395195
+Bharti Airtel Ltd.,Shares,3.276192
+Reliance Industries Ltd,Shares,2.977048
+IDFC First Bank Limited,Shares,2.965198
+Tata Steel Limited,Shares,2.800178
+Canara Bank,Shares,2.696005
+Larsen & Toubro Limited,Shares,2.678703
+State Bank Of India,Shares,1.883336
+Jio Financial Services Limited,Shares,1.593206
+Lic Housing Finance Ltd.,Shares,1.503208
+APL Apollo Tubes Limited,Shares,1.393074
+IndusInd Bank Ltd.,Shares,1.238450
+Indus Towers Limited,Shares,1.106942
+ITC Ltd,Shares,1.021452
+UltraTech Cement Ltd,Shares,0.995572
+Bharat Electronics Ltd.,Shares,0.764253
+Hindustan Aeronautics Limited,Shares,0.763526
+Bajaj Finserv Limited,Shares,0.717292
+NTPC Limited,Shares,0.703916
+Life Insurance Corporation of India,Shares,0.643505
+Asian Paints Ltd.,Shares,0.611301
+Ambuja Cements Ltd.,Shares,0.522030
+Lupin Ltd,Shares,0.439084
+Titan Company Limited,Shares,0.233427
+InterGlobe Aviation Limited,Shares,0.217361
+HDFC Life Insurance Company Limited,Shares,0.208420
+Indian Hotels Co. Ltd,Shares,0.158914
+Infosys Ltd,Shares,0.144520
+JSW Steel Limited,Shares,0.061501
+Margin / Deposits,Cash and equivalents,0.050887
+Derivative Positions,Derivatives,-67.351926

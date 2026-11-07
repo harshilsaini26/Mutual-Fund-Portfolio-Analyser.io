@@ -1,0 +1,75 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 99.8% of portfolio value | Unresolved: 0.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:36:15.052389+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,80.702212
+Government Securities,Bonds and other debt,14.580755
+Kotak Mahindra Bank Ltd.,Shares,7.113416
+Reliance Industries Ltd,Shares,6.479520
+Vodafone Idea Limited,Shares,6.078943
+Bharti Airtel Ltd.,Shares,5.730266
+HDFC Bank Ltd.,Shares,5.559595
+Sun Pharmaceutical Industries Ltd.,Shares,4.202843
+Cash & Bank Balance,Cash and equivalents,4.179345
+Adani Enterprises Ltd.,Shares,4.055585
+ICICI Bank Ltd.,Shares,3.432692
+Canara Bank,Shares,3.163167
+UltraTech Cement Ltd,Shares,2.079182
+ITC Ltd,Shares,2.029584
+Biocon Ltd.,Shares,2.013463
+Mahindra & Mahindra Ltd.,Shares,1.861941
+Adani Power Limited,Shares,1.636896
+Bank Of Baroda,Shares,1.610498
+Bajaj Finance Limited,Shares,1.595700
+AXIS Bank Ltd.,Shares,1.470490
+State Bank Of India,Shares,1.411723
+SBI Life Insurance Company Limited,Shares,1.383619
+Tata Steel Limited,Shares,1.296876
+Yes Bank Ltd.,Shares,1.250392
+Steel Authority of India Ltd.,Shares,1.200453
+Eicher Motors Ltd.,Shares,1.189194
+Net Receivables / Payables,Cash and equivalents,0.873398
+Coforge Limited,Shares,0.850369
+Larsen & Toubro Limited,Shares,0.841840
+Asian Paints Ltd.,Shares,0.768488
+Bandhan Bank Limited,Shares,0.766185
+Ambuja Cements Ltd.,Shares,0.765588
+Infosys Ltd,Shares,0.695264
+NTPC Limited,Shares,0.681319
+IDFC First Bank Limited,Shares,0.579820
+Tata Power Co. Ltd,Shares,0.488386
+Indian Energy Exchange Limited,Shares,0.476403
+Pidilite Industries Ltd.,Shares,0.468598
+Lic Housing Finance Ltd.,Shares,0.429620
+Dabur India Ltd.,Shares,0.425526
+Punjab National Bank,Shares,0.424289
+HDFC Life Insurance Company Limited,Shares,0.366759
+Jio Financial Services Limited,Shares,0.347781
+Tata Motors Limited,Shares,0.328846
+Divi's Laboratories Ltd.,Shares,0.277372
+Indus Towers Limited,Shares,0.270549
+Hindustan Aeronautics Limited,Shares,0.268757
+Grasim Industries Ltd,Shares,0.261166
+Crompton Greaves Consumer Electricals Limited,Shares,0.248714
+United Spirits Limited,Shares,0.207858
+Not matched to a company,Shares,0.187260
+Power Grid Corporation of India Limited,Shares,0.168880
+Hindalco Industries Ltd.,Shares,0.140562
+Tata Consumer Products Limited,Shares,0.133611
+Solar Industries India Limited,Shares,0.126020
+Godrej Properties Limited,Shares,0.112842
+One 97 Communications Limited,Shares,0.103759
+InterGlobe Aviation Limited,Shares,0.095656
+Torrent Pharmaceuticals Ltd.,Shares,0.076763
+Titan Company Limited,Shares,0.068447
+JSW Steel Limited,Shares,0.036079
+UPL Limited,Shares,0.031175
+Derivative Positions,Derivatives,-80.702299

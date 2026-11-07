@@ -1,0 +1,50 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 97.7% of portfolio value | Unresolved: 2.3% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 2.3% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:34:54.871022+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,67.793948
+Units of Other Schemes,Other funds,28.863321
+HDFC Bank Ltd.,Shares,8.799796
+ICICI Bank Ltd.,Shares,7.227392
+Hindalco Industries Ltd.,Shares,6.664713
+State Bank Of India,Shares,6.330184
+Reliance Industries Ltd,Shares,5.980458
+Bharti Airtel Ltd.,Shares,4.958130
+Tata Steel Limited,Shares,4.940701
+TREPS / Repo / Reverse Repo,Cash and equivalents,3.397083
+AXIS Bank Ltd.,Shares,3.219249
+HDFC Life Insurance Company Limited,Shares,2.747423
+Bharat Electronics Ltd.,Shares,2.524491
+Jio Financial Services Limited,Shares,2.275105
+Not matched to a company,Shares,2.270312
+Mahindra & Mahindra Ltd.,Shares,1.587962
+Kotak Mahindra Bank Ltd.,Shares,1.587699
+Hindustan Unilever Ltd.,Shares,1.110195
+Punjab National Bank,Shares,0.801563
+NTPC Limited,Shares,0.715075
+IndusInd Bank Ltd.,Shares,0.621301
+Bank Of Baroda,Shares,0.597636
+Container Corporation Of India Ltd.,Shares,0.495721
+Indus Towers Limited,Shares,0.395645
+JSW Steel Limited,Shares,0.361017
+Net Receivables / Payables,Cash and equivalents,0.316378
+Tata Power Co. Ltd,Shares,0.290448
+Bharat Heavy Electricals Ltd.,Shares,0.214792
+Oil And Natural Gas Corporation Ltd,Shares,0.200120
+Sun Pharmaceutical Industries Ltd.,Shares,0.146094
+Crompton Greaves Consumer Electricals Limited,Shares,0.117801
+Titan Company Limited,Shares,0.079037
+ITC Ltd,Shares,0.074376
+Asian Paints Ltd.,Shares,0.039420
+Power Finance Corporation Ltd,Shares,0.027768
+Larsen & Toubro Limited,Shares,0.021597
+Derivative Positions,Derivatives,-67.793951

@@ -1,0 +1,66 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 87.8% of portfolio value | Unresolved: 12.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 12.2% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:33:18.783609+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,17.873295
+Not matched to a company,Shares,12.194731
+Government Securities,Bonds and other debt,7.585252
+Kotak Mahindra Bank Ltd.,Shares,6.298011
+ICICI Bank Ltd.,Shares,5.386612
+One 97 Communications Limited,Shares,4.857209
+Adani Ports and Special Economic Zone Ltd,Shares,4.559904
+Bajaj Finance Limited,Shares,2.953949
+Divi's Laboratories Ltd.,Shares,2.946963
+HDFC Bank Ltd.,Shares,2.671897
+State Bank Of India,Shares,2.559492
+Adani Enterprises Ltd.,Shares,2.532382
+Punjab National Bank,Shares,2.458905
+Bharat Electronics Ltd.,Shares,2.376027
+Embassy Office Parks Reit,"REITs, InvITs and other",2.342724
+Torrent Pharmaceuticals Ltd.,Shares,1.660515
+Vodafone Idea Limited,Shares,1.642580
+PNB Housing Finance Limited,Shares,1.638842
+Reliance Industries Ltd,Shares,1.506274
+AXIS Bank Ltd.,Shares,1.504462
+ICICI Prudential Asset Management Company Limited,Shares,1.478069
+Coforge Limited,Shares,1.433100
+The Phoenix Mills Ltd.,Shares,1.417392
+Multi Commodity Exchange of India Ltd,Shares,1.383863
+Siemens Energy India Limited,Shares,1.341159
+ABB India Limited,Shares,1.328624
+Indegene Limited,Shares,1.328548
+Billionbrains Garage Ventures Limited,Shares,1.299928
+HDFC Asset Management Company Limited,Shares,1.258319
+Bharti Airtel Ltd.,Shares,1.234002
+Fortis Healthcare Ltd,Shares,1.212027
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.110081
+ITC Ltd,Shares,1.037737
+Power Grid Corporation of India Limited,Shares,1.026901
+Cipla Ltd.,Shares,1.015158
+Larsen & Toubro Limited,Shares,1.007984
+Titan Company Limited,Shares,0.995864
+Motilal Oswal Financial Services Limited,Shares,0.946363
+Tata Motors Limited,Shares,0.890595
+Cholamandalam Investment and Finance Company Ltd,Shares,0.871640
+InterGlobe Aviation Limited,Shares,0.860011
+Saregama India Ltd.,Shares,0.828181
+Gokaldas Exports Ltd,Shares,0.779096
+NBCC (India) Limited,Shares,0.666200
+Jio Financial Services Limited,Shares,0.596574
+Coal India Limited,Shares,0.508296
+Tata Steel Limited,Shares,0.497535
+Ather Energy Limited,Shares,0.474125
+Lic Housing Finance Ltd.,Shares,0.400384
+Ambuja Cements Ltd.,Shares,0.355868
+Hindustan Unilever Ltd.,Shares,0.234137
+Net Receivables / Payables,Cash and equivalents,-0.202571
+Derivative Positions,Derivatives,-17.165216

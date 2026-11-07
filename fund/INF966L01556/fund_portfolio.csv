@@ -1,0 +1,29 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 87.1% of portfolio value | Unresolved: 12.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 12.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:36:25.237203+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,12.870356
+Government Securities,Bonds and other debt,11.885233
+Zydus Lifesciences Limited,Shares,9.619496
+Adani Enterprises Ltd.,Shares,9.299189
+TREPS / Repo / Reverse Repo,Cash and equivalents,8.547688
+Adani Green Energy Limited,Shares,8.253240
+Aurobindo Pharma Ltd.,Shares,8.029563
+Divi's Laboratories Ltd.,Shares,7.800605
+Adani Power Limited,Shares,6.681460
+Life Insurance Corporation of India,Shares,5.943169
+Reliance Industries Ltd,Shares,4.544925
+Bharat Heavy Electricals Ltd.,Shares,3.822713
+Infosys Ltd,Shares,2.417499
+Units of Other Schemes,Other funds,0.296550
+Net Receivables / Payables,Cash and equivalents,0.066843
+Derivative Positions,Derivatives,-0.078529

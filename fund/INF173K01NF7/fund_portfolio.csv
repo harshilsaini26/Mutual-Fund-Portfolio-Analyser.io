@@ -1,0 +1,67 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 96.4% of portfolio value | Unresolved: 3.6% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 3.6% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:37:11.521756+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,71.814810
+Units of Other Schemes,Other funds,15.193450
+Government Securities,Bonds and other debt,10.026368
+HDFC Bank Ltd.,Shares,7.963627
+Reliance Industries Ltd,Shares,7.560145
+Ashok Leyland Ltd.,Shares,6.284575
+Bajaj Finance Limited,Shares,6.159533
+ICICI Bank Ltd.,Shares,5.274169
+TREPS / Repo / Reverse Repo,Cash and equivalents,5.069485
+Bharti Airtel Ltd.,Shares,4.416678
+Not matched to a company,Bonds and other debt,3.551424
+AXIS Bank Ltd.,Shares,2.874144
+NMDC Ltd,Shares,2.801298
+Larsen & Toubro Limited,Shares,2.455880
+UPL Limited,Shares,2.200057
+ITC Ltd,Shares,1.843145
+TVS Motor Company Ltd.,Shares,1.841288
+Hindalco Industries Ltd.,Shares,1.420035
+Mahindra & Mahindra Ltd.,Shares,1.402320
+Kotak Mahindra Bank Ltd.,Shares,1.207942
+Marico Limited,Shares,1.173441
+Indian Hotels Co. Ltd,Shares,0.784757
+ICICI Lombard General Insurance Company Limited,Shares,0.777237
+Power Finance Corporation Ltd,Shares,0.699303
+Tata Steel Limited,Shares,0.696425
+Swiggy Limited,Shares,0.686509
+One 97 Communications Limited,Shares,0.677708
+Tech Mahindra Limited,Shares,0.560315
+Jio Financial Services Limited,Shares,0.492131
+Bank Of Baroda,Shares,0.438281
+Bandhan Bank Limited,Shares,0.417001
+Adani Ports and Special Economic Zone Ltd,Shares,0.396538
+Havells India Limited,Shares,0.377319
+Max Financial Services Limited,Shares,0.357042
+RBL Bank Limited,Shares,0.356708
+Angel One Limited,Shares,0.356151
+Bharat Dynamics Limited,Shares,0.350432
+Astral Limited,Shares,0.346068
+Fortis Healthcare Ltd,Shares,0.332438
+Divi's Laboratories Ltd.,Shares,0.327815
+Ather Energy Limited,Shares,0.297677
+KPIT Technologies Ltd,Shares,0.287297
+Maruti Suzuki India Ltd.,Shares,0.233318
+Adani Green Energy Limited,Shares,0.199337
+Kaynes Technology India Limited,Shares,0.195029
+Coal India Limited,Shares,0.191779
+Dabur India Ltd.,Shares,0.176460
+Amber Enterprises India Limited,Shares,0.173470
+Ambuja Cements Ltd.,Shares,0.141680
+Cipla Ltd.,Shares,0.063728
+Bharat Electronics Ltd.,Shares,0.020556
+Indian Energy Exchange Limited,Shares,0.017288
+Net Receivables / Payables,Cash and equivalents,-3.554637
+Derivative Positions,Derivatives,-70.406974

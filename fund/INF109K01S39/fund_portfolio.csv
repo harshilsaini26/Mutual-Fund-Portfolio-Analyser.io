@@ -1,0 +1,73 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 42.5% of portfolio value | Unresolved: 57.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 57.5% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:33:36.371388+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,57.469064
+Government Securities,Bonds and other debt,11.463566
+Derivative Positions,Derivatives,3.822724
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.657062
+Godrej Industries Ltd.,Bonds and other debt,2.231428
+Gabriel India Ltd.,Bonds and other debt,1.518588
+HDFC Bank Ltd.,Shares,1.450250
+SBI Life Insurance Company Limited,Shares,1.426833
+ICICI Bank Ltd.,Shares,1.304454
+AXIS Bank Ltd.,Shares,1.034661
+Dr. Reddy's Laboratories Ltd.,Shares,0.977886
+NTPC Limited,Shares,0.916448
+Britannia Industries Ltd.,Shares,0.817338
+Bharti Airtel Ltd.,Shares,0.764077
+Sun Pharmaceutical Industries Ltd.,Shares,0.760153
+ICICI Lombard General Insurance Company Limited,Shares,0.750125
+Hindustan Unilever Ltd.,Shares,0.724672
+Reliance Industries Ltd,Shares,0.701185
+HDFC Life Insurance Company Limited,Shares,0.691436
+Mahindra & Mahindra Ltd.,Shares,0.656857
+Maruti Suzuki India Ltd.,Shares,0.637413
+Kotak Mahindra Bank Ltd.,Shares,0.635924
+Medplus Health Services Limited,Shares,0.585079
+Aditya Birla Lifestyle Brands Limited,Shares,0.475379
+ICICI Prudential Life Insurance Company Limited,Shares,0.454965
+Infosys Ltd,Shares,0.435044
+Godrej Consumer Products Ltd.,Shares,0.430096
+UPL Limited,Shares,0.427463
+KPIT Technologies Ltd,Shares,0.350565
+Can Fin Homes Ltd.,Shares,0.335072
+Carborundum Universal Ltd.,Shares,0.333491
+Dlf Limited,Shares,0.332421
+Biocon Ltd.,Shares,0.326580
+Margin / Deposits,Cash and equivalents,0.305818
+IndiaMART InterMESH Limited,Shares,0.301946
+Chemplast Sanmar Limited,Shares,0.267404
+Hyundai Motor India Limited,Shares,0.265471
+Mold-Tek Packaging Limited,Shares,0.245985
+V-Guard Industries Ltd.,Shares,0.232058
+Vedanta Aluminium Metal Limited,Shares,0.231740
+Voltamp Transformers Limited,Shares,0.231198
+PG Electroplast Limited,Shares,0.191488
+Medi Assist Healthcare Services Limited,Shares,0.189234
+KNR Constructions Limited,Shares,0.174809
+Tata Motors Limited,Shares,0.163105
+UTI Asset Management Company Limited,Shares,0.151108
+Avanti Feeds ltd.,Shares,0.146478
+Embassy Office Parks Reit,"REITs, InvITs and other",0.112373
+Amrutanjan Health Care Limited,Shares,0.098785
+Jubilant Ingrevia Limited,Shares,0.093522
+Campus Activewear Limited,Shares,0.089470
+Arvind Fashions Limited,Shares,0.063515
+Sagar Cements Ltd,Shares,0.044802
+Dhanuka Agritech Ltd.,Shares,0.040683
+PI Industries Limited,Shares,0.034356
+TeamLease Services Limited,Shares,0.026753
+Mindspace Business Parks Reit,"REITs, InvITs and other",0.023034
+Hindustan Petroleum Corporation Ltd,Shares,0.020481
+Anthem Biosciences Limited,Shares,0.014673
+Birla Corporation Ltd.,Shares,0.008597
+Net Receivables / Payables,Cash and equivalents,-1.667185

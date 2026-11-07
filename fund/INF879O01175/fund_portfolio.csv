@@ -1,0 +1,27 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 26.6% of portfolio value | Unresolved: 73.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 73.4% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:36:16.629655+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,73.405447
+Brookfield India Real Estate Trust,"REITs, InvITs and other",5.059581
+Embassy Office Parks Reit,"REITs, InvITs and other",5.005323
+Knowledge Realty Trust,"REITs, InvITs and other",2.340926
+Petronet Lng Ltd.,Shares,2.091966
+Coal India Limited,Shares,2.072662
+ITC Ltd,Shares,2.024838
+Power Grid Corporation of India Limited,Shares,1.972327
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.281226
+Net Receivables / Payables,Cash and equivalents,1.194719
+Units of Other Schemes,Other funds,1.013489
+Power Finance Corporation Ltd,Shares,0.967594
+Government Securities,Bonds and other debt,0.865350
+Swaraj Engines Ltd.,Shares,0.638777
+Indus Towers Limited,Shares,0.065775

@@ -1,0 +1,60 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 89.3% of portfolio value | Unresolved: 10.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 10.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:34:10.216672+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,39.924922
+Not matched to a company,Bonds and other debt,10.717589
+Units of Other Schemes,Other funds,9.244611
+Government Securities,Bonds and other debt,7.749075
+HDFC Bank Ltd.,Shares,7.466829
+AXIS Bank Ltd.,Shares,7.199533
+Kotak Mahindra Bank Ltd.,Shares,6.302458
+Reliance Industries Ltd,Shares,5.288755
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.958895
+United Spirits Limited,Shares,4.099291
+ICICI Bank Ltd.,Shares,3.715667
+Infosys Ltd,Shares,2.621913
+Hindustan Unilever Ltd.,Shares,2.367406
+Hyundai Motor India Limited,Shares,1.893142
+Ambuja Cements Ltd.,Shares,1.673348
+Bharti Airtel Ltd.,Shares,1.618091
+State Bank Of India,Shares,1.609889
+Mrs. Bectors Food Specialities Limited,Shares,1.503105
+Federal Bank Ltd.,Shares,1.390541
+UltraTech Cement Ltd,Shares,1.225481
+Tata Steel Limited,Shares,1.171604
+Honeywell Automation India Ltd.,Shares,1.122798
+Poly Medicure Ltd,Shares,1.121531
+Tube Investments of India Ltd,Shares,0.974069
+Cholamandalam Investment and Finance Company Ltd,Shares,0.858187
+Bansal Wire Industries Limited,Shares,0.855055
+Power Grid Corporation of India Limited,Shares,0.848903
+Metro Brands Limited,Shares,0.831678
+Sun Pharmaceutical Industries Ltd.,Shares,0.711173
+AU Small Finance Bank Limited,Shares,0.640369
+The Phoenix Mills Ltd.,Shares,0.606029
+Maruti Suzuki India Ltd.,Shares,0.580042
+Indus Towers Limited,Shares,0.567738
+Supreme Industries Ltd.,Shares,0.541825
+IndusInd Bank Ltd.,Shares,0.494063
+Entero Healthcare Solutions Limited,Shares,0.477881
+Bajaj Finance Limited,Shares,0.402416
+Bank Of Baroda,Shares,0.326877
+Indian Hotels Co. Ltd,Shares,0.326019
+SBI Life Insurance Company Limited,Shares,0.316251
+InterGlobe Aviation Limited,Shares,0.297310
+Tata Consumer Products Limited,Shares,0.194702
+Jio Financial Services Limited,Shares,0.171026
+ICICI Lombard General Insurance Company Limited,Shares,0.154136
+Aster DM Healthcare Limited,Shares,0.142950
+Pidilite Industries Ltd.,Shares,0.054622
+Derivative Positions,Derivatives,-37.359795

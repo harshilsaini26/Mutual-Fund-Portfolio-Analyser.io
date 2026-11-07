@@ -1,0 +1,30 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 94.1% of portfolio value | Unresolved: 5.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 5.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:36:29.878193+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,24.981283
+TREPS / Repo / Reverse Repo,Cash and equivalents,24.194353
+ICICI Prudential Asset Management Company Limited,Shares,9.901062
+Adani Green Energy Limited,Shares,8.477336
+Adani Enterprises Ltd.,Shares,8.165446
+Divi's Laboratories Ltd.,Shares,7.432874
+LG Electronics India Limited,Shares,7.394238
+Not matched to a company,Shares,5.927967
+Samvardhana Motherson International Limited,Shares,4.527574
+Government Securities,Bonds and other debt,4.243330
+Capri Global Capital Limited,Shares,3.963165
+Bharti Airtel Ltd.,Shares,3.210815
+Infosys Ltd,Shares,3.122939
+Reliance Industries Ltd,Shares,3.078170
+Coal India Limited,Shares,2.894901
+Zydus Lifesciences Limited,Shares,2.773711
+Life Insurance Corporation of India,Shares,1.139482
+Net Receivables / Payables,Cash and equivalents,-25.428646

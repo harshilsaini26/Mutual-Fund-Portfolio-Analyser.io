@@ -1,0 +1,72 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 80.8% of portfolio value | Unresolved: 19.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 19.2% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:33:21.102122+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,19.224117
+Margin / Deposits,Cash and equivalents,18.264658
+Government Securities,Bonds and other debt,12.190382
+HDFC Bank Ltd.,Shares,5.610613
+ICICI Bank Ltd.,Shares,4.751901
+AXIS Bank Ltd.,Shares,4.163527
+Aurobindo Pharma Ltd.,Shares,4.142145
+Reliance Industries Ltd,Shares,4.026051
+Kotak Mahindra Bank Ltd.,Shares,2.585478
+Larsen & Toubro Limited,Shares,2.550624
+Dlf Limited,Shares,2.428031
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.968885
+Sterlite Technologies Limited.,Shares,1.851712
+Tata Power Co. Ltd,Shares,1.815033
+Bharti Airtel Ltd.,Shares,1.401344
+RBL Bank Limited,Shares,1.368077
+Infosys Ltd,Shares,1.348710
+Radico Khaitan Ltd.,Shares,1.332769
+Mahindra & Mahindra Ltd.,Shares,1.300750
+Sri Lotus Developers and Realty Limited,Shares,1.294652
+GE Vernova T&D India Limited,Shares,1.282401
+State Bank Of India,Shares,1.274104
+Aditya Vision Limited,Shares,1.108748
+R R Kabel Limited,Shares,1.025107
+Polycab India Limited,Shares,0.980009
+Sun Pharmaceutical Industries Ltd.,Shares,0.924228
+Abbott India Ltd.,Shares,0.920022
+Tata Motors Limited,Shares,0.858088
+JSW Steel Limited,Shares,0.850253
+Meesho Limited,Shares,0.849731
+Swiggy Limited,Shares,0.848286
+Tata Consumer Products Limited,Shares,0.805129
+Hindustan Unilever Ltd.,Shares,0.780118
+Time Technoplast Limited,Shares,0.742232
+Sundaram Finance Ltd,Shares,0.738562
+Eicher Motors Ltd.,Shares,0.727538
+NTPC Limited,Shares,0.711556
+Max Healthcare Institute Limited,Shares,0.630737
+Ashok Leyland Ltd.,Shares,0.627576
+Tech Mahindra Limited,Shares,0.620290
+United Spirits Limited,Shares,0.617231
+UltraTech Cement Ltd,Shares,0.594567
+Hindalco Industries Ltd.,Shares,0.590320
+CarTrade Tech Limited,Shares,0.590130
+PNB Housing Finance Limited,Shares,0.569820
+HDFC Asset Management Company Limited,Shares,0.541499
+SBI Life Insurance Company Limited,Shares,0.517844
+Mphasis Limited,Shares,0.511509
+ITC Ltd,Shares,0.473493
+Devyani International Limited,Shares,0.441916
+CreditAccess Grameen Ltd.,Shares,0.431435
+Vinati Organics Ltd.,Shares,0.396262
+Bharat Bijlee Ltd.,Shares,0.355324
+Safari Industries (India) Ltd.,Shares,0.290934
+Can Fin Homes Ltd.,Shares,0.195150
+Billionbrains Garage Ventures Limited,Shares,0.187138
+UNO Minda Limited,Shares,0.138894
+Net Receivables / Payables,Cash and equivalents,-0.102988
+Derivative Positions,Derivatives,-18.264652

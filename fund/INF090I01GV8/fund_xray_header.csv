@@ -1,0 +1,14 @@
+﻿# View: fund_xray_header
+# Question: How has this fund done, and against what?
+# As of: 2026-11-07
+# Data as of: 06 Nov 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - Benchmark comparisons are left out of this public copy: the index data is licensed for personal use. The self-hosted app shows them.
+# Generated: 2026-11-07T00:32:44.395010+00:00
+window_key,obs_days,return_ann,return_cum,volatility_ann,max_dd,confidence,sharpe,sortino,treynor,risk_free_pct,bench_return_ann,beta,tracking_error,alpha_ann,information_ratio,up_capture,down_capture,interpolated_pct
+1 year,365,0.064903,0.064903,0.005083,-0.001163,medium,2.298446,6.321970,,5.3220,,,,,,,,0.000000
+3 years,1096,0.073389,0.236960,0.004293,-0.001163,high,3.043093,11.479789,,6.0325,,,,,,,,0.000000
+5 years,1824,0.067083,0.383292,0.004062,-0.002785,high,2.019941,6.220622,,5.8878,,,,,,,,0.000000
+Since 01 Jan 2013,5057,0.074223,1.696535,0.006185,-0.011585,high,1.928375,4.319812,,6.2296,,,,,,,,0.000000

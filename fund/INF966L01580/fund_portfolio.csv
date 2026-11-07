@@ -1,0 +1,44 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 93.7% of portfolio value | Unresolved: 6.3% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 6.3% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:36:31.271113+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,15.543922
+Units of Other Schemes,Other funds,10.707463
+TREPS / Repo / Reverse Repo,Cash and equivalents,10.083524
+Reliance Industries Ltd,Shares,8.496483
+Bharti Airtel Ltd.,Shares,8.383895
+Adani Enterprises Ltd.,Shares,6.885199
+Not matched to a company,Bonds and other debt,6.313467
+Adani Green Energy Limited,Shares,6.152086
+ICICI Bank Ltd.,Shares,5.204743
+Government Securities,Bonds and other debt,4.663638
+Indus Towers Limited,Shares,4.589057
+Aurobindo Pharma Ltd.,Shares,4.547470
+ICICI Prudential Asset Management Company Limited,Shares,3.084116
+Life Insurance Corporation of India,Shares,2.760024
+Oil And Natural Gas Corporation Ltd,Shares,2.459561
+Zydus Lifesciences Limited,Shares,2.392320
+HDFC Bank Ltd.,Shares,2.057108
+Black Box Limited,Shares,1.723281
+Larsen & Toubro Limited,Shares,1.466698
+Tata Steel Limited,Shares,1.067601
+Premier Energies Limited,Shares,1.025407
+Dlf Limited,Shares,0.816814
+Tata Motors Limited,Shares,0.692590
+Ventive Hospitality Limited,Shares,0.670218
+Bajaj Finserv Limited,Shares,0.482633
+Biocon Ltd.,Shares,0.472102
+Varun Beverages Limited,Shares,0.462593
+Godrej Properties Limited,Shares,0.448632
+Anand Rathi Share and Stock Brokers Limited,Shares,0.378096
+ITC Ltd,Shares,0.242381
+Derivative Positions,Derivatives,-14.273122

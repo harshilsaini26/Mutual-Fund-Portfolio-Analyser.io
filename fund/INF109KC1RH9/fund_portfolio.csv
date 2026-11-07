@@ -1,0 +1,75 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-07
+# Data as of: 30 Sep 2026 (38 days old)
+# Coverage: 93.3% of portfolio value | Unresolved: 6.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 6.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-07T00:33:45.586018+00:00
+holding,kind,weight_pct
+HDFC Bank Ltd.,Shares,8.997080
+Not matched to a company,Shares,6.724281
+ICICI Bank Ltd.,Shares,5.611286
+AXIS Bank Ltd.,Shares,5.118190
+Infosys Ltd,Shares,4.509427
+Life Insurance Corporation of India,Shares,4.220705
+Tata Motors Limited,Shares,3.509439
+Reliance Industries Ltd,Shares,3.453501
+SBI Life Insurance Company Limited,Shares,3.016194
+Bharti Airtel Ltd.,Shares,2.984148
+Info Edge(India) Ltd.,Shares,2.685532
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.680868
+Dr. Reddy's Laboratories Ltd.,Shares,2.652251
+ICICI Lombard General Insurance Company Limited,Shares,2.604240
+Larsen & Toubro Limited,Shares,2.553345
+HDFC Life Insurance Company Limited,Shares,2.470194
+Mahindra & Mahindra Ltd.,Shares,2.349926
+InterGlobe Aviation Limited,Shares,2.074642
+Britannia Industries Ltd.,Shares,2.026187
+Kotak Mahindra Bank Ltd.,Shares,1.869866
+Hindustan Unilever Ltd.,Shares,1.846410
+NTPC Limited,Shares,1.826030
+Sun Pharmaceutical Industries Ltd.,Shares,1.690912
+PI Industries Limited,Shares,1.274715
+UPL Limited,Shares,1.236187
+Tata Communications Limited,Shares,1.026568
+Gland Pharma Limited,Shares,1.004546
+KPIT Technologies Ltd,Shares,0.991467
+UltraTech Cement Ltd,Shares,0.989601
+Vedanta Aluminium Metal Limited,Shares,0.979447
+Tbo Tek Limited,Shares,0.966296
+Avenue Supermarts Limited,Shares,0.960497
+Swiggy Limited,Shares,0.954704
+Tata Consultancy Services Ltd.,Shares,0.896909
+Sona BLW Precision Forgings Limited,Shares,0.767624
+ICICI Prudential Life Insurance Company Limited,Shares,0.731011
+Cipla Ltd.,Shares,0.627025
+Government Securities,Bonds and other debt,0.605410
+Hindustan Aeronautics Limited,Shares,0.585310
+Margin / Deposits,Cash and equivalents,0.565817
+Aditya Birla Lifestyle Brands Limited,Shares,0.562144
+Oil And Natural Gas Corporation Ltd,Shares,0.553920
+Indian Energy Exchange Limited,Shares,0.536883
+Apollo Tyres Ltd,Shares,0.518237
+Aarti Industries Ltd,Shares,0.514327
+Indian Oil Corporation Ltd.,Shares,0.514235
+Delhivery Limited,Shares,0.509319
+Brainbees Solutions Limited,Shares,0.508469
+IndusInd Bank Ltd.,Shares,0.478111
+Oil India Limited,Shares,0.459463
+Tata Chemicals Ltd,Shares,0.372256
+Lic Housing Finance Ltd.,Shares,0.360707
+Net Receivables / Payables,Cash and equivalents,0.355922
+Mphasis Limited,Shares,0.327454
+Chambal Fertilisers & Chemicals Ltd,Shares,0.283325
+KEC International Ltd.,Shares,0.238152
+Bajaj Finserv Limited,Shares,0.225434
+PB Fintech Limited,Shares,0.163204
+Chemplast Sanmar Limited,Shares,0.135334
+State Bank Of India,Shares,0.119659
+REDTAPE Limited,Shares,0.061241
+Derivative Positions,Derivatives,-0.435584
