@@ -178,7 +178,7 @@ def test_performance_sets_each_measure_beside_its_benchmark(
     keys = {c["key"] for c in xray["payload"]["columns"]}
     assert {"sharpe", "sortino", "treynor", "alpha_ann", "beta", "tracking_error",
             "information_ratio", "up_capture", "down_capture"} <= keys
-    three_x = next(r for r in xray["payload"]["rows"] if r["window_key"] == "3 years")
+    three_x = next(r for r in xray["payload"]["rows"] if r["window_key"] == "3y")
     assert three_x["beta"] is not None
 
 
@@ -188,7 +188,7 @@ def test_a_capture_ratio_says_how_few_months_it_rests_on(
     """External audit, 2026-10-04: a one-year capture ratio rests on about six
     rising and six falling months, and the page should say so."""
     env = client.get(f"/api/views/fund_xray_header{QS}&scope_id=S1").json()
-    one = next(r for r in env["payload"]["rows"] if r["window_key"] == "1 year")
+    one = next(r for r in env["payload"]["rows"] if r["window_key"] == "1y")
     assert one["up_capture"] is not None
     caveats = env["quality"]["caveats"]
     note = next((c for c in caveats if "capture" in c), "")
@@ -566,7 +566,7 @@ def test_a_fall_is_written_one_way_everywhere(client: TestClient) -> None:  # no
     # Every figure called the same measure "Max drawdown"; its windows read
     # "since_first_nav", a key rather than a word.
     assert worst["label"] == "Deepest fall"
-    assert "since_first_nav" not in {r["window_key"] for r in xray["payload"]["rows"]}
+    assert "since_first_nav" not in {r["window"] for r in xray["payload"]["rows"]}
     header = client.get(f"/api/views/fund_header{QS}&scope_id=S1").json()
     tile = next(t for t in header["payload"]["tiles"] if t["key"] == "worst_fall")
     assert tile["kind"] == "fall"

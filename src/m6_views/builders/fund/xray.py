@@ -33,7 +33,7 @@ from src.m6_views.states import empty_envelope
 VIEW_ID = "fund_xray_header"
 
 COLUMNS = [
-    ("window_key", "Window", "text"),
+    ("window", "Window", "text"),
     ("obs_days", "Days", "count"),
     ("return_ann", "Return", "return_ann"),
     ("return_cum", "Cumulative", "fraction"),
@@ -66,11 +66,14 @@ class _Quality:
 
 def _row(key: str, w: ReturnWindow | None, since: str) -> dict[str, Any]:
     """Every column present, None where the window has no figure, so a short
-    history shows as dashes rather than as a missing row. The window is named as
-    Returns names it, "3 years" or "Since 01 Jan 2013", not by its key (design
-    critique, 2026-11-04: "since_first_nav")."""
+    history shows as dashes rather than as a missing row. The table names the
+    window as Returns names it, "3 years" or "Since 01 Jan 2013" (design
+    critique, 2026-11-04: "since_first_nav"), in `window`; `window_key` stays the
+    key, which the site build finds its rows by (`publish_site.fund_record`:
+    renaming it blanked every fund's figures there, 2026-11-05 to 11)."""
     row: dict[str, Any] = {k: getattr(w, k, None) for k, _, _ in COLUMNS}
-    row["window_key"] = {**PERIODS, "since_first_nav": since}.get(key, key)
+    row["window_key"] = key
+    row["window"] = {**PERIODS, "since_first_nav": since}.get(key, key)
     row["max_dd"] = w.drawdown.depth if w else None
     return row
 

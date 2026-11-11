@@ -76,14 +76,35 @@ def test_every_window_is_a_row_measured_against_its_benchmark(deps: Deps) -> Non
     env = build(deps, "S1")
     assert env.state == ViewState.OK, env.state_reason
     rows = env.payload["rows"]
-    # Named as Returns names them (design critique, 2026-11-04).
-    keys = [r["window_key"] for r in rows]
-    assert keys[:3] == ["1 year", "3 years", "5 years"] and keys[3].startswith("Since ")
+    # The key stays the key; the table shows a name beside it, as Returns names
+    # its periods (design critique, 2026-11-04).
+    assert [r["window_key"] for r in rows] == ["1y", "3y", "5y", "since_first_nav"]
+    names = [r["window"] for r in rows]
+    assert names[:3] == ["1 year", "3 years", "5 years"] and names[3].startswith("Since ")
+    shown = [c["key"] for c in env.payload["columns"]]
+    assert shown[0] == "window" and "window_key" not in shown
     assert all(r["beta"] is not None and r["alpha_ann"] is not None for r in rows)
     assert INDEX in env.payload["definition"]
     # Look-through properties, not a fund's: "not applicable", never 100%.
     assert env.coverage_pct is None and env.unresolved_pct is None
     assert env.data_as_of == AS_OF and env.staleness_days == 0
+
+
+def test_the_site_build_reads_its_figures_from_every_figures_rows(deps: Deps) -> None:
+    """Regression, 2026-11-11: the window column was renamed to its display name
+    ("3 years"), and the site build, which finds the three-year row by its key,
+    published every fund's return, volatility, fall and Sharpe as blank for a
+    week. The build reads `window_key`; the page shows `window`."""
+    from jobs.publish_site import fund_record
+
+    env = build(deps, "S1")
+    row = {"scheme_id": "S1", "amfi_code": "1", "name": "Fund", "category_key": "k",
+           "category_short": "K", "ter_value": None, "size_value": None,
+           "house": None, "rank_label": None, "size_label": None, "category": None}
+    record = fund_record(row, env, "2013-01-01")
+    # The fixture's prices span one year, not three: the one-year figure is the
+    # one that must arrive.
+    assert record["r1"] is not None and record["labels"]["r1"].endswith("p.a.")
 
 
 def test_a_flat_nav_is_explained_not_reported_as_zero(deps: Deps) -> None:
