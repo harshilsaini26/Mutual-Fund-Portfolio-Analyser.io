@@ -1,0 +1,33 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 85.9% of portfolio value | Unresolved: 14.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 14.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:05.155491+00:00
+holding,kind,weight_pct
+TREPS / Repo / Reverse Repo,Cash and equivalents,16.823820
+Derivative Positions,Derivatives,14.625548
+Not matched to a company,Shares,14.075341
+Samvardhana Motherson International Limited,Shares,9.741860
+Adani Green Energy Limited,Shares,8.261151
+Kalyani Steels Ltd,Shares,7.718069
+Adani Power Limited,Shares,6.630747
+Adani Enterprises Ltd.,Shares,6.114599
+Indus Towers Limited,Shares,4.935333
+Bharat Heavy Electricals Ltd.,Shares,4.850016
+Government Securities,Bonds and other debt,3.781984
+NCC Limited,Shares,3.647430
+Lloyds Metals and Energy Limited,Shares,2.890696
+Mangalam Cement Ltd.,Shares,2.807112
+Simplex Infrastructures Limited,Shares,2.799183
+Tata Power Co. Ltd,Shares,2.484745
+Om Infra Limited,Shares,0.945464
+Bharat Bijlee Ltd.,Shares,0.878152
+Orissa Minerals Development Company Limited,Shares,0.572698
+Ravindra Energy Limited,Shares,0.160307
+Net Receivables / Payables,Cash and equivalents,-14.744255

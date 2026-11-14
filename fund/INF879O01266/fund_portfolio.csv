@@ -1,0 +1,49 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 43.2% of portfolio value | Unresolved: 56.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 56.8% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:11:54.568675+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,56.776508
+Margin / Deposits,Cash and equivalents,7.790586
+Brookfield India Real Estate Trust,"REITs, InvITs and other",5.598082
+Embassy Office Parks Reit,"REITs, InvITs and other",5.565886
+Coal India Limited,Shares,3.022969
+Petronet Lng Ltd.,Shares,2.812762
+Units of Other Schemes,Other funds,2.769429
+Power Grid Corporation of India Limited,Shares,2.606294
+Knowledge Realty Trust,"REITs, InvITs and other",2.502577
+ITC Ltd,Shares,2.474230
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.351025
+HDFC Bank Ltd.,Shares,1.616787
+Bharti Airtel Ltd.,Shares,1.525533
+Reliance Industries Ltd,Shares,1.523034
+Government Securities,Bonds and other debt,1.179927
+Nesco Ltd,Shares,1.057748
+Swaraj Engines Ltd.,Shares,0.996223
+Power Finance Corporation Ltd,Shares,0.956435
+Net Receivables / Payables,Cash and equivalents,0.806242
+VST Industries Ltd.,Shares,0.719868
+Kotak Mahindra Bank Ltd.,Shares,0.717791
+Coforge Limited,Shares,0.669136
+UltraTech Cement Ltd,Shares,0.348197
+Mahindra & Mahindra Ltd.,Shares,0.319116
+Tata Steel Limited,Shares,0.296138
+Titan Company Limited,Shares,0.158456
+NMDC Ltd,Shares,0.140742
+Bajaj Finserv Limited,Shares,0.120962
+Aditya Birla Capital Ltd,Shares,0.093161
+Bharat Heavy Electricals Ltd.,Shares,0.090425
+Indus Towers Limited,Shares,0.054865
+Dlf Limited,Shares,0.050558
+SBI Life Insurance Company Limited,Shares,0.042697
+Ambuja Cements Ltd.,Shares,0.033664
+Bandhan Bank Limited,Shares,0.002535
+Derivative Positions,Derivatives,-7.790588

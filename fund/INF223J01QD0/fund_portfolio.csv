@@ -1,0 +1,69 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 87.0% of portfolio value | Unresolved: 13.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 13.0% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:11:57.776716+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,47.316260
+Not matched to a company,"REITs, InvITs and other",12.974946
+Government Securities,Bonds and other debt,12.378973
+Tata Steel Limited,Shares,7.830140
+Adani Ports and Special Economic Zone Ltd,Shares,6.350207
+Reliance Industries Ltd,Shares,6.151077
+HDFC Bank Ltd.,Shares,6.089125
+Titan Company Limited,Shares,5.790519
+Bajaj Finance Limited,Shares,5.556342
+Brookfield India Real Estate Trust,"REITs, InvITs and other",4.966564
+NMDC Ltd,Shares,4.389530
+Cash & Bank Balance,Cash and equivalents,3.562035
+Kotak Mahindra Bank Ltd.,Shares,3.111028
+Ambuja Cements Ltd.,Shares,2.621434
+AXIS Bank Ltd.,Shares,2.432039
+ICICI Bank Ltd.,Shares,1.900318
+Bharti Airtel Ltd.,Shares,1.142032
+State Bank Of India,Shares,0.927326
+Larsen & Toubro Limited,Shares,0.831920
+Infosys Ltd,Shares,0.684476
+Hindustan Unilever Ltd.,Shares,0.598629
+Mahindra & Mahindra Ltd.,Shares,0.478797
+Tata Consultancy Services Ltd.,Shares,0.464990
+Max Healthcare Institute Limited,Shares,0.400738
+Sun Pharmaceutical Industries Ltd.,Shares,0.393835
+Torrent Pharmaceuticals Ltd.,Shares,0.369585
+NTPC Limited,Shares,0.305509
+Bharat Electronics Ltd.,Shares,0.300553
+TVS Motor Company Ltd.,Shares,0.295066
+JSW Steel Limited,Shares,0.273826
+InterGlobe Aviation Limited,Shares,0.267277
+Nestle India Ltd.,Shares,0.266922
+ITC Ltd,Shares,0.266391
+Maruti Suzuki India Ltd.,Shares,0.243558
+UltraTech Cement Ltd,Shares,0.236655
+Tech Mahindra Limited,Shares,0.233823
+Tata Consumer Products Limited,Shares,0.225680
+Power Grid Corporation of India Limited,Shares,0.213821
+Asian Paints Ltd.,Shares,0.192227
+Hindalco Industries Ltd.,Shares,0.192050
+Eicher Motors Ltd.,Shares,0.191165
+Persistent Systems Limited,Shares,0.167269
+Divi's Laboratories Ltd.,Shares,0.157888
+Varun Beverages Limited,Shares,0.157711
+Samvardhana Motherson International Limited,Shares,0.139302
+HDFC Life Insurance Company Limited,Shares,0.137886
+Muthoot Finance Limited,Shares,0.129390
+SBI Life Insurance Company Limited,Shares,0.119124
+United Spirits Limited,Shares,0.118239
+LG Electronics India Limited,Shares,0.114345
+Mankind Pharma Limited,Shares,0.109389
+ICICI Lombard General Insurance Company Limited,Shares,0.107796
+Solar Industries India Limited,Shares,0.062837
+Cipla Ltd.,Shares,0.057703
+ICICI Prudential Asset Management Company Limited,Shares,0.049384
+Derivative Positions,Derivatives,-45.045651

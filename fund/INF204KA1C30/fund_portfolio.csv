@@ -1,0 +1,35 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 98.8% of portfolio value | Unresolved: 1.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:11:49.616229+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,74.918716
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.198891
+ICICI Bank Ltd.,Shares,2.866765
+State Bank Of India,Shares,2.081154
+Net Receivables / Payables,Cash and equivalents,1.682637
+Reliance Industries Ltd,Shares,1.544761
+HDFC Bank Ltd.,Shares,1.537169
+Larsen & Toubro Limited,Shares,1.291277
+Not matched to a company,Shares,1.171982
+AXIS Bank Ltd.,Shares,1.152316
+Samvardhana Motherson International Limited,Shares,1.133157
+NTPC Limited,Shares,1.108430
+Mahindra & Mahindra Ltd.,Shares,0.853139
+Dixon Technologies (India) Limited,Shares,0.710347
+Cummins India Ltd.,Shares,0.688295
+Infosys Ltd,Shares,0.660605
+Tata Consultancy Services Ltd.,Shares,0.444789
+Mishra Dhatu Nigam Limited,Shares,0.440813
+SBI Life Insurance Company Limited,Shares,0.429245
+Crompton Greaves Consumer Electricals Limited,Shares,0.301708
+Kaynes Technology India Limited,Shares,0.284283
+Sun Pharmaceutical Industries Ltd.,Shares,0.262666
+Tube Investments of India Ltd,Shares,0.206055
+Cash & Bank Balance,Cash and equivalents,0.030800

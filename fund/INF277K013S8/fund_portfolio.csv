@@ -1,0 +1,73 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 73.9% of portfolio value | Unresolved: 26.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 26.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:49.851666+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,26.139857
+Government Securities,Bonds and other debt,10.675727
+Reliance Industries Ltd,Shares,4.207824
+HDFC Bank Ltd.,Shares,3.067066
+Bharti Airtel Ltd.,Shares,3.008312
+ICICI Bank Ltd.,Shares,2.435261
+Larsen & Toubro Limited,Shares,2.001484
+Net Receivables / Payables,Cash and equivalents,1.842071
+Brookfield India Real Estate Trust,"REITs, InvITs and other",1.738892
+Godrej Properties Limited,Shares,1.568007
+State Bank Of India,Shares,1.560779
+Adani Ports and Special Economic Zone Ltd,Shares,1.550951
+Dr. Lal Pathlabs Limited,Shares,1.515991
+Sun Pharmaceutical Industries Ltd.,Shares,1.466884
+Federal Bank Ltd.,Shares,1.460936
+Mahindra & Mahindra Ltd.,Shares,1.446336
+Cummins India Ltd.,Shares,1.433638
+Bajaj Finserv Limited,Shares,1.418921
+AXIS Bank Ltd.,Shares,1.351732
+Tata Steel Limited,Shares,1.290827
+NTPC Limited,Shares,1.260746
+Nexus Select Trust,"REITs, InvITs and other",1.259156
+Adani Enterprises Ltd.,Shares,1.258045
+Bajaj Finance Limited,Shares,1.255468
+Margin / Deposits,Cash and equivalents,1.242628
+Infosys Ltd,Shares,1.222896
+Hindustan Unilever Ltd.,Shares,1.203366
+Niva Bupa Health Insurance Company Limited,Shares,1.164408
+Max Financial Services Limited,Shares,1.122492
+Tenneco Clean Air India Limited,Shares,1.070292
+PB Fintech Limited,Shares,1.014303
+Oil And Natural Gas Corporation Ltd,Shares,1.011226
+Delhivery Limited,Shares,1.005244
+Tech Mahindra Limited,Shares,0.991496
+Inventurus Knowledge Solutions Limited,Shares,0.959522
+Ambuja Cements Ltd.,Shares,0.949359
+Vedanta Ltd.,Bonds and other debt,0.937719
+Varun Beverages Limited,Shares,0.910305
+HDFC Life Insurance Company Limited,Shares,0.898369
+Prestige Estates Projects Limited,Shares,0.892096
+ICICI Lombard General Insurance Company Limited,Shares,0.883169
+One 97 Communications Limited,Shares,0.815412
+Sedemac Mechatronics Limited,Shares,0.793038
+Vishal Mega Mart Limited,Shares,0.762484
+CarTrade Tech Limited,Shares,0.762270
+Life Insurance Corporation of India,Shares,0.745813
+Vedanta Aluminium Metal Limited,Shares,0.733858
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.636474
+KEC International Ltd.,Shares,0.517174
+Dabur India Ltd.,Shares,0.489988
+Metropolis Healthcare Limited,Shares,0.450243
+Power Grid Corporation of India Limited,Shares,0.350709
+Physical Commodity,Bonds and other debt,0.210352
+Bharat Electronics Ltd.,Shares,0.148612
+Polycab India Limited,Shares,0.111541
+UNO Minda Limited,Shares,0.019731
+Max Healthcare Institute Limited,Shares,0.000480
+IndusInd Bank Ltd.,Shares,0.000394
+ITC Ltd,Shares,0.000057
+Derivative Positions,Derivatives,-1.242431

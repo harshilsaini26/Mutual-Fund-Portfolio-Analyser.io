@@ -1,0 +1,33 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 73.9% of portfolio value | Unresolved: 26.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 26.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:09:57.279159+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,48.476548
+Not matched to a company,Bonds and other debt,26.061597
+TREPS / Repo / Reverse Repo,Cash and equivalents,3.607384
+Net Receivables / Payables,Cash and equivalents,2.322234
+Life Insurance Corporation of India,Shares,2.090966
+Samvardhana Motherson International Limited,Shares,1.755874
+Mahindra & Mahindra Ltd.,Shares,1.603235
+Kotak Mahindra Bank Ltd.,Shares,1.539618
+Hindustan Aeronautics Limited,Shares,1.423092
+Swiggy Limited,Shares,1.378371
+Titan Company Limited,Shares,1.203896
+HDFC Bank Ltd.,Shares,1.091779
+V-Mart Retail Limited,Shares,1.049157
+InterGlobe Aviation Limited,Shares,1.004541
+Tata Steel Limited,Shares,0.984071
+Nippon Life India Asset Management Limited,Shares,0.922238
+Tata Consumer Products Limited,Shares,0.849593
+Motherson Sumi Wiring India Limited,Shares,0.702518
+Pfizer Ltd.,Shares,0.669239
+Jindal Stainless Limited,Shares,0.666090
+Biocon Ltd.,Shares,0.597959

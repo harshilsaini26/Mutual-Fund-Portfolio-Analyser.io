@@ -1,0 +1,22 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 81.3% of portfolio value | Unresolved: 18.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 18.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:13:01.951155+00:00
+holding,kind,weight_pct
+Dlf Limited,Shares,20.390050
+Not matched to a company,Shares,18.718385
+The Phoenix Mills Ltd.,Shares,17.059035
+Prestige Estates Projects Limited,Shares,11.793925
+Godrej Properties Limited,Shares,10.391729
+Oberoi Realty Limited,Shares,9.805775
+Brigade Enterprises Limited,Shares,5.032424
+Anant Raj Limited,Shares,4.311016
+Sobha Limited,Shares,2.566268
+Net Receivables / Payables,Cash and equivalents,-0.068607

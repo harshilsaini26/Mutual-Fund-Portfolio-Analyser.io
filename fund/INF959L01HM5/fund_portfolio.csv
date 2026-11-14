@@ -1,0 +1,23 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 96.0% of portfolio value | Unresolved: 4.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 4.0% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:11:22.170693+00:00
+holding,kind,weight_pct
+Infosys Ltd,Shares,31.167539
+Tata Consultancy Services Ltd.,Shares,18.996903
+HCL Technologies Ltd,Shares,11.759049
+Tech Mahindra Limited,Shares,10.429569
+Coforge Limited,Shares,6.562296
+Persistent Systems Limited,Shares,6.185810
+Wipro Ltd.,Shares,4.625053
+Not matched to a company,Shares,4.047582
+Mphasis Limited,Shares,3.073432
+Oracle Financial Services Software Limited,Shares,2.734450
+Net Receivables / Payables,Cash and equivalents,0.418317

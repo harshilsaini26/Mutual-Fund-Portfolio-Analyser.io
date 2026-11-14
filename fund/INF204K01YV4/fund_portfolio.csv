@@ -1,0 +1,66 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 30.1% of portfolio value | Unresolved: 69.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 69.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:11:24.628613+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,69.861798
+TREPS / Repo / Reverse Repo,Cash and equivalents,12.510211
+Brookfield India Real Estate Trust,"REITs, InvITs and other",1.521519
+Mindspace Business Parks Reit,"REITs, InvITs and other",1.453363
+Nexus Select Trust,"REITs, InvITs and other",1.198455
+Knowledge Realty Trust,"REITs, InvITs and other",1.160580
+Government Securities,Bonds and other debt,1.001663
+HDFC Bank Ltd.,Shares,0.853931
+Reliance Industries Ltd,Shares,0.761338
+ICICI Bank Ltd.,Shares,0.749272
+Net Receivables / Payables,Cash and equivalents,0.699302
+AU Small Finance Bank Limited,Shares,0.672039
+State Bank Of India,Shares,0.411728
+Larsen & Toubro Limited,Shares,0.392632
+Infosys Ltd,Shares,0.341781
+AXIS Bank Ltd.,Shares,0.324466
+Mahindra & Mahindra Ltd.,Shares,0.315747
+Maruti Suzuki India Ltd.,Shares,0.300284
+Bharti Airtel Ltd.,Shares,0.294952
+Bajaj Finance Limited,Shares,0.285804
+ITC Ltd,Shares,0.283941
+SBI Life Insurance Company Limited,Shares,0.259002
+Kotak Mahindra Bank Ltd.,Shares,0.257129
+Tata Consultancy Services Ltd.,Shares,0.253230
+Coal India Limited,Shares,0.251797
+Sun Pharmaceutical Industries Ltd.,Shares,0.219306
+Titan Company Limited,Shares,0.214005
+Bajaj Auto Limited,Shares,0.213994
+Hindustan Unilever Ltd.,Shares,0.187602
+JSW Energy Limited,Shares,0.177194
+NTPC Limited,Shares,0.171474
+IndusInd Bank Ltd.,Shares,0.167084
+Tata Steel Limited,Shares,0.166214
+Hindalco Industries Ltd.,Shares,0.153821
+HCL Technologies Ltd,Shares,0.145562
+UltraTech Cement Ltd,Shares,0.141490
+JSW Steel Limited,Shares,0.135513
+Grasim Industries Ltd,Shares,0.132760
+Power Grid Corporation of India Limited,Shares,0.132740
+Divi's Laboratories Ltd.,Shares,0.132361
+Asian Paints Ltd.,Shares,0.121114
+Bajaj Finserv Limited,Shares,0.117093
+Eicher Motors Ltd.,Shares,0.111515
+Nestle India Ltd.,Shares,0.104567
+Oil And Natural Gas Corporation Ltd,Shares,0.098468
+Dr. Reddy's Laboratories Ltd.,Shares,0.083721
+Cipla Ltd.,Shares,0.081367
+Cash & Bank Balance,Cash and equivalents,0.069066
+Tata Consumer Products Limited,Shares,0.066037
+Britannia Industries Ltd.,Shares,0.063765
+Tata Motors Limited,Shares,0.056848
+HDFC Life Insurance Company Limited,Shares,0.054187
+Wipro Ltd.,Shares,0.052468
+ITC Hotels Limited,Shares,0.012700

@@ -1,0 +1,16 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 6.0% of portfolio value | Unresolved: 94.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 94.0% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-11-14T01:08:15.502806+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,93.957840
+Government Securities,Bonds and other debt,2.340911
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.413726
+Union Bank of India,Bonds and other debt,1.307650
+Net Receivables / Payables,Cash and equivalents,0.979873

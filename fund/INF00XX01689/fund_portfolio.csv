@@ -1,0 +1,68 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 72.5% of portfolio value | Unresolved: 27.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 27.5% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:10:12.677689+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,27.460219
+HDFC Bank Ltd.,Shares,4.331684
+Reliance Industries Ltd,Shares,4.256233
+Net Receivables / Payables,Cash and equivalents,3.254441
+ICICI Bank Ltd.,Shares,3.149943
+Wockhardt Ltd,Shares,2.520485
+Laurus Labs Limited,Shares,2.374294
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.373544
+Ujjivan Small Finance Bank Limited,Shares,2.124010
+HDFC Life Insurance Company Limited,Shares,2.031847
+Bajaj Auto Limited,Shares,1.593085
+Government Securities,Bonds and other debt,1.575440
+Redington Limited,Shares,1.436119
+RBL Bank Limited,Shares,1.399142
+Divi's Laboratories Ltd.,Shares,1.378654
+Dr. Lal Pathlabs Limited,Shares,1.326374
+AXIS Bank Ltd.,Shares,1.304356
+IIFL Finance Limited,Shares,1.259852
+Gujarat Fluorochemicals Limited,Shares,1.232588
+Solar Industries India Limited,Shares,1.220657
+Titan Company Limited,Shares,1.175560
+Voltamp Transformers Limited,Shares,1.173311
+Hindalco Industries Ltd.,Shares,1.162662
+Balrampur Chini Mills Ltd.,Shares,1.160444
+LG Electronics India Limited,Shares,1.147265
+Yes Bank Ltd.,Shares,1.139520
+Kirloskar Oil Engines Limited,Shares,1.133398
+Aditya Birla Capital Ltd,Shares,1.130369
+Grasim Industries Ltd,Shares,1.122655
+TVS Motor Company Ltd.,Shares,1.120906
+AU Small Finance Bank Limited,Shares,1.118876
+Aarti Industries Ltd,Shares,1.109007
+One 97 Communications Limited,Shares,1.105853
+IDFC First Bank Limited,Shares,1.097827
+Bharat Heavy Electricals Ltd.,Shares,1.096484
+ramkrishna forgings Ltd.,Shares,1.067564
+Multi Commodity Exchange of India Ltd,Shares,1.066721
+Piramal Pharma Limited,Shares,1.062411
+Garware Hi-Tech Films Limited,Shares,1.050137
+Glenmark Pharmaceuticals ltd,Shares,1.036271
+State Bank Of India,Shares,1.023216
+BEML Ltd,Shares,1.008662
+Hindustan Copper Ltd.,Shares,0.996826
+Poonawalla Fincorp Limited,Shares,0.990205
+Vedanta Ltd.,Shares,0.988269
+Margin / Deposits,Cash and equivalents,0.986364
+LT Foods Limited,Shares,0.961504
+Infosys Ltd,Shares,0.934958
+Bajaj Finance Limited,Shares,0.734737
+Turtlemint Fintech Solutions Limited,Shares,0.596821
+Cholamandalam Investment and Finance Company Ltd,Shares,0.562093
+Ather Energy Limited,Shares,0.522024
+Bandhan Bank Limited,Shares,0.496820
+Inox Green Energy Services Limited,Shares,0.303657
+Derivative Positions,Derivatives,-0.986364

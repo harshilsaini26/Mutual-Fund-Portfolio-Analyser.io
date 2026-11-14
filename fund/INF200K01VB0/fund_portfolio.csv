@@ -1,0 +1,21 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 25.3% of portfolio value | Unresolved: 74.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 74.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-11-14T01:12:30.771066+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,74.713078
+Government Securities,Bonds and other debt,15.194685
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.828305
+Derivative Positions,Derivatives,1.480062
+Embassy Office Parks Reit,"REITs, InvITs and other",1.150575
+Mindspace Business Parks Reit,"REITs, InvITs and other",0.893113
+Cholamandalam Investment and Finance Company Ltd,Bonds and other debt,0.764104
+Motilal Oswal Financial Services Limited,Bonds and other debt,0.700747
+Brookfield India Real Estate Trust,"REITs, InvITs and other",0.366465
+Net Receivables / Payables,Cash and equivalents,-0.091134

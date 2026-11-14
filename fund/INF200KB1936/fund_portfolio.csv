@@ -1,0 +1,44 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 96.2% of portfolio value | Unresolved: 3.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 3.8% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:34.712967+00:00
+holding,kind,weight_pct
+ICICI Bank Ltd.,Shares,3.844228
+Sun Pharmaceutical Industries Ltd.,Shares,3.820352
+Not matched to a company,Shares,3.808899
+NTPC Limited,Shares,3.793952
+Britannia Industries Ltd.,Shares,3.678066
+Bharti Airtel Ltd.,Shares,3.650696
+Kotak Mahindra Bank Ltd.,Shares,3.630897
+SBI Life Insurance Company Limited,Shares,3.617697
+Nestle India Ltd.,Shares,3.525881
+ITC Ltd,Shares,3.497929
+Reliance Industries Ltd,Shares,3.468812
+Tata Power Co. Ltd,Shares,3.424748
+Cipla Ltd.,Shares,3.418342
+Power Grid Corporation of India Limited,Shares,3.393690
+HDFC Bank Ltd.,Shares,3.391943
+Hindustan Unilever Ltd.,Shares,3.374084
+Torrent Pharmaceuticals Ltd.,Shares,3.318956
+HDFC Life Insurance Company Limited,Shares,3.272175
+Dr. Reddy's Laboratories Ltd.,Shares,3.230828
+Maruti Suzuki India Ltd.,Shares,3.166188
+UltraTech Cement Ltd,Shares,3.156095
+Bajaj Auto Limited,Shares,3.126007
+State Bank Of India,Shares,3.082914
+Asian Paints Ltd.,Shares,3.042732
+Bajaj Finserv Limited,Shares,3.019439
+Titan Company Limited,Shares,3.014003
+Pidilite Industries Ltd.,Shares,2.971298
+Larsen & Toubro Limited,Shares,2.860265
+Wipro Ltd.,Shares,2.823966
+Tata Consultancy Services Ltd.,Shares,2.586177
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.268921
+Net Receivables / Payables,Cash and equivalents,-1.280180

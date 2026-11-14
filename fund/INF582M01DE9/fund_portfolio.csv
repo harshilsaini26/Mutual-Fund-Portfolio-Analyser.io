@@ -1,0 +1,87 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 70.1% of portfolio value | Unresolved: 29.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 29.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:13:12.516067+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,29.925369
+HDFC Bank Ltd.,Shares,4.777026
+ICICI Bank Ltd.,Shares,3.904319
+TREPS / Repo / Reverse Repo,Cash and equivalents,3.832291
+Bharti Airtel Ltd.,Shares,2.893026
+Reliance Industries Ltd,Shares,2.845935
+State Bank Of India,Shares,2.020581
+AXIS Bank Ltd.,Shares,2.011244
+Gabriel India Ltd.,Shares,1.795454
+Bajaj Finance Limited,Shares,1.713960
+Margin / Deposits,Cash and equivalents,1.511324
+Engineers India Ltd.,Shares,1.337081
+Infosys Ltd,Shares,1.304414
+Clean Max Enviro Energy Solutions Limited,Shares,1.302039
+Kotak Mahindra Bank Ltd.,Shares,1.282250
+RBL Bank Limited,Shares,1.250818
+Dr. Lal Pathlabs Limited,Shares,1.115607
+Larsen & Toubro Limited,Shares,1.029518
+Sai Life Sciences Limited,Shares,1.017451
+Tata Consumer Products Limited,Shares,0.971033
+Cummins India Ltd.,Shares,0.967958
+PNB Housing Finance Limited,Shares,0.967397
+Multi Commodity Exchange of India Ltd,Shares,0.950545
+Billionbrains Garage Ventures Limited,Shares,0.950511
+Government Securities,Bonds and other debt,0.948489
+Shadowfax Technologies Limited,Shares,0.881739
+Bharat Heavy Electricals Ltd.,Shares,0.864067
+Ipca Laboratories Ltd.,Shares,0.862434
+ZF Commercial Vehicle Control Systems India Limited,Shares,0.847552
+JSW Infrastructure Limited,Shares,0.847034
+Torrent Pharmaceuticals Ltd.,Shares,0.845945
+Ajanta Pharma Ltd.,Shares,0.841350
+The Phoenix Mills Ltd.,Shares,0.835675
+Maruti Suzuki India Ltd.,Shares,0.826917
+Ather Energy Limited,Shares,0.800046
+Sun Pharmaceutical Industries Ltd.,Shares,0.768243
+Nippon Life India Asset Management Limited,Shares,0.762473
+Hindustan Unilever Ltd.,Shares,0.753542
+Bharat Electronics Ltd.,Shares,0.744749
+Aditya Birla Capital Ltd,Shares,0.719925
+One 97 Communications Limited,Shares,0.708014
+Divi's Laboratories Ltd.,Shares,0.698219
+CG Power and Industrial Solutions Limited,Shares,0.697199
+Krn Heat Exchanger and Refrigeration Limited,Shares,0.694833
+JSW Energy Limited,Shares,0.693218
+Inventurus Knowledge Solutions Limited,Shares,0.692440
+Aarti Industries Ltd,Shares,0.677696
+UltraTech Cement Ltd,Shares,0.676055
+Solar Industries India Limited,Shares,0.663617
+Pidilite Industries Ltd.,Shares,0.648484
+Patanjali Foods Limited,Shares,0.637040
+GE Vernova T&D India Limited,Shares,0.617441
+Apar Industries Ltd,Shares,0.589654
+HDFC Life Insurance Company Limited,Shares,0.585241
+Ujjivan Small Finance Bank Limited,Shares,0.583029
+Godrej Properties Limited,Shares,0.565461
+Delhivery Limited,Shares,0.530816
+Titan Company Limited,Shares,0.524251
+Gokaldas Exports Ltd,Shares,0.521971
+Varun Beverages Limited,Shares,0.515873
+E2E Networks Limited,Shares,0.494443
+Mphasis Limited,Shares,0.486618
+Cyient Limited,Shares,0.475363
+HCL Technologies Ltd,Shares,0.464817
+IndusInd Bank Ltd.,Shares,0.436002
+Amber Enterprises India Limited,Shares,0.391502
+GlaxoSmithkline Pharmaceuticals Ltd.,Shares,0.360925
+Oil India Limited,Shares,0.352642
+NTPC Limited,Shares,0.306656
+Persistent Systems Limited,Shares,0.245857
+Wockhardt Ltd,Shares,0.187105
+LG Electronics India Limited,Shares,0.147062
+Net Receivables / Payables,Cash and equivalents,-0.185542
+Derivative Positions,Derivatives,-1.511333

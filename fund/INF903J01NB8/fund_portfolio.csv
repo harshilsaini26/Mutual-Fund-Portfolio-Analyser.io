@@ -1,0 +1,44 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 94.5% of portfolio value | Unresolved: 5.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 5.5% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:43.519462+00:00
+holding,kind,weight_pct
+ICICI Bank Ltd.,Shares,11.111237
+AXIS Bank Ltd.,Shares,10.110817
+HDFC Bank Ltd.,Shares,8.404373
+State Bank Of India,Shares,7.892472
+Kotak Mahindra Bank Ltd.,Shares,5.874047
+Not matched to a company,Shares,5.462815
+Bajaj Finserv Limited,Shares,4.728283
+DCB Bank Limited,Shares,4.537328
+PNB Housing Finance Limited,Shares,4.380426
+Bank Of Baroda,Shares,3.834670
+Cholamandalam Financial Holdings Limited,Shares,3.583939
+Bandhan Bank Limited,Shares,3.344879
+One 97 Communications Limited,Shares,3.223190
+AAVAS Financiers Limited,Shares,2.977105
+Equitas Small Finance Bank Limited,Shares,2.646601
+CSB Bank Limited,Shares,2.465520
+Ujjivan Small Finance Bank Limited,Shares,2.262150
+Five-Star Business Finance Ltd.,Shares,2.260539
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.025605
+PB Fintech Limited,Shares,1.302466
+Motilal Oswal Financial Services Limited,Shares,1.231571
+OnEMI Technology Solutions Limited,Shares,1.124000
+Government Securities,Bonds and other debt,1.074477
+Life Insurance Corporation of India,Shares,1.072637
+Angel One Limited,Shares,0.920487
+Power Finance Corporation Ltd,Shares,0.855229
+Rec Limited,Shares,0.668387
+ICICI Prudential Life Insurance Company Limited,Shares,0.591154
+Derivative Positions,Derivatives,0.509244
+IIFL Finance Limited,Shares,0.203370
+Margin / Deposits,Cash and equivalents,0.021856
+Net Receivables / Payables,Cash and equivalents,-0.700874

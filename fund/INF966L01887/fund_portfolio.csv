@@ -1,0 +1,38 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 94.3% of portfolio value | Unresolved: 5.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 5.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:06.447181+00:00
+holding,kind,weight_pct
+Aurobindo Pharma Ltd.,Shares,10.710407
+TREPS / Repo / Reverse Repo,Cash and equivalents,9.459885
+Lloyds Metals and Energy Limited,Shares,9.036215
+Derivative Positions,Derivatives,8.576669
+Tata Communications Limited,Shares,8.491482
+Indus Towers Limited,Shares,6.011623
+IRB Infrastructure Developers Limited,Shares,5.702136
+Not matched to a company,Shares,5.675237
+LG Electronics India Limited,Shares,5.092359
+Bharat Heavy Electricals Ltd.,Shares,5.033178
+Nippon Life India Asset Management Limited,Shares,4.669617
+Premier Energies Limited,Shares,4.591510
+Sona BLW Precision Forgings Limited,Shares,4.037010
+Linde India Limited,Shares,3.549353
+GlaxoSmithkline Pharmaceuticals Ltd.,Shares,3.218329
+Zydus Lifesciences Limited,Shares,3.131732
+Government Securities,Bonds and other debt,2.209598
+Ipca Laboratories Ltd.,Shares,2.014155
+Persistent Systems Limited,Shares,1.715609
+Container Corporation Of India Ltd.,Shares,1.654004
+United Breweries Ltd.,Shares,1.125140
+Welspun Corp Limited,Shares,1.092934
+Cochin Shipyard Limited,Shares,0.857245
+IDBI Bank Ltd,Shares,0.469152
+Godrej Properties Limited,Shares,0.438370
+Net Receivables / Payables,Cash and equivalents,-8.562949

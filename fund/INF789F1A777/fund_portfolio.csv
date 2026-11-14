@@ -1,0 +1,65 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 93.5% of portfolio value | Unresolved: 6.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 6.5% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:13:20.482376+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,31.559217
+Government Securities,Bonds and other debt,16.565328
+Net Receivables / Payables,Cash and equivalents,8.871246
+Not matched to a company,"REITs, InvITs and other",6.490907
+AXIS Bank Ltd.,Shares,5.129127
+HDFC Bank Ltd.,Shares,4.648618
+Mahindra & Mahindra Ltd.,Shares,3.805291
+Kotak Mahindra Bank Ltd.,Shares,3.647915
+Grasim Industries Ltd,Shares,3.428672
+Bharti Airtel Ltd.,Shares,3.329805
+State Bank Of India,Shares,3.268896
+ICICI Bank Ltd.,Shares,3.174045
+Reliance Industries Ltd,Shares,2.830461
+Larsen & Toubro Limited,Shares,2.347441
+Bajaj Finance Limited,Shares,2.284741
+Maruti Suzuki India Ltd.,Shares,2.170632
+JSW Steel Limited,Shares,1.535755
+ITC Ltd,Shares,1.377509
+Indus Towers Limited,Shares,1.269504
+SBI Life Insurance Company Limited,Shares,1.100478
+Aurobindo Pharma Ltd.,Shares,1.071907
+Hindustan Aeronautics Limited,Shares,1.047563
+Infosys Ltd,Shares,1.041993
+Tata Consultancy Services Ltd.,Shares,1.019850
+InterGlobe Aviation Limited,Shares,1.017848
+Vedanta Aluminium Metal Limited,Shares,1.009817
+Knowledge Realty Trust,"REITs, InvITs and other",0.992871
+IndusInd Bank Ltd.,Shares,0.991677
+Embassy Office Parks Reit,"REITs, InvITs and other",0.963976
+Coal India Limited,Shares,0.900270
+Adani Ports and Special Economic Zone Ltd,Shares,0.865197
+Oil And Natural Gas Corporation Ltd,Shares,0.850352
+Power Grid Corporation of India Limited,Shares,0.827947
+Nexus Select Trust,"REITs, InvITs and other",0.820301
+Hero MotoCorp Limited,Shares,0.818685
+Tata Power Co. Ltd,Shares,0.807533
+Life Insurance Corporation of India,Shares,0.796405
+HCL Technologies Ltd,Shares,0.789405
+Bajaj Auto Limited,Shares,0.746959
+Brookfield India Real Estate Trust,"REITs, InvITs and other",0.698334
+Cipla Ltd.,Shares,0.681947
+Tata Motors Limited,Shares,0.681512
+NTPC Limited,Shares,0.680605
+Bajaj Finserv Limited,Shares,0.645643
+Dr. Reddy's Laboratories Ltd.,Shares,0.539292
+Wipro Ltd.,Shares,0.518069
+Hindalco Industries Ltd.,Shares,0.393428
+Rec Limited,Shares,0.230756
+Dlf Limited,Shares,0.219081
+Dabur India Ltd.,Shares,0.053163
+Cash & Bank Balance,Cash and equivalents,0.001243
+Derivative Positions,Derivatives,-31.559217

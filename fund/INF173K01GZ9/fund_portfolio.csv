@@ -1,0 +1,77 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 93.2% of portfolio value | Unresolved: 6.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 6.8% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:43.173873+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,45.640503
+Bharti Airtel Ltd.,Shares,9.287351
+Government Securities,Bonds and other debt,7.814609
+ICICI Bank Ltd.,Shares,7.528523
+Reliance Industries Ltd,Shares,7.363053
+Not matched to a company,Shares,6.764964
+HDFC Bank Ltd.,Shares,5.523774
+AXIS Bank Ltd.,Shares,4.866909
+Larsen & Toubro Limited,Shares,3.591109
+Kotak Mahindra Bank Ltd.,Shares,3.142617
+State Bank Of India,Shares,2.441810
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.217469
+Mahindra & Mahindra Ltd.,Shares,2.004759
+Hindalco Industries Ltd.,Shares,1.982630
+Bajaj Finance Limited,Shares,1.335223
+JSW Steel Limited,Shares,1.184195
+TVS Motor Company Ltd.,Shares,1.110585
+One 97 Communications Limited,Shares,0.955496
+Bajaj Finserv Limited,Shares,0.928849
+NTPC Limited,Shares,0.877824
+Oracle Financial Services Software Limited,Shares,0.873667
+Cholamandalam Investment and Finance Company Ltd,Shares,0.832164
+Coforge Limited,Shares,0.779910
+Vedanta Aluminium Metal Limited,Shares,0.744462
+Fractal Analytics Limited,Shares,0.737972
+Amber Enterprises India Limited,Shares,0.696565
+Billionbrains Garage Ventures Limited,Shares,0.647979
+Granules India Ltd.,Shares,0.641755
+Poonawalla Fincorp Limited,Shares,0.641299
+MTAR Technologies Limited,Shares,0.631236
+Coromandel International Limited,Shares,0.623644
+Sun Pharmaceutical Industries Ltd.,Shares,0.614864
+Aster DM Healthcare Limited,Shares,0.614800
+PB Fintech Limited,Shares,0.603953
+Cummins India Ltd.,Shares,0.599573
+SBI Life Insurance Company Limited,Shares,0.586499
+Force Motors Limited,Shares,0.568547
+Multi Commodity Exchange of India Ltd,Shares,0.563054
+UNO Minda Limited,Shares,0.545282
+JSW Infrastructure Limited,Shares,0.516631
+Mankind Pharma Limited,Shares,0.501542
+Delhivery Limited,Shares,0.491448
+Home First Finance Company India Limited,Shares,0.490377
+UltraTech Cement Ltd,Shares,0.485139
+InterGlobe Aviation Limited,Shares,0.473793
+CCL Products (India) Ltd.,Shares,0.451355
+CRISIL Ltd.,Shares,0.451186
+Ambuja Cements Ltd.,Shares,0.418781
+Indegene Limited,Shares,0.397531
+Bajaj Auto Limited,Shares,0.389377
+Mrs. Bectors Food Specialities Limited,Shares,0.386535
+Ashok Leyland Ltd.,Shares,0.374733
+Prudent Corporate Advisory Services Limited,Shares,0.368180
+Alkem Laboratories Limited,Shares,0.364098
+Gland Pharma Limited,Shares,0.350080
+Lupin Ltd,Shares,0.333888
+TD Power Systems Ltd,Shares,0.297889
+Cochin Shipyard Limited,Shares,0.273712
+Clean Science and Technology Limited,Shares,0.270467
+Elecon Engineering Co.Ltd.,Shares,0.249759
+Thermax Ltd.,Shares,0.249091
+Maruti Suzuki India Ltd.,Shares,0.012693
+Net Receivables / Payables,Cash and equivalents,-0.660915
+Derivative Positions,Derivatives,-37.046847

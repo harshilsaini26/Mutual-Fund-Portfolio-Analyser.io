@@ -1,0 +1,16 @@
+﻿# View: fund_xray_header
+# Question: How has this fund done, and against what?
+# As of: 2026-11-14
+# Data as of: 13 Nov 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+#   - Over 1 year the benchmark had 8 rising and 5 falling months; a capture ratio needs six each way, so a blank one is left blank.
+#   - Over 3 years the capture ratios rest on 26 rising and 11 falling months of the benchmark; that few makes them rough.
+# Generated: 2026-11-14T01:09:16.575026+00:00
+window,obs_days,return_ann,return_cum,volatility_ann,max_dd,confidence,sharpe,sortino,treynor,risk_free_pct,bench_return_ann,beta,tracking_error,alpha_ann,information_ratio,up_capture,down_capture,interpolated_pct
+1 year,365,0.048452,0.048452,0.178135,-0.144409,medium,-0.026620,-0.036766,-0.004737,5.3194,0.047675,1.000956,0.001187,0.000782,0.654591,1.003894,,0.000000
+3 years,1096,0.168875,0.597682,0.186260,-0.266736,high,0.583340,0.792654,0.108564,6.0222,0.169151,1.000818,0.000974,-0.000365,-0.283368,0.999473,1.000292,0.000000
+5 years,1824,0.107766,0.667701,0.179347,-0.266736,high,0.272221,0.363993,0.048797,5.8944,0.108741,1.000519,0.001013,-0.001001,-0.962488,0.997352,1.000655,0.000000
+Since 03 Nov 2021,1836,0.114812,0.727551,0.179206,-0.266736,high,0.312590,0.418620,0.055986,5.8794,0.115664,1.000574,0.001042,-0.000885,-0.817658,0.997352,1.000304,0.000000

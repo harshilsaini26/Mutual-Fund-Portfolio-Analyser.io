@@ -1,0 +1,76 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 71.9% of portfolio value | Unresolved: 28.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 28.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:10:56.244999+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,32.831020
+Not matched to a company,Bonds and other debt,28.123390
+Government Securities,Bonds and other debt,6.600795
+HDFC Bank Ltd.,Shares,6.035069
+ICICI Bank Ltd.,Shares,5.872500
+Reliance Industries Ltd,Shares,5.395637
+Bajaj Finance Limited,Shares,4.790276
+Ambuja Cements Ltd.,Shares,3.728640
+Sun Pharmaceutical Industries Ltd.,Shares,3.304490
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.481093
+Mahindra & Mahindra Ltd.,Shares,2.295336
+Larsen & Toubro Limited,Shares,1.741878
+Canara Bank,Shares,1.739066
+Brookfield India Real Estate Trust,"REITs, InvITs and other",1.625571
+Kotak Mahindra Bank Ltd.,Shares,1.558047
+Bharti Airtel Ltd.,Shares,1.252035
+Divi's Laboratories Ltd.,Shares,1.217021
+Embassy Office Parks Reit,"REITs, InvITs and other",1.138520
+Units of Other Schemes,Other funds,1.035732
+State Bank Of India,Shares,0.974795
+Nexus Select Trust,"REITs, InvITs and other",0.836937
+Shriram Pistons & Rings Ltd,Shares,0.813286
+Titan Company Limited,Shares,0.757549
+Aditya Vision Limited,Shares,0.739465
+AXIS Bank Ltd.,Shares,0.731973
+Persistent Systems Limited,Shares,0.608597
+PTC Industries Ltd.,Shares,0.591476
+Tech Mahindra Limited,Shares,0.544463
+Coromandel International Limited,Shares,0.538397
+Tata Steel Limited,Shares,0.518232
+Sai Life Sciences Limited,Shares,0.484451
+Infosys Ltd,Shares,0.483064
+Anthem Biosciences Limited,Shares,0.454137
+Hindustan Aeronautics Limited,Shares,0.449514
+NTPC Limited,Shares,0.407394
+Nippon Life India Asset Management Limited,Shares,0.387422
+ISGEC Heavy Engineering Limited,Shares,0.382395
+L&T Finance Limited,Shares,0.375635
+TVS Motor Company Ltd.,Shares,0.371668
+Bank Of Baroda,Shares,0.363656
+Union Bank of India,Shares,0.362269
+Kajaria Ceramics Ltd,Shares,0.356819
+Hyundai Motor India Limited,Shares,0.352043
+Hindalco Industries Ltd.,Shares,0.350078
+Tata Power Co. Ltd,Shares,0.345706
+Bharat Electronics Ltd.,Shares,0.344011
+Oil And Natural Gas Corporation Ltd,Shares,0.340949
+Technocraft Industries (India) Ltd.,Shares,0.340410
+SBI Life Insurance Company Limited,Shares,0.339794
+Tata Motors Limited,Shares,0.331320
+Power Grid Corporation of India Limited,Shares,0.331127
+National Aluminium Co. Ltd.,Shares,0.328334
+Kirloskar Brothers Ltd.,Shares,0.327025
+Grasim Industries Ltd,Shares,0.323154
+Hindustan Unilever Ltd.,Shares,0.322094
+Oil India Limited,Shares,0.319706
+Ingersoll-Rand (India) Ltd.,Shares,0.319244
+Tata Consumer Products Limited,Shares,0.311598
+Archean Chemical Industries Limited,Shares,0.307842
+Godfrey Phillips India Ltd.,Shares,0.288487
+Hindustan Petroleum Corporation Ltd,Shares,0.081987
+Margin / Deposits,Cash and equivalents,0.070643
+Derivative Positions,Derivatives,-31.375262

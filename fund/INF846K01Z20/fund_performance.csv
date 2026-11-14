@@ -1,0 +1,13 @@
+﻿# View: fund_performance
+# Question: How has it done for the risk taken?
+# As of: 2026-11-14
+# Data as of: 12 Nov 2026 (2 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - Benchmark comparisons are left out of this public copy: the index data is licensed for personal use. The self-hosted app shows them.
+# Generated: 2026-11-14T01:07:21.502122+00:00
+measure,1y,3y,5y,meaning
+Return a year,0.089561,0.213891,0.107143,"Annualised, with dividends reinvested."
+Volatility,0.212397,0.196079,0.209465,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.152439,-0.225916,-0.308378,The largest fall from a high within the period.

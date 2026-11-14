@@ -1,0 +1,26 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 15.8% of portfolio value | Unresolved: 84.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 84.2% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-11-14T01:09:10.613088+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,84.221646
+Government Securities,Bonds and other debt,9.089748
+Union Bank of India,Bonds and other debt,6.741591
+Federal Bank Ltd.,Bonds and other debt,2.248548
+Yes Bank Ltd.,Bonds and other debt,1.117624
+Canara Bank,Bonds and other debt,0.747208
+Godrej Consumer Products Ltd.,Bonds and other debt,0.521406
+Tata Communications Limited,Bonds and other debt,0.520775
+Aditya Birla Money Ltd,Bonds and other debt,0.446725
+Aarti Industries Ltd,Bonds and other debt,0.445655
+Godrej Properties Limited,Bonds and other debt,0.413260
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.282908
+Network 18 Media & Investments Limited,Bonds and other debt,0.149254
+Derivative Positions,Derivatives,0.113049
+Net Receivables / Payables,Cash and equivalents,-7.059397

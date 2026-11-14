@@ -1,0 +1,31 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 97.1% of portfolio value | Unresolved: 2.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 2.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:06.048490+00:00
+holding,kind,weight_pct
+TREPS / Repo / Reverse Repo,Cash and equivalents,10.878399
+Aurobindo Pharma Ltd.,Shares,9.936557
+Bharat Heavy Electricals Ltd.,Shares,9.473100
+Adani Enterprises Ltd.,Shares,9.121080
+Ador Welding Ltd.,Shares,8.474766
+Derivative Positions,Derivatives,8.339126
+Lloyds Metals and Energy Limited,Shares,8.078365
+Adani Green Energy Limited,Shares,7.847324
+Zydus Wellness Limited,Shares,7.604441
+Ravindra Energy Limited,Shares,6.016438
+Gujarat Themis Biosyn Ltd.,Shares,5.416820
+Government Securities,Bonds and other debt,5.024741
+Sumitomo Chemical India Limited,Shares,3.877899
+LG Electronics India Limited,Shares,2.864145
+Not matched to a company,Bonds and other debt,2.850366
+Colgate-Palmolive (India) Ltd.,Shares,1.352865
+Pfizer Ltd.,Shares,1.181051
+PTC India Ltd,Shares,0.454028
+Net Receivables / Payables,Cash and equivalents,-8.791511

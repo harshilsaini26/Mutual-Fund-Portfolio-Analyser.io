@@ -1,0 +1,44 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 91.2% of portfolio value | Unresolved: 8.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 8.8% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:11:24.335607+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,8.800798
+Hindalco Industries Ltd.,Shares,5.429366
+JSW Steel Limited,Shares,4.795173
+Divi's Laboratories Ltd.,Shares,4.738325
+Bajaj Auto Limited,Shares,4.620255
+Grasim Industries Ltd,Shares,4.599656
+Coal India Limited,Shares,4.085949
+Adani Enterprises Ltd.,Shares,3.931285
+Eicher Motors Ltd.,Shares,3.928638
+TVS Motor Company Ltd.,Shares,3.824608
+Nestle India Ltd.,Shares,3.750037
+Oil And Natural Gas Corporation Ltd,Shares,3.515279
+Hindustan Aeronautics Limited,Shares,3.492493
+SBI Life Insurance Company Limited,Shares,3.058766
+Cipla Ltd.,Shares,3.058420
+Dr. Reddy's Laboratories Ltd.,Shares,3.016992
+Jio Financial Services Limited,Shares,2.864860
+Cholamandalam Investment and Finance Company Ltd,Shares,2.815376
+Max Healthcare Institute Limited,Shares,2.755076
+Hero MotoCorp Limited,Shares,2.687065
+Indian Hotels Co. Ltd,Shares,2.577396
+Tata Consumer Products Limited,Shares,2.455989
+Tata Motors Limited,Shares,2.395573
+Tata Power Co. Ltd,Shares,2.389704
+Varun Beverages Limited,Shares,2.339645
+Britannia Industries Ltd.,Shares,2.274856
+HDFC Life Insurance Company Limited,Shares,2.215246
+Suzlon Energy Ltd.,Shares,1.910290
+Wipro Ltd.,Shares,1.696936
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.231191
+Cash & Bank Balance,Cash and equivalents,0.001841
+Net Receivables / Payables,Cash and equivalents,-0.257084

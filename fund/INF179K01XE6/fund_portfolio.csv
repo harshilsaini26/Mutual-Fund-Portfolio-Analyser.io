@@ -1,0 +1,50 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 51.6% of portfolio value | Unresolved: 48.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 48.4% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:09:03.572117+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,48.438281
+Government Securities,Bonds and other debt,28.495467
+Net Receivables / Payables,Cash and equivalents,2.540837
+ICICI Bank Ltd.,Shares,2.126271
+HDFC Bank Ltd.,Shares,1.596159
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.463493
+State Bank Of India,Shares,1.389227
+AXIS Bank Ltd.,Shares,1.287635
+Reliance Industries Ltd,Shares,0.954787
+Larsen & Toubro Limited,Shares,0.846840
+Kotak Mahindra Bank Ltd.,Shares,0.805013
+Sun Pharmaceutical Industries Ltd.,Shares,0.730609
+Embassy Office Parks Reit,"REITs, InvITs and other",0.698869
+Bharti Airtel Ltd.,Shares,0.678373
+NTPC Limited,Shares,0.623065
+Tata Consultancy Services Ltd.,Shares,0.560810
+Infosys Ltd,Shares,0.515569
+Power Grid Corporation of India Limited,Shares,0.502892
+HCL Technologies Ltd,Shares,0.474900
+Oil And Natural Gas Corporation Ltd,Shares,0.435904
+Hindustan Unilever Ltd.,Shares,0.423218
+Hero MotoCorp Limited,Shares,0.421570
+SBI Life Insurance Company Limited,Shares,0.409360
+Lupin Ltd,Shares,0.391928
+Cipla Ltd.,Shares,0.346458
+NHPC Limited,Shares,0.281118
+Bajaj Auto Limited,Shares,0.279895
+Union Bank of India,Shares,0.275094
+Coal India Limited,Shares,0.273486
+Indus Towers Limited,Shares,0.240153
+Power Finance Corporation Ltd,Shares,0.230404
+Hindustan Petroleum Corporation Ltd,Shares,0.225449
+Great Eastern Shipping Co. Ltd.,Shares,0.200771
+JK Paper Ltd.,Shares,0.200314
+Escorts Kubota Limited,Shares,0.174722
+Gateway Distriparks Limited,Shares,0.167438
+Goodyear India Ltd.,Shares,0.149317
+Rec Limited,Shares,0.144304

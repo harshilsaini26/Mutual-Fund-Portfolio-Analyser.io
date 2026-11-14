@@ -1,0 +1,37 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 91.2% of portfolio value | Unresolved: 8.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 8.8% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:35.907250+00:00
+holding,kind,weight_pct
+State Bank Of India,Shares,15.656046
+Not matched to a company,Shares,8.830517
+NTPC Limited,Shares,8.606487
+Bharat Electronics Ltd.,Shares,7.874354
+Power Grid Corporation of India Limited,Shares,7.414855
+Gail (India) Ltd.,Shares,6.868867
+Bank Of Baroda,Shares,5.206911
+Bharat Heavy Electricals Ltd.,Shares,4.250573
+Container Corporation Of India Ltd.,Shares,3.662347
+Oil And Natural Gas Corporation Ltd,Shares,3.660254
+Indian Bank,Shares,3.585966
+PNB Housing Finance Limited,Shares,3.129586
+Engineers India Ltd.,Shares,2.874856
+National Aluminium Co. Ltd.,Shares,2.441548
+NMDC Ltd,Shares,2.397202
+General Insurance Corporation of India,Shares,2.162898
+Life Insurance Corporation of India,Shares,2.127189
+Hindustan Aeronautics Limited,Shares,2.020350
+Petronet Lng Ltd.,Shares,1.835816
+NHPC Limited,Shares,1.486186
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.325301
+Gujarat Gas Limited,Shares,1.309935
+Canara Robeco Asset Management Company Limited,Shares,1.261040
+Government Securities,Bonds and other debt,0.078132
+Net Receivables / Payables,Cash and equivalents,-0.067216

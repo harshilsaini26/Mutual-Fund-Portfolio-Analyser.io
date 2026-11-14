@@ -1,0 +1,39 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 86.2% of portfolio value | Unresolved: 13.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 13.8% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:09:27.720382+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,13.815806
+ICICI Bank Ltd.,Shares,7.776844
+HDFC Bank Ltd.,Shares,6.477622
+Larsen & Toubro Limited,Shares,4.295869
+Multi Commodity Exchange of India Ltd,Shares,4.242114
+Reliance Industries Ltd,Shares,4.068508
+Shadowfax Technologies Limited,Shares,4.002385
+TVS Motor Company Ltd.,Shares,3.987503
+TREPS / Repo / Reverse Repo,Cash and equivalents,3.745472
+Infosys Ltd,Shares,3.691277
+Nippon Life India Asset Management Limited,Shares,3.667484
+Blue Star Ltd,Shares,3.468686
+GE Vernova T&D India Limited,Shares,3.359804
+Kalyan Jewellers India Limited,Shares,3.159920
+KEI Industries Ltd.,Shares,3.053952
+Mankind Pharma Limited,Shares,3.003669
+Apar Industries Ltd,Shares,2.979231
+Tata Motors Limited,Shares,2.890457
+TD Power Systems Ltd,Shares,2.694230
+RBL Bank Limited,Shares,2.534591
+Hdb Financial Services Limited,Shares,2.484463
+Artemis Medicare Services Limited,Shares,2.467485
+Hyundai Motor India Limited,Shares,2.320455
+Tata Consumer Products Limited,Shares,2.169642
+Swiggy Limited,Shares,2.143079
+Krishna Institute of Medical Sciences Limited,Shares,1.705551
+Net Receivables / Payables,Cash and equivalents,-0.206099

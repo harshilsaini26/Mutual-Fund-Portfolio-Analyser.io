@@ -1,0 +1,45 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 95.1% of portfolio value | Unresolved: 4.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 4.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:09:07.673361+00:00
+holding,kind,weight_pct
+ICICI Bank Ltd.,Shares,9.158799
+HDFC Bank Ltd.,Shares,7.827277
+Kotak Mahindra Bank Ltd.,Shares,6.909291
+AXIS Bank Ltd.,Shares,6.242309
+State Bank Of India,Shares,5.102674
+Not matched to a company,Shares,4.874393
+Sun Pharmaceutical Industries Ltd.,Shares,4.068894
+InterGlobe Aviation Limited,Shares,4.000059
+HCL Technologies Ltd,Shares,3.542364
+Maruti Suzuki India Ltd.,Shares,3.395695
+Aster DM Healthcare Limited,Shares,3.299030
+Eicher Motors Ltd.,Shares,3.217720
+Bharti Airtel Ltd.,Shares,3.202582
+SBI Life Insurance Company Limited,Shares,3.020804
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.691577
+Bosch Ltd,Shares,2.506598
+Cipla Ltd.,Shares,2.399321
+Adani Green Energy Limited,Shares,2.356714
+Havells India Limited,Shares,2.320933
+Karur Vysya Bank Ltd.,Shares,2.319975
+FSN E-Commerce Ventures Limited,Shares,2.229510
+Hyundai Motor India Limited,Shares,1.947017
+JSW Infrastructure Limited,Shares,1.933427
+Nexus Select Trust,"REITs, InvITs and other",1.890088
+Tata Steel Limited,Shares,1.784838
+Chalet Hotels Limited,Shares,1.764170
+Metropolis Healthcare Limited,Shares,1.387252
+Amber Enterprises India Limited,Shares,1.296346
+PB Fintech Limited,Shares,1.167461
+CG Power and Industrial Solutions Limited,Shares,1.141975
+Restaurant Brands Asia Limited,Shares,0.769118
+Government Securities,Bonds and other debt,0.189904
+Net Receivables / Payables,Cash and equivalents,0.041885

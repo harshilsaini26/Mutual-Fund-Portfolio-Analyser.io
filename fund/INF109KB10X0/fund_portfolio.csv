@@ -1,0 +1,43 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 96.3% of portfolio value | Unresolved: 3.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 3.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:09:35.867387+00:00
+holding,kind,weight_pct
+HDFC Bank Ltd.,Shares,12.585524
+ICICI Bank Ltd.,Shares,11.031182
+Reliance Industries Ltd,Shares,9.152423
+Bharti Airtel Ltd.,Shares,6.376348
+Larsen & Toubro Limited,Shares,5.104383
+State Bank Of India,Shares,4.638291
+Infosys Ltd,Shares,4.083069
+AXIS Bank Ltd.,Shares,4.080879
+Not matched to a company,Shares,3.695382
+Kotak Mahindra Bank Ltd.,Shares,3.572953
+Mahindra & Mahindra Ltd.,Shares,3.067280
+Bajaj Finance Limited,Shares,2.991146
+ITC Ltd,Shares,2.957623
+Tata Consultancy Services Ltd.,Shares,2.413892
+Sun Pharmaceutical Industries Ltd.,Shares,2.283967
+Titan Company Limited,Shares,2.178725
+Hindustan Unilever Ltd.,Shares,1.952824
+Maruti Suzuki India Ltd.,Shares,1.790256
+NTPC Limited,Shares,1.778282
+Tata Steel Limited,Shares,1.768292
+Adani Ports and Special Economic Zone Ltd,Shares,1.626199
+Bharat Electronics Ltd.,Shares,1.623020
+HCL Technologies Ltd,Shares,1.511817
+UltraTech Cement Ltd,Shares,1.503580
+Power Grid Corporation of India Limited,Shares,1.379616
+InterGlobe Aviation Limited,Shares,1.298114
+Asian Paints Ltd.,Shares,1.264539
+Tech Mahindra Limited,Shares,1.135017
+Bajaj Finserv Limited,Shares,1.129332
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.303794
+Net Receivables / Payables,Cash and equivalents,-0.277749

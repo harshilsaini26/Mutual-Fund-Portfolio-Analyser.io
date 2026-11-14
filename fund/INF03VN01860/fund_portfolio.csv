@@ -1,0 +1,58 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 92.2% of portfolio value | Unresolved: 7.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 7.8% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:13:39.912953+00:00
+holding,kind,weight_pct
+ICICI Bank Ltd.,Shares,11.768376
+HDFC Bank Ltd.,Shares,7.966380
+Not matched to a company,Shares,7.845045
+Kotak Mahindra Bank Ltd.,Shares,6.430661
+Derivative Positions,Derivatives,5.927455
+AXIS Bank Ltd.,Shares,4.769050
+Cash & Bank Balance,Cash and equivalents,4.020092
+State Bank Of India,Shares,3.458933
+Government Securities,Bonds and other debt,3.348364
+Bajaj Finance Limited,Shares,2.977186
+Bajaj Finserv Limited,Shares,2.718531
+Five-Star Business Finance Ltd.,Shares,2.602609
+PNB Housing Finance Limited,Shares,2.530100
+IIFL Finance Limited,Shares,2.394284
+Multi Commodity Exchange of India Ltd,Shares,2.313203
+Ujjivan Small Finance Bank Limited,Shares,2.051451
+Cholamandalam Investment and Finance Company Ltd,Shares,1.766601
+Max Financial Services Limited,Shares,1.572410
+Canara HSBC Life Insurance Company Limited,Shares,1.512352
+Cholamandalam Financial Holdings Limited,Shares,1.443466
+Aditya Birla Capital Ltd,Shares,1.393182
+Aye Finance Limited,Shares,1.315605
+Mahindra & Mahindra Financial Services Limited,Shares,1.312733
+City Union Bank Ltd,Shares,1.300748
+OnEMI Technology Solutions Limited,Shares,1.254283
+SBI Life Insurance Company Limited,Shares,1.178616
+Repco Home Finance Limited,Shares,1.151158
+Motilal Oswal Financial Services Limited,Shares,0.921014
+IndusInd Bank Ltd.,Shares,0.916232
+Bajaj Holdings & Investment Limited,Shares,0.915420
+South Indian Bank Ltd.,Shares,0.884940
+AAVAS Financiers Limited,Shares,0.858203
+Billionbrains Garage Ventures Limited,Shares,0.847993
+CARE Ratings Limited,Shares,0.833858
+National Securities Depository Limited,Shares,0.818640
+Federal Bank Ltd.,Shares,0.785123
+Manappuram Finance Limited,Shares,0.759168
+ICICI Lombard General Insurance Company Limited,Shares,0.723425
+HDFC Life Insurance Company Limited,Shares,0.695275
+Bank of India,Shares,0.673697
+Power Finance Corporation Ltd,Shares,0.641502
+PB Fintech Limited,Shares,0.306533
+Computer Age Management Services Limited,Shares,0.239678
+BSE Ltd.,Shares,0.054871
+Edelweiss Financial Services Ltd.,Shares,0.003714
+Net Receivables / Payables,Cash and equivalents,-0.202160

@@ -1,0 +1,86 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 77.1% of portfolio value | Unresolved: 22.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 22.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:13:14.159815+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,32.508608
+Not matched to a company,Bonds and other debt,22.914289
+Government Securities,Bonds and other debt,7.101484
+HDFC Bank Ltd.,Shares,4.848435
+Patanjali Foods Limited,Shares,4.809087
+Indus Towers Limited,Shares,3.685952
+ICICI Bank Ltd.,Shares,3.634368
+Bajaj Finance Limited,Shares,3.041594
+NTPC Limited,Shares,2.648202
+Bharti Airtel Ltd.,Shares,2.645385
+Net Receivables / Payables,Cash and equivalents,2.541954
+KEI Industries Ltd.,Shares,2.539225
+Kotak Mahindra Bank Ltd.,Shares,2.371269
+Reliance Industries Ltd,Shares,2.329985
+AXIS Bank Ltd.,Shares,2.178138
+TREPS / Repo / Reverse Repo,Cash and equivalents,1.673744
+Glenmark Pharmaceuticals ltd,Shares,1.618463
+InterGlobe Aviation Limited,Shares,1.316179
+State Bank Of India,Shares,1.176920
+Adani Ports and Special Economic Zone Ltd,Shares,1.052714
+Mahindra & Mahindra Ltd.,Shares,1.038718
+Tata Steel Limited,Shares,0.981500
+Infosys Ltd,Shares,0.885199
+Hindalco Industries Ltd.,Shares,0.870498
+Ujjivan Small Finance Bank Limited,Shares,0.856502
+Engineers India Ltd.,Shares,0.812665
+Sai Life Sciences Limited,Shares,0.702279
+Max Financial Services Limited,Shares,0.689339
+Crompton Greaves Consumer Electricals Limited,Shares,0.671381
+Dr. Lal Pathlabs Limited,Shares,0.668477
+One 97 Communications Limited,Shares,0.650695
+Shadowfax Technologies Limited,Shares,0.643565
+CG Power and Industrial Solutions Limited,Shares,0.596647
+Torrent Pharmaceuticals Ltd.,Shares,0.575872
+Delhivery Limited,Shares,0.575080
+Maruti Suzuki India Ltd.,Shares,0.574112
+Syrma SGS Technology Limited,Shares,0.569270
+Tata Consumer Products Limited,Shares,0.545415
+Inventurus Knowledge Solutions Limited,Shares,0.529658
+Clean Max Enviro Energy Solutions Limited,Shares,0.529130
+Ather Energy Limited,Shares,0.522440
+Solar Industries India Limited,Shares,0.520239
+Hindustan Unilever Ltd.,Shares,0.510292
+RBL Bank Limited,Shares,0.506683
+IndusInd Bank Ltd.,Shares,0.499905
+Krn Heat Exchanger and Refrigeration Limited,Shares,0.493127
+Gabriel India Ltd.,Shares,0.482388
+Ajanta Pharma Ltd.,Shares,0.472353
+JSW Infrastructure Limited,Shares,0.470856
+Mphasis Limited,Shares,0.440399
+Varun Beverages Limited,Shares,0.432916
+Kirloskar Oil Engines Limited,Shares,0.432036
+Data Patterns (India) Limited,Shares,0.415135
+Larsen & Toubro Limited,Shares,0.397178
+ZF Commercial Vehicle Control Systems India Limited,Shares,0.396033
+Aarti Industries Ltd,Shares,0.394977
+Bharat Heavy Electricals Ltd.,Shares,0.380804
+Nippon Life India Asset Management Limited,Shares,0.369537
+Godrej Properties Limited,Shares,0.329749
+Ipca Laboratories Ltd.,Shares,0.324819
+GlaxoSmithkline Pharmaceuticals Ltd.,Shares,0.316897
+Oil India Limited,Shares,0.316369
+FSN E-Commerce Ventures Limited,Shares,0.304573
+Gokaldas Exports Ltd,Shares,0.298411
+JSW Energy Limited,Shares,0.292954
+Karur Vysya Bank Ltd.,Shares,0.277285
+UltraTech Cement Ltd,Shares,0.270067
+Sun Pharmaceutical Industries Ltd.,Shares,0.269010
+Billionbrains Garage Ventures Limited,Shares,0.246299
+Bharat Electronics Ltd.,Shares,0.218923
+E2E Networks Limited,Shares,0.171829
+Wockhardt Ltd,Shares,0.132040
+Derivative Positions,Derivatives,-32.508520

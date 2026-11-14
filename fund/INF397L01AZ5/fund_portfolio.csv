@@ -1,0 +1,74 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 95.4% of portfolio value | Unresolved: 4.6% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 4.6% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:10:47.537802+00:00
+holding,kind,weight_pct
+Margin / Deposits,Cash and equivalents,31.940679
+TREPS / Repo / Reverse Repo,Cash and equivalents,22.180914
+Units of Other Schemes,Other funds,11.062793
+Not matched to a company,Shares,4.586961
+Cipla Ltd.,Shares,2.662154
+State Bank Of India,Shares,2.232725
+Bajaj Auto Limited,Shares,1.785197
+APL Apollo Tubes Limited,Shares,1.783646
+Bank Of Baroda,Shares,1.743573
+Divi's Laboratories Ltd.,Shares,1.681524
+Solar Industries India Limited,Shares,1.604480
+Ashok Leyland Ltd.,Shares,1.594656
+Torrent Pharmaceuticals Ltd.,Shares,1.588451
+LG Electronics India Limited,Shares,1.470558
+Ajanta Pharma Ltd.,Shares,1.469782
+Tata Consultancy Services Ltd.,Shares,1.431519
+UltraTech Cement Ltd,Shares,1.416265
+Radico Khaitan Ltd.,Shares,1.411094
+Hindalco Industries Ltd.,Shares,1.363524
+Kotak Mahindra Bank Ltd.,Shares,1.293719
+Sona BLW Precision Forgings Limited,Shares,1.287514
+FSN E-Commerce Ventures Limited,Shares,1.269933
+Bharti Airtel Ltd.,Shares,1.226499
+Hero MotoCorp Limited,Shares,1.219519
+Endurance Technologies Limited,Shares,1.201938
+HDFC Bank Ltd.,Shares,1.191079
+Titan Company Limited,Shares,1.185909
+Tata Steel Limited,Shares,1.179187
+Godfrey Phillips India Ltd.,Shares,1.094128
+Asian Paints Ltd.,Shares,1.087148
+Coforge Limited,Shares,1.073962
+Ujjivan Small Finance Bank Limited,Shares,1.066206
+Persistent Systems Limited,Shares,1.023548
+National Aluminium Co. Ltd.,Shares,0.991748
+AU Small Finance Bank Limited,Shares,0.966411
+ICICI Bank Ltd.,Shares,0.956845
+Hitachi Energy India Limited,Shares,0.950382
+Bajaj Finance Limited,Shares,0.930216
+Maruti Suzuki India Ltd.,Shares,0.928147
+Infosys Ltd,Shares,0.925304
+Eicher Motors Ltd.,Shares,0.924269
+CarTrade Tech Limited,Shares,0.899708
+HDFC Asset Management Company Limited,Shares,0.884455
+Garware Hi-Tech Films Limited,Shares,0.852396
+Siemens Ltd.,Shares,0.842830
+United Spirits Limited,Shares,0.840245
+HDFC Life Insurance Company Limited,Shares,0.741225
+Jubilant Foodworks Limited,Shares,0.737864
+Max Financial Services Limited,Shares,0.710201
+Muthoot Finance Limited,Shares,0.707615
+Lumax Auto Technologies Ltd.,Shares,0.698050
+Larsen & Toubro Limited,Shares,0.680469
+Bharat Electronics Ltd.,Shares,0.678142
+Hindustan Aeronautics Limited,Shares,0.674523
+Allied Blenders and Distillers Limited,Shares,0.673489
+CreditAccess Grameen Ltd.,Shares,0.493288
+Tube Investments of India Ltd,Shares,0.491220
+Thermax Ltd.,Shares,0.482430
+Crompton Greaves Consumer Electricals Limited,Shares,0.464074
+Net Receivables / Payables,Cash and equivalents,0.404352
+Derivative Positions,Derivatives,-31.940682

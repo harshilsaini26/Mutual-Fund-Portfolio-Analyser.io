@@ -1,0 +1,39 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 63.4% of portfolio value | Unresolved: 36.6% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 36.6% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:08:39.518615+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,36.577212
+Sun Pharmaceutical Industries Ltd.,Shares,10.446197
+Divi's Laboratories Ltd.,Shares,7.094236
+Laurus Labs Limited,Shares,4.442615
+Torrent Pharmaceuticals Ltd.,Shares,4.375688
+Cipla Ltd.,Shares,4.343371
+Max Healthcare Institute Limited,Shares,4.193096
+Dr. Reddy's Laboratories Ltd.,Shares,3.946391
+Lupin Ltd,Shares,2.966348
+Aurobindo Pharma Ltd.,Shares,2.767754
+Fortis Healthcare Ltd,Shares,2.414976
+Glenmark Pharmaceuticals ltd,Shares,2.105461
+Ipca Laboratories Ltd.,Shares,1.718281
+Mankind Pharma Limited,Shares,1.652135
+Biocon Ltd.,Shares,1.474704
+Alkem Laboratories Limited,Shares,1.381245
+Gland Pharma Limited,Shares,1.374990
+Zydus Lifesciences Limited,Shares,1.370976
+Aster DM Healthcare Limited,Shares,1.038892
+Ajanta Pharma Ltd.,Shares,1.011995
+Global Health Limited,Shares,0.703680
+Narayana Hrudayalaya Limited,Shares,0.697529
+GlaxoSmithkline Pharmaceuticals Ltd.,Shares,0.674698
+Wockhardt Ltd,Shares,0.615537
+Anthem Biosciences Limited,Shares,0.546055
+Cash & Bank Balance,Cash and equivalents,0.104249
+Net Receivables / Payables,Cash and equivalents,-0.038311

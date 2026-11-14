@@ -1,0 +1,33 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 91.0% of portfolio value | Unresolved: 9.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 9.0% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:05.526849+00:00
+holding,kind,weight_pct
+TREPS / Repo / Reverse Repo,Cash and equivalents,21.846373
+Derivative Positions,Derivatives,14.458090
+Aurobindo Pharma Ltd.,Shares,9.762632
+Lloyds Metals and Energy Limited,Shares,9.739601
+Not matched to a company,Shares,8.995625
+Samvardhana Motherson International Limited,Shares,8.023723
+Adani Enterprises Ltd.,Shares,6.740233
+Adani Green Energy Limited,Shares,6.169544
+Adani Power Limited,Shares,5.474736
+Zydus Lifesciences Limited,Shares,3.661624
+Sona BLW Precision Forgings Limited,Shares,3.292543
+Premier Energies Limited,Shares,3.102586
+Government Securities,Bonds and other debt,3.084767
+Nippon Life India Asset Management Limited,Shares,3.078493
+Tata Communications Limited,Shares,2.899633
+JSW Infrastructure Limited,Shares,1.855547
+3M India Ltd.,Shares,1.159265
+Life Insurance Corporation of India,Shares,1.154750
+Procter & Gamble Hygiene & Health Care Ltd.,Shares,0.277265
+Bharat Heavy Electricals Ltd.,Shares,0.000139
+Net Receivables / Payables,Cash and equivalents,-14.777169

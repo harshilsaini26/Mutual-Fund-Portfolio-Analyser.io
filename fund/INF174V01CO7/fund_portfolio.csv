@@ -1,0 +1,42 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 89.8% of portfolio value | Unresolved: 10.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 10.2% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:10:59.984037+00:00
+holding,kind,weight_pct
+ICICI Bank Ltd.,Shares,11.878263
+Not matched to a company,Shares,10.176403
+HDFC Bank Ltd.,Shares,10.175370
+AXIS Bank Ltd.,Shares,7.498347
+State Bank Of India,Shares,5.387637
+Multi Commodity Exchange of India Ltd,Shares,4.950005
+Bajaj Finance Limited,Shares,4.537740
+Kotak Mahindra Bank Ltd.,Shares,4.342843
+Ujjivan Small Finance Bank Limited,Shares,4.284603
+Aditya Birla Capital Ltd,Shares,3.792707
+One 97 Communications Limited,Shares,3.336583
+Nippon Life India Asset Management Limited,Shares,2.885043
+Karur Vysya Bank Ltd.,Shares,2.858035
+SBI Life Insurance Company Limited,Shares,2.857990
+Max Financial Services Limited,Shares,2.586000
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.469363
+Angel One Limited,Shares,2.192048
+IndusInd Bank Ltd.,Shares,2.045616
+Bandhan Bank Limited,Shares,1.878199
+PB Fintech Limited,Shares,1.649440
+PNB Housing Finance Limited,Shares,1.250724
+Cholamandalam Investment and Finance Company Ltd,Shares,1.170195
+Bank of maharashtra,Shares,1.070027
+DCB Bank Limited,Shares,1.038166
+Union Bank of India,Shares,0.960557
+L&T Finance Limited,Shares,0.940785
+Bajaj Finserv Limited,Shares,0.855671
+Indian Bank,Shares,0.847448
+Margin / Deposits,Cash and equivalents,0.049432
+Net Receivables / Payables,Cash and equivalents,0.034760

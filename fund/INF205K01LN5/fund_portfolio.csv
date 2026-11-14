@@ -1,0 +1,58 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 70.8% of portfolio value | Unresolved: 29.2% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 29.2% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:10:02.931608+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,29.180371
+HDFC Bank Ltd.,Shares,8.282838
+Net Receivables / Payables,Cash and equivalents,7.201428
+Reliance Industries Ltd,Shares,6.664356
+ICICI Bank Ltd.,Shares,5.122718
+Government Securities,Bonds and other debt,3.827052
+Kotak Mahindra Bank Ltd.,Shares,3.463354
+Infosys Ltd,Shares,2.972305
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.926603
+Tata Consultancy Services Ltd.,Shares,2.497889
+AXIS Bank Ltd.,Shares,2.375899
+ICICI Lombard General Insurance Company Limited,Shares,2.024858
+Larsen & Toubro Limited,Shares,1.998612
+SBI Life Insurance Company Limited,Shares,1.972500
+ITC Ltd,Shares,1.891284
+UltraTech Cement Ltd,Shares,1.662155
+Britannia Industries Ltd.,Shares,1.551117
+Hindustan Unilever Ltd.,Shares,1.521074
+Astral Limited,Shares,1.517563
+Jubilant Foodworks Limited,Shares,1.517231
+Godrej Consumer Products Ltd.,Shares,1.317791
+Tech Mahindra Limited,Shares,1.282620
+InterGlobe Aviation Limited,Shares,1.269420
+Hyundai Motor India Limited,Shares,1.259498
+Bajaj Finance Limited,Shares,1.243042
+Cholamandalam Investment and Finance Company Ltd,Shares,1.216919
+Grasim Industries Ltd,Shares,1.186754
+Varun Beverages Limited,Shares,1.028541
+Cipla Ltd.,Shares,0.998664
+Bharti Airtel Ltd.,Shares,0.836642
+Dr. Lal Pathlabs Limited,Shares,0.726125
+Bajaj Auto Limited,Shares,0.638209
+Tata Motors Limited,Shares,0.583660
+eClerx Services Limited,Shares,0.453453
+Samvardhana Motherson International Limited,Shares,0.451980
+KNR Constructions Limited,Shares,0.393942
+Carborundum Universal Ltd.,Shares,0.355615
+IndusInd Bank Ltd.,Shares,0.299460
+Awfis Space Solutions Limited,Shares,0.288951
+Blue Star Ltd,Shares,0.252152
+Home First Finance Company India Limited,Shares,0.244688
+Tube Investments of India Ltd,Shares,0.197259
+Max Financial Services Limited,Shares,0.152089
+Jio Financial Services Limited,Shares,0.062080
+Derivative Positions,Derivatives,-6.910761

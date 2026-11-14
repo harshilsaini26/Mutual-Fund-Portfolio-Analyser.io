@@ -1,0 +1,46 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 94.1% of portfolio value | Unresolved: 5.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 5.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:09:40.345037+00:00
+holding,kind,weight_pct
+Kotak Mahindra Bank Ltd.,Shares,9.699323
+Reliance Industries Ltd,Shares,9.687493
+Derivative Positions,Derivatives,8.574868
+HDFC Bank Ltd.,Shares,7.229914
+AXIS Bank Ltd.,Shares,7.004049
+Not matched to a company,Shares,5.908016
+NTPC Limited,Shares,4.873025
+ITC Ltd,Shares,4.824873
+Hindustan Unilever Ltd.,Shares,4.600784
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.488276
+State Bank Of India,Shares,4.306935
+Government Securities,Bonds and other debt,4.154764
+Asian Paints Ltd.,Shares,4.117764
+ICICI Bank Ltd.,Shares,3.236047
+HDFC Life Insurance Company Limited,Shares,2.552210
+Bajaj Finserv Limited,Shares,2.472269
+Tata Consumer Products Limited,Shares,2.309912
+Larsen & Toubro Limited,Shares,2.301494
+Godrej Consumer Products Ltd.,Shares,1.907710
+Bajaj Auto Limited,Shares,1.774925
+Life Insurance Corporation of India,Shares,1.612678
+Tata Consultancy Services Ltd.,Shares,1.464366
+Coal India Limited,Shares,1.257946
+Grasim Industries Ltd,Shares,1.161634
+Power Grid Corporation of India Limited,Shares,1.157125
+UltraTech Cement Ltd,Shares,1.117693
+Bajaj Holdings & Investment Limited,Shares,1.100555
+Nestle India Ltd.,Shares,1.069134
+Infosys Ltd,Shares,0.811317
+Britannia Industries Ltd.,Shares,0.788384
+Bharti Airtel Ltd.,Shares,0.716972
+Margin / Deposits,Cash and equivalents,0.244840
+Maruti Suzuki India Ltd.,Shares,0.241967
+Net Receivables / Payables,Cash and equivalents,-8.769262

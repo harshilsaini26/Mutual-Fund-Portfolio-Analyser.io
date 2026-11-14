@@ -1,0 +1,33 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 69.9% of portfolio value | Unresolved: 30.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 30.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:38.032341+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,30.101668
+Bharti Airtel Ltd.,Shares,16.915130
+Infosys Ltd,Shares,8.374169
+Tata Consultancy Services Ltd.,Shares,7.008303
+Coforge Limited,Shares,5.051722
+Amagi Media Labs Limited,Shares,3.967281
+Firstsource Solutions Ltd.,Shares,3.693987
+Swiggy Limited,Shares,3.611674
+TREPS / Repo / Reverse Repo,Cash and equivalents,3.396961
+Persistent Systems Limited,Shares,2.795232
+Tech Mahindra Limited,Shares,2.567595
+HCL Technologies Ltd,Shares,2.368311
+Info Edge(India) Ltd.,Shares,2.054582
+PB Fintech Limited,Shares,1.559494
+L&T Technology Services Limited,Shares,1.554132
+FSN E-Commerce Ventures Limited,Shares,1.540365
+Indegene Limited,Shares,1.269494
+Tbo Tek Limited,Shares,1.216792
+Capillary Technologies India Limited,Shares,1.099370
+Government Securities,Bonds and other debt,0.071690
+Net Receivables / Payables,Cash and equivalents,-0.217952

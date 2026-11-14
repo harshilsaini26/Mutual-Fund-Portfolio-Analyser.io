@@ -1,0 +1,24 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 31 Oct 2026 (14 days old)
+# Coverage: 21.0% of portfolio value | Unresolved: 79.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 79.0% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-11-14T01:13:16.376127+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,79.024032
+Government Securities,Bonds and other debt,7.904996
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.961197
+Alembic Pharmaceuticals Limited,Bonds and other debt,2.204742
+Federal Bank Ltd.,Bonds and other debt,1.480670
+Redington Limited,Bonds and other debt,1.470293
+HDFC Bank Ltd.,Bonds and other debt,1.469373
+Derivative Positions,Derivatives,1.110241
+Canara Bank,Bonds and other debt,0.737608
+Punjab National Bank,Bonds and other debt,0.736303
+PNB Housing Finance Limited,Bonds and other debt,0.367783
+Reliance Industries Ltd,Bonds and other debt,0.367594
+Net Receivables / Payables,Cash and equivalents,0.165168

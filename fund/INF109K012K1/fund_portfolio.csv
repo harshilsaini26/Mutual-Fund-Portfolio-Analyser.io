@@ -1,0 +1,73 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 97.9% of portfolio value | Unresolved: 2.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 2.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:10:01.006473+00:00
+holding,kind,weight_pct
+HDFC Bank Ltd.,Shares,9.451537
+ICICI Bank Ltd.,Shares,8.968662
+Life Insurance Corporation of India,Shares,5.834244
+Reliance Industries Ltd,Shares,5.133146
+ITC Ltd,Shares,4.514781
+Sun Pharmaceutical Industries Ltd.,Shares,4.369311
+Infosys Ltd,Shares,4.151080
+Maruti Suzuki India Ltd.,Shares,3.163032
+AXIS Bank Ltd.,Shares,2.932060
+Hindustan Unilever Ltd.,Shares,2.682676
+Tata Motors Limited,Shares,2.631389
+Tata Consultancy Services Ltd.,Shares,2.579380
+Bharti Airtel Ltd.,Shares,2.497525
+SBI Life Insurance Company Limited,Shares,2.307136
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.301180
+Not matched to a company,Shares,2.144748
+NTPC Limited,Shares,2.090378
+Dr. Reddy's Laboratories Ltd.,Shares,2.060973
+State Bank Of India,Shares,2.016561
+HDFC Life Insurance Company Limited,Shares,1.981463
+Bajaj Finserv Limited,Shares,1.799540
+Kotak Mahindra Bank Ltd.,Shares,1.722078
+Larsen & Toubro Limited,Shares,1.588983
+Oil And Natural Gas Corporation Ltd,Shares,1.582214
+Apollo Tyres Ltd,Shares,1.478153
+UltraTech Cement Ltd,Shares,1.431574
+Cipla Ltd.,Shares,1.347344
+Tata Steel Limited,Shares,1.301136
+Hyundai Motor India Limited,Shares,1.284710
+Asian Paints Ltd.,Shares,1.266391
+ICICI Lombard General Insurance Company Limited,Shares,1.138628
+Lic Housing Finance Ltd.,Shares,1.016471
+Godrej Consumer Products Ltd.,Shares,0.987630
+Coal India Limited,Shares,0.765637
+Government Securities,Bonds and other debt,0.714856
+Hero MotoCorp Limited,Shares,0.603336
+Biocon Ltd.,Shares,0.551468
+JK Lakshmi Cement Limited,Shares,0.538254
+Mphasis Limited,Shares,0.526344
+Central Bank of India,Shares,0.491341
+General Insurance Corporation of India,Shares,0.462900
+Margin / Deposits,Cash and equivalents,0.453860
+ACC Ltd,Shares,0.449076
+Gujarat Gas Limited,Shares,0.339738
+Vedanta Aluminium Metal Limited,Shares,0.328414
+Galaxy Surfactants Limited,Shares,0.318384
+V-Guard Industries Ltd.,Shares,0.311129
+Dabur India Ltd.,Shares,0.298906
+IndusInd Bank Ltd.,Shares,0.268253
+Go Digit General Insurance Limited,Shares,0.259843
+Tata Chemicals Ltd,Shares,0.254989
+Gateway Distriparks Limited,Shares,0.164689
+Hdb Financial Services Limited,Shares,0.138785
+Blue Jet Healthcare Limited,Shares,0.122740
+Pfizer Ltd.,Shares,0.114427
+Sundaram-Clayton Limited,Shares,0.111204
+TTK Prestige Ltd.,Shares,0.032326
+Canara HSBC Life Insurance Company Limited,Shares,0.026544
+Net Receivables / Payables,Cash and equivalents,-0.135286
+Derivative Positions,Derivatives,-0.268271

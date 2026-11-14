@@ -1,0 +1,35 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 81.9% of portfolio value | Unresolved: 18.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 18.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:14.908019+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,73.728556
+Not matched to a company,Shares,18.144408
+Cash & Bank Balance,Cash and equivalents,7.290647
+Samvardhana Motherson International Limited,Shares,6.088213
+Divi's Laboratories Ltd.,Shares,5.651588
+Solar Industries India Limited,Shares,5.513682
+Torrent Pharmaceuticals Ltd.,Shares,5.226940
+Bajaj Auto Limited,Shares,4.832524
+Titan Company Limited,Shares,3.991716
+TVS Motor Company Ltd.,Shares,3.682998
+Hindalco Industries Ltd.,Shares,3.563115
+Zydus Lifesciences Limited,Shares,3.506022
+Nestle India Ltd.,Shares,3.135792
+State Bank Of India,Shares,2.820213
+Vedanta Ltd.,Shares,2.794399
+Grasim Industries Ltd,Shares,2.670214
+JSW Steel Limited,Shares,2.583587
+Bosch Ltd,Shares,2.349518
+Bajaj Finance Limited,Shares,1.855220
+Punjab National Bank,Shares,1.427432
+ICICI Bank Ltd.,Shares,1.426851
+Derivative Positions,Derivatives,-62.283635

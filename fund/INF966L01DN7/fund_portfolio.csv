@@ -1,0 +1,30 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 97.5% of portfolio value | Unresolved: 2.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 2.5% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:02.682468+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,15.914792
+TREPS / Repo / Reverse Repo,Cash and equivalents,10.804763
+ICICI Prudential Asset Management Company Limited,Shares,10.444278
+LG Electronics India Limited,Shares,9.328198
+Capri Global Capital Limited,Shares,9.031560
+Aurobindo Pharma Ltd.,Shares,8.940270
+Nippon Life India Asset Management Limited,Shares,8.765705
+Ventive Hospitality Limited,Shares,8.031653
+Zydus Lifesciences Limited,Shares,7.160332
+Bharti Airtel Ltd.,Shares,4.573866
+Colgate-Palmolive (India) Ltd.,Shares,4.535012
+Government Securities,Bonds and other debt,4.425074
+Emami Ltd,Shares,4.063531
+Adani Power Limited,Shares,3.406687
+Not matched to a company,Bonds and other debt,2.476416
+Procter & Gamble Hygiene & Health Care Ltd.,Shares,2.167699
+Zydus Wellness Limited,Shares,1.860541
+Net Receivables / Payables,Cash and equivalents,-15.930377

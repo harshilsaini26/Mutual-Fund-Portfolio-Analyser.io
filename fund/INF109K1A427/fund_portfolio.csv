@@ -1,0 +1,57 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 95.1% of portfolio value | Unresolved: 4.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 4.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:09:36.895929+00:00
+holding,kind,weight_pct
+Mahindra & Mahindra Ltd.,Shares,7.869552
+CG Power and Industrial Solutions Limited,Shares,7.099792
+UltraTech Cement Ltd,Shares,6.457488
+Not matched to a company,Shares,4.949667
+TVS Motor Company Ltd.,Shares,4.567184
+JSW Steel Limited,Shares,3.995595
+Tata Motors Limited,Shares,3.955241
+Cholamandalam Investment and Finance Company Ltd,Shares,3.819325
+Bajaj Finance Limited,Shares,3.769815
+Samvardhana Motherson International Limited,Shares,3.635196
+APL Apollo Tubes Limited,Shares,3.373541
+Coromandel International Limited,Shares,3.239615
+JSW Infrastructure Limited,Shares,3.173537
+Ambuja Cements Ltd.,Shares,3.086109
+Voltas Ltd.,Shares,2.894304
+Jindal Stainless Limited,Shares,2.598896
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.573382
+Hindalco Industries Ltd.,Shares,2.565785
+Tata Steel Limited,Shares,2.400647
+Piramal Pharma Limited,Shares,2.339795
+Bharti Airtel Ltd.,Shares,1.841030
+Carborundum Universal Ltd.,Shares,1.761434
+Adani Ports and Special Economic Zone Ltd,Shares,1.709606
+Margin / Deposits,Cash and equivalents,1.543919
+Kirloskar Oil Engines Limited,Shares,1.379947
+Indian Hotels Co. Ltd,Shares,1.355808
+Reliance Industries Ltd,Shares,1.243769
+Zensar Technologies Ltd.,Shares,1.243271
+Vedanta Aluminium Metal Limited,Shares,1.206886
+Tata Consumer Products Limited,Shares,1.040727
+Aditya Birla Sun Life AMC Limited,Shares,1.009541
+Grasim Industries Ltd,Shares,0.986161
+Aditya Birla Fashion and Retail Limited,Shares,0.910037
+Aarti Industries Ltd,Shares,0.890089
+Welspun Corp Limited,Shares,0.811384
+Aditya Birla Lifestyle Brands Limited,Shares,0.721546
+IndusInd Bank Ltd.,Shares,0.646941
+Deepak Nitrite Limited,Shares,0.585001
+Vedanta Ltd.,Shares,0.500586
+Ceat Ltd.,Shares,0.499564
+Titan Company Limited,Shares,0.373511
+Gujarat Fluorochemicals Limited,Shares,0.257281
+Net Receivables / Payables,Cash and equivalents,-0.386412
+Derivative Positions,Derivatives,-0.496093

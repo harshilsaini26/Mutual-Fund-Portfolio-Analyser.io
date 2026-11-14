@@ -1,0 +1,29 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-14
+# Data as of: 30 Sep 2026 (45 days old)
+# Coverage: 91.0% of portfolio value | Unresolved: 9.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 9.0% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-14T01:12:04.844241+00:00
+holding,kind,weight_pct
+Derivative Positions,Derivatives,32.109602
+TREPS / Repo / Reverse Repo,Cash and equivalents,26.572665
+GlaxoSmithkline Pharmaceuticals Ltd.,Shares,9.690707
+Zydus Lifesciences Limited,Shares,9.385618
+Strides Pharma Science Limited,Shares,9.036788
+Not matched to a company,Shares,9.014692
+Pfizer Ltd.,Shares,7.367257
+Ipca Laboratories Ltd.,Shares,5.979966
+Aurobindo Pharma Ltd.,Shares,5.087384
+Zydus Wellness Limited,Shares,4.896610
+Government Securities,Bonds and other debt,3.510262
+Colgate-Palmolive (India) Ltd.,Shares,3.449489
+Natco Pharma Ltd.,Shares,3.011524
+Dr. Reddy's Laboratories Ltd.,Shares,2.332848
+LG Electronics India Limited,Shares,0.592723
+Sumitomo Chemical India Limited,Shares,0.260381
+Net Receivables / Payables,Cash and equivalents,-32.298516
