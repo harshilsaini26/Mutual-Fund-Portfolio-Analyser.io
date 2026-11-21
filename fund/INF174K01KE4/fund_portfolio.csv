@@ -1,0 +1,14 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-21
+# Data as of: 15 Nov 2026 (6 days old)
+# Coverage: 86.6% of portfolio value | Unresolved: 13.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 13.4% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+# Generated: 2026-11-21T01:49:02.373416+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,81.891353
+Not matched to a company,Bonds and other debt,13.400163
+TREPS / Repo / Reverse Repo,Cash and equivalents,11.365708
+Net Receivables / Payables,Cash and equivalents,-6.657224
