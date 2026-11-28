@@ -1,0 +1,15 @@
+﻿# View: fund_performance
+# Question: How has it done against its benchmark, for the risk taken?
+# As of: 2026-11-28
+# Data as of: 27 Nov 2026 (1 days old)
+# Coverage: — of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m2, m0
+# Notes:
+#   - The benchmark here is an index fund that tracks the index, not the index itself, whose levels are licensed for personal use. That fund's costs keep it a little behind the index, so this fund's lead over it reads a little larger than over the index.
+# Generated: 2026-11-28T03:20:01.032050+00:00
+measure,1y,3y,5y,meaning
+Return a year,0.002133,0.103984,0.126871,"Annualised, with dividends reinvested."
+Benchmark a year,-0.003143,0.107909,0.097792,"The benchmark over the same days, dividends included."
+Ahead of benchmark,0.005276,-0.003925,0.029079,The fund's return a year less the benchmark's.
+Volatility,0.148161,0.138286,0.136686,"How widely its daily price swings, scaled to a year."
+Deepest fall,-0.145691,-0.163646,-0.163646,The largest fall from a high within the period.

@@ -1,0 +1,67 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 93.4% of portfolio value | Unresolved: 6.6% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 6.6% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:18:40.564969+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,6.587600
+Cash & Bank Balance,Cash and equivalents,4.394243
+One 97 Communications Limited,Shares,3.358947
+Bharti Airtel Ltd.,Shares,3.245210
+Reliance Industries Ltd,Shares,2.992747
+Radico Khaitan Ltd.,Shares,2.939761
+Navin Fluorine International Limited,Shares,2.898975
+HDFC Bank Ltd.,Shares,2.847799
+Bharat Heavy Electricals Ltd.,Shares,2.668704
+Larsen & Toubro Limited,Shares,2.586167
+ICICI Bank Ltd.,Shares,2.442291
+Infosys Ltd,Shares,2.435509
+Eicher Motors Ltd.,Shares,2.411359
+Multi Commodity Exchange of India Ltd,Shares,2.293860
+Titan Company Limited,Shares,2.279564
+State Bank Of India,Shares,2.223981
+Mahindra & Mahindra Ltd.,Shares,2.189109
+Karur Vysya Bank Ltd.,Shares,2.140764
+Federal Bank Ltd.,Shares,2.094538
+Persistent Systems Limited,Shares,2.071724
+Bharat Electronics Ltd.,Shares,1.995656
+IndusInd Bank Ltd.,Shares,1.937617
+Kotak Mahindra Bank Ltd.,Shares,1.897436
+NLC India Limited,Shares,1.887023
+Cummins India Ltd.,Shares,1.830268
+Sun Pharmaceutical Industries Ltd.,Shares,1.776095
+Lupin Ltd,Shares,1.756598
+AXIS Bank Ltd.,Shares,1.750895
+Britannia Industries Ltd.,Shares,1.668889
+Indian Hotels Co. Ltd,Shares,1.668169
+Tech Mahindra Limited,Shares,1.622765
+NHPC Limited,Shares,1.597776
+Hindustan Petroleum Corporation Ltd,Shares,1.574837
+Samvardhana Motherson International Limited,Shares,1.447432
+Ajanta Pharma Ltd.,Shares,1.352170
+Pidilite Industries Ltd.,Shares,1.251667
+Linde India Limited,Shares,1.242207
+GE Vernova T&D India Limited,Shares,1.239335
+Solar Industries India Limited,Shares,1.159179
+UltraTech Cement Ltd,Shares,1.135029
+UNO Minda Limited,Shares,1.112421
+Blue Star Ltd,Shares,1.087381
+Life Insurance Corporation of India,Shares,1.083071
+Smartworks Coworking Spaces Limited,Shares,1.036941
+Lloyds Metals and Energy Limited,Shares,1.031666
+Derivative Positions,Derivatives,1.008299
+KEI Industries Ltd.,Shares,0.968552
+RBL Bank Limited,Shares,0.901755
+Zydus Lifesciences Limited,Shares,0.895949
+Government Securities,Bonds and other debt,0.841415
+Tata Motors Limited,Shares,0.814611
+National Aluminium Co. Ltd.,Shares,0.484870
+LG Electronics India Limited,Shares,0.426831
+Cochin Shipyard Limited,Shares,0.400751
+Net Receivables / Payables,Cash and equivalents,-0.988408

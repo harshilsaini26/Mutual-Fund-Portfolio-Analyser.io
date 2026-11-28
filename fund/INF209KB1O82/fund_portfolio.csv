@@ -1,0 +1,47 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 95.9% of portfolio value | Unresolved: 4.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 4.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:17:37.682388+00:00
+holding,kind,weight_pct
+State Bank Of India,Shares,17.239071
+NTPC Limited,Shares,7.313661
+Power Grid Corporation of India Limited,Shares,6.564063
+Bharat Heavy Electricals Ltd.,Shares,6.316113
+Union Bank of India,Shares,5.129157
+Bank of maharashtra,Shares,4.650443
+Bharat Electronics Ltd.,Shares,4.631666
+Not matched to a company,Shares,4.086620
+Gail (India) Ltd.,Shares,3.853220
+PNB Housing Finance Limited,Shares,3.636502
+Life Insurance Corporation of India,Shares,3.423124
+Bank of India,Shares,3.120089
+Oil And Natural Gas Corporation Ltd,Shares,3.110616
+Hindustan Aeronautics Limited,Shares,2.838500
+NMDC Ltd,Shares,2.814051
+Coal India Limited,Shares,2.510954
+Bank Of Baroda,Shares,2.457259
+TREPS / Repo / Reverse Repo,Cash and equivalents,2.095614
+Hindustan Petroleum Corporation Ltd,Shares,2.023739
+SBI Life Insurance Company Limited,Shares,1.765914
+Indian Oil Corporation Ltd.,Shares,1.747754
+Oil India Limited,Shares,1.537826
+Mahanagar Gas Limited,Shares,1.299483
+National Aluminium Co. Ltd.,Shares,0.970801
+Margin / Deposits,Cash and equivalents,0.964092
+Power Finance Corporation Ltd,Shares,0.794035
+BEML Ltd,Shares,0.731608
+Steel Authority of India Ltd.,Shares,0.606577
+Canara Robeco Asset Management Company Limited,Shares,0.601317
+Derivative Positions,Derivatives,0.430465
+Container Corporation Of India Ltd.,Shares,0.423771
+Indian Railway Catering & Tourism Corporation Ltd,Shares,0.359051
+Indian Bank,Shares,0.355009
+Gujarat Gas Limited,Shares,0.223845
+Net Receivables / Payables,Cash and equivalents,-0.626010

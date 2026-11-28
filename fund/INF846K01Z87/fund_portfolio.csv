@@ -1,0 +1,38 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 79.7% of portfolio value | Unresolved: 20.3% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 20.3% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:17:59.567605+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,20.349701
+Adani Enterprises Ltd.,Shares,4.665349
+Dlf Limited,Shares,4.344740
+Infosys Ltd,Shares,3.861279
+InterGlobe Aviation Limited,Shares,3.848204
+Bajaj Holdings & Investment Limited,Shares,3.745319
+Bajaj Finance Limited,Shares,3.654774
+Grasim Industries Ltd,Shares,3.643043
+Larsen & Toubro Limited,Shares,3.627036
+Cholamandalam Investment and Finance Company Ltd,Shares,3.617546
+State Bank Of India,Shares,3.591220
+HDFC Life Insurance Company Limited,Shares,3.563265
+Reliance Industries Ltd,Shares,3.558554
+Hindustan Unilever Ltd.,Shares,3.544176
+Pidilite Industries Ltd.,Shares,3.472707
+Government Securities,Bonds and other debt,3.366169
+Jio Financial Services Limited,Shares,3.331779
+HDFC Bank Ltd.,Shares,3.292134
+Hyundai Motor India Limited,Shares,3.243189
+Mahindra & Mahindra Ltd.,Shares,3.224059
+Cash & Bank Balance,Cash and equivalents,2.972832
+Bajaj Finserv Limited,Shares,2.490498
+Ambuja Cements Ltd.,Shares,1.850984
+Anthem Biosciences Limited,Shares,1.298375
+Net Receivables / Payables,Cash and equivalents,1.178274
+Derivative Positions,Derivatives,0.664794

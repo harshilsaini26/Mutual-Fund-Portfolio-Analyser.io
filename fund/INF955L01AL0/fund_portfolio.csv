@@ -1,0 +1,18 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 13.7% of portfolio value | Unresolved: 86.3% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 86.3% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-11-28T03:18:41.280171+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,86.281644
+Government Securities,Bonds and other debt,8.992988
+Cash & Bank Balance,Cash and equivalents,4.065877
+Derivative Positions,Derivatives,0.845280
+Canara Bank,Bonds and other debt,0.175492
+Lic Housing Finance Ltd.,Bonds and other debt,0.174985
+Net Receivables / Payables,Cash and equivalents,-0.536266

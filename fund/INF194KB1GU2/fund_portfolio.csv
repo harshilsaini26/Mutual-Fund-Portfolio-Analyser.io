@@ -1,0 +1,55 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 94.3% of portfolio value | Unresolved: 5.7% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 5.7% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:18:25.146422+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,21.390329
+Margin / Deposits,Cash and equivalents,9.387233
+HDFC Bank Ltd.,Shares,6.926718
+Reliance Industries Ltd,Shares,6.422411
+ICICI Bank Ltd.,Shares,6.070190
+Not matched to a company,Shares,5.720483
+Kotak Mahindra Bank Ltd.,Shares,4.826135
+Titan Company Limited,Shares,4.384960
+Bharti Airtel Ltd.,Shares,4.031254
+Infosys Ltd,Shares,3.723596
+Maruti Suzuki India Ltd.,Shares,3.190552
+AXIS Bank Ltd.,Shares,2.642139
+Tata Consultancy Services Ltd.,Shares,2.502165
+Larsen & Toubro Limited,Shares,2.322599
+ITC Ltd,Shares,2.169941
+Bajaj Finserv Limited,Shares,2.000772
+Oil And Natural Gas Corporation Ltd,Shares,1.931585
+Cipla Ltd.,Shares,1.663406
+HDFC Life Insurance Company Limited,Shares,1.499437
+Life Insurance Corporation of India,Shares,1.423222
+Cholamandalam Investment and Finance Company Ltd,Shares,1.359177
+Hindustan Unilever Ltd.,Shares,1.278335
+Hero MotoCorp Limited,Shares,1.238399
+ICICI Prudential Life Insurance Company Limited,Shares,1.171212
+Bajaj Finance Limited,Shares,1.073058
+Info Edge(India) Ltd.,Shares,1.019468
+Coal India Limited,Shares,0.958394
+SBI Life Insurance Company Limited,Shares,0.947596
+United Spirits Limited,Shares,0.761973
+Tata Motors Limited,Shares,0.758145
+Lupin Ltd,Shares,0.721181
+Dabur India Ltd.,Shares,0.710154
+Emami Ltd,Shares,0.616629
+Swiggy Limited,Shares,0.504478
+Varun Beverages Limited,Shares,0.410381
+Dhanuka Agritech Ltd.,Shares,0.390156
+Sonata Software Ltd.,Shares,0.383415
+Net Receivables / Payables,Cash and equivalents,0.347935
+Sobha Limited,Shares,0.315713
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.039821
+Cash & Bank Balance,Cash and equivalents,0.009655
+Derivative Positions,Derivatives,-9.244402

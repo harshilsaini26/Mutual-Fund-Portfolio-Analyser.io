@@ -1,0 +1,52 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 85.0% of portfolio value | Unresolved: 15.0% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 15.0% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:17:38.813483+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,30.841832
+TREPS / Repo / Reverse Repo,Cash and equivalents,28.794491
+Not matched to a company,Bonds and other debt,15.038694
+Net Receivables / Payables,Cash and equivalents,2.485194
+ICICI Bank Ltd.,Shares,1.851691
+TD Power Systems Ltd,Shares,1.628413
+HDFC Bank Ltd.,Shares,1.573161
+Metropolis Healthcare Limited,Shares,1.239002
+Hindalco Industries Ltd.,Shares,1.171640
+Bharti Airtel Ltd.,Shares,1.120551
+State Bank Of India,Shares,1.031997
+Federal Bank Ltd.,Shares,0.964257
+Fortis Healthcare Ltd,Shares,0.947605
+Bajaj Finance Limited,Shares,0.888569
+S.J.S. Enterprises Limited,Shares,0.785635
+UltraTech Cement Ltd,Shares,0.785635
+AXIS Bank Ltd.,Shares,0.782985
+Sun Pharmaceutical Industries Ltd.,Shares,0.672860
+Max Financial Services Limited,Shares,0.672104
+Torrent Pharmaceuticals Ltd.,Shares,0.633881
+Bajaj Auto Limited,Shares,0.568033
+Larsen & Toubro Limited,Shares,0.536245
+Sona BLW Precision Forgings Limited,Shares,0.535109
+Bank of maharashtra,Shares,0.519594
+Tech Mahindra Limited,Shares,0.474560
+Bank Of Baroda,Shares,0.352325
+Kotak Mahindra Bank Ltd.,Shares,0.349297
+Godrej Consumer Products Ltd.,Shares,0.344756
+Infosys Ltd,Shares,0.314102
+SBFC Finance Limited,Shares,0.300479
+Avenue Supermarts Limited,Shares,0.290639
+SBI Life Insurance Company Limited,Shares,0.251660
+Vinati Organics Ltd.,Shares,0.227062
+Whirlpool of India Ltd,Shares,0.209654
+NTPC Limited,Shares,0.191489
+Mrs. Bectors Food Specialities Limited,Shares,0.183542
+Cipla Ltd.,Shares,0.165755
+Praj Industries Ltd.,Shares,0.121100
+Cholamandalam Investment and Finance Company Ltd,Shares,0.101421
+V-Guard Industries Ltd.,Shares,0.052981

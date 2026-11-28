@@ -1,0 +1,17 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 15.6% of portfolio value | Unresolved: 84.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 84.4% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+# Generated: 2026-11-28T03:17:46.068171+00:00
+holding,kind,weight_pct
+Not matched to a company,Bonds and other debt,84.388051
+Cash & Bank Balance,Cash and equivalents,6.517569
+Government Securities,Bonds and other debt,6.336336
+Net Receivables / Payables,Cash and equivalents,2.418339
+Lic Housing Finance Ltd.,Bonds and other debt,0.334123
+Derivative Positions,Derivatives,0.005582

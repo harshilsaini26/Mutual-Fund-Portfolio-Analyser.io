@@ -1,0 +1,44 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 79.6% of portfolio value | Unresolved: 20.4% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 20.4% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:17:22.303738+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,20.405978
+Infosys Ltd,Shares,10.784951
+Tata Consultancy Services Ltd.,Shares,8.295811
+Tech Mahindra Limited,Shares,7.820387
+Bharti Airtel Ltd.,Shares,7.059182
+Persistent Systems Limited,Shares,5.265488
+Coforge Limited,Shares,5.250702
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.108108
+HCL Technologies Ltd,Shares,3.647768
+Cyient Limited,Shares,3.111621
+Swiggy Limited,Shares,2.804827
+One 97 Communications Limited,Shares,2.261301
+Cyient DLM Limited,Shares,1.843869
+RateGain Travel Technologies Limited,Shares,1.674977
+Vodafone Idea Limited,Shares,1.490587
+Firstsource Solutions Ltd.,Shares,1.487262
+Physicswallah Limited,Shares,1.435113
+KPIT Technologies Ltd,Shares,1.341639
+Sonata Software Ltd.,Shares,1.261867
+Capillary Technologies India Limited,Shares,1.168033
+Urban Company Limited,Shares,1.157896
+Ather Energy Limited,Shares,1.141191
+eClerx Services Limited,Shares,1.093253
+PB Fintech Limited,Shares,0.911531
+Mastek Limited,Shares,0.832773
+Dynamatic Technologies Ltd.,Shares,0.817282
+Derivative Positions,Derivatives,0.700411
+Margin / Deposits,Cash and equivalents,0.548494
+Mphasis Limited,Shares,0.468738
+Sedemac Mechatronics Limited,Shares,0.456720
+CMS Info Systems Limited,Shares,0.386396
+Net Receivables / Payables,Cash and equivalents,-1.034156

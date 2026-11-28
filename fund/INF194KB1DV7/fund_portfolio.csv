@@ -1,0 +1,45 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 96.1% of portfolio value | Unresolved: 3.9% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 3.9% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:18:24.337866+00:00
+holding,kind,weight_pct
+Bharti Airtel Ltd.,Shares,4.047883
+ICICI Bank Ltd.,Shares,4.013730
+Kotak Mahindra Bank Ltd.,Shares,3.967464
+Not matched to a company,Shares,3.889341
+Sun Pharmaceutical Industries Ltd.,Shares,3.690562
+NTPC Limited,Shares,3.669721
+Dr. Reddy's Laboratories Ltd.,Shares,3.497246
+SBI Life Insurance Company Limited,Shares,3.491242
+ITC Ltd,Shares,3.490363
+Wipro Ltd.,Shares,3.487739
+Britannia Industries Ltd.,Shares,3.487490
+Cipla Ltd.,Shares,3.456616
+Power Grid Corporation of India Limited,Shares,3.407754
+Reliance Industries Ltd,Shares,3.360456
+Hindustan Unilever Ltd.,Shares,3.304975
+HDFC Bank Ltd.,Shares,3.273173
+HDFC Life Insurance Company Limited,Shares,3.252900
+Tata Power Co. Ltd,Shares,3.249306
+Torrent Pharmaceuticals Ltd.,Shares,3.148577
+UltraTech Cement Ltd,Shares,3.139984
+Tata Consultancy Services Ltd.,Shares,3.115529
+Nestle India Ltd.,Shares,3.100601
+State Bank Of India,Shares,3.050465
+Maruti Suzuki India Ltd.,Shares,2.974357
+Bajaj Auto Limited,Shares,2.937023
+Pidilite Industries Ltd.,Shares,2.925668
+Larsen & Toubro Limited,Shares,2.907340
+Asian Paints Ltd.,Shares,2.900028
+Titan Company Limited,Shares,2.877387
+Bajaj Finserv Limited,Shares,2.871599
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.062772
+Cash & Bank Balance,Cash and equivalents,0.000402
+Net Receivables / Payables,Cash and equivalents,-0.049693

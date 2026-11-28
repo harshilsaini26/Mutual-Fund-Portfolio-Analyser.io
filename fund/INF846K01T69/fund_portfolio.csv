@@ -1,0 +1,49 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 95.2% of portfolio value | Unresolved: 4.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 4.8% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:18:00.091305+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,55.505414
+Cash & Bank Balance,Cash and equivalents,5.237016
+Not matched to a company,Shares,4.759457
+Reliance Industries Ltd,Shares,4.542343
+Bharti Airtel Ltd.,Shares,2.654924
+Infosys Ltd,Shares,2.612516
+State Bank Of India,Shares,2.203640
+ICICI Bank Ltd.,Shares,1.980073
+HDFC Bank Ltd.,Shares,1.963478
+Life Insurance Corporation of India,Shares,1.741984
+HCL Technologies Ltd,Shares,1.641264
+Kotak Mahindra Bank Ltd.,Shares,1.422536
+ITC Ltd,Shares,1.388425
+Larsen & Toubro Limited,Shares,1.194820
+Mahindra & Mahindra Ltd.,Shares,1.165318
+NTPC Limited,Shares,1.068746
+Sun Pharmaceutical Industries Ltd.,Shares,0.885743
+Varun Beverages Limited,Shares,0.880903
+Net Receivables / Payables,Cash and equivalents,0.810836
+Tech Mahindra Limited,Shares,0.786175
+Mankind Pharma Limited,Shares,0.703201
+Britannia Industries Ltd.,Shares,0.679001
+Cipla Ltd.,Shares,0.596488
+HDFC Life Insurance Company Limited,Shares,0.504986
+Info Edge(India) Ltd.,Shares,0.497150
+Tata Consultancy Services Ltd.,Shares,0.453358
+AXIS Bank Ltd.,Shares,0.298935
+Indus Towers Limited,Shares,0.291560
+Cyient DLM Limited,Shares,0.266437
+Torrent Pharmaceuticals Ltd.,Shares,0.220110
+Hindustan Unilever Ltd.,Shares,0.208356
+BSE Ltd.,Shares,0.204668
+Bajaj Finance Limited,Shares,0.193605
+Sundaram Finance Ltd,Shares,0.168943
+Global Health Limited,Shares,0.142208
+ITC Hotels Limited,Shares,0.087353
+Hero MotoCorp Limited,Shares,0.038030

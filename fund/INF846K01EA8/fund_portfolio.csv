@@ -1,0 +1,45 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 72.5% of portfolio value | Unresolved: 27.5% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 27.5% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:17:45.571521+00:00
+holding,kind,weight_pct
+Government Securities,Bonds and other debt,49.084821
+Not matched to a company,Bonds and other debt,27.533797
+Cash & Bank Balance,Cash and equivalents,3.562330
+Reliance Industries Ltd,Shares,1.766882
+ICICI Bank Ltd.,Shares,1.710828
+Net Receivables / Payables,Cash and equivalents,1.641525
+HDFC Bank Ltd.,Shares,1.506959
+Infosys Ltd,Shares,1.361774
+Cholamandalam Investment and Finance Company Ltd,Shares,1.121868
+Cipla Ltd.,Shares,1.058109
+Kotak Mahindra Bank Ltd.,Shares,1.011076
+Bharti Airtel Ltd.,Shares,0.959346
+NTPC Limited,Shares,0.913441
+State Bank Of India,Shares,0.856824
+Divi's Laboratories Ltd.,Shares,0.679172
+Larsen & Toubro Limited,Shares,0.575382
+Mahindra & Mahindra Ltd.,Shares,0.531685
+ITC Ltd,Shares,0.526047
+HDFC Life Insurance Company Limited,Shares,0.505938
+Titan Company Limited,Shares,0.464450
+Britannia Industries Ltd.,Shares,0.462194
+AXIS Bank Ltd.,Shares,0.436070
+Tech Mahindra Limited,Shares,0.285342
+Sun Pharmaceutical Industries Ltd.,Shares,0.279750
+Tata Consultancy Services Ltd.,Shares,0.278341
+Bajaj Finance Limited,Shares,0.180705
+Hindustan Unilever Ltd.,Shares,0.156273
+Indus Towers Limited,Shares,0.148004
+InterGlobe Aviation Limited,Shares,0.140956
+HCL Technologies Ltd,Shares,0.106751
+BSE Ltd.,Shares,0.101770
+Sundaram Finance Ltd,Shares,0.025936
+Tata Motors Limited,Shares,0.025654

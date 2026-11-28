@@ -1,0 +1,74 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 84.2% of portfolio value | Unresolved: 15.8% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 15.8% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:18:35.621376+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,15.771397
+Cash & Bank Balance,Cash and equivalents,6.452238
+Government Securities,Bonds and other debt,3.487252
+HDFC Bank Ltd.,Shares,3.035023
+Reliance Industries Ltd,Shares,2.857793
+Larsen & Toubro Limited,Shares,2.713787
+Bharti Airtel Ltd.,Shares,2.593920
+Infosys Ltd,Shares,2.491803
+ICICI Bank Ltd.,Shares,2.204772
+Multi Commodity Exchange of India Ltd,Shares,2.123367
+Bharat Heavy Electricals Ltd.,Shares,2.037601
+Eicher Motors Ltd.,Shares,2.024283
+One 97 Communications Limited,Shares,1.947399
+Kotak Mahindra Bank Ltd.,Shares,1.811874
+Mahindra & Mahindra Ltd.,Shares,1.797295
+JSW Steel Limited,Shares,1.746715
+Sun Pharmaceutical Industries Ltd.,Shares,1.730613
+Radico Khaitan Ltd.,Shares,1.718692
+Karur Vysya Bank Ltd.,Shares,1.653607
+Samvardhana Motherson International Limited,Shares,1.645431
+Bharat Electronics Ltd.,Shares,1.555642
+Titan Company Limited,Shares,1.554836
+State Bank Of India,Shares,1.516925
+IndusInd Bank Ltd.,Shares,1.468446
+Federal Bank Ltd.,Shares,1.428634
+Marico Limited,Shares,1.401858
+Power Grid Corporation of India Limited,Shares,1.393097
+Navin Fluorine International Limited,Shares,1.368914
+Cummins India Ltd.,Shares,1.300399
+Hindustan Petroleum Corporation Ltd,Shares,1.292967
+Hitachi Energy India Limited,Shares,1.288090
+InterGlobe Aviation Limited,Shares,1.282069
+UltraTech Cement Ltd,Shares,1.258037
+Tech Mahindra Limited,Shares,1.255224
+AXIS Bank Ltd.,Shares,1.194243
+Persistent Systems Limited,Shares,1.165785
+NTPC Limited,Shares,1.108344
+Ajanta Pharma Ltd.,Shares,1.106740
+GE Vernova T&D India Limited,Shares,1.056651
+Solar Industries India Limited,Shares,1.054197
+Hindustan Unilever Ltd.,Shares,1.045562
+Polycab India Limited,Shares,1.023401
+Life Insurance Corporation of India,Shares,1.007367
+Maruti Suzuki India Ltd.,Shares,0.998561
+NHPC Limited,Shares,0.994447
+Pidilite Industries Ltd.,Shares,0.973254
+Nestle India Ltd.,Shares,0.920232
+Tata Consumer Products Limited,Shares,0.898854
+Lupin Ltd,Shares,0.880980
+Fractal Analytics Limited,Shares,0.854314
+Vedanta Aluminium Metal Limited,Shares,0.843231
+Tata Motors Limited,Shares,0.833440
+Amber Enterprises India Limited,Shares,0.770804
+Yes Bank Ltd.,Shares,0.663692
+Container Corporation Of India Ltd.,Shares,0.616418
+Smartworks Coworking Spaces Limited,Shares,0.471515
+Muthoot Finance Limited,Shares,0.468960
+National Securities Depository Limited,Shares,0.063753
+Amagi Media Labs Limited,Shares,0.045843
+Derivative Positions,Derivatives,-0.309073
+Net Receivables / Payables,Cash and equivalents,-1.961515

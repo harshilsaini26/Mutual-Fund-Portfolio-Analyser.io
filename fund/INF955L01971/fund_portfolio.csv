@@ -1,0 +1,47 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 89.9% of portfolio value | Unresolved: 10.1% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 10.1% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:18:36.041882+00:00
+holding,kind,weight_pct
+Not matched to a company,Shares,10.098152
+ICICI Bank Ltd.,Shares,9.860934
+State Bank Of India,Shares,7.180273
+Kotak Mahindra Bank Ltd.,Shares,6.674687
+HDFC Bank Ltd.,Shares,6.176291
+AXIS Bank Ltd.,Shares,5.555907
+Bajaj Finance Limited,Shares,5.118545
+Multi Commodity Exchange of India Ltd,Shares,3.498842
+Cash & Bank Balance,Cash and equivalents,3.461575
+One 97 Communications Limited,Shares,3.378264
+PNB Housing Finance Limited,Shares,3.250339
+Karur Vysya Bank Ltd.,Shares,3.139735
+Cholamandalam Investment and Finance Company Ltd,Shares,2.896464
+BSE Ltd.,Shares,2.813114
+Ujjivan Small Finance Bank Limited,Shares,2.246847
+RBL Bank Limited,Shares,2.063179
+Aditya Birla Capital Ltd,Shares,2.063042
+IndusInd Bank Ltd.,Shares,1.806114
+Union Bank of India,Shares,1.731072
+SBI Life Insurance Company Limited,Shares,1.624876
+City Union Bank Ltd,Shares,1.580634
+AU Small Finance Bank Limited,Shares,1.574364
+Federal Bank Ltd.,Shares,1.464289
+ICICI Prudential Asset Management Company Limited,Shares,1.431999
+Prudent Corporate Advisory Services Limited,Shares,1.377373
+PB Fintech Limited,Shares,1.332484
+Billionbrains Garage Ventures Limited,Shares,1.286557
+L&T Finance Limited,Shares,1.005609
+Mahindra & Mahindra Financial Services Limited,Shares,0.974240
+Government Securities,Bonds and other debt,0.962562
+Jammu and Kashmir Bank Ltd.,Shares,0.792178
+Life Insurance Corporation of India,Shares,0.721819
+Max Financial Services Limited,Shares,0.705360
+Derivative Positions,Derivatives,0.322252
+Net Receivables / Payables,Cash and equivalents,-0.169972

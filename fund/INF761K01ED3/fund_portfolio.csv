@@ -1,0 +1,50 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 100.0% of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 1 holding with a negative weight (written options or borrowing) are listed in the table and not drawn in the pictures.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:18:28.130096+00:00
+holding,kind,weight_pct
+Net Receivables / Payables,Cash and equivalents,76.517260
+Units of Other Schemes,Other funds,18.260375
+HDFC Bank Ltd.,Shares,5.008606
+Tata Steel Limited,Shares,4.789488
+Bharat Forge Ltd,Shares,4.328765
+Canara Bank,Shares,4.315532
+TREPS / Repo / Reverse Repo,Cash and equivalents,4.220871
+Vedanta Ltd.,Shares,3.820306
+Reliance Industries Ltd,Shares,3.688300
+Vodafone Idea Limited,Shares,3.363642
+Bajaj Finance Limited,Shares,3.202085
+UPL Limited,Shares,2.767097
+Container Corporation Of India Ltd.,Shares,2.687861
+JSW Steel Limited,Shares,2.594661
+NTPC Limited,Shares,2.580292
+Samvardhana Motherson International Limited,Shares,2.578587
+Power Finance Corporation Ltd,Shares,2.449178
+Hindustan Unilever Ltd.,Shares,2.316036
+State Bank Of India,Shares,1.932682
+AXIS Bank Ltd.,Shares,1.852552
+Bank Of Baroda,Shares,1.756430
+Siemens Energy India Limited,Shares,1.632948
+United Spirits Limited,Shares,1.602504
+Divi's Laboratories Ltd.,Shares,1.587972
+Aurobindo Pharma Ltd.,Shares,1.576606
+Nestle India Ltd.,Shares,1.515880
+HDFC Life Insurance Company Limited,Shares,1.406280
+Indian Bank,Shares,1.194551
+Government Securities,Bonds and other debt,1.160372
+Tube Investments of India Ltd,Shares,1.135936
+Ambuja Cements Ltd.,Shares,1.051098
+Biocon Ltd.,Shares,0.928265
+JSW Energy Limited,Shares,0.829707
+Oil And Natural Gas Corporation Ltd,Shares,0.741053
+Godrej Properties Limited,Shares,0.330990
+Bank of maharashtra,Shares,0.214652
+UltraTech Cement Ltd,Shares,0.089709
+Derivative Positions,Derivatives,-72.029129

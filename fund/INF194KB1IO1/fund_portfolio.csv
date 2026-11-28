@@ -1,0 +1,28 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 100.0% of portfolio value | Unresolved: — | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:18:22.925455+00:00
+holding,kind,weight_pct
+HDFC Bank Ltd.,Shares,18.174084
+ICICI Bank Ltd.,Shares,14.981932
+Kotak Mahindra Bank Ltd.,Shares,11.279317
+AXIS Bank Ltd.,Shares,9.969828
+State Bank Of India,Shares,9.937376
+Federal Bank Ltd.,Shares,7.014051
+IndusInd Bank Ltd.,Shares,4.614346
+AU Small Finance Bank Limited,Shares,4.142035
+IDFC First Bank Limited,Shares,4.009595
+Bank Of Baroda,Shares,3.712263
+Punjab National Bank,Shares,3.550003
+Canara Bank,Shares,3.308366
+Union Bank of India,Shares,3.107952
+Yes Bank Ltd.,Shares,2.172979
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.173224
+Cash & Bank Balance,Cash and equivalents,0.002631
+Net Receivables / Payables,Cash and equivalents,-0.149982

@@ -1,0 +1,44 @@
+﻿# View: fund_portfolio
+# Question: What does this fund own?
+# As of: 2026-11-28
+# Data as of: 31 Oct 2026 (28 days old)
+# Coverage: 92.7% of portfolio value | Unresolved: 7.3% | Confidence: medium
+# Source modules: m3, m0
+# Notes:
+#   - 7.3% of this fund's portfolio could not be identified to a company; it is shown as a separate block.
+#   - This portfolio comes from Groww's page for the fund, an aggregator, not from the fund house's own file. The page carries no ISINs, so more of it is unresolved than the fund house's file would leave.
+#   - Sectors are as the fund house labels them; two fund houses may name the same sector differently.
+# Generated: 2026-11-28T03:18:24.639669+00:00
+holding,kind,weight_pct
+Laurus Labs Limited,Shares,8.215672
+Not matched to a company,Shares,7.306445
+Multi Commodity Exchange of India Ltd,Shares,6.036882
+Hindalco Industries Ltd.,Shares,4.871502
+BSE Ltd.,Shares,4.856977
+NTPC Limited,Shares,4.763015
+Tata Steel Limited,Shares,4.739614
+Adani Power Limited,Shares,4.423568
+Cummins India Ltd.,Shares,4.309881
+GE Vernova T&D India Limited,Shares,4.278590
+Federal Bank Ltd.,Shares,4.139530
+Vedanta Ltd.,Shares,4.041444
+Bharat Heavy Electricals Ltd.,Shares,3.512549
+Samvardhana Motherson International Limited,Shares,3.312072
+CG Power and Industrial Solutions Limited,Shares,2.953797
+Bharat Forge Ltd,Shares,2.950211
+Torrent Pharmaceuticals Ltd.,Shares,2.828813
+Hitachi Energy India Limited,Shares,2.665545
+National Aluminium Co. Ltd.,Shares,2.529982
+Polycab India Limited,Shares,2.485511
+Adani Green Energy Limited,Shares,2.175921
+Solar Industries India Limited,Shares,2.130553
+Vodafone Idea Limited,Shares,1.908828
+ABB India Limited,Shares,1.808859
+Glenmark Pharmaceuticals ltd,Shares,1.781961
+Steel Authority of India Ltd.,Shares,1.542573
+Aditya Birla Capital Ltd,Shares,1.345415
+KEI Industries Ltd.,Shares,1.238811
+L&T Finance Limited,Shares,0.837499
+TREPS / Repo / Reverse Repo,Cash and equivalents,0.159054
+Cash & Bank Balance,Cash and equivalents,0.001166
+Net Receivables / Payables,Cash and equivalents,-0.152240
